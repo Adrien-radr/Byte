@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 int main() {
-    char c;
-    printf("%c\n", EOF);
+    printf( "Hello, Byte World!!\n" );
+
+    return 0;
 }
