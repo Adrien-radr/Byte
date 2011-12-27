@@ -12,9 +12,12 @@ ARCH = 64
 
 CC = gcc
 
-CFLAGS = -Wall -g -Isrc/ -lX11 -lXrandr -lGL -llua -lIL -lILU
+CFLAGS = -Wall -g -Isrc/ -lX11 -lXrandr -lGL -llua -lIL -lILU -std=c99
 
 OBJ = \
+src/clock.o\
+src/color.o\
+src/common.o\
 src/main.o
 
 
@@ -33,7 +36,7 @@ all:
 byte: $(OBJ)
 	@ $(CC) $(CFLAGS) $(OBJ) $(LIB) -o bin/byte
 	
-%.o: %.cpp
+%.o: %.c
 	@ $(CC) $(CFLAGS) -c $< -o $@
 	@echo "CC	$@"
 
