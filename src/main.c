@@ -2,6 +2,7 @@
 #include "keys.h"
 #include "color.h"
 #include "clock.h"
+#include "vector.h"
 
 int main() {
     printf( "Hello, Byte World!!\n" );
@@ -17,7 +18,16 @@ int main() {
     printf( "%s\n", date );
 
 
+    vec2 a = { .x = 2.f, .y = 3.f }, b = { .x= 5.f, .y = -6.f };
 
+    vec2 c = vec2_add( &a, &b );
+    log_info( "a + b = { %f, %f }", c.x, c.y );
+
+    c = vec2_sub( &a, &b );
+    log_info( "a - b = { %f, %f }", c.x, c.y );
+
+    vec2_normalize( &c );
+    log_info( "c normalized = { %f, %f }", c.x, c.y );
 
     enum Key kA = K_A;
     printf( "%d\n", kA );
@@ -28,12 +38,6 @@ int main() {
     check( Color_cmp( &col1, &col2 ), "col1 & col2 not equal" );
 
 
-    Clock c;
-    Clock_reset( &c );
-    Clock_sleep( 2000 );
-
-    f32 t = Clock_getElapsedTime( &c );
-    log_info( "Time : %f", t );
 
 
     return 0;

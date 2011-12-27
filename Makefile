@@ -18,7 +18,8 @@ OBJ = \
 src/clock.o\
 src/color.o\
 src/common.o\
-src/main.o
+src/main.o\
+src/vector.o
 
 
 LIB = \
