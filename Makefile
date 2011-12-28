@@ -17,6 +17,7 @@ CFLAGS = -Wall -g -Isrc/ -lX11 -lXrandr -lGL -llua -lIL -lILU -std=c99
 OBJ = \
 src/clock.o\
 src/color.o\
+src/context.o\
 src/common.o\
 src/main.o\
 src/vector.o

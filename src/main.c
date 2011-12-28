@@ -3,13 +3,25 @@
 #include "color.h"
 #include "clock.h"
 #include "vector.h"
+#include "context.h"
+
+
+void Clean() {
+    Context_destroy();
+
+
+    CloseLog();
+}
 
 int main() {
+    InitLog();
+
+
     printf( "Hello, Byte World!!\n" );
 
-    char date[50];
-    char time[16];
-    GetTime( date, 50, DateFmt );
+    str64 date;
+    str16 time;
+    GetTime( date, 64, DateFmt );
     GetTime( time, 16, TimeFmt );
 
     strncat( date, " - ", 3 );
@@ -18,30 +30,19 @@ int main() {
     printf( "%s\n", date );
 
 
-    vec2 a = { .x = 2.f, .y = 3.f }, b = { .x= 5.f, .y = -6.f };
+    char title[20];
+    MSG( title, 20, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
 
-    vec2 c = vec2_add( &a, &b );
-    log_info( "a + b = { %f, %f }", c.x, c.y );
+    Context_init( 800, 600, false, title, 0 );
 
-    c = vec2_sub( &a, &b );
-    log_info( "a - b = { %f, %f }", c.x, c.y );
+    Clock_sleep( 1000 );
 
-    vec2_normalize( &c );
-    log_info( "c normalized = { %f, %f }", c.x, c.y );
-
-    enum Key kA = K_A;
-    printf( "%d\n", kA );
-
-    Color col1 = White;
-    Color col2 = White;
-
-    check( Color_cmp( &col1, &col2 ), "col1 & col2 not equal" );
-
-
-
+    Clean();
 
     return 0;
 
-error:
+error :
+    Clean();
     return -1;
 }
+

@@ -89,12 +89,21 @@
 
 
 //      MISC
+    // String types
+    typedef char str16[16];
+    typedef char str64[64];
+    typedef char str256[256];
+    typedef char str1024[1024];
+
     // Format for Date and Time
     extern const char DateFmt[];
     extern const char TimeFmt[];
 
     /// Returns date/time in given format
     void GetTime( char *t, int t_size, const char *fmt );
+
+    /// Macro for snprintf
+#   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__) 
 
         
 #endif // COMMON_H
