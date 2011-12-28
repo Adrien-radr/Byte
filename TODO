@@ -2,9 +2,9 @@ Byte-Project : TODO File
 =========================
 
 ---------
-Priority
+Priority ( - : to do,  + : done )
 ---------
-- Context/Window
++ Context/Window
 - Inputs/Events
 - Textures
 - Basic VBO/VAO meshes (sprites)
