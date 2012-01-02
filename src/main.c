@@ -4,13 +4,19 @@
 #include "clock.h"
 #include "vector.h"
 #include "context.h"
+#include "event.h"
 
 
 void Clean() {
     Context_destroy();
-
+    EventManager_destroy();
 
     CloseLog();
+}
+
+void listener( const Event* pEvent ) {
+    if( pEvent->mType == E_CharPressed )
+        printf( "%c\n", pEvent->mChar );
 }
 
 int main() {
@@ -34,8 +40,16 @@ int main() {
     MSG( title, 20, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
 
     Context_init( 800, 600, false, title, 0 );
+    EventManager_init();
 
-    Clock_sleep( 1000 );
+
+
+    while( !IsKeyUp( K_Escape ) ) {
+        EventManager_update();
+        Context_update();
+
+        Context_swap();
+    }
 
     Clean();
 

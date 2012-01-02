@@ -1,4 +1,15 @@
 Byte-Project Log v0.0.3
-Wed 28 Dec 2011 - 12:35:48
+Sun 01 Jan 2012 - 19:55:38
 ==========================
-[INFO] GLFW Window succesfully initialized!
+[INFO] GLFW Window successfully initialized!
+[INFO] Event manager successfully initialized!
+[INFO] FPS = %f
+[INFO] FPS = %f
+[INFO] FPS = %f
+[INFO] FPS = %f
+[INFO] FPS = %f
+[INFO] FPS = %f
+[INFO] FPS = %f
+[INFO] FPS = %f
+[INFO] FPS = %f
+[INFO] FPS = %f

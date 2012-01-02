@@ -5,7 +5,7 @@ Byte-Project : TODO File
 Priority ( - : to do,  + : done )
 ---------
 + Context/Window
-- Inputs/Events
++ Inputs/Events
 - Textures
 - Basic VBO/VAO meshes (sprites)
 - Scene structure

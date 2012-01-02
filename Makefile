@@ -12,13 +12,14 @@ ARCH = 64
 
 CC = gcc
 
-CFLAGS = -Wall -g -Isrc/ -lX11 -lXrandr -lGL -llua -lIL -lILU -std=c99
+CFLAGS = -Wall -ggdb3 -Isrc/ -lX11 -lXrandr -lGL -llua -lIL -lILU -std=c99
 
 OBJ = \
 src/clock.o\
 src/color.o\
 src/context.o\
 src/common.o\
+src/event.o\
 src/main.o\
 src/vector.o
 
