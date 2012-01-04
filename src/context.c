@@ -1,4 +1,5 @@
-#include <GL/glfw.h>
+#include "GL/glew.h"
+#include "GL/glfw.h"
 
 #include "context.h"
 #include "event.h"
@@ -32,6 +33,8 @@ void GLFWCALL WindowResizeCallback( int pWidth, int pHeight ) {
     if( context ) {
         context->mSize.x = pWidth;
         context->mSize.y = pHeight;
+
+        glViewport( 0, 0, (GLsizei)pWidth, (GLsizei)pHeight );
     }
 }
 
@@ -106,9 +109,40 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
         glfwSetMouseWheelCallback( MouseWheelCallback );
         glfwSetMousePosCallback( MouseMovedCallback );
 
+    glfwEnable( GLFW_KEY_REPEAT );
+
+    // GLEW initialisation
+    GLenum glerr = glewInit();
+
+    check( GLEW_OK == glerr, "GLEW Error : %s\n", glewGetErrorString( glerr ) );
+
+    log_info( "GLEW v%s successfully initialized!\n", glewGetString( GLEW_VERSION ) );
+
+    // GL Version 
+    int majV, minV;
+    glGetIntegerv( GL_MAJOR_VERSION, &majV );
+    glGetIntegerv( GL_MINOR_VERSION, &minV );
+    log_info( "OpenGL %d.%d\n", majV, minV );
+    log_info( "GLSL %s\n", glGetString( GL_SHADING_LANGUAGE_VERSION ) );
+    log_info( "Hardware : %s - %s\n", glGetString( GL_VENDOR ), glGetString( GL_RENDERER ) );
+
+    // GL state initialisations
+    glHint( GL_GENERATE_MIPMAP_HINT, GL_NICEST );
+
+    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LESS );
+
+//    glEnable( GL_CULL_FACE );
+//    glCullFace( GL_BACK );
+
+    glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
+
 
     // reset frame clock
     Clock_reset( &context->mClock );
+
+
+
     log_info( "GLFW Window successfully initialized!\n" );
     return true;
         
@@ -146,6 +180,11 @@ void Context_swap() {
     glfwSwapBuffers();
 }
 
+bool Context_isWindowOpen() {
+    return ( glfwGetWindowParam( GLFW_OPENED ) > 0 );
+}
+
+
 void Context_setVSync( bool pVal ) {
     glfwSwapInterval( pVal );
 }
@@ -155,4 +194,72 @@ void Context_showCursor( bool pVal ) {
         glfwEnable( GLFW_MOUSE_CURSOR );
     else
         glfwDisable( GLFW_MOUSE_CURSOR );
+}
+
+
+void CheckGLError_func( const char *pFile, u32 pLine ) {
+#ifdef _DEBUG
+    GLenum error = glGetError();
+
+    if (error != GL_NO_ERROR) {
+        const str64 errorStr;
+        const str256 description;
+
+        switch (error)
+        {
+            case GL_INVALID_ENUM :
+            {
+                strncpy( errorStr, 64, "GL_INVALID_ENUM" );
+                strncpy( description, 256, "An unacceptable value has been specified for an enumerated argument." );
+                break;
+            }
+
+            case GL_INVALID_VALUE :
+            {
+                strncpy( errorStr, 64, "GL_INVALID_VALUE" );
+                strncpy( description, 256, "A numeric argument is out of range." );
+                break;
+            }
+
+            case GL_INVALID_OPERATION :
+            {
+                strncpy( errorStr, 64, "GL_INVALID_OPERATION" );
+                strncpy( description, 256, "The specified operation is not allowed in the current state." );
+                break;
+            }
+
+            case GL_STACK_OVERFLOW :
+            {
+                strncpy( errorStr, 64, "GL_STACK_OVERFLOW" );
+                strncpy( description, 256, "This command would cause a stack overflow." );
+                break;
+            }
+
+            case GL_STACK_UNDERFLOW :
+            {
+                strncpy( errorStr, 64, "GL_STACK_UNDERFLOW" );
+                strncpy( description, 256, "This command would cause a stack underflow." );
+                break;
+            }
+
+            case GL_OUT_OF_MEMORY :
+            {
+                strncpy( errorStr, 64, "GL_OUT_OF_MEMORY" );
+                strncpy( description, 256, "There is not enough memory left to execute the command." );
+                break;
+            }
+
+            case GL_INVALID_FRAMEBUFFER_OPERATION :
+            {
+                strncpy( errorStr, 64, "GL_INVALID_FRAMEBUFFER_OPERATION_EXT" );
+                strncpy( description, 256, "The object bound to FRAMEBUFFER_BINDING is not \"framebuffer complete\"." );
+                break;
+            }
+        }
+
+        log_err( "OpenGL Error (%s [%d])\n"
+                 "-- Error          : %s\n"
+                 "-- Description    : %s\n", pFile, pLine, errorStr, description );
+    }
+#endif
 }

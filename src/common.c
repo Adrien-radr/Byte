@@ -48,6 +48,37 @@ extern inline f32 Deg2Rad( const f32 a );
 extern inline f32 Rad2Deg( const f32 a );
 
 
+bool ReadFile( char **pBuffer, const char *pFile ) {
+    check( pFile, "In ReadFile : given file name is uninitialized!\n" );
+
+    // if buffer exists, destroy it
+    if( *pBuffer )
+        DEL_PTR( *pBuffer );
+
+    FILE *file;
+    u32 file_size = 0;
+
+    file = fopen( pFile, "r" );
+
+    check( file, "Couldn't open file \"%s\".\n", pFile );
+
+    // Get file size in bytes
+    fseek( file, 0L, SEEK_END );
+    file_size = ftell( file );
+    fseek( file, 0L, SEEK_SET );
+
+    // allocate string and copy file contents in it
+    *pBuffer = malloc( file_size + 1 );
+    fread( *pBuffer, 1, file_size, file );
+
+    fclose( file );
+
+    return 1;
+
+error:
+    fclose( file );
+    return 0;
+}
 
 void GetTime( char *t, int t_size,  const char *fmt ) {
     if( !t || !fmt ) return;

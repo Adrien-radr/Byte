@@ -102,6 +102,9 @@
     /// Returns date/time in given format
     void GetTime( char *t, int t_size, const char *fmt );
 
+    /// Read an entire file in a buffer
+    bool ReadFile( char **pBuffer, const char *pFile );
+
     /// Macro for snprintf
 #   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__) 
 

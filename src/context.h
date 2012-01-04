@@ -22,10 +22,17 @@ void Context_update();
 /// Swap context/window framebuffer
 void Context_swap();
 
+/// Returns the state of window
+bool Context_isWindowOpen();
+
 /// (de)Activate Vertical synchronisation
 void Context_setVSync( bool pVal );
 
 /// Show or Hide the mouse cursor in the window boundaries
 void Context_showCursor( bool pVal ); 
 
+// OpenGL Error Handling
+    /// Check general Opengl Error and log it
+    void CheckGLError_func( const char *pFile, u32 pLine );
+#   define CheckGLError() CheckGLError_func( __FILE__, __LINE__ )
 #endif

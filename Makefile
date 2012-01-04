@@ -21,6 +21,7 @@ src/context.o\
 src/common.o\
 src/event.o\
 src/main.o\
+src/shader.o\
 src/vector.o
 
 
