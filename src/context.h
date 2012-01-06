@@ -2,7 +2,7 @@
 #define BYTE_CONTEXT_H
 
 #include "common.h"
-#include "vector.h"
+#include "matrix.h"
 
 
 /// Initialize and returns a Context instance
@@ -25,11 +25,19 @@ void Context_swap();
 /// Returns the state of window
 bool Context_isWindowOpen();
 
+/// Sets the window resize callback function
+void Context_setResizeCallback( void (*pFunc)() );
+
 /// (de)Activate Vertical synchronisation
 void Context_setVSync( bool pVal );
 
 /// Show or Hide the mouse cursor in the window boundaries
 void Context_showCursor( bool pVal ); 
+
+
+/// Returns the context projection matrix
+const mat3* Context_getProjectionMatrix();
+
 
 // OpenGL Error Handling
     /// Check general Opengl Error and log it

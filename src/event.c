@@ -139,25 +139,46 @@ bool IsWheelDown() {
 }
 
 // Listener funcs
-bool EventManager_addKeyListener( ListenerFunc pFunc ) {
+bool EventManager_addListener( enum ListenerType pType, ListenerFunc pFunc ) {
     if( eventManager ) {
-        // if array is already full, realloc
-        if( eventManager->mKLCpt == eventManager->mKLSize ) {
-            u32 size = eventManager->mKLSize;
-            eventManager->mKLSize = size * 2;
+        // switch on Listener type
+        if( LT_KeyListener == pType ) {
+            // if array is already full, realloc
+            if( eventManager->mKLCpt == eventManager->mKLSize ) {
+                u32 size = eventManager->mKLSize;
+                eventManager->mKLSize = size * 2;
 
-            ListenerFunc tmp[size];
+                ListenerFunc tmp[size];
 
-            memcpy( tmp, eventManager->mKeyListeners, size  * sizeof( ListenerFunc ) );
-            eventManager->mKeyListeners = realloc( eventManager->mKeyListeners, eventManager->mKLSize * sizeof( ListenerFunc ) );
-            check_mem( eventManager->mKeyListeners );
+                memcpy( tmp, eventManager->mKeyListeners, size  * sizeof( ListenerFunc ) );
+                eventManager->mKeyListeners = realloc( eventManager->mKeyListeners, eventManager->mKLSize * sizeof( ListenerFunc ) );
+                check_mem( eventManager->mKeyListeners );
 
-            memcpy( eventManager->mKeyListeners, tmp, size * sizeof( ListenerFunc ) );
-        }
+                memcpy( eventManager->mKeyListeners, tmp, size * sizeof( ListenerFunc ) );
+            }
 
-        // add the new listener at the back of array
-        eventManager->mKeyListeners[eventManager->mKLCpt++] = pFunc;
+            // add the new listener at the back of array
+            eventManager->mKeyListeners[eventManager->mKLCpt++] = pFunc;
 
+        } else if( LT_MouseListener == pType ) {
+            if( eventManager->mMLCpt == eventManager->mMLSize ) {
+                u32 size = eventManager->mMLSize;
+                eventManager->mMLSize = size * 2;
+
+                ListenerFunc tmp[size];
+
+                memcpy( tmp, eventManager->mMouseListeners, size  * sizeof( ListenerFunc ) );
+                eventManager->mMouseListeners = realloc( eventManager->mMouseListeners, eventManager->mMLSize * sizeof( ListenerFunc ) );
+                check_mem( eventManager->mMouseListeners );
+
+                memcpy( eventManager->mMouseListeners, tmp, size * sizeof( ListenerFunc ) );
+            }
+
+            // add the new listener at the back of array
+            eventManager->mMouseListeners[eventManager->mMLCpt++] = pFunc;
+
+        } else
+            return false;
 
         return true;
     }
@@ -165,7 +186,7 @@ bool EventManager_addKeyListener( ListenerFunc pFunc ) {
 error:
     return false;
 }
-
+/*
 bool EventManager_addMouseListener( ListenerFunc pFunc ) {
     if( eventManager ) {
         // if array is already full, realloc
@@ -190,7 +211,7 @@ bool EventManager_addMouseListener( ListenerFunc pFunc ) {
 error:
     return false;
 }
-
+*/
 
 void EventManager_propagateEvent( const Event* pEvent ) {
     switch( pEvent->mType ) {

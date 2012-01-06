@@ -36,7 +36,7 @@ inline void CloseLog() {
                                             char m[256]; \
                                             snprintf( m, 256, M, ##__VA_ARGS__ );\
                                             printf( "[%s] (%s:%d) %s", HEAD, __FILE__, __LINE__, m );\
-                                            WriteLog( "[%s] %s", HEAD, M );\
+                                            WriteLog( "[%s] %s", HEAD, m );\
                                           } while(0)
 
 #   define clean_errno() (errno == 0 ? "None" : strerror(errno))

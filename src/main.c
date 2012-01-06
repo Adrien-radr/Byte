@@ -9,6 +9,8 @@
 
 #include "GL/glew.h"
 
+Shader defShader;
+
 void Clean() {
     Context_destroy();
     EventManager_destroy();
@@ -19,6 +21,15 @@ void Clean() {
 void listener( const Event* pEvent ) {
     if( pEvent->mType == E_CharPressed )
         printf( "%c\n", pEvent->mChar );
+}
+
+void ResizeCallback() {
+    const mat3 *pm = Context_getProjectionMatrix();
+    if( pm ) {
+        Shader_bind( &defShader );
+            Shader_sendMat3( &defShader, "MVP", pm );
+        Shader_bind( 0 );
+    }
 }
 
 int main() {
@@ -38,11 +49,13 @@ int main() {
     printf( "%s\n", date );
 
 
-    char title[20];
-    MSG( title, 20, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
+    str32 title;
+    MSG( title, 32, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
 
     Context_init( 800, 600, false, title, 0 );
+    Context_setResizeCallback( ResizeCallback );
     EventManager_init();
+    EventManager_addListener( LT_KeyListener, listener );
 
     printf( "\n\n" );
 
@@ -80,18 +93,15 @@ int main() {
 
 
     // shader
-    Shader defShader;
     check( Shader_buildFromFile( &defShader, "default.vs", "default.fs" ), "Error in shader creation.\n" );
 
 
 
-    mat3 projMatrix;
-    mat3_ortho( &projMatrix, 0.f, 800.f, 600.f, 0.f ); 
 
     vec2 translation = { .x = 100.f, .y = 50.f };
 
     Shader_bind( &defShader );
-    Shader_sendMat3( &defShader, "MVP", &projMatrix );
+    Shader_sendMat3( &defShader, "MVP", Context_getProjectionMatrix() );
     Shader_bind( 0 );
 
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {

@@ -4,18 +4,22 @@
 #include "context.h"
 #include "event.h"
 #include "clock.h"
+#include "vector.h"
 
 /// GLFW Window/Context 
 typedef struct s_Context {
-    vec2    *mVideoModes;   ///< Video Modes width/height
-    int     mVideoModesNb;  ///< Video Modes count
+    vec2    *mVideoModes;       ///< Video Modes width/height
+    int     mVideoModesNb;      ///< Video Modes count
 
-    vec2    mSize;          ///< Context used VideoMode
-    u32     mMultiSamples;  ///< FSAA samples
+    vec2    mSize;              ///< Context used VideoMode
+    u32     mMultiSamples;      ///< FSAA samples
 
 
-    Clock   mClock;         ///< Clock accumulating time since context creation
-    f32     mCurrTime;      ///< Current time
+    Clock   mClock;             ///< Clock accumulating time since context creation
+    f32     mCurrTime;          ///< Current time
+
+    mat3    mProjectionMatrix;  ///< Projection matrix used 
+    void (*mResizeCallback)();  ///< Window resize callback function
 } Context;
 
 /// Context only instance definition
@@ -34,7 +38,11 @@ void GLFWCALL WindowResizeCallback( int pWidth, int pHeight ) {
         context->mSize.x = pWidth;
         context->mSize.y = pHeight;
 
+        mat3_ortho( &context->mProjectionMatrix, 0.f, pWidth, pHeight, 0.f );
         glViewport( 0, 0, (GLsizei)pWidth, (GLsizei)pHeight );
+
+        if( context->mResizeCallback )
+            context->mResizeCallback();
     }
 }
 
@@ -77,6 +85,9 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     context->mSize.x = pWidth;
     context->mSize.y = pHeight;
 
+    // projection matrix
+    mat3_ortho( &context->mProjectionMatrix, 0.f, pWidth, pHeight, 0.f );
+    context->mResizeCallback = NULL;
 
     // Set window name
     check( pName, "Window name invalid\n" );
@@ -188,6 +199,10 @@ bool Context_isWindowOpen() {
     return ( glfwGetWindowParam( GLFW_OPENED ) > 0 );
 }
 
+void Context_setResizeCallback( void (*pFunc)() ) {
+    if( context )
+        context->mResizeCallback = pFunc;
+}
 
 void Context_setVSync( bool pVal ) {
     glfwSwapInterval( pVal );
@@ -200,6 +215,11 @@ void Context_showCursor( bool pVal ) {
         glfwDisable( GLFW_MOUSE_CURSOR );
 }
 
+const mat3* Context_getProjectionMatrix() {
+    if( context ) 
+        return &context->mProjectionMatrix;
+    return NULL;
+}
 
 void CheckGLError_func( const char *pFile, u32 pLine ) {
 #ifdef _DEBUG

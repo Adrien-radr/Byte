@@ -28,6 +28,11 @@ typedef struct s_Event {
     char mChar;					    ///< In case of CharPressed/KeyPressed/Released
 } Event;
 
+enum ListenerType {
+    LT_KeyListener,
+    LT_MouseListener
+};
+
 
 
 /// Initialize the Eventmanager and its states
@@ -59,8 +64,8 @@ void EventManager_update();
 // Listeners
     typedef void (*ListenerFunc)( const Event* );
     
-bool EventManager_addKeyListener( ListenerFunc pFunc );
-bool EventManager_addMouseListener( ListenerFunc pFunc );
+bool EventManager_addListener( enum ListenerType pType, ListenerFunc pFunc );
+//bool EventManager_addMouseListener( ListenerFunc pFunc );
 
 
 

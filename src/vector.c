@@ -1,9 +1,5 @@
 #include "vector.h"
 
-float* vec2_toArray( const vec2 *A ) {
-    return ((float*)&A->x);
-}
-
 vec2 vec2_cpy( const vec2 *A ) {
     vec2 ret = { .x = A->x, .y = A->y };
     return ret;
