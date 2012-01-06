@@ -3,9 +3,10 @@ Byte : a C/OpenGL 2D Game Project
 Author(s) : Adrian 'Revk' Dubouchet
 
 
-This is a 2D 4X Game. Context isn't already set up.
+This is a 2D Game with GPU based rendering (OpenGL3/GLSL).
 Will focus on engine framework (rendering) first.
 
+Linux version only for now. But Windows will follow shortly.
 
 ----------
 Used tech
