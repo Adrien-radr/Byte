@@ -12,7 +12,7 @@ ARCH = 64
 
 CC = gcc
 
-CFLAGS = -Wall -ggdb3 -Isrc/ -lX11 -lXrandr -lGL -llua -lIL -lILU -std=c99
+CFLAGS = -Wall -ggdb3 -Isrc/ -lX11 -lXrandr -lGL -llua -lIL -lILU -std=c99 -D_DEBUG
 
 OBJ = \
 src/clock.o\
@@ -21,6 +21,7 @@ src/context.o\
 src/common.o\
 src/event.o\
 src/main.o\
+src/matrix.o\
 src/shader.o\
 src/vector.o
 

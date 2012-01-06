@@ -1,5 +1,5 @@
 Byte-Project Log v0.0.3
-Tue 03 Jan 2012 - 20:43:56
+Thu 05 Jan 2012 - 19:33:35
 ==========================
 [INFO] GLEW v%s successfully initialized!
 [INFO] OpenGL %d.%d
@@ -7,3 +7,5 @@ Tue 03 Jan 2012 - 20:43:56
 [INFO] Hardware : %s - %s
 [INFO] GLFW Window successfully initialized!
 [INFO] Event manager successfully initialized!
+[INFO] FPS = %f
+[INFO] FPS = %f

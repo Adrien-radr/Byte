@@ -129,16 +129,20 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     // GL state initialisations
     glHint( GL_GENERATE_MIPMAP_HINT, GL_NICEST );
 
-    glEnable( GL_DEPTH_TEST );
-    glDepthFunc( GL_LESS );
+    glDisable( GL_DEPTH_TEST );
+    //glDepthFunc( GL_LESS );
 
-//    glEnable( GL_CULL_FACE );
-//    glCullFace( GL_BACK );
+    glDisable( GL_CULL_FACE );
+    //glCullFace( GL_BACK );
+    //glFrontFace( GL_CCW );
 
     glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
 
+    // clear gl errors
+    glGetError();
 
     // reset frame clock
+    context->mCurrTime = 0.f;
     Clock_reset( &context->mClock );
 
 
@@ -202,57 +206,57 @@ void CheckGLError_func( const char *pFile, u32 pLine ) {
     GLenum error = glGetError();
 
     if (error != GL_NO_ERROR) {
-        const str64 errorStr;
-        const str256 description;
+        str64 errorStr;
+        str256 description;
 
         switch (error)
         {
             case GL_INVALID_ENUM :
             {
-                strncpy( errorStr, 64, "GL_INVALID_ENUM" );
-                strncpy( description, 256, "An unacceptable value has been specified for an enumerated argument." );
+                strncpy( errorStr, "GL_INVALID_ENUM", 64 );
+                strncpy( description, "An unacceptable value has been specified for an enumerated argument.", 256 );
                 break;
             }
 
             case GL_INVALID_VALUE :
             {
-                strncpy( errorStr, 64, "GL_INVALID_VALUE" );
-                strncpy( description, 256, "A numeric argument is out of range." );
+                strncpy( errorStr, "GL_INVALID_VALUE", 64 );
+                strncpy( description, "A numeric argument is out of range.", 256 );
                 break;
             }
 
             case GL_INVALID_OPERATION :
             {
-                strncpy( errorStr, 64, "GL_INVALID_OPERATION" );
-                strncpy( description, 256, "The specified operation is not allowed in the current state." );
+                strncpy( errorStr, "GL_INVALID_OPERATION", 64 );
+                strncpy( description, "The specified operation is not allowed in the current state.", 256 );
                 break;
             }
 
             case GL_STACK_OVERFLOW :
             {
-                strncpy( errorStr, 64, "GL_STACK_OVERFLOW" );
-                strncpy( description, 256, "This command would cause a stack overflow." );
+                strncpy( errorStr, "GL_STACK_OVERFLOW", 64 );
+                strncpy( description, "This command would cause a stack overflow.", 256 );
                 break;
             }
 
             case GL_STACK_UNDERFLOW :
             {
-                strncpy( errorStr, 64, "GL_STACK_UNDERFLOW" );
-                strncpy( description, 256, "This command would cause a stack underflow." );
+                strncpy( errorStr, "GL_STACK_UNDERFLOW", 64 );
+                strncpy( description, "This command would cause a stack underflow.", 256 );
                 break;
             }
 
             case GL_OUT_OF_MEMORY :
             {
-                strncpy( errorStr, 64, "GL_OUT_OF_MEMORY" );
-                strncpy( description, 256, "There is not enough memory left to execute the command." );
+                strncpy( errorStr, "GL_OUT_OF_MEMORY", 64 );
+                strncpy( description, "There is not enough memory left to execute the command.", 256 );
                 break;
             }
 
             case GL_INVALID_FRAMEBUFFER_OPERATION :
             {
-                strncpy( errorStr, 64, "GL_INVALID_FRAMEBUFFER_OPERATION_EXT" );
-                strncpy( description, 256, "The object bound to FRAMEBUFFER_BINDING is not \"framebuffer complete\"." );
+                strncpy( errorStr, "GL_INVALID_FRAMEBUFFER_OPERATION_EXT", 64 );
+                strncpy( description, "The object bound to FRAMEBUFFER_BINDING is not \"framebuffer complete\".", 256 );
                 break;
             }
         }

@@ -25,6 +25,7 @@ GLuint BuildShader( const char *pSrc, GLenum pType ) {
                  "-----------------------------------------------------\n", log );
 
         DEL_PTR( log );
+        shader = 0;
     }
     return shader;
 }
@@ -65,11 +66,6 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
     check( pFSrc, "In Shader_build(), given Fragment Shader source is uninitialized!\n" );
 
 
-    // reinitialize shader if already created
-    if( pShader->mProgram )
-        glDeleteProgram( pShader->mProgram );
-
-
     pShader->mProgram = glCreateProgram();
 
     // Compile vertex & fragment shaders
@@ -107,6 +103,7 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
         
         DEL_PTR( log );
     }
+    CheckGLError();
 
     return 1;
 error:
@@ -127,6 +124,11 @@ void Shader_bind( Shader *pShader ) {
 }
 
 void Shader_sendVec2( Shader *pShader, const char *pVarName, const vec2 *pVector ) {
-    glUniform2fv( glGetUniformLocation( pShader->mProgram, pVarName), 1, (float*)pVector );
+    glUniform2fv( glGetUniformLocation( pShader->mProgram, pVarName), 1, &pVector->x );
+    CheckGLError();
+}
+
+void Shader_sendMat3( Shader *pShader, const char *pVarName, const mat3 *pMatrix ) {
+    glUniformMatrix3fv( glGetUniformLocation( pShader->mProgram, pVarName), 1, GL_FALSE, pMatrix->x );
     CheckGLError();
 }

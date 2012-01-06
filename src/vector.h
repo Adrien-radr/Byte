@@ -7,6 +7,9 @@ typedef struct s_vec2 {
     f32 x, y;
 } vec2;
 
+/// Returns the vector to array form
+float* vec2_toArray( const vec2 *A );
+
 /// Returns a vector equal to the given one
 vec2 vec2_cpy( const vec2 *A );
 

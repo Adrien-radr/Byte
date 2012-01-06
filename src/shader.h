@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "vector.h"
+#include "matrix.h"
 
 typedef struct s_Shader {
     u32 mProgram;
@@ -30,5 +31,10 @@ void Shader_bind( Shader *pShader );
 /// @param pVarName : Variable name in shader src
 /// @param pVector  : Vector to send
 void Shader_sendVec2( Shader *pShader, const char *pVarName, const vec2 *pVector );
+
+/// Send a uniform mat3 to the shader
+/// @param pVarName : Variable name in shader src
+/// @param pVector  : Matrix to send
+void Shader_sendMat3( Shader *pShader, const char *pVarName, const mat3 *pMatrix );
 
 #endif // BYTE_SHADER
