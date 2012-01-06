@@ -27,7 +27,7 @@ void ResizeCallback() {
     const mat3 *pm = Context_getProjectionMatrix();
     if( pm ) {
         Shader_bind( &defShader );
-            Shader_sendMat3( &defShader, "MVP", pm );
+            Shader_sendMat3( &defShader, "ProjectionMatrix", pm );
         Shader_bind( 0 );
     }
 }
@@ -98,11 +98,17 @@ int main() {
 
 
 
-    vec2 translation = { .x = 100.f, .y = 50.f };
-
     Shader_bind( &defShader );
-    Shader_sendMat3( &defShader, "MVP", Context_getProjectionMatrix() );
+    Shader_sendMat3( &defShader, "ProjectionMatrix", Context_getProjectionMatrix() );
     Shader_bind( 0 );
+
+
+    mat3 ModelMatrix;
+    mat3_scalef( &ModelMatrix, 2.f, 2.f );
+    mat3_rotatef( &ModelMatrix, 45.f );
+
+    mat3_translatef( &ModelMatrix, 50.f, 200.f );
+
 
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {
         EventManager_update();
@@ -113,7 +119,7 @@ int main() {
 
         
         Shader_bind( &defShader );
-        Shader_sendVec2( &defShader, "offset", &translation );
+        Shader_sendMat3( &defShader, "ModelMatrix", &ModelMatrix );
 
         glBindBuffer( GL_ARRAY_BUFFER, vbo );
         glEnableVertexAttribArray( 0 );

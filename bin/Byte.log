@@ -1,5 +1,5 @@
-Byte-Project Log v0.0.4
-Fri 06 Jan 2012 - 16:17:58
+Byte-Project Log v0.0.5
+Fri 06 Jan 2012 - 17:47:53
 ==========================
 [INFO] GLEW v1.6.0 successfully initialized!
 [INFO] OpenGL 3.2
@@ -7,5 +7,4 @@ Fri 06 Jan 2012 - 16:17:58
 [INFO] Hardware : ATI Technologies Inc. - ATI Mobility Radeon HD 5800 Series 
 [INFO] GLFW Window successfully initialized!
 [INFO] Event manager successfully initialized!
-[INFO] FPS = 1642.249023
-[INFO] FPS = 485.901764
+[INFO] FPS = 2218.034912
