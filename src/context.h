@@ -39,8 +39,4 @@ void Context_showCursor( bool pVal );
 const mat3* Context_getProjectionMatrix();
 
 
-// OpenGL Error Handling
-    /// Check general Opengl Error and log it
-    void CheckGLError_func( const char *pFile, u32 pLine );
-#   define CheckGLError() CheckGLError_func( __FILE__, __LINE__ )
 #endif

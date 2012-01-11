@@ -21,5 +21,10 @@ void Renderer_endVao();
 /// Bind a Vao given its index
 void Renderer_bindVao( u32 pIndex );
 
-#endif // BYTE_RENDERER
+// OpenGL Error Handling
+    /// Check general Opengl Error and log it
+    void CheckGLError_func( const char *pFile, u32 pLine );
+#   define CheckGLError() CheckGLError_func( __FILE__, __LINE__ )
 
+
+#endif // BYTE_RENDERER

@@ -122,35 +122,6 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
 
     glfwEnable( GLFW_KEY_REPEAT );
 
-    // GLEW initialisation
-    GLenum glerr = glewInit();
-
-    check( GLEW_OK == glerr, "GLEW Error : %s\n", glewGetErrorString( glerr ) );
-
-    log_info( "GLEW v%s successfully initialized!\n", glewGetString( GLEW_VERSION ) );
-
-    // GL Version 
-    int majV, minV;
-    glGetIntegerv( GL_MAJOR_VERSION, &majV );
-    glGetIntegerv( GL_MINOR_VERSION, &minV );
-    log_info( "OpenGL %d.%d\n", majV, minV );
-    log_info( "GLSL %s\n", glGetString( GL_SHADING_LANGUAGE_VERSION ) );
-    log_info( "Hardware : %s - %s\n", glGetString( GL_VENDOR ), glGetString( GL_RENDERER ) );
-
-    // GL state initialisations
-    glHint( GL_GENERATE_MIPMAP_HINT, GL_NICEST );
-
-    glDisable( GL_DEPTH_TEST );
-    //glDepthFunc( GL_LESS );
-
-    glDisable( GL_CULL_FACE );
-    //glCullFace( GL_BACK );
-    //glFrontFace( GL_CCW );
-
-    glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
-
-    // clear gl errors
-    glGetError();
 
     // reset frame clock
     context->mCurrTime = 0.f;
@@ -220,71 +191,4 @@ const mat3* Context_getProjectionMatrix() {
     if( context ) 
         return &context->mProjectionMatrix;
     return NULL;
-}
-
-void CheckGLError_func( const char *pFile, u32 pLine ) {
-#ifdef _DEBUG
-    GLenum error = glGetError();
-
-    if (error != GL_NO_ERROR) {
-        str64 errorStr;
-        str256 description;
-
-        switch (error)
-        {
-            case GL_INVALID_ENUM :
-            {
-                strncpy( errorStr, "GL_INVALID_ENUM", 64 );
-                strncpy( description, "An unacceptable value has been specified for an enumerated argument.", 256 );
-                break;
-            }
-
-            case GL_INVALID_VALUE :
-            {
-                strncpy( errorStr, "GL_INVALID_VALUE", 64 );
-                strncpy( description, "A numeric argument is out of range.", 256 );
-                break;
-            }
-
-            case GL_INVALID_OPERATION :
-            {
-                strncpy( errorStr, "GL_INVALID_OPERATION", 64 );
-                strncpy( description, "The specified operation is not allowed in the current state.", 256 );
-                break;
-            }
-
-            case GL_STACK_OVERFLOW :
-            {
-                strncpy( errorStr, "GL_STACK_OVERFLOW", 64 );
-                strncpy( description, "This command would cause a stack overflow.", 256 );
-                break;
-            }
-
-            case GL_STACK_UNDERFLOW :
-            {
-                strncpy( errorStr, "GL_STACK_UNDERFLOW", 64 );
-                strncpy( description, "This command would cause a stack underflow.", 256 );
-                break;
-            }
-
-            case GL_OUT_OF_MEMORY :
-            {
-                strncpy( errorStr, "GL_OUT_OF_MEMORY", 64 );
-                strncpy( description, "There is not enough memory left to execute the command.", 256 );
-                break;
-            }
-
-            case GL_INVALID_FRAMEBUFFER_OPERATION :
-            {
-                strncpy( errorStr, "GL_INVALID_FRAMEBUFFER_OPERATION_EXT", 64 );
-                strncpy( description, "The object bound to FRAMEBUFFER_BINDING is not \"framebuffer complete\".", 256 );
-                break;
-            }
-        }
-
-        log_err( "OpenGL Error (%s [%d])\n"
-                 "-- Error          : %s\n"
-                 "-- Description    : %s\n", pFile, pLine, errorStr, description );
-    }
-#endif
 }
