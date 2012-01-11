@@ -22,6 +22,8 @@ src/common.o\
 src/event.o\
 src/main.o\
 src/matrix.o\
+src/mesh.o\
+src/renderer.o\
 src/shader.o\
 src/vector.o
 

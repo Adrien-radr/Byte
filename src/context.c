@@ -170,9 +170,10 @@ error:
 void Context_destroy() {
     glfwTerminate();
 
-    if( context )
+    if( context ) {
         DEL_PTR( context->mVideoModes );
-    DEL_PTR( context );
+        DEL_PTR( context );
+    }
 }
 
 

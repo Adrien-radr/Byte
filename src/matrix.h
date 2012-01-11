@@ -8,14 +8,8 @@
 typedef struct s_mat3 {
     f32 x[9];       ///< Matrix data
 } mat3;
-/*
-inline mat4 mat4_new( f32 x00, f32 x01, f32 x02, 
-                          f32 x10, f32 x11, f32 x12,
-                          f32 x20, f32 x21, f32 x22 ) {
-    Matrix mat = { .x = { x00, x01, x02, x10, x11, x12, x20, x21, x22 } }
-    return mat;
-}
-*/
+
+
 
 inline mat3 mat3_new(   f32 x00, f32 x01, f32 x02, 
                         f32 x10, f32 x11, f32 x12,

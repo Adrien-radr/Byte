@@ -186,32 +186,6 @@ bool EventManager_addListener( enum ListenerType pType, ListenerFunc pFunc ) {
 error:
     return false;
 }
-/*
-bool EventManager_addMouseListener( ListenerFunc pFunc ) {
-    if( eventManager ) {
-        // if array is already full, realloc
-        if( eventManager->mMLCpt == eventManager->mMLSize ) {
-            u32 size = eventManager->mMLSize;
-            eventManager->mMLSize = size * 2;
-
-            ListenerFunc tmp[size];
-
-            memcpy( tmp, eventManager->mMouseListeners, size  * sizeof( ListenerFunc ) );
-            eventManager->mMouseListeners = realloc( eventManager->mMouseListeners, eventManager->mMLSize * sizeof( ListenerFunc ) );
-            check_mem( eventManager->mMouseListeners );
-
-            memcpy( eventManager->mMouseListeners, tmp, size * sizeof( ListenerFunc ) );
-        }
-
-        // add the new listener at the back of array
-        eventManager->mMouseListeners[eventManager->mMLCpt++] = pFunc;
-        return true;
-    }
-
-error:
-    return false;
-}
-*/
 
 void EventManager_propagateEvent( const Event* pEvent ) {
     switch( pEvent->mType ) {

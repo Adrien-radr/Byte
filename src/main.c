@@ -6,12 +6,15 @@
 #include "context.h"
 #include "event.h"
 #include "shader.h"
+#include "renderer.h"
+#include "mesh.h"
 
 #include "GL/glew.h"
 
 Shader defShader;
 
 void Clean() {
+    Renderer_destroy();
     Context_destroy();
     EventManager_destroy();
 
@@ -36,7 +39,7 @@ int main() {
     InitLog();
 
 
-    printf( "Hello, Byte World!!\n\n" );
+    printf( "Hello, Byte World!!\n" );
 
     str64 date;
     str16 time;
@@ -46,68 +49,64 @@ int main() {
     strncat( date, " - ", 3 );
     strncat( date, time, 16 );
 
-    printf( "%s\n", date );
+    printf( "%s\n\n", date );
 
 
     str32 title;
     MSG( title, 32, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
 
-    Context_init( 800, 600, false, title, 0 );
+    check( Context_init( 800, 600, false, title, 0 ), "Error while creating Context!\n" );
     Context_setResizeCallback( ResizeCallback );
+
+    check( Renderer_init(), "Error while creating Renderer!\n" );
+
     EventManager_init();
     EventManager_addListener( LT_KeyListener, listener );
 
     printf( "\n\n" );
 
 
-    // vertex data
-    const float vertexData[] = {
-        -5.f,    -5.f, 1.f,
-        -5.f,     5.f, 1.f,
-         5.f,     5.f, 1.f,
-
-        -5.f,    -5.f, 1.f,
-         5.f,     5.f, 1.f,
-         5.f,    -5.f, 1.f,
 
 
-        1.0f,    0.0f, 0.0f, 1.0f,
-        0.0f,    1.0f, 0.0f, 1.0f,
-        0.0f,    0.0f, 1.0f, 1.0f,
+    vec2 data[] = {
+        { .x = -5.f, .y = -5.f },
+        { .x = -5.f, .y = 5.f },
+        { .x = 5.f, .y = 5.f },
 
-        1.0f,    0.0f, 0.0f, 1.0f,
-        0.0f,    0.0f, 1.0f, 1.0f,
-        1.0f,    0.0f, 1.0f, 1.0f,
+        { .x = -5.f, .y = -5.f },
+        { .x = 5.f, .y = 5.f },
+        { .x = 5.f, .y = -5.f }
     };
 
-    u32 vao;
-    glGenVertexArrays( 1, &vao );
-    glBindVertexArray( vao );
 
-    u32 vbo;
-    glGenBuffers( 1, &vbo );
-    glBindBuffer( GL_ARRAY_BUFFER, vbo );
-        glBufferData( GL_ARRAY_BUFFER, sizeof( vertexData ), vertexData, GL_STATIC_DRAW );
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
+    Mesh *m = NULL;
 
 
     // shader
     check( Shader_buildFromFile( &defShader, "default.vs", "default.fs" ), "Error in shader creation.\n" );
-
-
-
 
     Shader_bind( &defShader );
     Shader_sendMat3( &defShader, "ProjectionMatrix", Context_getProjectionMatrix() );
     Shader_bind( 0 );
 
 
-    mat3 ModelMatrix;
+    int vao = Renderer_beginVao();
+    check( vao >= 0, "Could not create vao!\n" );
+    glEnableVertexAttribArray( 0 );
+    //glEnableVertexAttribArray( 1 );
+
+    m = Mesh_new();
+    Mesh_addVbo( m, MA_Position, data, sizeof( data ) );
+    
+    mat3 ModelMatrix, MM;
     mat3_scalef( &ModelMatrix, 2.f, 2.f );
     mat3_rotatef( &ModelMatrix, 45.f );
 
     mat3_translatef( &ModelMatrix, 50.f, 200.f );
+
+    mat3_scalef( &MM, 3.f, 3.f );
+    mat3_translatef( &MM, 500.f, 400.f );
 
 
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {
@@ -115,31 +114,29 @@ int main() {
         Context_update();
 
 
-        glClear( GL_COLOR_BUFFER_BIT /* | GL_DEPTH_BUFFER_BIT */ );
+        glClear( GL_COLOR_BUFFER_BIT );
 
         
         Shader_bind( &defShader );
-        Shader_sendMat3( &defShader, "ModelMatrix", &ModelMatrix );
+            Shader_sendMat3( &defShader, "ModelMatrix", &MM );
 
-        glBindBuffer( GL_ARRAY_BUFFER, vbo );
-        glEnableVertexAttribArray( 0 );
-        glEnableVertexAttribArray( 1 );
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-        glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, 0, (void*)(9 * 2 * sizeof(f32)) );
-        glDrawArrays( GL_TRIANGLES, 0, 6 );
+            Mesh_bind( m );
+            glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
 
-        glDisableVertexAttribArray( 0 );
-        glDisableVertexAttribArray( 1 );
+            Shader_sendMat3( &defShader, "ModelMatrix", &ModelMatrix );
+            glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
         Shader_bind( 0 );
 
         Context_swap();
     }
 
+    Mesh_destroy( m );
     Clean();
 
     return 0;
 
 error :
+    Mesh_destroy( m );
     Clean();
     return -1;
 }
