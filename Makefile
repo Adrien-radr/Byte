@@ -1,7 +1,7 @@
 NAME = Byte-Project
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
-VERSION_PATCH = 5
+VERSION_PATCH = 6
 VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 ARCH = 64
@@ -19,6 +19,7 @@ src/clock.o\
 src/color.o\
 src/context.o\
 src/common.o\
+src/device.o\
 src/event.o\
 src/main.o\
 src/matrix.o\

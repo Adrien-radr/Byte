@@ -1,5 +1,5 @@
 #include "shader.h"
-#include "context.h"
+#include "renderer.h"
 
 #include "GL/glew.h"
 
@@ -19,7 +19,8 @@ GLuint BuildShader( const char *pSrc, GLenum pType ) {
         GLchar *log = (GLchar*)malloc( len );
         glGetShaderInfoLog( shader, len, NULL, log );
 
-        log_err( "Shader compilation error : \n"
+                        
+        log_err( "Shader compilation error : \n" 
                  "-----------------------------------------------------\n"
                  "%s"
                  "-----------------------------------------------------\n", log );

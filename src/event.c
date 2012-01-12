@@ -13,6 +13,8 @@ typedef struct s_InputState {
 } InputState;
 
 
+// Array ListenerArray with ListenerFunc* data type
+SimpleArray( ListenerFunc, Listener )
 
 /// Manage real time events from GLFW callbacks
 /// Distribute these events to registered listeners
@@ -20,15 +22,9 @@ typedef struct s_EventManager {
     InputState   mCurrState,        ///< Inputs of current frame
                  mPrevState;        ///< Inputs of previous frame
             
+    ListenerArray mKeyListeners;
+    ListenerArray mMouseListeners;
    
-    ListenerFunc *mKeyListeners;    ///< Array of Key Listeners
-    ListenerFunc *mMouseListeners;  ///< Array of Mouse Listeners
-
-    u32          mKLCpt,            ///< Key listeners count
-                 mMLCpt,            ///< Mouse listeners count
-
-                 mKLSize,           ///< Size of Key listener array
-                 mMLSize;           ///< Size of Mouse listener array
 } EventManager;
 
 
@@ -39,7 +35,7 @@ static EventManager *eventManager = NULL;
 bool EventManager_init() {
     check( !eventManager, "Event Manager already created!\n" );
 
-    eventManager = malloc( sizeof(*eventManager) );
+    eventManager = malloc( sizeof( EventManager ) );
     check_mem( eventManager );
 
     // Init states
@@ -53,16 +49,9 @@ bool EventManager_init() {
     eventManager->mPrevState.mWheel = 0;
     eventManager->mPrevState.mCloseSignal = false;
 
-    // Listeners (base array size = 10)
-    eventManager->mKLSize = 10;
-    eventManager->mKLCpt = 0;
-    eventManager->mKeyListeners = malloc( 10 * sizeof( ListenerFunc ) );
-    check_mem( eventManager->mKeyListeners );
-
-    eventManager->mMLSize = 10;
-    eventManager->mMLCpt = 0;
-    eventManager->mMouseListeners = malloc( 10 * sizeof( ListenerFunc ) );
-    check_mem( eventManager->mMouseListeners );
+    // Init Listener arrays
+    ListenerArray_init( &eventManager->mKeyListeners, 10 );
+    ListenerArray_init( &eventManager->mMouseListeners, 10 );
 
 
     
@@ -78,8 +67,8 @@ error:
 
 void EventManager_destroy() {
     if( eventManager ) {
-        DEL_PTR( eventManager->mKeyListeners );
-        DEL_PTR( eventManager->mMouseListeners );
+        ListenerArray_destroy( &eventManager->mKeyListeners );
+        ListenerArray_destroy( &eventManager->mMouseListeners );
         DEL_PTR( eventManager );
     }
 }
@@ -143,47 +132,20 @@ bool EventManager_addListener( enum ListenerType pType, ListenerFunc pFunc ) {
     if( eventManager ) {
         // switch on Listener type
         if( LT_KeyListener == pType ) {
-            // if array is already full, realloc
-            if( eventManager->mKLCpt == eventManager->mKLSize ) {
-                u32 size = eventManager->mKLSize;
-                eventManager->mKLSize = size * 2;
-
-                ListenerFunc tmp[size];
-
-                memcpy( tmp, eventManager->mKeyListeners, size  * sizeof( ListenerFunc ) );
-                eventManager->mKeyListeners = realloc( eventManager->mKeyListeners, eventManager->mKLSize * sizeof( ListenerFunc ) );
-                check_mem( eventManager->mKeyListeners );
-
-                memcpy( eventManager->mKeyListeners, tmp, size * sizeof( ListenerFunc ) );
-            }
-
-            // add the new listener at the back of array
-            eventManager->mKeyListeners[eventManager->mKLCpt++] = pFunc;
-
+            if( ListenerArray_checkSize( &eventManager->mKeyListeners ) ) 
+                eventManager->mKeyListeners.data[eventManager->mKeyListeners.cpt++] = pFunc;
+            else
+                return false;
         } else if( LT_MouseListener == pType ) {
-            if( eventManager->mMLCpt == eventManager->mMLSize ) {
-                u32 size = eventManager->mMLSize;
-                eventManager->mMLSize = size * 2;
-
-                ListenerFunc tmp[size];
-
-                memcpy( tmp, eventManager->mMouseListeners, size  * sizeof( ListenerFunc ) );
-                eventManager->mMouseListeners = realloc( eventManager->mMouseListeners, eventManager->mMLSize * sizeof( ListenerFunc ) );
-                check_mem( eventManager->mMouseListeners );
-
-                memcpy( eventManager->mMouseListeners, tmp, size * sizeof( ListenerFunc ) );
-            }
-
-            // add the new listener at the back of array
-            eventManager->mMouseListeners[eventManager->mMLCpt++] = pFunc;
-
+            if( ListenerArray_checkSize( &eventManager->mMouseListeners ) ) 
+                eventManager->mMouseListeners.data[eventManager->mMouseListeners.cpt++] = pFunc;
+            else
+                return false;
         } else
             return false;
 
         return true;
     }
-
-error:
     return false;
 }
 
@@ -192,12 +154,12 @@ void EventManager_propagateEvent( const Event* pEvent ) {
         case E_KeyPressed:
         case E_KeyReleased:
         case E_CharPressed:
-            for( u32 i = 0; i < eventManager->mKLCpt; ++i )
-                eventManager->mKeyListeners[i]( pEvent );
+            for( u32 i = 0; i < eventManager->mKeyListeners.cpt; ++i )
+                eventManager->mKeyListeners.data[i]( pEvent );
             break;
         default:
-            for( u32 i = 0; i < eventManager->mMLCpt; ++i )
-                eventManager->mMouseListeners[i]( pEvent );
+            for( u32 i = 0; i < eventManager->mMouseListeners.cpt; ++i )
+                eventManager->mMouseListeners.data[i]( pEvent );
             break;
     }
 }
@@ -251,4 +213,5 @@ void EventManager_propagateEvent( const Event* pEvent ) {
             EventManager_propagateEvent( &e );
         }
     }
+
 

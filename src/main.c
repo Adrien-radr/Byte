@@ -8,23 +8,17 @@
 #include "shader.h"
 #include "renderer.h"
 #include "mesh.h"
+#include "device.h"
 
 #include "GL/glew.h"
 
-Shader defShader;
-
-void Clean() {
-    Renderer_destroy();
-    Context_destroy();
-    EventManager_destroy();
-
-    CloseLog();
-}
 
 void listener( const Event* pEvent ) {
     if( pEvent->mType == E_CharPressed )
         printf( "%c\n", pEvent->mChar );
 }
+
+Shader defShader;
 
 void ResizeCallback() {
     const mat3 *pm = Context_getProjectionMatrix();
@@ -35,9 +29,13 @@ void ResizeCallback() {
     }
 }
 
-int main() {
-    InitLog();
 
+int main() {
+
+    Device_init();
+
+    Context_setResizeCallback( ResizeCallback );
+    EventManager_addListener( LT_KeyListener, listener );
 
     printf( "Hello, Byte World!!\n" );
 
@@ -52,18 +50,10 @@ int main() {
     printf( "%s\n\n", date );
 
 
-    str32 title;
-    MSG( title, 32, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
 
-    check( Context_init( 800, 600, false, title, 0 ), "Error while creating Context!\n" );
-    Context_setResizeCallback( ResizeCallback );
 
-    check( Renderer_init(), "Error while creating Renderer!\n" );
 
-    EventManager_init();
-    EventManager_addListener( LT_KeyListener, listener );
 
-    printf( "\n\n" );
 
 
 
@@ -79,9 +69,7 @@ int main() {
     };
 
 
-
     Mesh *m = NULL;
-
 
     // shader
     check( Shader_buildFromFile( &defShader, "default.vs", "default.fs" ), "Error in shader creation.\n" );
@@ -91,10 +79,12 @@ int main() {
     Shader_bind( 0 );
 
 
+
     int vao = Renderer_beginVao();
     check( vao >= 0, "Could not create vao!\n" );
     glEnableVertexAttribArray( 0 );
-    //glEnableVertexAttribArray( 1 );
+
+
 
     m = Mesh_new();
     Mesh_addVbo( m, MA_Position, data, sizeof( data ) );
@@ -110,34 +100,32 @@ int main() {
 
 
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {
-        EventManager_update();
-        Context_update();
+        Device_beginFrame();
+            glClear( GL_COLOR_BUFFER_BIT );
 
+            
+            Shader_bind( &defShader );
+                Shader_sendMat3( &defShader, "ModelMatrix", &MM );
 
-        glClear( GL_COLOR_BUFFER_BIT );
+                Mesh_bind( m );
+                glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
 
-        
-        Shader_bind( &defShader );
-            Shader_sendMat3( &defShader, "ModelMatrix", &MM );
-
-            Mesh_bind( m );
-            glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
-
-            Shader_sendMat3( &defShader, "ModelMatrix", &ModelMatrix );
-            glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
-        Shader_bind( 0 );
-
-        Context_swap();
+                Shader_sendMat3( &defShader, "ModelMatrix", &ModelMatrix );
+                glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
+            Shader_bind( 0 );
+        Device_endFrame();
     }
 
     Mesh_destroy( m );
-    Clean();
+
+    Device_destroy();
 
     return 0;
 
 error :
     Mesh_destroy( m );
-    Clean();
+
+    Device_destroy();
     return -1;
 }
 

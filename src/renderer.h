@@ -21,6 +21,8 @@ void Renderer_endVao();
 /// Bind a Vao given its index
 void Renderer_bindVao( u32 pIndex );
 
+/// Create a new mesh and return its ID
+
 // OpenGL Error Handling
     /// Check general Opengl Error and log it
     void CheckGLError_func( const char *pFile, u32 pLine );

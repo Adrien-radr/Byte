@@ -33,8 +33,8 @@ inline void CloseLog() {
 #endif
 
 #   define write_and_log( HEAD, M, ... )  do {\
-                                            char m[256]; \
-                                            snprintf( m, 256, M, ##__VA_ARGS__ );\
+                                            char m[512]; \
+                                            snprintf( m, 512, M, ##__VA_ARGS__ );\
                                             printf( "[%s] (%s:%d) %s", HEAD, __FILE__, __LINE__, m );\
                                             WriteLog( "[%s] %s", HEAD, m );\
                                           } while(0)

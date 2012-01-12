@@ -1,11 +1,19 @@
 #include "renderer.h"
+#include "mesh.h"
+
 #include "GL/glew.h"
+
+
+// Array VaoArray with u32 data type
+SimpleArray( u32, Vao )
+
+// Array MeshArray with Mesh* data type
+HeapArray( Mesh*, Mesh )
 
 /// Application Renderer
 struct s_Renderer {
-    u32     *mVaos;
-    u32     mVaoCpt;
-    u32     mVaoSize;
+    VaoArray    mVaos;
+    MeshArray   mMeshes;
 };
 
 /// Renderer only instance definition
@@ -18,14 +26,10 @@ bool Renderer_init() {
     renderer = malloc( sizeof( Renderer ) );
     check_mem( renderer );
     
-    // initial number of 10 vaos
-    renderer->mVaos = malloc( 10 * sizeof( u32 ) );
-    check_mem( renderer->mVaos );
-
-    renderer->mVaoCpt = 0;
-    renderer->mVaoSize = 10;
-
-
+    // initial number of 10 vaos and 100 meshes
+    VaoArray_init( &renderer->mVaos, 10 );
+    
+    MeshArray_init( &renderer->mMeshes, 100 );
 
 
     // GLEW initialisation
@@ -63,17 +67,17 @@ bool Renderer_init() {
     log_info( "Renderer successfully initialized!\n" );
 
     return true;
+
 error:
-    if( renderer ) {
-        DEL_PTR( renderer->mVaos );
-        DEL_PTR( renderer );
-    }
+    Renderer_destroy();
+
     return false;
 }
 
 void Renderer_destroy() {
     if( renderer ) {
-        DEL_PTR( renderer->mVaos );
+        VaoArray_destroy( &renderer->mVaos );
+        MeshArray_destroy( &renderer->mMeshes );
         DEL_PTR( renderer );
     }
 }
@@ -81,29 +85,16 @@ void Renderer_destroy() {
 int Renderer_beginVao() {
     if( renderer ) {
         // check if Vao array is not already full
-        if( renderer->mVaoCpt == renderer->mVaoSize ) {
-            u32 size = renderer->mVaoSize;
-            renderer->mVaoSize = size * 2;
+        if( VaoArray_checkSize( &renderer->mVaos ) ) {
+            // create and bind a new VAO
+            glGenVertexArrays( 1, &renderer->mVaos.data[renderer->mVaos.cpt] );
+            glBindVertexArray( renderer->mVaos.data[renderer->mVaos.cpt] );
 
-            u32 tmp[size];
 
-            memcpy( tmp, renderer->mVaos, size * sizeof( u32 ) );
-            renderer->mVaos = realloc( renderer->mVaos, renderer->mVaoSize * sizeof( u32 ) );
-            check_mem( renderer->mVaos );
-            
-            memcpy( renderer->mVaos, tmp, size * sizeof( u32 ) );
+            return renderer->mVaos.cpt++;
         }
-
-        // create and bind a new VAO
-        glGenVertexArrays( 1, &renderer->mVaos[renderer->mVaoCpt] );
-        glBindVertexArray( renderer->mVaos[renderer->mVaoCpt] );
-
-
-        return renderer->mVaoCpt++;
     }   
-
-error:
-        return -1;
+    return -1;
 }
 
 void Renderer_endVao() {
@@ -113,7 +104,7 @@ void Renderer_endVao() {
 
 void Renderer_bindVao( u32 pIndex ) {
     if( renderer )
-        glBindVertexArray( renderer->mVaos[pIndex] );
+        glBindVertexArray( renderer->mVaos.data[pIndex] );
 }
 
 

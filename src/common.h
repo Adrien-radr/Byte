@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 0
-#define BYTE_PATCH 5
+#define BYTE_PATCH 6
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -13,7 +13,18 @@
 #   define BYTE_UNIX
 #endif
 
-// Types shortcuts
+// Common includes
+#include <stdlib.h>
+#include <time.h>
+
+// Debug & Log
+#include "debug.h"
+
+
+
+// ##########################################################################################
+//      MISC
+    // Types shortcuts
 	typedef unsigned char		u8;
 	typedef unsigned short		u16;
 	typedef unsigned int	    u32;
@@ -23,15 +34,15 @@
 
 #   define eol "\n"
 
-// Common includes
-#include <stdlib.h>
-#include <time.h>
+    // String types
+    typedef char str16[16];
+    typedef char str32[32];
+    typedef char str64[64];
+    typedef char str256[256];
+    typedef char str1024[1024];
 
-// Debug & Log
-#include "debug.h"
-
-// Function shortcuts
-#ifndef DEL_PTR
+    // Free a pointer and set it to NULL
+#   ifndef DEL_PTR
 #   define DEL_PTR(p)       \
         do {                \
             if( p ) {        \
@@ -39,9 +50,107 @@
                 (p) = NULL; \
             }               \
         } while(0)
-#endif
+#   endif
+
+    // Format for Date and Time
+    extern const char DateFmt[];
+    extern const char TimeFmt[];
+
+    /// Returns date/time in given format
+    void GetTime( char *t, int t_size, const char *fmt );
+
+    /// Read an entire file in a buffer
+    bool ReadFile( char **pBuffer, const char *pFile );
+
+    /// Macro for snprintf
+#   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__) 
+
+// ##########################################################################################
 
 
+// ##########################################################################################
+// Generic array type
+// One must choose if the objects in the array hate to be dynamically destroyed or not :
+//  - SimpleArray : no memory managment for individual data in array
+//  - HeapArray : individual data in array are destroyed with DEL_PTR when the array is destroyed
+// 
+// Use :
+//  SimpleArray( float, Float );
+//  
+//  int main .. {
+//      FloatArray arr;
+//      FloatArray_init( &arr, 10 );
+//      
+//      if( FloatArray_checkSize( &arr ) ) {
+//          arr.data[arr.cpt] = 5.f;
+//          printf( "%f\n", arr.data[arr.cpt] );
+//          ++arr.cpt;
+//      }
+//      
+//      FloatArray_destroy( &arr );
+//  }
+#   define Array( type, name )                                                  \
+    typedef struct {                                                            \
+        type    *data;                                                          \
+        u32     cpt;                                                            \
+        u32     size;                                                           \
+    } name##Array;                                                              \
+                                                                                \
+    bool name##Array_init( name##Array *arr, u32 size ) {                       \
+        arr->data = calloc( size, sizeof( type ) );                             \
+        check_mem( arr->data );                                                 \
+        arr->cpt  = 0;                                                          \
+        arr->size = size;                                                       \
+                                                                                \
+        return true;                                                            \
+    error:                                                                      \
+        return false;                                                           \
+    }                                                                           \
+                                                                                \
+    bool name##Array_checkSize( name##Array *arr ) {                            \
+        if( arr ) {                                                             \
+            if( arr->cpt == arr->size ) {                                       \
+                u32 size = arr->size;                                           \
+                arr->size *= 2;                                                 \
+                                                                                \
+                type tmp[size];                                                 \
+                                                                                \
+                memcpy( tmp, arr->data, size * sizeof( type ) );                \
+                arr->data = realloc( arr->data, arr->size * sizeof( type ) );   \
+                check_mem( arr->data );                                         \
+                                                                                \
+                memcpy( arr->data, tmp, size * sizeof( type ) );                \
+            }                                                                   \
+            return true;                                                        \
+        }                                                                       \
+    error:                                                                      \
+        return false;                                                           \
+    }                                                                           
+
+#   define SimpleArray( type, name )                                            \
+    Array( type, name )                                                         \
+                                                                                \
+    void name##Array_destroy( name##Array *arr ) {                              \
+        if( arr )                                                               \
+            DEL_PTR( arr->data );                                               \
+    }                                                                           
+
+
+#   define HeapArray( type, name )                                              \
+    Array( type, name )                                                         \
+                                                                                \
+    void name##Array_destroy( name##Array *arr ) {                              \
+        if( arr ) {                                                             \
+            for( int i = 0; i < arr->size; ++i )                                \
+                DEL_PTR( arr->data[i] );                                        \
+        }                                                                       \
+        DEL_PTR( arr->data );                                                   \
+    }                                                                           
+
+// ##########################################################################################
+
+
+// ##########################################################################################
 //      MATH
 //#include "vector.h"
 #include <math.h>
@@ -86,28 +195,8 @@
     inline f32 Rad2Deg( const f32 a ) {
         return a * ( 180.f / M_PI );
     }
+// ##########################################################################################
 
-
-//      MISC
-    // String types
-    typedef char str16[16];
-    typedef char str32[32];
-    typedef char str64[64];
-    typedef char str256[256];
-    typedef char str1024[1024];
-
-    // Format for Date and Time
-    extern const char DateFmt[];
-    extern const char TimeFmt[];
-
-    /// Returns date/time in given format
-    void GetTime( char *t, int t_size, const char *fmt );
-
-    /// Read an entire file in a buffer
-    bool ReadFile( char **pBuffer, const char *pFile );
-
-    /// Macro for snprintf
-#   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__) 
 
         
 #endif // COMMON_H
