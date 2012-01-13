@@ -51,7 +51,7 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     check( pWidth >= 100 && pHeight >= 100, "Width and Height of window must be larger than %dpx\n", 100 );
 
 
-    context = (Context*)malloc( sizeof( *context ) );
+    context = (Context*)byte_alloc( sizeof( Context ) );
     check_mem( context );
 
     // Initialize GLFW 
@@ -61,7 +61,7 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     GLFWvidmode vidmodes[64];
 
     context->mVideoModesNb = glfwGetVideoModes( vidmodes, 64 );
-    context->mVideoModes = malloc( sizeof(vec2) * context->mVideoModesNb );
+    context->mVideoModes = byte_alloc( sizeof(vec2) * context->mVideoModesNb );
     bool resolutionFound = false;
 
     for( int i = 0; i < context->mVideoModesNb; ++i ) {
@@ -142,8 +142,8 @@ void Context_destroy() {
     glfwTerminate();
 
     if( context ) {
-        DEL_PTR( context->mVideoModes );
-        DEL_PTR( context );
+        DEL_PTR( context->mVideoModes, sizeof( vec2 ) * context->mVideoModesNb );
+        DEL_PTR( context, sizeof( Context ) );
     }
 }
 

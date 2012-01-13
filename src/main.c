@@ -69,7 +69,7 @@ int main() {
     };
 
 
-    Mesh *m = NULL;
+   // Mesh *m = NULL;
 
     // shader
     check( Shader_buildFromFile( &defShader, "default.vs", "default.fs" ), "Error in shader creation.\n" );
@@ -85,9 +85,11 @@ int main() {
     glEnableVertexAttribArray( 0 );
 
 
+    u32 mesh = Renderer_createMesh( data, sizeof( data ), NULL, 0 );
+    check( mesh >= 0, "Error while creating mesh!\n" );
 
-    m = Mesh_new();
-    Mesh_addVbo( m, MA_Position, data, sizeof( data ) );
+    //m = Mesh_new();
+    //Mesh_addVbo( m, MA_Position, data, sizeof( data ) );
     
     mat3 ModelMatrix, MM;
     mat3_scalef( &ModelMatrix, 2.f, 2.f );
@@ -107,23 +109,26 @@ int main() {
             Shader_bind( &defShader );
                 Shader_sendMat3( &defShader, "ModelMatrix", &MM );
 
-                Mesh_bind( m );
-                glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
+                //Mesh_bind( m );
+                //glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
+                Renderer_renderMesh( mesh );
 
                 Shader_sendMat3( &defShader, "ModelMatrix", &ModelMatrix );
-                glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
+                Renderer_renderMesh( mesh );
+                //glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
             Shader_bind( 0 );
         Device_endFrame();
     }
 
-    Mesh_destroy( m );
+    //Mesh_destroy( m );
+
 
     Device_destroy();
 
     return 0;
 
 error :
-    Mesh_destroy( m );
+    //Mesh_destroy( m );
 
     Device_destroy();
     return -1;

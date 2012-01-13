@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 0
-#define BYTE_PATCH 6
+#define BYTE_PATCH 7
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -41,16 +41,44 @@
     typedef char str256[256];
     typedef char str1024[1024];
 
-    // Free a pointer and set it to NULL
-#   ifndef DEL_PTR
-#   define DEL_PTR(p)       \
-        do {                \
-            if( p ) {        \
-                free(p); \
-                (p) = NULL; \
-            }               \
+
+    // Allocate a pointer 
+    inline void* byte_alloc_func( u32 size, const char* file, u32 line ) {
+        void* ret = malloc( size );
+        MemoryManager_allocation( ret, size, file[4], line );
+        return ret;
+    }
+
+#ifndef byte_alloc
+#   ifdef _DEBUG
+#   define byte_alloc( size ) byte_alloc_func( (size), __FILE__, __LINE__ )
+#   else
+#   define byte_alloc( size ) malloc( (size ) )
+#   endif
+#endif
+
+
+    // Free a pointer and set it to NULL (tell memory managment)
+#ifndef DEL_PTR
+#   ifdef _DEBUG
+#   define DEL_PTR(p, size)                         \
+        do {                                        \
+            if( p ) {                               \
+                MemoryManager_deallocation( (p) );  \
+                free(p);                            \
+                (p) = NULL;                         \
+            }                                       \
+        } while(0)
+#   else
+#   define DEL_PTR(p, size)     \
+        do {                    \
+            if( p ) {           \
+                free(p);        \
+                (p) = NULL;     \
+            }                   \
         } while(0)
 #   endif
+#endif
 
     // Format for Date and Time
     extern const char DateFmt[];
@@ -60,7 +88,8 @@
     void GetTime( char *t, int t_size, const char *fmt );
 
     /// Read an entire file in a buffer
-    bool ReadFile( char **pBuffer, const char *pFile );
+    /// @return : pBuffer allocated size (file size + '\0' char)
+    u32 ReadFile( char **pBuffer, const char *pFile );
 
     /// Macro for snprintf
 #   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__) 
@@ -89,6 +118,17 @@
 //      
 //      FloatArray_destroy( &arr );
 //  }
+                /*u32 size = arr->size;                                           \
+                arr->size *= 2;                                                 \
+                                                                                \
+                type tmp[size];                                                 \
+                                                                                \
+                memcpy( tmp, arr->data, size * sizeof( type ) );                \
+                arr->data = realloc( arr->data, arr->size * sizeof( type ) );   \
+                check_mem( arr->data );                                         \
+                                                                                \
+                memcpy( arr->data, tmp, size * sizeof( type ) );                \
+                */
 #   define Array( type, name )                                                  \
     typedef struct {                                                            \
         type    *data;                                                          \
@@ -110,20 +150,10 @@
     bool name##Array_checkSize( name##Array *arr ) {                            \
         if( arr ) {                                                             \
             if( arr->cpt == arr->size ) {                                       \
-                u32 size = arr->size;                                           \
-                arr->size *= 2;                                                 \
-                                                                                \
-                type tmp[size];                                                 \
-                                                                                \
-                memcpy( tmp, arr->data, size * sizeof( type ) );                \
-                arr->data = realloc( arr->data, arr->size * sizeof( type ) );   \
-                check_mem( arr->data );                                         \
-                                                                                \
-                memcpy( arr->data, tmp, size * sizeof( type ) );                \
+                arr->data = realloc( arr->data, (arr->cpt *= 2) * sizeof( type ) ); \
             }                                                                   \
             return true;                                                        \
         }                                                                       \
-    error:                                                                      \
         return false;                                                           \
     }                                                                           
 
@@ -132,19 +162,19 @@
                                                                                 \
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr )                                                               \
-            DEL_PTR( arr->data );                                               \
+            DEL_PTR( arr->data, sizeof(type) );                                 \
     }                                                                           
 
 
-#   define HeapArray( type, name )                                              \
+#   define HeapArray( type, name, destructionFunc )                             \
     Array( type, name )                                                         \
                                                                                 \
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr ) {                                                             \
             for( int i = 0; i < arr->size; ++i )                                \
-                DEL_PTR( arr->data[i] );                                        \
+                destructionFunc( arr->data[i] );                                \
         }                                                                       \
-        DEL_PTR( arr->data );                                                   \
+        DEL_PTR( arr->data, sizeof( type ) );                                   \
     }                                                                           
 
 // ##########################################################################################

@@ -2,6 +2,7 @@
 #define BYTE_RENDERER_HPP
 
 #include "common.h"
+#include "vector.h"
 
 typedef struct s_Renderer Renderer;
 
@@ -22,7 +23,10 @@ void Renderer_endVao();
 void Renderer_bindVao( u32 pIndex );
 
 /// Create a new mesh and return its ID
+int  Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u32 pIndicesSize );
 
+/// Render a mesh given its identifier
+void Renderer_renderMesh( u32 pIndex );
 // OpenGL Error Handling
     /// Check general Opengl Error and log it
     void CheckGLError_func( const char *pFile, u32 pLine );

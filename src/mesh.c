@@ -2,7 +2,7 @@
 #include "GL/glew.h"
 
 Mesh* Mesh_new() {
-    Mesh* mesh = malloc( sizeof( Mesh ) );
+    Mesh* mesh = byte_alloc( sizeof( Mesh ) );
 
     mesh->mVbo[0] = 0;
     mesh->mIbo = 0;
@@ -18,9 +18,9 @@ void Mesh_destroy( Mesh *pMesh ) {
     if( pMesh ) {
         glDeleteBuffers( 1, &pMesh->mVbo[0] );
         glDeleteBuffers( 1, &pMesh->mIbo );
-        DEL_PTR( pMesh->mData );
-        DEL_PTR( pMesh->mIndices );
-        DEL_PTR( pMesh );
+        DEL_PTR( pMesh->mData, sizeof( pMesh->mData ) );
+        DEL_PTR( pMesh->mIndices, sizeof( pMesh->mIndices ) );
+        DEL_PTR( pMesh, sizeof( Mesh ) );
     }
 }
 
@@ -31,7 +31,7 @@ void Mesh_addVbo( Mesh *pMesh, MeshAttrib pIndex, vec2 *pArray, u32 pArraySize )
         // If the given array is position data and we already have some, destroy the previous one
         if( 0 == ma ) {
             if( pMesh->mData ) 
-                DEL_PTR( pMesh->mData );
+                DEL_PTR( pMesh->mData, sizeof( pMesh->mData ) );
 
             pMesh->mVertexCount = pArraySize / sizeof( vec2 );
             u32 sizeInFloat = pMesh->mVertexCount * 2;
@@ -59,7 +59,7 @@ void Mesh_addVbo( Mesh *pMesh, MeshAttrib pIndex, vec2 *pArray, u32 pArraySize )
 void Mesh_addIbo( Mesh *pMesh, u32 *pArray, u32 pArraySize ) {
     if( pMesh ) {
         if( pMesh->mIndices ) 
-            DEL_PTR( pMesh->mIndices );
+            DEL_PTR( pMesh->mIndices, sizeof( pMesh->mIndices ) );
 
         pMesh->mIndices = pArray;
         pMesh->mIndexCount = pArraySize / sizeof( u32 );

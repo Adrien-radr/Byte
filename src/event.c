@@ -35,7 +35,7 @@ static EventManager *eventManager = NULL;
 bool EventManager_init() {
     check( !eventManager, "Event Manager already created!\n" );
 
-    eventManager = malloc( sizeof( EventManager ) );
+    eventManager = byte_alloc( sizeof( EventManager ) );
     check_mem( eventManager );
 
     // Init states
@@ -69,7 +69,7 @@ void EventManager_destroy() {
     if( eventManager ) {
         ListenerArray_destroy( &eventManager->mKeyListeners );
         ListenerArray_destroy( &eventManager->mMouseListeners );
-        DEL_PTR( eventManager );
+        DEL_PTR( eventManager, sizeof( EventManager ) );
     }
 }
 

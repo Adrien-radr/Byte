@@ -6,6 +6,22 @@
 #include <string.h>
 #include <stdbool.h>
 
+// Memory manager
+typedef struct {
+    size_t  allocated_bytes;
+    void*   alloc_stack[512];
+    size_t  alloc_sizes[512];
+    int     alloc_lines[512];
+    char    alloc_files[512];
+
+    int     alloc_cpt;
+} MemoryManager;
+    
+bool MemoryManager_init();
+void MemoryManager_destroy();
+void MemoryManager_allocation( void* ptr, size_t size, char file, int line );
+void MemoryManager_deallocation( void* ptr );
+
 // Log file (var defined in common.c
 extern FILE *Log;
 extern bool LogOpened;

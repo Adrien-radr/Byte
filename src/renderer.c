@@ -8,12 +8,14 @@
 SimpleArray( u32, Vao )
 
 // Array MeshArray with Mesh* data type
-HeapArray( Mesh*, Mesh )
+HeapArray( Mesh*, Mesh, Mesh_destroy )
 
 /// Application Renderer
 struct s_Renderer {
     VaoArray    mVaos;
     MeshArray   mMeshes;
+
+    int         mCurrentMesh;
 };
 
 /// Renderer only instance definition
@@ -23,7 +25,7 @@ Renderer *renderer = NULL;
 bool Renderer_init() {
     check( !renderer, "Renderer already created!\n" );
 
-    renderer = malloc( sizeof( Renderer ) );
+    renderer = byte_alloc( sizeof( Renderer ) );
     check_mem( renderer );
     
     // initial number of 10 vaos and 100 meshes
@@ -31,7 +33,8 @@ bool Renderer_init() {
     
     MeshArray_init( &renderer->mMeshes, 100 );
 
-
+    renderer->mCurrentMesh = 1;
+ 
     // GLEW initialisation
     GLenum glerr = glewInit();
 
@@ -61,7 +64,7 @@ bool Renderer_init() {
 
     // clear gl errors
     glGetError();
-
+ 
 
 
     log_info( "Renderer successfully initialized!\n" );
@@ -78,7 +81,7 @@ void Renderer_destroy() {
     if( renderer ) {
         VaoArray_destroy( &renderer->mVaos );
         MeshArray_destroy( &renderer->mMeshes );
-        DEL_PTR( renderer );
+        DEL_PTR( renderer, sizeof( Renderer ) );
     }
 }
 
@@ -109,7 +112,47 @@ void Renderer_bindVao( u32 pIndex ) {
 
 
 
+int Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u32 pIndicesSize ) {
+    if( renderer ) {
+        check( pPositions, "In Renderer_createMesh : given Position array is NULL!\n" );
+        //check( pIndices, "In Renderer_createMesh : given Indice array is NULL!\n" );
 
+        if( MeshArray_checkSize( &renderer->mMeshes ) ) {
+            Mesh *m = Mesh_new();
+            check_mem( m );
+
+            // add Position data
+            Mesh_addVbo( m, MA_Position, pPositions, pPositionsSize );
+
+            // add Indices data
+
+
+            // add the Mesh to the renderer array
+            int index = renderer->mMeshes.cpt++;
+            renderer->mMeshes.data[index] = m;
+
+            return index;
+
+        } else
+            log_err( "In Renderer_createMesh : Error with MeshArray expansion!\n" );
+    }
+error:
+    return -1;
+}
+
+void Renderer_renderMesh( u32 pIndex ) {
+    if( renderer && pIndex < renderer->mMeshes.cpt ) {
+        Mesh *m = renderer->mMeshes.data[pIndex];
+
+        // bind mesh only if it isnt already
+        if( renderer->mCurrentMesh != pIndex ) {
+            Mesh_bind( m );
+            renderer->mCurrentMesh = pIndex;
+        }
+
+        glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
+    }
+}
 
 
 

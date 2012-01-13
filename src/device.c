@@ -11,11 +11,15 @@ Device *device = NULL;
 
 
 bool Device_init() {
+#   ifdef _DEBUG
+    MemoryManager_init();
+#   endif
+
     InitLog();
 
     check( !device, "Device already initialized!\n" );
 
-    device = malloc( sizeof( Device ) );
+    device = byte_alloc( sizeof( Device ) );
     check_mem( device );
 
     // Initialize Context
@@ -47,10 +51,13 @@ void Device_destroy() {
         Context_destroy();
         EventManager_destroy();
 
-        DEL_PTR( device );
+        DEL_PTR( device, sizeof( Device ) );
     }
 
     CloseLog();
+#   ifdef _DEBUG
+    MemoryManager_destroy();
+#   endif
 }
 
 void Device_beginFrame() {

@@ -16,7 +16,7 @@ GLuint BuildShader( const char *pSrc, GLenum pType ) {
         GLint len;
         glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &len );
 
-        GLchar *log = (GLchar*)malloc( len );
+        GLchar *log = byte_alloc( len );
         glGetShaderInfoLog( shader, len, NULL, log );
 
                         
@@ -25,7 +25,7 @@ GLuint BuildShader( const char *pSrc, GLenum pType ) {
                  "%s"
                  "-----------------------------------------------------\n", log );
 
-        DEL_PTR( log );
+        DEL_PTR( log, (size_t)len );
         shader = 0;
     }
     return shader;
@@ -40,21 +40,24 @@ bool Shader_buildFromFile( Shader *pShader, const char *pVFile, const char *pFFi
     // Get shaders source
     char *v_src = NULL, *f_src = NULL;
 
-    check( ReadFile( &v_src, pVFile ), "Failed to read Vertex Shader file \"%s\"!\n", pVFile );
-    check( ReadFile( &f_src, pFFile ), "Failed to read Fragment Shader file \"%s\"!\n", pFFile );
+    u32 v_src_size = ReadFile( &v_src, pVFile );
+    check( v_src_size, "Failed to read Vertex Shader file \"%s\"!\n", pVFile );
+
+    u32 f_src_size = ReadFile( &f_src, pFFile );
+    check( f_src_size, "Failed to read Fragment Shader file \"%s\"!\n", pFFile );
 
     // create shader from sources
     check( Shader_build( pShader, v_src, f_src ), "Failed to compile shader program from sources \"%s\" and \"%s\".\n", pVFile, pFFile );
 
 
-    DEL_PTR( v_src );
-    DEL_PTR( f_src );
+    DEL_PTR( v_src, (size_t)v_src_size );
+    DEL_PTR( f_src, (size_t)f_src_size ); 
 
     return 1;
 
 error:
-    DEL_PTR( v_src );
-    DEL_PTR( f_src );
+    DEL_PTR( v_src, (size_t)v_src_size );
+    DEL_PTR( f_src, (size_t)f_src_size );
     return 0;
 }
 
@@ -93,7 +96,7 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
         GLint len;
         glGetProgramiv( pShader->mProgram, GL_INFO_LOG_LENGTH, &len );
 
-        GLchar *log = malloc( len );
+        GLchar *log = byte_alloc( len );
         glGetProgramInfoLog( pShader->mProgram, len, NULL, log );
 
         log_err( "Shader Program link error : \n"
@@ -102,7 +105,7 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
                  "-----------------------------------------------------\n", log );
 
         
-        DEL_PTR( log );
+        DEL_PTR( log, (size_t)len );
     }
     CheckGLError();
 
