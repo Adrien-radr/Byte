@@ -29,14 +29,10 @@ void ResizeCallback() {
     }
 }
 
-void delstr( const char *str ) {
-    
-}
-
 
 int main() {
 
-    Device_init();
+    check( Device_init(), "Error while creating Device, exiting program.\n" );
 
     Context_setResizeCallback( ResizeCallback );
     EventManager_addListener( LT_KeyListener, listener );
@@ -66,10 +62,11 @@ int main() {
         { .x = -5.f, .y = -5.f },
         { .x = -5.f, .y = 5.f },
         { .x = 5.f, .y = 5.f },
-
-        { .x = -5.f, .y = -5.f },
-        { .x = 5.f, .y = 5.f },
         { .x = 5.f, .y = -5.f }
+    };
+
+    u32 indices[] = {
+        0, 1, 2, 0, 2, 3
     };
 
 
@@ -88,7 +85,7 @@ int main() {
     glEnableVertexAttribArray( 0 );
 
 
-    u32 mesh = Renderer_createMesh( data, sizeof( data ), NULL, 0 );
+    u32 mesh = Renderer_createMesh( data, sizeof( data ), indices, sizeof( indices ) );
     check( mesh >= 0, "Error while creating mesh!\n" );
 
     

@@ -142,8 +142,8 @@ void Context_destroy() {
     glfwTerminate();
 
     if( context ) {
-        DEL_PTR( context->mVideoModes, sizeof( vec2 ) * context->mVideoModesNb );
-        DEL_PTR( context, sizeof( Context ) );
+        DEL_PTR( context->mVideoModes );
+        DEL_PTR( context );
     }
 }
 

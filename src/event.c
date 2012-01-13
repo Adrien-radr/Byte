@@ -69,7 +69,7 @@ void EventManager_destroy() {
     if( eventManager ) {
         ListenerArray_destroy( &eventManager->mKeyListeners );
         ListenerArray_destroy( &eventManager->mMouseListeners );
-        DEL_PTR( eventManager, sizeof( EventManager ) );
+        DEL_PTR( eventManager );
     }
 }
 

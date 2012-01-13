@@ -27,6 +27,9 @@ int  Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u
 
 /// Render a mesh given its identifier
 void Renderer_renderMesh( u32 pIndex );
+
+
+
 // OpenGL Error Handling
     /// Check general Opengl Error and log it
     void CheckGLError_func( const char *pFile, u32 pLine );

@@ -33,7 +33,7 @@ void MemoryManager_allocation( void *ptr, size_t size, char file, int line );
 void MemoryManager_reallocation( void *ptr, size_t size, char file, int line );
 
 /// Reallocation accounting function (keep account on a reallocation, do not reallocate anything)
-void MemoryManager_deallocation( void *ptr );
+void MemoryManager_deallocation( void *ptr, char file, int line );
 
 
 //  ##########################################3
@@ -92,18 +92,18 @@ inline void CloseLog() {
 #endif
 
     // Free a pointer and set it to NULL (tell memory managment)
+    inline void byte_dealloc_func( void **ptr, const char *file, int line ) {
+        if( ptr ) {
+            MemoryManager_deallocation( *ptr, file[4], line );  
+            free(*ptr);                            
+            *ptr = NULL;                        
+        }
+    }
 #ifndef DEL_PTR
 #   ifdef _DEBUG
-#   define DEL_PTR(p, size)                         \
-        do {                                        \
-            if( p ) {                               \
-                MemoryManager_deallocation( (p) );  \
-                free(p);                            \
-                (p) = NULL;                         \
-            }                                       \
-        } while(0)
+#   define DEL_PTR(p) byte_dealloc_func( (void**)(&p), __FILE__, __LINE__ )
 #   else
-#   define DEL_PTR(p, size)     \
+#   define DEL_PTR(p)           \
         do {                    \
             if( p ) {           \
                 free(p);        \

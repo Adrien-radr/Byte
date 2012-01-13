@@ -20,7 +20,7 @@ u32 ReadFile( char **pBuffer, const char *pFile ) {
 
     // if buffer exists, destroy it
     if( *pBuffer )
-        DEL_PTR( *pBuffer, sizeof( *pBuffer ) );
+        DEL_PTR( *pBuffer );
 
     FILE *file;
     u32 file_size = 0;

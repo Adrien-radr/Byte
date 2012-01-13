@@ -51,7 +51,7 @@ void Device_destroy() {
         Context_destroy();
         EventManager_destroy();
 
-        DEL_PTR( device, sizeof( Device ) );
+        DEL_PTR( device );
     }
 
     CloseLog();

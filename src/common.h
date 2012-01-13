@@ -116,7 +116,8 @@
     bool name##Array_checkSize( name##Array *arr ) {                            \
         if( arr ) {                                                             \
             if( arr->cpt == arr->size )                                         \
-                arr->data = byte_realloc( arr->data, (arr->cpt *= 2) * sizeof( type ) ); \
+                arr->data = byte_realloc( arr->data,                            \
+                        (arr->cpt *= 2) * sizeof( type ) );                     \
             return true;                                                        \
         }                                                                       \
         return false;                                                           \
@@ -127,7 +128,7 @@
                                                                                 \
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr )                                                               \
-            DEL_PTR( arr->data, sizeof(type) * arr->size );                     \
+            DEL_PTR( arr->data );                                               \
     }                                                                           
 
 
@@ -139,7 +140,7 @@
             for( int i = 0; i < arr->size; ++i )                                \
                 destructionFunc( arr->data[i] );                                \
         }                                                                       \
-        DEL_PTR( arr->data, sizeof( type ) * arr->size );                       \
+        DEL_PTR( arr->data );                                                   \
     }                                                                           
 
 // ##########################################################################################

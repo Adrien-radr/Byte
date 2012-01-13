@@ -25,7 +25,7 @@ GLuint BuildShader( const char *pSrc, GLenum pType ) {
                  "%s"
                  "-----------------------------------------------------\n", log );
 
-        DEL_PTR( log, (size_t)len );
+        DEL_PTR( log );
         shader = 0;
     }
     return shader;
@@ -50,14 +50,14 @@ bool Shader_buildFromFile( Shader *pShader, const char *pVFile, const char *pFFi
     check( Shader_build( pShader, v_src, f_src ), "Failed to compile shader program from sources \"%s\" and \"%s\".\n", pVFile, pFFile );
 
 
-    DEL_PTR( v_src, (size_t)v_src_size );
-    DEL_PTR( f_src, (size_t)f_src_size ); 
+    DEL_PTR( v_src );
+    DEL_PTR( f_src ); 
 
     return 1;
 
 error:
-    DEL_PTR( v_src, (size_t)v_src_size );
-    DEL_PTR( f_src, (size_t)f_src_size );
+    DEL_PTR( v_src );
+    DEL_PTR( f_src );
     return 0;
 }
 
@@ -105,7 +105,7 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
                  "-----------------------------------------------------\n", log );
 
         
-        DEL_PTR( log, (size_t)len );
+        DEL_PTR( log );
     }
     CheckGLError();
 

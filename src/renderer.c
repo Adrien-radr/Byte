@@ -81,7 +81,7 @@ void Renderer_destroy() {
     if( renderer ) {
         VaoArray_destroy( &renderer->mVaos );
         MeshArray_destroy( &renderer->mMeshes );
-        DEL_PTR( renderer, sizeof( Renderer ) );
+        DEL_PTR( renderer );
     }
 }
 
@@ -115,7 +115,7 @@ void Renderer_bindVao( u32 pIndex ) {
 int Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u32 pIndicesSize ) {
     if( renderer ) {
         check( pPositions, "In Renderer_createMesh : given Position array is NULL!\n" );
-        //check( pIndices, "In Renderer_createMesh : given Indice array is NULL!\n" );
+        check( pIndices, "In Renderer_createMesh : given Indice array is NULL!\n" );
 
         if( MeshArray_checkSize( &renderer->mMeshes ) ) {
             Mesh *m = Mesh_new();
@@ -125,6 +125,7 @@ int Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u3
             Mesh_addVbo( m, MA_Position, pPositions, pPositionsSize );
 
             // add Indices data
+            Mesh_addIbo( m, pIndices, pIndicesSize );
 
 
             // add the Mesh to the renderer array
@@ -150,7 +151,7 @@ void Renderer_renderMesh( u32 pIndex ) {
             renderer->mCurrentMesh = pIndex;
         }
 
-        glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
+        glDrawElements( GL_TRIANGLES, m->mIndexCount, GL_UNSIGNED_INT, 0 );
     }
 }
 
