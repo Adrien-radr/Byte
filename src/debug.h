@@ -19,8 +19,9 @@ typedef struct {
     
 bool MemoryManager_init();
 void MemoryManager_destroy();
-void MemoryManager_allocation( void* ptr, size_t size, char file, int line );
-void MemoryManager_deallocation( void* ptr );
+void MemoryManager_allocation( void *ptr, size_t size, char file, int line );
+void MemoryManager_reallocation( void *ptr, size_t size, char file, int line );
+void MemoryManager_deallocation( void *ptr );
 
 // Log file (var defined in common.c
 extern FILE *Log;

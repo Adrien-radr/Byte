@@ -44,19 +44,37 @@
 
     // Allocate a pointer 
     inline void* byte_alloc_func( u32 size, const char* file, u32 line ) {
-        void* ret = malloc( size );
+        void* ret = calloc( 1, size );
         MemoryManager_allocation( ret, size, file[4], line );
         return ret;
     }
 
+    // Allocate a pointer (with calloc) and use memory manager in debug mode
 #ifndef byte_alloc
 #   ifdef _DEBUG
 #   define byte_alloc( size ) byte_alloc_func( (size), __FILE__, __LINE__ )
 #   else
-#   define byte_alloc( size ) malloc( (size ) )
+#   define byte_alloc( size ) calloc( 1, (size ) )
 #   endif
 #endif
 
+    // Reallocate a pointer
+    inline void* byte_realloc_func( void *ptr, u32 size, const char *file, u32 line ) {
+        if( ptr ) {
+            ptr = realloc( ptr, size );   
+            MemoryManager_reallocation( ptr, size, file[4], line );
+        }
+        return ptr;
+    }
+
+    // Reallocate a pointer and use memory manager in debug mode
+#ifndef byte_realloc
+#   ifdef _DEBUG
+#   define byte_realloc( ptr, size ) byte_realloc_func( (ptr), (size), __FILE__, __LINE__ )
+#   else
+#   define byte_realloc( ptr, size ) realloc( (ptr), (size) )
+#   endif
+#endif
 
     // Free a pointer and set it to NULL (tell memory managment)
 #ifndef DEL_PTR
@@ -118,17 +136,6 @@
 //      
 //      FloatArray_destroy( &arr );
 //  }
-                /*u32 size = arr->size;                                           \
-                arr->size *= 2;                                                 \
-                                                                                \
-                type tmp[size];                                                 \
-                                                                                \
-                memcpy( tmp, arr->data, size * sizeof( type ) );                \
-                arr->data = realloc( arr->data, arr->size * sizeof( type ) );   \
-                check_mem( arr->data );                                         \
-                                                                                \
-                memcpy( arr->data, tmp, size * sizeof( type ) );                \
-                */
 #   define Array( type, name )                                                  \
     typedef struct {                                                            \
         type    *data;                                                          \
@@ -137,7 +144,7 @@
     } name##Array;                                                              \
                                                                                 \
     bool name##Array_init( name##Array *arr, u32 size ) {                       \
-        arr->data = calloc( size, sizeof( type ) );                             \
+        arr->data = byte_alloc( size * sizeof( type ) );                        \
         check_mem( arr->data );                                                 \
         arr->cpt  = 0;                                                          \
         arr->size = size;                                                       \
@@ -149,9 +156,8 @@
                                                                                 \
     bool name##Array_checkSize( name##Array *arr ) {                            \
         if( arr ) {                                                             \
-            if( arr->cpt == arr->size ) {                                       \
-                arr->data = realloc( arr->data, (arr->cpt *= 2) * sizeof( type ) ); \
-            }                                                                   \
+            if( arr->cpt == arr->size )                                         \
+                arr->data = byte_realloc( arr->data, (arr->cpt *= 2) * sizeof( type ) ); \
             return true;                                                        \
         }                                                                       \
         return false;                                                           \
@@ -162,7 +168,7 @@
                                                                                 \
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr )                                                               \
-            DEL_PTR( arr->data, sizeof(type) );                                 \
+            DEL_PTR( arr->data, sizeof(type) * arr->size );                     \
     }                                                                           
 
 
@@ -174,7 +180,7 @@
             for( int i = 0; i < arr->size; ++i )                                \
                 destructionFunc( arr->data[i] );                                \
         }                                                                       \
-        DEL_PTR( arr->data, sizeof( type ) );                                   \
+        DEL_PTR( arr->data, sizeof( type ) * arr->size );                       \
     }                                                                           
 
 // ##########################################################################################

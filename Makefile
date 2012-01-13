@@ -19,6 +19,7 @@ src/clock.o\
 src/color.o\
 src/context.o\
 src/common.o\
+src/debug.o\
 src/device.o\
 src/event.o\
 src/main.o\
