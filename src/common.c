@@ -7,8 +7,6 @@
 const char DateFmt[] = "%a %d %b %Y";
 const char TimeFmt[] = "%H:%M:%S";
  
-extern inline void* byte_alloc_func( u32 size, const char* file, u32 line );
-extern inline void* byte_realloc_func( void *ptr, u32 size, const char *file, u32 line );
 extern inline int Sign( const f32 a, const f32 threshold );
 extern inline f32 Abs( const f32 a );
 extern inline bool Eq( f32 a, f32 b, f32 e );

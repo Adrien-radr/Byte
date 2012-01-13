@@ -42,61 +42,6 @@
     typedef char str1024[1024];
 
 
-    // Allocate a pointer 
-    inline void* byte_alloc_func( u32 size, const char* file, u32 line ) {
-        void* ret = calloc( 1, size );
-        MemoryManager_allocation( ret, size, file[4], line );
-        return ret;
-    }
-
-    // Allocate a pointer (with calloc) and use memory manager in debug mode
-#ifndef byte_alloc
-#   ifdef _DEBUG
-#   define byte_alloc( size ) byte_alloc_func( (size), __FILE__, __LINE__ )
-#   else
-#   define byte_alloc( size ) calloc( 1, (size ) )
-#   endif
-#endif
-
-    // Reallocate a pointer
-    inline void* byte_realloc_func( void *ptr, u32 size, const char *file, u32 line ) {
-        if( ptr ) {
-            ptr = realloc( ptr, size );   
-            MemoryManager_reallocation( ptr, size, file[4], line );
-        }
-        return ptr;
-    }
-
-    // Reallocate a pointer and use memory manager in debug mode
-#ifndef byte_realloc
-#   ifdef _DEBUG
-#   define byte_realloc( ptr, size ) byte_realloc_func( (ptr), (size), __FILE__, __LINE__ )
-#   else
-#   define byte_realloc( ptr, size ) realloc( (ptr), (size) )
-#   endif
-#endif
-
-    // Free a pointer and set it to NULL (tell memory managment)
-#ifndef DEL_PTR
-#   ifdef _DEBUG
-#   define DEL_PTR(p, size)                         \
-        do {                                        \
-            if( p ) {                               \
-                MemoryManager_deallocation( (p) );  \
-                free(p);                            \
-                (p) = NULL;                         \
-            }                                       \
-        } while(0)
-#   else
-#   define DEL_PTR(p, size)     \
-        do {                    \
-            if( p ) {           \
-                free(p);        \
-                (p) = NULL;     \
-            }                   \
-        } while(0)
-#   endif
-#endif
 
     // Format for Date and Time
     extern const char DateFmt[];
@@ -123,6 +68,7 @@
 // 
 // Use :
 //  SimpleArray( float, Float );
+//  HeapArray( Mesh*, Mesh, Mesh_destroy );
 //  
 //  int main .. {
 //      FloatArray arr;
@@ -135,6 +81,19 @@
 //      }
 //      
 //      FloatArray_destroy( &arr );
+//      
+//      MeshArray m_arr;
+//      MeshArray_init( &m_arr, 10 );
+//      u32 index = 0;
+//      
+//      if( MeshArray_checkSize( &m_arr ) ) {
+//          Mesh *m = Mesh_new();
+//          index = str_arr.cpt++;
+//          str_arr.data[index] = m;
+//      }
+//      
+//      Mesh_bind( i&m_arr->data[index] );
+//      StringArray_destroy( &str_arr );
 //  }
 #   define Array( type, name )                                                  \
     typedef struct {                                                            \

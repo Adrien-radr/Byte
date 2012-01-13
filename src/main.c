@@ -29,6 +29,10 @@ void ResizeCallback() {
     }
 }
 
+void delstr( const char *str ) {
+    
+}
+
 
 int main() {
 

@@ -1,5 +1,5 @@
 Byte-Project Log v0.0.7
-Fri 13 Jan 2012 - 15:53:28
+Fri 13 Jan 2012 - 16:17:51
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.6.0 successfully initialized!
@@ -9,4 +9,4 @@ Fri 13 Jan 2012 - 15:53:28
 [INFO] Renderer successfully initialized!
 [INFO] Event manager successfully initialized!
 [INFO] Device successfully initialized!
-[INFO] FPS = 4306.267090
+[INFO] FPS = 1730.323486

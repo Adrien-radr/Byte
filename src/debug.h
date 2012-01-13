@@ -6,7 +6,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-// Memory manager
+//  ##########################################3
+//      MEMORY MANAGER
+//  ##########################################3
 typedef struct {
     size_t  allocated_bytes;
     void*   alloc_stack[512];
@@ -17,12 +19,26 @@ typedef struct {
     int     alloc_cpt;
 } MemoryManager;
     
+/// Initialize memory manager (call this at the very begining of program)
 bool MemoryManager_init();
+
+/// Destroy the Memory manager (call this at the very end of program)
+/// This will also print a Report on any memory leak (will free them in the process)
 void MemoryManager_destroy();
+
+/// Allocation accounting function (keep account on an allocation, do not allocate anything)
 void MemoryManager_allocation( void *ptr, size_t size, char file, int line );
+
+/// Deallocation accounting function (keep account on a deallocation, do not free anything)
 void MemoryManager_reallocation( void *ptr, size_t size, char file, int line );
+
+/// Reallocation accounting function (keep account on a reallocation, do not reallocate anything)
 void MemoryManager_deallocation( void *ptr );
 
+
+//  ##########################################3
+//      LOG
+//  ##########################################3
 // Log file (var defined in common.c
 extern FILE *Log;
 extern bool LogOpened;
@@ -35,6 +51,73 @@ int InitLog();
 inline void CloseLog() {
     fclose( Log );
 }
+
+
+
+//  ##########################################3
+//      MEMORY ALLOCATORS
+//  ##########################################3
+    // Allocate a pointer 
+    inline void* byte_alloc_func( size_t size, const char* file, int line ) {
+        void* ret = calloc( 1, size );
+        MemoryManager_allocation( ret, size, file[4], line );
+        return ret;
+    }
+
+    // Allocate a pointer (with calloc) and use memory manager in debug mode
+#ifndef byte_alloc
+#   ifdef _DEBUG
+#   define byte_alloc( size ) byte_alloc_func( (size), __FILE__, __LINE__ )
+#   else
+#   define byte_alloc( size ) calloc( 1, (size ) )
+#   endif
+#endif
+
+    // Reallocate a pointer
+    inline void* byte_realloc_func( void *ptr, size_t size, const char *file, int line ) {
+        if( ptr ) {
+            ptr = realloc( ptr, size );   
+            MemoryManager_reallocation( ptr, size, file[4], line );
+        }
+        return ptr;
+    }
+
+    // Reallocate a pointer and use memory manager in debug mode
+#ifndef byte_realloc
+#   ifdef _DEBUG
+#   define byte_realloc( ptr, size ) byte_realloc_func( (ptr), (size), __FILE__, __LINE__ )
+#   else
+#   define byte_realloc( ptr, size ) realloc( (ptr), (size) )
+#   endif
+#endif
+
+    // Free a pointer and set it to NULL (tell memory managment)
+#ifndef DEL_PTR
+#   ifdef _DEBUG
+#   define DEL_PTR(p, size)                         \
+        do {                                        \
+            if( p ) {                               \
+                MemoryManager_deallocation( (p) );  \
+                free(p);                            \
+                (p) = NULL;                         \
+            }                                       \
+        } while(0)
+#   else
+#   define DEL_PTR(p, size)     \
+        do {                    \
+            if( p ) {           \
+                free(p);        \
+                (p) = NULL;     \
+            }                   \
+        } while(0)
+#   endif
+#endif
+
+
+
+//  ##########################################3
+//      DEBUG MSG
+//  ##########################################3
 
 /// Write a message in the log file
 #define WriteLog( M, ... )  do {\
