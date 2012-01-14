@@ -9,6 +9,11 @@ typedef struct s_Device {
 
 Device *device = NULL;
 
+void ResizeCallback() {
+    const mat3 *pm = Context_getProjectionMatrix();
+    if( pm ) 
+        Renderer_updateProjectionMatrix( pm );
+}
 
 bool Device_init() {
 #   ifdef _DEBUG
@@ -27,6 +32,7 @@ bool Device_init() {
     MSG( title, 32, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
 
     check( Context_init( 800, 600, false, title, 0 ), "Error while creating Context!\n" );
+    Context_setResizeCallback( ResizeCallback );
 
     // Initialize Renderer
     check( Renderer_init(), "Error while creating Renderer!\n" );
@@ -63,6 +69,8 @@ void Device_destroy() {
 void Device_beginFrame() {
     EventManager_update();
     Context_update();
+
+    Renderer_beginFrame();
 }
 
 

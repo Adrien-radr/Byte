@@ -137,8 +137,9 @@
                                                                                 \
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr ) {                                                             \
-            for( int i = 0; i < arr->size; ++i )                                \
-                destructionFunc( arr->data[i] );                                \
+            for( int i = 0; i < arr->cpt; ++i )                                 \
+                if( arr->data[i] )                                              \
+                    destructionFunc( arr->data[i] );                            \
         }                                                                       \
         DEL_PTR( arr->data );                                                   \
     }                                                                           

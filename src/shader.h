@@ -7,7 +7,12 @@
 
 typedef struct s_Shader {
     u32 mProgram;
+
+    bool mUseProjectionMatrix;
 } Shader;
+
+/// Create a new shader
+Shader *Shader_new();
 
 /// Build and Link a GLSL program, with a Vertex and a Fragment shader
 /// @param pVSrc : string containing the vertex shader source
@@ -30,11 +35,11 @@ void Shader_bind( Shader *pShader );
 /// Send a uniform vec2 to the shader
 /// @param pVarName : Variable name in shader src
 /// @param pVector  : Vector to send
-void Shader_sendVec2( Shader *pShader, const char *pVarName, const vec2 *pVector );
+void Shader_sendVec2( const char *pVarName, const vec2 *pVector );
 
 /// Send a uniform mat3 to the shader
 /// @param pVarName : Variable name in shader src
 /// @param pVector  : Matrix to send
-void Shader_sendMat3( Shader *pShader, const char *pVarName, const mat3 *pMatrix );
+void Shader_sendMat3( const char *pVarName, const mat3 *pMatrix );
 
 #endif // BYTE_SHADER

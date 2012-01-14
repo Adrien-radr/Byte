@@ -3,6 +3,15 @@
 
 #include "GL/glew.h"
 
+
+Shader *Shader_new() {
+    Shader *s = byte_alloc( sizeof( Shader ) );
+
+    s->mUseProjectionMatrix = true;
+
+    return s;
+}
+
 GLuint BuildShader( const char *pSrc, GLenum pType ) {
     GLuint shader = glCreateShader( pType );
 
@@ -120,6 +129,7 @@ error:
 void Shader_destroy( Shader *pShader ) {
     if( pShader )
         glDeleteProgram( pShader->mProgram );
+    DEL_PTR( pShader );
 }
 
 void Shader_bind( Shader *pShader ) {
@@ -127,12 +137,12 @@ void Shader_bind( Shader *pShader ) {
     glUseProgram( program );
 }
 
-void Shader_sendVec2( Shader *pShader, const char *pVarName, const vec2 *pVector ) {
-    glUniform2fv( glGetUniformLocation( pShader->mProgram, pVarName), 1, &pVector->x );
+void Shader_sendVec2( const char *pVarName, const vec2 *pVector ) {
+    glUniform2fv( glGetUniformLocation( Renderer_currentGLProgram(), pVarName), 1, &pVector->x );
     CheckGLError();
 }
 
-void Shader_sendMat3( Shader *pShader, const char *pVarName, const mat3 *pMatrix ) {
-    glUniformMatrix3fv( glGetUniformLocation( pShader->mProgram, pVarName), 1, GL_FALSE, pMatrix->x );
+void Shader_sendMat3( const char *pVarName, const mat3 *pMatrix ) {
+    glUniformMatrix3fv( glGetUniformLocation( Renderer_currentGLProgram(), pVarName), 1, GL_FALSE, pMatrix->x );
     CheckGLError();
 }

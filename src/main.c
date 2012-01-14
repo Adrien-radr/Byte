@@ -18,23 +18,12 @@ void listener( const Event* pEvent ) {
         printf( "%c\n", pEvent->mChar );
 }
 
-Shader defShader;
-
-void ResizeCallback() {
-    const mat3 *pm = Context_getProjectionMatrix();
-    if( pm ) {
-        Shader_bind( &defShader );
-            Shader_sendMat3( &defShader, "ProjectionMatrix", pm );
-        Shader_bind( 0 );
-    }
-}
 
 
 int main() {
 
     check( Device_init(), "Error while creating Device, exiting program.\n" );
 
-    Context_setResizeCallback( ResizeCallback );
     EventManager_addListener( LT_KeyListener, listener );
 
     printf( "Hello, Byte World!!\n" );
@@ -72,11 +61,11 @@ int main() {
 
 
     // shader
-    check( Shader_buildFromFile( &defShader, "default.vs", "default.fs" ), "Error in shader creation.\n" );
+    int shader = Renderer_createShader( "default.vs", "default.fs" );
+    check( shader >= 0, "Error in shader creation. Exiting program!\n" );
 
-    Shader_bind( &defShader );
-    Shader_sendMat3( &defShader, "ProjectionMatrix", Context_getProjectionMatrix() );
-    Shader_bind( 0 );
+    Renderer_useShader( shader );
+    Shader_sendMat3( "ProjectionMatrix", Context_getProjectionMatrix() );
 
 
 
@@ -101,20 +90,13 @@ int main() {
 
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {
         Device_beginFrame();
-            glClear( GL_COLOR_BUFFER_BIT );
-
-            
-            Shader_bind( &defShader );
-                Shader_sendMat3( &defShader, "ModelMatrix", &MM );
-
-                //Mesh_bind( m );
-                //glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
+            Renderer_useShader( shader );
+                Shader_sendMat3( "ModelMatrix", &MM );
                 Renderer_renderMesh( mesh );
 
-                Shader_sendMat3( &defShader, "ModelMatrix", &ModelMatrix );
+                Shader_sendMat3( "ModelMatrix", &ModelMatrix );
                 Renderer_renderMesh( mesh );
-                //glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
-            Shader_bind( 0 );
+            Renderer_useShader( -1 );
         Device_endFrame();
     }
 

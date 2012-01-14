@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "vector.h"
+#include "matrix.h"
 
 typedef struct s_Renderer Renderer;
 
@@ -11,6 +12,12 @@ bool Renderer_init();
 
 /// Destroy a given renderer
 void Renderer_destroy();
+
+/// Function called at the begining of every rendering phase
+void Renderer_beginFrame();
+
+/// Update the projection matrix used to render in shaders
+void Renderer_updateProjectionMatrix( const mat3 *pm );
 
 /// Begin a new VAO in the given Renderer
 /// @return : the indice in the Renderer VAO array of the created VAO
@@ -27,6 +34,20 @@ int  Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u
 
 /// Render a mesh given its identifier
 void Renderer_renderMesh( u32 pIndex );
+
+/// Create a new shader and return its ID
+int  Renderer_createShader( const char *pVFile, const char *pFFile );
+
+/// Sets the renderer to use a given shader
+/// @param pShader : shader index in renderer shader array. -1 to unbind all shaders
+void Renderer_useShader( int pShader );
+
+/// Returns the currently bound shader
+int  Renderer_currentShader();
+
+/// Returns the currently bound GL program
+u32  Renderer_currentGLProgram();
+
 
 
 

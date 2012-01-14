@@ -2,7 +2,7 @@
 #include "GL/glew.h"
 
 Mesh* Mesh_new() {
-    Mesh* mesh = byte_alloc( sizeof( Mesh ) );
+    Mesh *mesh = byte_alloc( sizeof( Mesh ) );
 
     return mesh;
 }

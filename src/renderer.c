@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "mesh.h"
+#include "shader.h"
 
 #include "GL/glew.h"
 
@@ -10,17 +11,21 @@ SimpleArray( u32, Vao )
 // Array MeshArray with Mesh* data type
 HeapArray( Mesh*, Mesh, Mesh_destroy )
 
+// Array ShaderArray with Shader* data type
+HeapArray( Shader*, Shader, Shader_destroy )
+
 /// Application Renderer
 struct s_Renderer {
-    VaoArray    mVaos;
-    MeshArray   mMeshes;
+    VaoArray        mVaos;
+    MeshArray       mMeshes;
+    ShaderArray     mShaders;
 
-    int         mCurrentMesh;
+    int             mCurrentMesh,
+                    mCurrentShader;
 };
 
 /// Renderer only instance definition
 Renderer *renderer = NULL;
-
 
 bool Renderer_init() {
     check( !renderer, "Renderer already created!\n" );
@@ -33,7 +38,10 @@ bool Renderer_init() {
     
     MeshArray_init( &renderer->mMeshes, 100 );
 
-    renderer->mCurrentMesh = 1;
+    ShaderArray_init( &renderer->mShaders, 10 );
+
+    renderer->mCurrentMesh = -1;
+    renderer->mCurrentShader = -1;
  
     // GLEW initialisation
     GLenum glerr = glewInit();
@@ -81,9 +89,31 @@ void Renderer_destroy() {
     if( renderer ) {
         VaoArray_destroy( &renderer->mVaos );
         MeshArray_destroy( &renderer->mMeshes );
+        ShaderArray_destroy( &renderer->mShaders );
         DEL_PTR( renderer );
     }
 }
+
+void Renderer_beginFrame() {
+    glClear( GL_COLOR_BUFFER_BIT );
+}
+
+void Renderer_updateProjectionMatrix( const mat3 *pm ) {
+    if( renderer ) {
+        u32 currShader = renderer->mCurrentShader;
+
+        // update every shader using projection matrix
+        for( u32 i = 0; renderer && (i < renderer->mShaders.cpt); ++i ) 
+            if( renderer->mShaders.data[i]->mUseProjectionMatrix ) {
+                Renderer_useShader( i );
+                Shader_sendMat3( "ProjectionMatrix", pm );
+            }
+
+        // returns to shader used before update
+        Renderer_useShader( currShader );
+    }
+}
+
 
 int Renderer_beginVao() {
     if( renderer ) {
@@ -155,7 +185,46 @@ void Renderer_renderMesh( u32 pIndex ) {
     }
 }
 
+int  Renderer_createShader( const char *pVFile, const char *pFFile ) {
+    Shader *s = NULL;
 
+    if( renderer && ShaderArray_checkSize( &renderer->mShaders ) ) {
+        s = Shader_new();
+        check_mem( s );
+
+        // shader creation and linking
+        check( Shader_buildFromFile( s, pVFile, pFFile ), "Error in shader creation.\n" );
+
+        // storage
+        int index = renderer->mShaders.cpt++;
+        renderer->mShaders.data[index] = s;
+
+        return index;
+    }
+
+error:
+    DEL_PTR( s );
+    return -1;
+}
+
+void Renderer_useShader( int pShader ) { 
+    if( renderer && pShader < renderer->mShaders.cpt && pShader != renderer->mCurrentShader ) {
+        renderer->mCurrentShader = pShader;
+        Shader_bind( pShader < 0 ? 0 :renderer->mShaders.data[pShader] );
+    }
+}
+
+int  Renderer_currentShader() {
+    if( renderer ) 
+        return renderer->mCurrentShader;
+    return -1;
+}
+
+u32  Renderer_currentGLProgram() {
+    if( renderer )
+        return renderer->mShaders.data[renderer->mCurrentShader]->mProgram;
+    return 0;
+}
 
 
 

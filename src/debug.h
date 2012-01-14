@@ -93,7 +93,7 @@ inline void CloseLog() {
 
     // Free a pointer and set it to NULL (tell memory managment)
     inline void byte_dealloc_func( void **ptr, const char *file, int line ) {
-        if( ptr ) {
+        if( ptr && *ptr ) {
             MemoryManager_deallocation( *ptr, file[4], line );  
             free(*ptr);                            
             *ptr = NULL;                        
