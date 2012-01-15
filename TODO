@@ -6,12 +6,14 @@ Priority ( - : to do,  + : done )
 ---------
 + Context/Window
 + Inputs/Events
-- Textures
-- Basic VBO/VAO meshes (sprites)
++ Renderer with data managment
++ Textures
++ Basic VBO/VAO meshes (sprites)
 - Scene structure
 
 ---------
 Else
 ---------
-- 
+- Config file
+- Lua integration as a scripting language
 

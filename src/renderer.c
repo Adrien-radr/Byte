@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "mesh.h"
 #include "shader.h"
+#include "texture.h"
 
 #include "GL/glew.h"
 
@@ -14,14 +15,20 @@ HeapArray( Mesh*, Mesh, Mesh_destroy )
 // Array ShaderArray with Shader* data type
 HeapArray( Shader*, Shader, Shader_destroy )
 
+// Array TextureArray with Texture* data type
+HeapArray( Texture*, Texture, Texture_destroy )
+
 /// Application Renderer
 struct s_Renderer {
     VaoArray        mVaos;
     MeshArray       mMeshes;
     ShaderArray     mShaders;
+    TextureArray    mTextures;
 
     int             mCurrentMesh,
-                    mCurrentShader;
+                    mCurrentShader,
+                    mCurrentTexture,
+                    mCurrentTextureTarget;
 };
 
 /// Renderer only instance definition
@@ -35,16 +42,21 @@ bool Renderer_init() {
     
     // initial number of 10 vaos and 100 meshes
     VaoArray_init( &renderer->mVaos, 10 );
-    
-    MeshArray_init( &renderer->mMeshes, 100 );
-
+    MeshArray_init( &renderer->mMeshes, 50 );
     ShaderArray_init( &renderer->mShaders, 10 );
+    TextureArray_init( &renderer->mTextures, 10 );
 
     renderer->mCurrentMesh = -1;
     renderer->mCurrentShader = -1;
+    renderer->mCurrentTexture = -1;
+    renderer->mCurrentTextureTarget = 0;
  
     // GLEW initialisation
+    glewExperimental = 1;
     GLenum glerr = glewInit();
+
+    // remove GLEW error cause of Core profile
+    glGetError();
 
     check( GLEW_OK == glerr, "GLEW Error : %s\n", glewGetErrorString( glerr ) );
 
@@ -59,7 +71,7 @@ bool Renderer_init() {
     log_info( "Hardware : %s - %s\n", glGetString( GL_VENDOR ), glGetString( GL_RENDERER ) );
 
     // GL state initialisations
-    glHint( GL_GENERATE_MIPMAP_HINT, GL_NICEST );
+    //glHint( GL_GENERATE_MIPMAP_HINT, GL_NICEST );
 
     glDisable( GL_DEPTH_TEST );
     //glDepthFunc( GL_LESS );
@@ -71,10 +83,8 @@ bool Renderer_init() {
     glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
 
     // clear gl errors
-    glGetError();
+    CheckGLError();
  
-
-
     log_info( "Renderer successfully initialized!\n" );
 
     return true;
@@ -89,6 +99,7 @@ void Renderer_destroy() {
     if( renderer ) {
         VaoArray_destroy( &renderer->mVaos );
         MeshArray_destroy( &renderer->mMeshes );
+        TextureArray_destroy( &renderer->mTextures );
         ShaderArray_destroy( &renderer->mShaders );
         DEL_PTR( renderer );
     }
@@ -142,7 +153,7 @@ void Renderer_bindVao( u32 pIndex ) {
 
 
 
-int Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u32 pIndicesSize ) {
+int  Renderer_createMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize ) {
     if( renderer ) {
         check( pPositions, "In Renderer_createMesh : given Position array is NULL!\n" );
         check( pIndices, "In Renderer_createMesh : given Indice array is NULL!\n" );
@@ -153,6 +164,10 @@ int Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u3
 
             // add Position data
             Mesh_addVbo( m, MA_Position, pPositions, pPositionsSize );
+            
+            // add Texcoords data if it exist
+            if( pTexcoords )
+                Mesh_addVbo( m, MA_Texcoord, pTexcoords, pTexcoordsSize );
 
             // add Indices data
             Mesh_addIbo( m, pIndices, pIndicesSize );
@@ -210,7 +225,7 @@ error:
 void Renderer_useShader( int pShader ) { 
     if( renderer && pShader < renderer->mShaders.cpt && pShader != renderer->mCurrentShader ) {
         renderer->mCurrentShader = pShader;
-        Shader_bind( pShader < 0 ? 0 :renderer->mShaders.data[pShader] );
+        Shader_bind( pShader < 0 ? 0 : renderer->mShaders.data[pShader] );
     }
 }
 
@@ -222,10 +237,44 @@ int  Renderer_currentShader() {
 
 u32  Renderer_currentGLProgram() {
     if( renderer )
-        return renderer->mShaders.data[renderer->mCurrentShader]->mProgram;
+        return renderer->mShaders.data[renderer->mCurrentShader]->mID;
     return 0;
 }
 
+
+int  Renderer_createTexture( const char *pTFile ) {
+    Texture *t = NULL;
+
+    if( renderer && pTFile ) {
+        t = Texture_new();
+        check_mem( t );
+
+        // texture creation from file
+        check( Texture_loadFromFile( t, pTFile ), "Error in texture creation.\n" );
+
+        // storage
+        int index = renderer->mTextures.cpt++;
+        renderer->mTextures.data[index] = t;
+
+        return index;
+    }
+
+error:
+    DEL_PTR( t );
+    return -1;
+}
+
+void Renderer_useTexture( int pTexture, u32 pTarget ) {
+    if( renderer && pTexture < renderer->mTextures.cpt && pTexture != renderer->mCurrentTexture ) {
+        renderer->mCurrentTexture = pTexture;
+
+        int target = -1;
+        if( pTarget != renderer->mCurrentTextureTarget ) 
+            renderer->mCurrentTextureTarget = target = pTarget;
+
+        Texture_bind( pTexture < 0 ? 0 : renderer->mTextures.data[pTexture], target );
+    }
+}
 
 
 void CheckGLError_func( const char *pFile, u32 pLine ) {
@@ -284,6 +333,13 @@ void CheckGLError_func( const char *pFile, u32 pLine ) {
             {
                 strncpy( errorStr, "GL_INVALID_FRAMEBUFFER_OPERATION_EXT", 64 );
                 strncpy( description, "The object bound to FRAMEBUFFER_BINDING is not \"framebuffer complete\".", 256 );
+                break;
+            }
+
+            default : 
+            {
+                strncpy( errorStr, "UNKNOWN", 64 );
+                strncpy( description, "Unknown GL Error", 256 );
                 break;
             }
         }

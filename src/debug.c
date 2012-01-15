@@ -43,7 +43,7 @@ void MemoryManager_destroy() {
                                               mem_manager->alloc_files[i],
                                               mem_manager->alloc_lines[i],
                                               mem_manager->alloc_sizes[i] );
-                    //free( mem_manager->alloc_stack[i] );
+                    free( mem_manager->alloc_stack[i] );
                 } 
             }
         }
@@ -66,19 +66,20 @@ void MemoryManager_allocation( void* ptr, size_t size, char file, int line ) {
     }
 }
 
-void MemoryManager_reallocation( void *ptr, size_t size, char file, int line ) {
+void MemoryManager_reallocation( void *ptr, void *oldptr, size_t size, char file, int line ) {
     if( mem_manager ) {
         bool found = false;
         for( int i = 0; (i < mem_manager->alloc_cpt) && !found; ++i )
-            if( ptr == mem_manager->alloc_stack[i] ) {
+            if( oldptr == mem_manager->alloc_stack[i] && 0 != mem_manager->alloc_sizes[i] ) {
                 mem_manager->allocated_bytes += size - mem_manager->alloc_sizes[i];
+                mem_manager->alloc_stack[i] = ptr;
                 mem_manager->alloc_sizes[i] = size;
                 mem_manager->alloc_lines[i] = line;
                 mem_manager->alloc_files[i] = file;
                 found = true;
             }
         if( !found )
-            log_err( "MemoryManager error (%c:%d): Tried to reallocate pointer \"%ld\", but it has never been allocated in the memory manager before!\b", file, line, (size_t)ptr );
+            log_err( "MemoryManager error (%c:%d): Tried to reallocate pointer \"%ld\", but it has never been allocated in the memory manager before!\n", file, line, (size_t)ptr );
     }
 }
 
@@ -92,7 +93,7 @@ void MemoryManager_deallocation( void* ptr, char file, int line ) {
                 found = true;
             }
         if( !found )
-            log_err( "MemoryManager error (%c:%d): Tried to deallocate pointer \"%ld\", but it has never been allocated in the memory manager before!\b", file, line, (size_t)ptr );
+            log_err( "MemoryManager error (%c:%d): Tried to deallocate pointer \"%ld\", but it has never been allocated in the memory manager before!\n", file, line, (size_t)ptr );
     }
 }
 
@@ -102,7 +103,7 @@ void MemoryManager_deallocation( void* ptr, char file, int line ) {
 //      MEMORY ALLOCATORS
 //  ################################
 extern inline void* byte_alloc_func( size_t size, const char* file, int line );
-extern inline void* byte_realloc_func( void *ptr, size_t size, const char *file, int line );
+extern inline void* byte_realloc_func( void **ptr, size_t size, const char *file, int line );
 extern inline void byte_dealloc_func( void **ptr, const char *file, int line );
 
 

@@ -79,7 +79,7 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
     check( pFSrc, "In Shader_build(), given Fragment Shader source is uninitialized!\n" );
 
 
-    pShader->mProgram = glCreateProgram();
+    pShader->mID = glCreateProgram();
 
     // Compile vertex & fragment shaders
     v_shader = BuildShader( pVSrc, GL_VERTEX_SHADER );
@@ -88,25 +88,25 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
     f_shader = BuildShader( pFSrc, GL_FRAGMENT_SHADER );
     check( f_shader, "Failed to build Fragment shader.\n" );
 
-    glAttachShader( pShader->mProgram, v_shader );
-    glAttachShader( pShader->mProgram, f_shader );
+    glAttachShader( pShader->mID, v_shader );
+    glAttachShader( pShader->mID, f_shader );
 
     glDeleteShader( v_shader );
     glDeleteShader( f_shader );
     
 
     // Check link status
-    glLinkProgram( pShader->mProgram );
+    glLinkProgram( pShader->mID );
 
     GLint status;
-    glGetProgramiv( pShader->mProgram, GL_LINK_STATUS, &status );
+    glGetProgramiv( pShader->mID, GL_LINK_STATUS, &status );
 
     if( !status ) {
         GLint len;
-        glGetProgramiv( pShader->mProgram, GL_INFO_LOG_LENGTH, &len );
+        glGetProgramiv( pShader->mID, GL_INFO_LOG_LENGTH, &len );
 
         GLchar *log = byte_alloc( len );
-        glGetProgramInfoLog( pShader->mProgram, len, NULL, log );
+        glGetProgramInfoLog( pShader->mID, len, NULL, log );
 
         log_err( "Shader Program link error : \n"
                  "-----------------------------------------------------\n"
@@ -122,18 +122,18 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
 error:
     glDeleteShader( v_shader );
     glDeleteShader( f_shader );
-    glDeleteProgram( pShader->mProgram );
+    glDeleteProgram( pShader->mID );
     return 0;
 }
 
 void Shader_destroy( Shader *pShader ) {
     if( pShader )
-        glDeleteProgram( pShader->mProgram );
+        glDeleteProgram( pShader->mID );
     DEL_PTR( pShader );
 }
 
 void Shader_bind( Shader *pShader ) {
-    GLuint program = ( pShader ? pShader->mProgram : 0 );
+    GLuint program = ( pShader ? pShader->mID : 0 );
     glUseProgram( program );
 }
 
@@ -144,5 +144,10 @@ void Shader_sendVec2( const char *pVarName, const vec2 *pVector ) {
 
 void Shader_sendMat3( const char *pVarName, const mat3 *pMatrix ) {
     glUniformMatrix3fv( glGetUniformLocation( Renderer_currentGLProgram(), pVarName), 1, GL_FALSE, pMatrix->x );
+    CheckGLError();
+}
+
+void Shader_sendTexture( const char *pVarName, u32 pTexture ) {
+    glUniform1i( glGetUniformLocation( Renderer_currentGLProgram(), pVarName), pTexture );
     CheckGLError();
 }

@@ -30,7 +30,7 @@ void MemoryManager_destroy();
 void MemoryManager_allocation( void *ptr, size_t size, char file, int line );
 
 /// Deallocation accounting function (keep account on a deallocation, do not free anything)
-void MemoryManager_reallocation( void *ptr, size_t size, char file, int line );
+void MemoryManager_reallocation( void *ptr, void *oldptr, size_t size, char file, int line );
 
 /// Reallocation accounting function (keep account on a reallocation, do not reallocate anything)
 void MemoryManager_deallocation( void *ptr, char file, int line );
@@ -74,18 +74,19 @@ inline void CloseLog() {
 #endif
 
     // Reallocate a pointer
-    inline void* byte_realloc_func( void *ptr, size_t size, const char *file, int line ) {
-        if( ptr ) {
-            ptr = realloc( ptr, size );   
-            MemoryManager_reallocation( ptr, size, file[4], line );
+    inline void* byte_realloc_func( void **ptr, size_t size, const char *file, int line ) {
+        if( ptr && *ptr ) {
+            void *oldptr = *ptr;
+            *ptr = realloc( *ptr, size );   
+            MemoryManager_reallocation( *ptr, oldptr, size, file[4], line );
         }
-        return ptr;
+        return *ptr;
     }
 
     // Reallocate a pointer and use memory manager in debug mode
 #ifndef byte_realloc
 #   ifdef _DEBUG
-#   define byte_realloc( ptr, size ) byte_realloc_func( (ptr), (size), __FILE__, __LINE__ )
+#   define byte_realloc( ptr, size ) byte_realloc_func( (void**)(&ptr), (size), __FILE__, __LINE__ )
 #   else
 #   define byte_realloc( ptr, size ) realloc( (ptr), (size) )
 #   endif

@@ -7,7 +7,7 @@
 
 /// Mesh structure
 typedef struct s_Mesh {
-    u32     mVbo[1];        ///< Vbos array (0 = position)
+    u32     mVbo[2];        ///< Vbos array (0 = position, 1 = texcoords)
     u32     mIbo;           ///< Indices of Mesh
 
     u32     mIndexCount;    ///< Index count
@@ -19,7 +19,8 @@ typedef struct s_Mesh {
 
 /// Mesh attrib type in VBOs
 typedef enum e_MeshAttrib {
-    MA_Position = 0
+    MA_Position = 0,
+    MA_Texcoord = 1
 } MeshAttrib;
 
 /// Initialize a new mesh pointer

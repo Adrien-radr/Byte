@@ -30,7 +30,7 @@ void Renderer_endVao();
 void Renderer_bindVao( u32 pIndex );
 
 /// Create a new mesh and return its ID
-int  Renderer_createMesh( vec2 *pPositions, u32 pPositionsSize, u32 *pIndices, u32 pIndicesSize );
+int  Renderer_createMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
 
 /// Render a mesh given its identifier
 void Renderer_renderMesh( u32 pIndex );
@@ -48,7 +48,11 @@ int  Renderer_currentShader();
 /// Returns the currently bound GL program
 u32  Renderer_currentGLProgram();
 
+/// Create a new texture from file and return its ID
+int  Renderer_createTexture( const char *pTFile );
 
+/// Sets the renderer to use a given texture in the given unit
+void Renderer_useTexture( int pTexture, u32 pTarget );
 
 
 // OpenGL Error Handling

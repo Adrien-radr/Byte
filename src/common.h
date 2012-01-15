@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 0
-#define BYTE_PATCH 8
+#define BYTE_PATCH 9
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -51,6 +51,9 @@
 
     /// Returns date/time in given format
     void GetTime( char *t, int t_size, const char *fmt );
+
+    /// Returns whether or not a file exists
+    bool FileExist( const char *pFile );
 
     /// Read an entire file in a buffer
     /// @return : pBuffer allocated size (file size + '\0' char)

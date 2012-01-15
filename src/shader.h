@@ -4,11 +4,12 @@
 #include "common.h"
 #include "vector.h"
 #include "matrix.h"
+#include "texture.h"
 
 typedef struct s_Shader {
-    u32 mProgram;
+    u32 mID;
 
-    bool mUseProjectionMatrix;
+    bool mUseProjectionMatrix;  ///< Flag for the use of the projection matrix in shader
 } Shader;
 
 /// Create a new shader
@@ -41,5 +42,10 @@ void Shader_sendVec2( const char *pVarName, const vec2 *pVector );
 /// @param pVarName : Variable name in shader src
 /// @param pVector  : Matrix to send
 void Shader_sendMat3( const char *pVarName, const mat3 *pMatrix );
+
+/// Send a uniform texture to the shader
+/// @param pVarName : Variable name in shader src
+/// @param pTexture : texture target to use 
+void Shader_sendTexture( const char *pVarName, u32 pTexture );
 
 #endif // BYTE_SHADER
