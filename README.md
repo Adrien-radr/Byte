@@ -2,8 +2,10 @@ Byte : a C/OpenGL 2D Game Project
 =================================
 Author(s) : Adrian 'Revk' Dubouchet <greunne@gmail.com>
 
-### NOTE to readers : Feel free to fork/watch and give me comments on my work.
-If you're interested in my project, feel free to contact me!!
+**NOTE to readers** : Feel free to fork/watch and give me comments on my work. If you're interested in my project, feel free to contact me!!
+
+----------
+
 
 
 This is a 2D Game with GPU based rendering (OpenGL3/GLSL).
