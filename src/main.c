@@ -51,6 +51,7 @@ int main() {
     // ###############################3
     //      TEXTURE
     int texture = Renderer_createTexture( "img_test.png" );
+    check( texture >= 0, "Error in texture creation. Exiting program!\n" );
     Renderer_useTexture( texture, 0 );
 
 

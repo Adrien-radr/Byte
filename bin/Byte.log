@@ -1,5 +1,5 @@
 Byte-Project Log v0.0.9
-Sun 15 Jan 2012 - 16:48:24
+Sun 15 Jan 2012 - 17:01:21
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.6.0 successfully initialized!
@@ -9,8 +9,6 @@ Sun 15 Jan 2012 - 16:48:24
 [INFO] Renderer successfully initialized!
 [INFO] Event manager successfully initialized!
 [INFO] Device successfully initialized!
-[INFO] FPS = 2012.621826
-[INFO] FPS = 493.099457
-[INFO] FPS = 2487.724854
-[INFO] FPS = 2291.969482
-[INFO] FPS = 543.585266
+[ERROR] Error while loading texture "img_text.png" : Unable to open file
+[ERROR] Error in texture creation.
+[ERROR] Error in texture creation. Exiting program!
