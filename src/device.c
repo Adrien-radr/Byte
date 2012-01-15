@@ -4,7 +4,7 @@
 #include "event.h"
 
 typedef struct s_Device {
-
+    int dummy;
 } Device;
 
 Device *device = NULL;

@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 0
-#define BYTE_PATCH 7
+#define BYTE_PATCH 8
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -42,6 +42,8 @@
     typedef char str1024[1024];
 
 
+    // Data structures Reallocation ratio (at each realloc, multiply the current size by this)
+#   define REALLOC_RATIO 1.7
 
     // Format for Date and Time
     extern const char DateFmt[];
@@ -117,7 +119,7 @@
         if( arr ) {                                                             \
             if( arr->cpt == arr->size )                                         \
                 arr->data = byte_realloc( arr->data,                            \
-                        (arr->cpt *= 2) * sizeof( type ) );                     \
+                        (arr->size *= REALLOC_RATIO) * sizeof( type ) );        \
             return true;                                                        \
         }                                                                       \
         return false;                                                           \
@@ -138,8 +140,7 @@
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr ) {                                                             \
             for( int i = 0; i < arr->cpt; ++i )                                 \
-                if( arr->data[i] )                                              \
-                    destructionFunc( arr->data[i] );                            \
+                destructionFunc( arr->data[i] );                                \
         }                                                                       \
         DEL_PTR( arr->data );                                                   \
     }                                                                           

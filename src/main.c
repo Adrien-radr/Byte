@@ -9,7 +9,7 @@
 #include "renderer.h"
 #include "mesh.h"
 #include "device.h"
-
+#include "handlemanager.h"
 #include "GL/glew.h"
 
 
@@ -53,16 +53,17 @@ int main() {
         { .x = 5.f, .y = 5.f },
         { .x = 5.f, .y = -5.f }
     };
-
+    
     u32 indices[] = {
         0, 1, 2, 0, 2, 3
     };
 
 
 
+
     // shader
     int shader = Renderer_createShader( "default.vs", "default.fs" );
-    check( shader >= 0, "Error in shader creation. Exiting program!\n" );
+    //check( shader >= 0, "Error in shader creation. Exiting program!\n" );
 
     Renderer_useShader( shader );
     Shader_sendMat3( "ProjectionMatrix", Context_getProjectionMatrix() );

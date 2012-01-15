@@ -38,12 +38,12 @@ void MemoryManager_destroy() {
             u32 cpt = mem_manager->alloc_cpt;
             for( u32 i = 0; i < cpt; ++i ) {
                 if( mem_manager->alloc_sizes[i] ) {
-                    printf( "\tAddress : 0x%ld  (%c:%d)\n"
-                            "\tSize : %ld\n", (size_t)mem_manager->alloc_stack[i], 
-                                                      mem_manager->alloc_files[i],
-                                                      mem_manager->alloc_lines[i],
-                                                      mem_manager->alloc_sizes[i] );
-                    free( mem_manager->alloc_stack[i] );
+                    printf( "\tAddress : %p  (%c:%d)\n"
+                            "\tSize : %ld\n", mem_manager->alloc_stack[i], 
+                                              mem_manager->alloc_files[i],
+                                              mem_manager->alloc_lines[i],
+                                              mem_manager->alloc_sizes[i] );
+                    //free( mem_manager->alloc_stack[i] );
                 } 
             }
         }
@@ -86,7 +86,7 @@ void MemoryManager_deallocation( void* ptr, char file, int line ) {
     if( mem_manager ) {
         bool found = false;
         for( int i = 0; (i < mem_manager->alloc_cpt) && !found; ++i )
-            if( ptr == mem_manager->alloc_stack[i] ) {
+            if( ptr == mem_manager->alloc_stack[i] && 0 != mem_manager->alloc_sizes[i] ) {
                 mem_manager->allocated_bytes -= mem_manager->alloc_sizes[i];
                 mem_manager->alloc_sizes[i] = 0;
                 found = true;
