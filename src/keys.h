@@ -3,16 +3,16 @@
 
 
 	/// Enumeration of the different mouse buttons
-	enum MouseButton {
+	typedef enum {
 		MB_Left,
 		MB_Right,   
 		MB_Middle,   
 		MB_X1, 
 		MB_X2
-	};
+	} MouseButton;
 
 	/// Enumeration of the different Keyboard keys
-	enum Key {
+	typedef enum {
 		K_A			= 65,
 		K_B				,	
 		K_C				,
@@ -136,5 +136,5 @@
 		K_LSystem		 					,
 		K_RSystem		 					,
 		K_Menu		 					,
-	};
+	} Key;
 #endif

@@ -3,11 +3,10 @@
 
 #include "context.h"
 #include "event.h"
-#include "clock.h"
 #include "vector.h"
 
 /// GLFW Window/Context 
-typedef struct s_Context {
+typedef struct {
     vec2    *mVideoModes;       ///< Video Modes width/height
     int     mVideoModesNb;      ///< Video Modes count
 
@@ -15,11 +14,8 @@ typedef struct s_Context {
     u32     mMultiSamples;      ///< FSAA samples
 
 
-    Clock   mClock;             ///< Clock accumulating time since context creation
-    f32     mCurrTime;          ///< Current time
-
-    mat3    mProjectionMatrix;  ///< Projection matrix used 
-    void (*mResizeCallback)();  ///< Window resize callback function
+    //bool    mSizeChanged;       ///< True if size has been changed
+    //mat3    mProjectionMatrix;  ///< Projection matrix used 
 } Context;
 
 /// Context only instance definition
@@ -31,20 +27,6 @@ Context *context = NULL;
 static vec2 defaultWinSize = { .x = 800, .y = 600 };
 
 
-
-/// Window Callback Function
-void GLFWCALL WindowResizeCallback( int pWidth, int pHeight ) {
-    if( context ) {
-        context->mSize.x = pWidth;
-        context->mSize.y = pHeight;
-
-        mat3_ortho( &context->mProjectionMatrix, 0.f, pWidth, pHeight, 0.f );
-        glViewport( 0, 0, (GLsizei)pWidth, (GLsizei)pHeight );
-
-        if( context->mResizeCallback )
-            context->mResizeCallback();
-    }
-}
 
 bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName, u32 pMultiSamples ) {
     check( !context, "Context already created!\n" );
@@ -84,10 +66,8 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
 
     context->mSize.x = pWidth;
     context->mSize.y = pHeight;
+    //context->mSizeChanged = true;
 
-    // projection matrix
-    mat3_ortho( &context->mProjectionMatrix, 0.f, pWidth, pHeight, 0.f );
-    context->mResizeCallback = NULL;
 
     // Set window name
     check( pName, "Window name invalid\n" );
@@ -123,10 +103,6 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     glfwEnable( GLFW_KEY_REPEAT );
 
 
-    // reset frame clock
-    context->mCurrTime = 0.f;
-    Clock_reset( &context->mClock );
-
 
 
     log_info( "GLFW Window successfully initialized!\n" );
@@ -147,20 +123,8 @@ void Context_destroy() {
     }
 }
 
-
-void Context_update() {
-    static f32 fpsTime = 0.f;
-
-    const f32 now = Clock_getElapsedTime( &context->mClock );
-    const f32 frameTime = now - context->mCurrTime;
-    context->mCurrTime = now;
-
-    fpsTime += frameTime;
-
-    if( fpsTime > 1.f ) {
-        fpsTime = 0.f;
-        log_info( "FPS = %f\n", ( 1.f / frameTime ) );
-    }
+bool Context_isInitialized() {
+    return NULL != context;
 }
 
 void Context_swap() {
@@ -170,10 +134,27 @@ void Context_swap() {
 bool Context_isWindowOpen() {
     return ( glfwGetWindowParam( GLFW_OPENED ) > 0 );
 }
+/*
+bool Context_sizeChanged() {
+    return context && context->mSizeChanged;
+}
+*/
+vec2 Context_getSize() {
+    vec2 size = { .x = -1, .y = -1 };
 
-void Context_setResizeCallback( void (*pFunc)() ) {
-    if( context )
-        context->mResizeCallback = pFunc;
+    if( context ) {
+        size.x = context->mSize.x;
+        size.y = context->mSize.y;
+    }
+        
+    return size;
+}
+
+void Context_setSize( vec2 pSize ) {
+    if( context ) {
+        context->mSize.x = pSize.x;
+        context->mSize.y = pSize.y;
+    }
 }
 
 void Context_setVSync( bool pVal ) {
@@ -185,10 +166,4 @@ void Context_showCursor( bool pVal ) {
         glfwEnable( GLFW_MOUSE_CURSOR );
     else
         glfwDisable( GLFW_MOUSE_CURSOR );
-}
-
-const mat3* Context_getProjectionMatrix() {
-    if( context ) 
-        return &context->mProjectionMatrix;
-    return NULL;
 }

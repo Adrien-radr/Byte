@@ -1,7 +1,7 @@
 NAME = Byte-Project
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
-VERSION_PATCH = 9
+VERSION_PATCH = 10
 VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 ARCH = 64
@@ -15,6 +15,7 @@ CC = gcc
 CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -lX11 -lXrandr -lGL -llua -std=c99 -D_DEBUG
 
 OBJ = \
+src/camera.o\
 src/clock.o\
 src/color.o\
 src/context.o\

@@ -147,7 +147,7 @@ void Shader_sendMat3( const char *pVarName, const mat3 *pMatrix ) {
     CheckGLError();
 }
 
-void Shader_sendTexture( const char *pVarName, u32 pTexture ) {
-    glUniform1i( glGetUniformLocation( Renderer_currentGLProgram(), pVarName), pTexture );
+void Shader_sendInt( const char *pVarName, int pValue ) {
+    glUniform1i( glGetUniformLocation( Renderer_currentGLProgram(), pVarName), pValue );
     CheckGLError();
 }

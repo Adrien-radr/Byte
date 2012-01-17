@@ -5,33 +5,30 @@
 #include "keys.h"
 #include "vector.h"
 
+/// Types of event that can occur
+typedef enum {
+    E_MouseMoved,
+    E_MousePressed,
+    E_MouseReleased,
+    E_MouseWheelMoved,
+    E_KeyPressed,
+    E_KeyReleased,
+    E_CharPressed
+} EventType;
+
 /// Event object binding a Type of Event to the value
 /// changed by the event.
 /// This is used primalarly by the GLFW Callback funcs
 /// to distribute the event recorded to all Listeners
-typedef struct s_Event {
-    /// Type of the event
-    enum {
-        E_MouseMoved,
-        E_MousePressed,
-        E_MouseReleased,
-        E_MouseWheelMoved,
-        E_KeyPressed,
-        E_KeyReleased,
-        E_CharPressed
-    } mType;
+typedef struct {
+    EventType   Type;               ///< Type of the event
                         
-    vec2 mMousePos;     		    ///< In case of MouseMoved
-    enum MouseButton mMouseButton;	///< In case of MousePressed/Released
-    int mWheel;					    ///< In case of MouseWheelMoved
-    enum Key mKey;				    ///< In case of KeyPressed/Released
-    char mChar;					    ///< In case of CharPressed/KeyPressed/Released
+    vec2        MousePos;     	    ///< In case of MouseMoved
+    MouseButton MouseButton;   	    ///< In case of MousePressed/Released
+    int         Wheel;				///< In case of MouseWheelMoved
+    Key         Key;			    ///< In case of KeyPressed/Released
+    char        Char;				///< In case of CharPressed/KeyPressed/Released
 } Event;
-
-enum ListenerType {
-    LT_KeyListener,
-    LT_MouseListener
-};
 
 
 
@@ -41,20 +38,21 @@ bool EventManager_init();
 /// Free the EventManager
 void EventManager_destroy();
 
-/// Update the input states of the EventManager
+/// Update the input states of the EventManager and propagate all recorded events
+/// to all registered listeners
 /// Call this every frame
 void EventManager_update();
 
 // Input querying functions
     u32  GetMouseX();
     u32  GetMouseY();
-    bool IsKeyDown( enum Key pK );
-    bool IsKeyUp( enum Key pK );
-    bool IsKeyHit( enum Key pK );
+    bool IsKeyDown( Key pK );
+    bool IsKeyUp( Key pK );
+    bool IsKeyHit( Key pK );
 
-    bool IsMouseDown( enum MouseButton pK );
-    bool IsMouseUp( enum MouseButton pK );
-    bool IsMouseHit( enum MouseButton pK );
+    bool IsMouseDown( MouseButton pK );
+    bool IsMouseUp( MouseButton pK );
+    bool IsMouseHit( MouseButton pK );
 
     bool IsWheelUp();
     bool IsWheelDown();
@@ -62,10 +60,27 @@ void EventManager_update();
 
 
 // Listeners
-    typedef void (*ListenerFunc)( const Event* );
+// To create a event listener, one must register it to the Eventmanager 
+// You can send a void* when registering. It will be available everytime the callback is used
+// Exemple : if pData is a pointer on Camera, one could do this in his listener func :
+//         ((Camera*)pData).mPosition.x = pEvent.MousePos.x;
+//         ((Camera*)pData).mPosition.y = pEvent.MousePos.y;
+    /// Listener function type
+    /// @param pEvent : Event recorded that can be processed
+    /// @parma pData : Void pointer on anything that could be usefull in the callback
+    typedef void (*ListenerFunc)( const Event *pEvent, void *pData );
     
-bool EventManager_addListener( enum ListenerType pType, ListenerFunc pFunc );
-//bool EventManager_addMouseListener( ListenerFunc pFunc );
+    /// Different types of listener
+    typedef enum {
+        LT_KeyListener,
+        LT_MouseListener
+    } ListenerType;
+
+    /// Listener registering function
+    /// @param pType : Key or Mouse listener
+    /// @param pFunc : Callback function of the listener (of type ListenerFunc)
+    /// @parma pData : Void pointer on anything that could be usefull in the callback
+    bool EventManager_addListener( ListenerType pType, ListenerFunc pFunc, void *pData );
 
 
 

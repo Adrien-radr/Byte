@@ -16,8 +16,8 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
 /// Destroy a context instance
 void Context_destroy();
 
-/// Update the context, call this every frame
-void Context_update();
+/// Returns true if the context is initialized
+bool Context_isInitialized();
 
 /// Swap context/window framebuffer
 void Context_swap();
@@ -25,8 +25,14 @@ void Context_swap();
 /// Returns the state of window
 bool Context_isWindowOpen();
 
-/// Sets the window resize callback function
-void Context_setResizeCallback( void (*pFunc)() );
+/// Returns the window size
+vec2 Context_getSize();
+
+/// Returns whether the window size has changed or not
+//bool Context_sizeChanged();
+
+/// Sets the window size
+void Context_setSize( vec2 pSize );
 
 /// (de)Activate Vertical synchronisation
 void Context_setVSync( bool pVal );
@@ -36,7 +42,12 @@ void Context_showCursor( bool pVal );
 
 
 /// Returns the context projection matrix
-const mat3* Context_getProjectionMatrix();
+//const mat3* Context_getProjectionMatrix();
 
+
+
+
+/// GLFW Resize callback function (defined in device.c)
+extern void WindowResizeCallback( int pWidth, int pHeight );
 
 #endif

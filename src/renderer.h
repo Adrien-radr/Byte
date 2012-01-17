@@ -19,40 +19,52 @@ void Renderer_beginFrame();
 /// Update the projection matrix used to render in shaders
 void Renderer_updateProjectionMatrix( const mat3 *pm );
 
-/// Begin a new VAO in the given Renderer
-/// @return : the indice in the Renderer VAO array of the created VAO
-int  Renderer_beginVao();
 
-/// End the current VAO in the current Renderer
-void Renderer_endVao();
+// ##########################################################################3
+//      MESH UTILS
+// ##########################################################################3
+    /// Begin a new VAO in the given Renderer
+    /// @return : the indice in the Renderer VAO array of the created VAO
+    int  Renderer_beginVao();
 
-/// Bind a Vao given its index
-void Renderer_bindVao( u32 pIndex );
+    /// End the current VAO in the current Renderer
+    void Renderer_endVao();
 
-/// Create a new mesh and return its ID
-int  Renderer_createMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
+    /// Bind a Vao given its index
+    void Renderer_bindVao( u32 pIndex );
 
-/// Render a mesh given its identifier
-void Renderer_renderMesh( u32 pIndex );
+    /// Create a new mesh and return its ID
+    int  Renderer_createMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
 
-/// Create a new shader and return its ID
-int  Renderer_createShader( const char *pVFile, const char *pFFile );
+    /// Render a mesh given its identifier
+    void Renderer_renderMesh( u32 pIndex );
 
-/// Sets the renderer to use a given shader
-/// @param pShader : shader index in renderer shader array. -1 to unbind all shaders
-void Renderer_useShader( int pShader );
 
-/// Returns the currently bound shader
-int  Renderer_currentShader();
+// ##########################################################################3
+//      SHADER UTILS
+// ##########################################################################3
+    /// Create a new shader and return its ID
+    int  Renderer_createShader( const char *pVFile, const char *pFFile );
 
-/// Returns the currently bound GL program
-u32  Renderer_currentGLProgram();
+    /// Sets the renderer to use a given shader
+    /// @param pShader : shader index in renderer shader array. -1 to unbind all shaders
+    void Renderer_useShader( int pShader );
 
-/// Create a new texture from file and return its ID
-int  Renderer_createTexture( const char *pTFile );
+    /// Returns the currently bound shader
+    int  Renderer_currentShader();
 
-/// Sets the renderer to use a given texture in the given unit
-void Renderer_useTexture( int pTexture, u32 pTarget );
+    /// Returns the currently bound GL program
+    u32  Renderer_currentGLProgram();
+
+
+// ##########################################################################3
+//      TEXTURE UTILS
+// ##########################################################################3
+    /// Create a new texture from file and return its ID
+    int  Renderer_createTexture( const char *pTFile );
+
+    /// Sets the renderer to use a given texture in the given unit
+    void Renderer_useTexture( int pTexture, u32 pTarget );
 
 
 // OpenGL Error Handling

@@ -214,6 +214,10 @@ int  Renderer_createShader( const char *pVFile, const char *pFFile ) {
         int index = renderer->mShaders.cpt++;
         renderer->mShaders.data[index] = s;
 
+        // Sets Albedo texture to use Texture target 0
+        Renderer_useShader( index );
+        Shader_sendInt( "Albedo", 0 );
+
         return index;
     }
 

@@ -43,9 +43,9 @@ void Shader_sendVec2( const char *pVarName, const vec2 *pVector );
 /// @param pVector  : Matrix to send
 void Shader_sendMat3( const char *pVarName, const mat3 *pMatrix );
 
-/// Send a uniform texture to the shader
+/// Send a uniform integer value to the shader
 /// @param pVarName : Variable name in shader src
-/// @param pTexture : texture target to use 
-void Shader_sendTexture( const char *pVarName, u32 pTexture );
+/// @param pValue : Value to send in that variable
+void Shader_sendInt( const char *pVarName, int pValue );
 
 #endif // BYTE_SHADER

@@ -10,6 +10,9 @@ Priority ( - : to do,  + : done )
 + Textures
 + Basic VBO/VAO meshes (sprites)
 - Scene structure
+- Camera
+- Automatic Resource loading (from files)
+- Entity 
 
 ---------
 Else

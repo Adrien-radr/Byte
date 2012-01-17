@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 0
-#define BYTE_PATCH 9
+#define BYTE_PATCH 10
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -126,7 +126,9 @@
             return true;                                                        \
         }                                                                       \
         return false;                                                           \
-    }                                                                           
+    }                                                                           \
+                                                                                
+
 
 #   define SimpleArray( type, name )                                            \
     Array( type, name )                                                         \
@@ -134,7 +136,14 @@
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr )                                                               \
             DEL_PTR( arr->data );                                               \
-    }                                                                           
+    }                                                                           \
+                                                                                \
+    void name##Array_clear( name##Array *arr ) {                                \
+        if( arr ) {                                                             \
+            memset( arr->data, 0, arr->cpt * sizeof( type ) );                  \
+            arr->cpt = 0;                                                       \
+        }                                                                       \
+    }
 
 
 #   define HeapArray( type, name, destructionFunc )                             \

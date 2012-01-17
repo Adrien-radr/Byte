@@ -2,7 +2,7 @@
 
 
 /// Structure containing the state of all inputs at a given time
-typedef struct s_InputState {
+typedef struct {
     bool mKeyboard[330];        ///< Keyboard keys
     bool mMouse[5];             ///< Mouse buttons
     int  mWheel;                ///< Mouse wheel absolute pos
@@ -13,17 +13,28 @@ typedef struct s_InputState {
 } InputState;
 
 
-// Array ListenerArray with ListenerFunc* data type
-SimpleArray( ListenerFunc, Listener )
+typedef struct {
+    ListenerFunc    function;   ///< actual listener function
+    void            *data;      ///< data to be set when registering listener
+} ListenerStruct;
+
+// Array ListenerArray with ListenerStruct data type
+SimpleArray( ListenerStruct, Listener )
+
+// Array EventArray with Event data type
+SimpleArray( Event, Event );
 
 /// Manage real time events from GLFW callbacks
 /// Distribute these events to registered listeners
-typedef struct s_EventManager {
-    InputState   mCurrState,        ///< Inputs of current frame
-                 mPrevState;        ///< Inputs of previous frame
+typedef struct {
+    InputState      mCurrState,         ///< Inputs of current frame
+                    mPrevState;         ///< Inputs of previous frame
             
-    ListenerArray mKeyListeners;
-    ListenerArray mMouseListeners;
+    ListenerArray   mKeyListeners;      ///< List of all registered mouse listeners
+    ListenerArray   mMouseListeners;    ///< List of all registered key listeners
+
+    EventArray      mFrameKeyEvents,    ///< All key events recorded during the frame
+                    mFrameMouseEvents;  ///< All mouse events recorded during the frame
    
 } EventManager;
 
@@ -53,6 +64,8 @@ bool EventManager_init() {
     ListenerArray_init( &eventManager->mKeyListeners, 10 );
     ListenerArray_init( &eventManager->mMouseListeners, 10 );
 
+    EventArray_init( &eventManager->mFrameKeyEvents, 50 );
+    EventArray_init( &eventManager->mFrameMouseEvents, 50 );
 
     
     log_info( "Event manager successfully initialized!\n" );
@@ -69,11 +82,36 @@ void EventManager_destroy() {
     if( eventManager ) {
         ListenerArray_destroy( &eventManager->mKeyListeners );
         ListenerArray_destroy( &eventManager->mMouseListeners );
+        EventArray_destroy( &eventManager->mFrameKeyEvents );
+        EventArray_destroy( &eventManager->mFrameMouseEvents );
         DEL_PTR( eventManager );
     }
 }
 
 void EventManager_update() {
+    // if there has been key events during the frame, send them to all keylisteners
+    if( eventManager->mFrameKeyEvents.cpt ) {
+        for( u32 i = 0; i < eventManager->mKeyListeners.cpt; ++i ) {
+            const ListenerStruct *ls = &eventManager->mKeyListeners.data[i];
+            for( u32 j = 0; j < eventManager->mFrameKeyEvents.cpt; ++j )
+                ls->function( &eventManager->mFrameKeyEvents.data[j], ls->data );
+        }
+
+        EventArray_clear( &eventManager->mFrameKeyEvents );
+    }
+    // if there has been mouse events during the frame, send them to all mouselisteners
+    if( eventManager->mFrameMouseEvents.cpt ) {
+        for( u32 i = 0; i < eventManager->mMouseListeners.cpt; ++i ) {
+            const ListenerStruct *ls = &eventManager->mMouseListeners.data[i];
+            for( u32 j = 0; j < eventManager->mFrameMouseEvents.cpt; ++j )
+                ls->function( &eventManager->mFrameMouseEvents.data[j], ls->data );
+        }
+
+        EventArray_clear( &eventManager->mFrameMouseEvents );
+    }
+
+
+
     // Set previous state to current state.
     memcpy( eventManager->mPrevState.mKeyboard, eventManager->mCurrState.mKeyboard, 330 * sizeof( bool ) );
     memcpy( eventManager->mPrevState.mMouse, eventManager->mCurrState.mMouse, 5 * sizeof( bool ) );
@@ -93,28 +131,28 @@ u32  GetMouseY() {
 }
 
 
-bool IsKeyDown( enum Key pK ) {
+bool IsKeyDown( Key pK ) {
     return eventManager->mCurrState.mKeyboard[pK];
 }
 
-bool IsKeyUp( enum Key pK ) {
+bool IsKeyUp( Key pK ) {
     return !eventManager->mCurrState.mKeyboard[pK] && eventManager->mPrevState.mKeyboard[pK];
 }
 
-bool IsKeyHit( enum Key pK ) {
+bool IsKeyHit( Key pK ) {
     return eventManager->mCurrState.mKeyboard[pK] && !eventManager->mPrevState.mKeyboard[pK];
 }
 
 
-bool IsMouseDown( enum MouseButton pK ) {
+bool IsMouseDown( MouseButton pK ) {
     return eventManager->mCurrState.mMouse[pK];
 }
 
-bool IsMouseUp( enum MouseButton pK ) {
+bool IsMouseUp( MouseButton pK ) {
     return eventManager->mCurrState.mMouse[pK] && !eventManager->mPrevState.mMouse[pK];
 }
 
-bool IsMouseHit( enum MouseButton pK ) {
+bool IsMouseHit( MouseButton pK ) {
     return eventManager->mCurrState.mMouse[pK] && !eventManager->mPrevState.mMouse[pK];
 }
 
@@ -128,17 +166,18 @@ bool IsWheelDown() {
 }
 
 // Listener funcs
-bool EventManager_addListener( enum ListenerType pType, ListenerFunc pFunc ) {
+bool EventManager_addListener( ListenerType pType, ListenerFunc pFunc, void *pData ) {
     if( eventManager ) {
+        ListenerStruct s = { .function = pFunc, .data = pData };
         // switch on Listener type
         if( LT_KeyListener == pType ) {
-            if( ListenerArray_checkSize( &eventManager->mKeyListeners ) ) 
-                eventManager->mKeyListeners.data[eventManager->mKeyListeners.cpt++] = pFunc;
-            else
+            if( ListenerArray_checkSize( &eventManager->mKeyListeners ) ) {
+                eventManager->mKeyListeners.data[eventManager->mKeyListeners.cpt++] = s;
+            } else
                 return false;
         } else if( LT_MouseListener == pType ) {
             if( ListenerArray_checkSize( &eventManager->mMouseListeners ) ) 
-                eventManager->mMouseListeners.data[eventManager->mMouseListeners.cpt++] = pFunc;
+                eventManager->mMouseListeners.data[eventManager->mMouseListeners.cpt++] = s;
             else
                 return false;
         } else
@@ -149,17 +188,17 @@ bool EventManager_addListener( enum ListenerType pType, ListenerFunc pFunc ) {
     return false;
 }
 
-void EventManager_propagateEvent( const Event* pEvent ) {
-    switch( pEvent->mType ) {
+void EventManager_propagateEvent( const Event pEvent ) {
+    switch( pEvent.Type ) {
         case E_KeyPressed:
         case E_KeyReleased:
         case E_CharPressed:
-            for( u32 i = 0; i < eventManager->mKeyListeners.cpt; ++i )
-                eventManager->mKeyListeners.data[i]( pEvent );
+            if( EventArray_checkSize( &eventManager->mFrameKeyEvents ) ) 
+                eventManager->mFrameKeyEvents.data[eventManager->mFrameKeyEvents.cpt++] = pEvent;
             break;
         default:
-            for( u32 i = 0; i < eventManager->mMouseListeners.cpt; ++i )
-                eventManager->mMouseListeners.data[i]( pEvent );
+            if( EventArray_checkSize( &eventManager->mFrameMouseEvents ) ) 
+                eventManager->mFrameMouseEvents.data[eventManager->mFrameMouseEvents.cpt++] = pEvent;
             break;
     }
 }
@@ -170,16 +209,16 @@ void EventManager_propagateEvent( const Event* pEvent ) {
         if( eventManager )
             eventManager->mCurrState.mKeyboard[pKey] = pValue ? true : false;
 
-        Event e = { .mType = ( pValue ? E_KeyPressed : E_KeyReleased ), .mKey = (enum Key)pKey, .mChar = pKey };
+        Event e = { .Type = ( pValue ? E_KeyPressed : E_KeyReleased ), .Key = (Key)pKey, .Char = pKey };
 
-        EventManager_propagateEvent( &e );
+        EventManager_propagateEvent( e );
     }
 
     void CharPressedCallback( int pChar, int pValue ) {
         if( eventManager ) {
-            Event e = { .mType = E_CharPressed, .mChar = pChar };
+            Event e = { .Type = E_CharPressed, .Char = pChar };
 
-            EventManager_propagateEvent( &e );
+            EventManager_propagateEvent( e );
         }
     }
 
@@ -187,9 +226,9 @@ void EventManager_propagateEvent( const Event* pEvent ) {
         if( eventManager ) {
             eventManager->mCurrState.mMouse[pButton] = pValue ? true : false;
 
-            Event e = { .mType = (pValue ? E_MousePressed : E_MouseReleased), .mMouseButton = (enum MouseButton)pButton };
+            Event e = { .Type = (pValue ? E_MousePressed : E_MouseReleased), .MouseButton = (MouseButton)pButton };
 
-            EventManager_propagateEvent( &e );
+            EventManager_propagateEvent( e );
         }
     }
 
@@ -197,9 +236,9 @@ void EventManager_propagateEvent( const Event* pEvent ) {
         if( eventManager ) {
             eventManager->mCurrState.mWheel = pWheel;
 
-            Event e = { .mType = E_MouseWheelMoved, .mWheel = (pWheel - eventManager->mPrevState.mWheel) };
+            Event e = { .Type = E_MouseWheelMoved, .Wheel = (pWheel - eventManager->mPrevState.mWheel) };
 
-            EventManager_propagateEvent( &e );
+            EventManager_propagateEvent( e );
         }
     }
 
@@ -208,9 +247,9 @@ void EventManager_propagateEvent( const Event* pEvent ) {
             eventManager->mCurrState.mMousePos.x = (f32)pX;
             eventManager->mCurrState.mMousePos.y = (f32)pY;
 
-            Event e = { .mType = E_MouseMoved, .mMousePos = { .x = pX, .y = pY } };
+            Event e = { .Type = E_MouseMoved, .MousePos = { .x = pX, .y = pY } };
 
-            EventManager_propagateEvent( &e );
+            EventManager_propagateEvent( e );
         }
     }
 

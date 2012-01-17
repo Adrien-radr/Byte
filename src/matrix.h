@@ -18,23 +18,30 @@ inline mat3 mat3_new(   f32 x00, f32 x01, f32 x02,
     return m;
 }
 
+/// make the given matrix an identity matrix
+void mat3_identity( mat3 *A );
+
 /// Multiply AxB. Result is in A
 void mat3_mul( mat3 *A, const mat3 *B );
 
 /// Create a translation matrix 
-void mat3_translationf( mat3 *mat, f32 x, f32 y );
-void mat3_translationfv( mat3 *mat, const vec2 *v );
+void mat3_translationMatrixf( mat3 *mat, f32 x, f32 y );
+void mat3_translationMatrixfv( mat3 *mat, const vec2 *v );
 
 /// Add a translation component to an existing matrix
 void mat3_translatef( mat3 *mat, f32 x, f32 y );
 void mat3_translatefv( mat3 *mat, const vec2 *v );
 
-/// Create a scale matrix 
+/// Create a scale matrix
+void mat3_scaleMatrixf( mat3 *mat, f32 x, f32 y );
+void mat3_scaleMatrixfv( mat3 *mat, const vec2 *v );
+
+/// Scale a matrix 
 void mat3_scalef( mat3 *mat, f32 x, f32 y );
 void mat3_scalefv( mat3 *mat, const vec2 *v );
 
 /// Create a rotation matrix 
-void mat3_rotationf( mat3 *mat, f32 angle );
+void mat3_rotationMatrixf( mat3 *mat, f32 angle );
 
 /// Rotate an existing matrix
 void mat3_rotatef( mat3 *mat, f32 angle );

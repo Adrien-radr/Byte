@@ -1,5 +1,5 @@
-Byte-Project Log v0.0.9
-Sun 15 Jan 2012 - 17:01:21
+Byte-Project Log v0.0.10
+Tue 17 Jan 2012 - 03:12:41
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.6.0 successfully initialized!
@@ -9,6 +9,21 @@ Sun 15 Jan 2012 - 17:01:21
 [INFO] Renderer successfully initialized!
 [INFO] Event manager successfully initialized!
 [INFO] Device successfully initialized!
-[ERROR] Error while loading texture "img_text.png" : Unable to open file
-[ERROR] Error in texture creation.
-[ERROR] Error in texture creation. Exiting program!
+[INFO] FPS = 550.939697
+[INFO] Camera Position : <0.000000, 0.000000>
+[INFO] Cam zoom = 1.000000
+[INFO] FPS = 2105.574219
+[INFO] Camera Position : <0.000000, 0.000000>
+[INFO] Cam zoom = 1.000000
+[INFO] FPS = 1949.932129
+[INFO] Camera Position : <0.000000, 0.000000>
+[INFO] Cam zoom = 1.000000
+[INFO] FPS = 1922.229126
+[INFO] Camera Position : <0.000000, 0.000000>
+[INFO] Cam zoom = 1.000000
+[INFO] FPS = 410.562256
+[INFO] Camera Position : <0.000000, 0.000000>
+[INFO] Cam zoom = 1.000000
+[INFO] FPS = 2631.307373
+[INFO] Camera Position : <0.000000, 0.000000>
+[INFO] Cam zoom = 0.344374

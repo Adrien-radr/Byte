@@ -1,37 +1,45 @@
-#include "common.h"
-#include "keys.h"
 #include "color.h"
-#include "clock.h"
-#include "vector.h"
-#include "context.h"
-#include "event.h"
 #include "shader.h"
-#include "renderer.h"
-#include "mesh.h"
 #include "device.h"
-#include "handlemanager.h"
-#include "texture.h"
+#include "camera.h"
 #include "GL/glew.h"
 
 /*
             TODO
 
-    - 
 
 
 */
 
-void listener( const Event* pEvent ) {
-    if( pEvent->mType == E_CharPressed )
-        printf( "%c\n", pEvent->mChar );
+void listener( const Event* pEvent, void *data ) {
+    if( pEvent->Type == E_CharPressed )
+        printf( "%c\n", pEvent->Char );
 }
 
+void cameraMouseListener( const Event *pEvent, void *pCamera ) {
+    Camera *cam = (Camera*)pCamera;
+    if( pEvent->Type == E_MouseWheelMoved ) 
+        Camera_zoom( cam, pEvent->Wheel );
+}
+
+void cameraUpdate( Camera *pCamera ) {
+    vec2 move = { .x = 0.f, .y = 0.f };
+    if( IsKeyDown( K_W ) )
+        move.y -= 1.f;
+    if( IsKeyDown( K_A ) )
+        move.x -= 1.f;
+    if( IsKeyDown( K_S ) )
+        move.y += 1.f;
+    if( IsKeyDown( K_D ) )
+        move.x += 1.f;
+
+    Camera_move( pCamera, &move );
+}
 
 int main() {
-
     check( Device_init(), "Error while creating Device, exiting program.\n" );
 
-    EventManager_addListener( LT_KeyListener, listener );
+    EventManager_addListener( LT_KeyListener, listener, NULL );
 
     printf( "Hello, Byte World!!\n" );
 
@@ -42,7 +50,6 @@ int main() {
 
     strncat( date, " - ", 3 );
     strncat( date, time, 16 );
-
     printf( "%s\n\n", date );
 
 
@@ -60,10 +67,15 @@ int main() {
     int shader = Renderer_createShader( "default.vs", "default.fs" );
     check( shader >= 0, "Error in shader creation. Exiting program!\n" );
 
-    Renderer_useShader( shader );
-    Shader_sendMat3( "ProjectionMatrix", Context_getProjectionMatrix() );
-    Shader_sendTexture( "Texture", 0 );
 
+
+    // ###############################3
+    //      CAMERA
+    Camera *cam = Camera_new();
+    Camera_registerListener( cam, cameraMouseListener, LT_MouseListener );
+    Camera_registerUpdateFunction( cam, cameraUpdate );
+
+    Device_setCamera( cam );
 
 
     // ###############################3
@@ -99,21 +111,38 @@ int main() {
     // ###############################3
     //      MATRICES
     mat3 ModelMatrix, MM;
-    mat3_scalef( &ModelMatrix, 2.f, 2.f );
+    mat3_identity( &ModelMatrix );
     mat3_rotatef( &ModelMatrix, 45.f );
+    mat3_scalef( &ModelMatrix, 2.f, 1.f );
 
-    mat3_translatef( &ModelMatrix, 50.f, 200.f );
+    mat3_translatef( &ModelMatrix, 400.f, 300.f );
 
+    mat3_identity( &MM );
     mat3_scalef( &MM, 3.f, 3.f );
     mat3_translatef( &MM, 500.f, 400.f );
 
     CheckGLError();
 
+    f32 accum = 0;
+
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {
         Device_beginFrame();
+        Camera_update( cam );
+
+            // stuff
+            accum += Device_getFrameTime();
+            if( accum > 1.f ) {
+                accum = 0.f;
+                log_info( "Camera Position : <%f, %f>\n", cam->mPosition.x, cam->mPosition.y );
+                log_info( "Cam zoom = %f\n", cam->mZoom );
+            }
+
+
+
+            // rendering
             Renderer_useShader( shader );
-                Shader_sendMat3( "ModelMatrix", &MM );
-                Renderer_renderMesh( mesh );
+                //Shader_sendMat3( "ModelMatrix", &MM );
+                //Renderer_renderMesh( mesh );
 
                 Shader_sendMat3( "ModelMatrix", &ModelMatrix );
                 Renderer_renderMesh( mesh );
@@ -121,12 +150,14 @@ int main() {
         Device_endFrame();
     }
 
+    Camera_destroy( cam );
 
     Device_destroy();
 
     return 0;
 
 error :
+    Camera_destroy( cam );
 
     Device_destroy();
     return -1;
