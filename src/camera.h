@@ -30,6 +30,7 @@ struct s_Camera {
     mat3            mProjectionMatrix;  ///< The projection matrix used to render
 
     CameraUpdate    mUpdateFunc;        ///< Update function called every frame. use this to manage inputs
+
 };
 
 /// Create a new camera and returns it

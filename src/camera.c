@@ -51,8 +51,8 @@ void Camera_calculateProjectionMatrix( Camera *pCamera ) {
            width = windowSize.x - xoffset,
            height = windowSize.y - yoffset;
 
-       vec2 move = { .x = pCamera->mPosition.x * pCamera->mSpeed, 
-                     .y = pCamera->mPosition.y * pCamera->mSpeed };
+       vec2 move = { .x = pCamera->mPosition.x, 
+                     .y = pCamera->mPosition.y };
 
        mat3_ortho( &pCamera->mProjectionMatrix, xoffset + move.x, 
                                                 width + move.x, 
@@ -68,8 +68,8 @@ void Camera_update( Camera *pCamera ) {
 
 void Camera_move( Camera *pCamera, vec2 *pVector ) {
     if( pCamera && pVector ) {
-        pCamera->mPosition.x += pVector->x;
-        pCamera->mPosition.y += pVector->y;
+        pCamera->mPosition.x += pVector->x * pCamera->mSpeed;
+        pCamera->mPosition.y += pVector->y * pCamera->mSpeed;
 
         // recalculate projection matrix and warn every shaders using it
         Camera_calculateProjectionMatrix( pCamera );
@@ -86,6 +86,26 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
 
         // alterate current zoom level depending on zoom direction and speed
         pCamera->mZoom -= pZoom * pCamera->mCurrZoomSpeed;
+
+        // modify cameraposition to zoom on mouse
+        vec2 windowSize = Context_getSize();
+        f32 mx = GetMouseX(),
+            my = GetMouseY();
+
+        // here we zoom to 10% in the direction from the window center to the mouse position
+        vec2 dir = { .x = (mx - ( windowSize.x / 2.f ) ), .y = (my - ( windowSize.y / 2.f ) ) };
+        f32 dir_len = vec2_len( &dir );
+        vec2_normalize( &dir );
+
+        dir = vec2_mul( &dir, 0.1f * dir_len );
+        // dezoom in inverse direction of mouse
+        if( pZoom < 0 ) dir = vec2_neg( &dir );
+
+
+        printf( "dir = < %f, %f> \n", dir.x, dir.y );
+
+        pCamera->mPosition.x += dir.x;
+        pCamera->mPosition.y += dir.y;
 
         // no negative zoom
         if( pCamera->mZoom < 0.1f ) pCamera->mZoom = 0.1f;

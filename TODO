@@ -1,22 +1,17 @@
 Byte-Project : TODO File
 =========================
 
----------
-Priority ( - : to do,  + : done )
----------
 + Context/Window
 + Inputs/Events
 + Renderer with data managment
 + Textures
 + Basic VBO/VAO meshes (sprites)
 - Scene structure
-- Camera
++ Camera
 - Automatic Resource loading (from files)
 - Entity 
-
----------
-Else
----------
+- Phong Lighting
+- Dynamicla shadows
 - Config file
 - Lua integration as a scripting language
 

@@ -133,8 +133,8 @@ int main() {
             accum += Device_getFrameTime();
             if( accum > 1.f ) {
                 accum = 0.f;
-                log_info( "Camera Position : <%f, %f>\n", cam->mPosition.x, cam->mPosition.y );
-                log_info( "Cam zoom = %f\n", cam->mZoom );
+                //log_info( "Camera Position : <%f, %f>\n", cam->mPosition.x, cam->mPosition.y );
+                //log_info( "Cam zoom = %f\n", cam->mZoom );
             }
 
 
