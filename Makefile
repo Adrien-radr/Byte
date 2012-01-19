@@ -28,15 +28,19 @@ src/main.o\
 src/matrix.o\
 src/mesh.o\
 src/renderer.o\
+src/resource.o\
 src/shader.o\
+src/scene.o\
 src/texture.o\
-src/vector.o
+src/vector.o\
+src/world.o
 
 
 LIB = \
 ext/libglfw$(ARCH).a\
+ext/libSOIL$(ARCH).a\
 ext/GL/glew$(ARCH).o\
-ext/libSOIL$(ARCH).a
+ext/json/cJSON$(ARCH).o
 
 
 .PHONY: all, clean, byte

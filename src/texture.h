@@ -14,8 +14,9 @@ Texture *Texture_new();
 void Texture_destroy( Texture *pTexture );
 
 /// Load a given texture file and store it in given texture handle
-//// @return : true if everything went well, false otherwise.
-bool Texture_loadFromFile( Texture *pTexture, const char *pFile );
+/// @param pMipmaps : true if mipmap construction is needed
+/// @return : true if everything went well, false otherwise.
+bool Texture_loadFromFile( Texture *pTexture, const char *pFile, bool pMipmaps );
 
 /// Binds the texture to the given target ( -1 for NO target switching )
 void Texture_bind( Texture *pTexture, int pTarget );

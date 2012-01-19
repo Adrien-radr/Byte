@@ -19,6 +19,9 @@ void Renderer_beginFrame();
 /// Update the projection matrix used to render in shaders
 void Renderer_updateProjectionMatrix( const mat3 *pm );
 
+/// Returns whether or not the renderer is initialized
+bool Renderer_isInitialized();
+
 
 // ##########################################################################3
 //      MESH UTILS
@@ -61,7 +64,7 @@ void Renderer_updateProjectionMatrix( const mat3 *pm );
 //      TEXTURE UTILS
 // ##########################################################################3
     /// Create a new texture from file and return its ID
-    int  Renderer_createTexture( const char *pTFile );
+    int  Renderer_createTexture( const char *pTFile, bool pMipmaps );
 
     /// Sets the renderer to use a given texture in the given unit
     void Renderer_useTexture( int pTexture, u32 pTarget );

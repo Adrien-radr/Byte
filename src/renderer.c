@@ -125,6 +125,9 @@ void Renderer_updateProjectionMatrix( const mat3 *pm ) {
     }
 }
 
+bool Renderer_isInitialized() {
+    return ( NULL != renderer );
+}
 
 int Renderer_beginVao() {
     if( renderer ) {
@@ -246,7 +249,7 @@ u32  Renderer_currentGLProgram() {
 }
 
 
-int  Renderer_createTexture( const char *pTFile ) {
+int  Renderer_createTexture( const char *pTFile, bool pMipmaps ) {
     Texture *t = NULL;
 
     if( renderer && pTFile ) {
@@ -254,7 +257,7 @@ int  Renderer_createTexture( const char *pTFile ) {
         check_mem( t );
 
         // texture creation from file
-        check( Texture_loadFromFile( t, pTFile ), "Error in texture creation.\n" );
+        check( Texture_loadFromFile( t, pTFile, pMipmaps ), "Error in texture creation.\n" );
 
         // storage
         int index = renderer->mTextures.cpt++;

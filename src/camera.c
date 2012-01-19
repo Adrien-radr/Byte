@@ -10,7 +10,7 @@ Camera *Camera_new() {
 
     c->mSpeed = 0.1f;
     c->mZoom = 1.f;
-    c->mBaseZoomSpeed = c->mCurrZoomSpeed = 0.2f;
+    c->mBaseZoomSpeed = 0.2f;
     Camera_calculateProjectionMatrix( c );
 
 error:
@@ -51,13 +51,11 @@ void Camera_calculateProjectionMatrix( Camera *pCamera ) {
            width = windowSize.x - xoffset,
            height = windowSize.y - yoffset;
 
-       vec2 move = { .x = pCamera->mPosition.x, 
-                     .y = pCamera->mPosition.y };
 
-       mat3_ortho( &pCamera->mProjectionMatrix, xoffset + move.x, 
-                                                width + move.x, 
-                                                height + move.y, 
-                                                yoffset + move.y );
+       mat3_ortho( &pCamera->mProjectionMatrix, xoffset + pCamera->mPosition.x, 
+                                                width + pCamera->mPosition.x, 
+                                                height + pCamera->mPosition.y, 
+                                                yoffset + pCamera->mPosition.y );
     }
 }
 
@@ -79,36 +77,42 @@ void Camera_move( Camera *pCamera, vec2 *pVector ) {
 
 void Camera_zoom( Camera *pCamera, int pZoom ) {
     if( pCamera ) {
-        // Zoom speed is constant if zoom is superior to 1. Else, it decrease based on current zoom level
-        if( pCamera->mZoom >= 1.f ) pCamera->mCurrZoomSpeed = pCamera->mBaseZoomSpeed;
-        else
-            pCamera->mCurrZoomSpeed = pCamera->mBaseZoomSpeed * (0.5f * pCamera->mZoom);
+        // clamp pZoom (no rapid zoom
+        if( pZoom > 1 ) pZoom = 1;
+        if( pZoom < -1 ) pZoom = -1;
+
+        // Zoom speed dependant on current zoom level
+        f32 zoomSpeed = pCamera->mBaseZoomSpeed * (0.5f * pCamera->mZoom);
 
         // alterate current zoom level depending on zoom direction and speed
-        pCamera->mZoom -= pZoom * pCamera->mCurrZoomSpeed;
-
-        // modify cameraposition to zoom on mouse
-        vec2 windowSize = Context_getSize();
-        f32 mx = GetMouseX(),
-            my = GetMouseY();
-
-        // here we zoom to 10% in the direction from the window center to the mouse position
-        vec2 dir = { .x = (mx - ( windowSize.x / 2.f ) ), .y = (my - ( windowSize.y / 2.f ) ) };
-        f32 dir_len = vec2_len( &dir );
-        vec2_normalize( &dir );
-
-        dir = vec2_mul( &dir, 0.1f * dir_len );
-        // dezoom in inverse direction of mouse
-        if( pZoom < 0 ) dir = vec2_neg( &dir );
+        pCamera->mZoom -= pZoom * zoomSpeed;
 
 
-        printf( "dir = < %f, %f> \n", dir.x, dir.y );
+        // bottom zoom limit
+        if( pCamera->mZoom <= 0.1f ) pCamera->mZoom = 0.1f;
+        else {
+            // if we are not at the bottom limit, 
+            // modify cameraposition to zoom on mouse
+            vec2 windowSize = Context_getSize();
+            f32 mx = GetMouseX(),
+                my = GetMouseY();
 
-        pCamera->mPosition.x += dir.x;
-        pCamera->mPosition.y += dir.y;
+            // here we zoom in the direction from the window center to the mouse position, with a 
+            // magnitude depending on the zoom level (less magnitude if near ground)
+            vec2 dir = { .x = (mx - ( windowSize.x / 2.f ) ), .y = (my - ( windowSize.y / 2.f ) ) };
+            f32 dir_len = vec2_len( &dir );
+            vec2_normalize( &dir );
 
-        // no negative zoom
-        if( pCamera->mZoom < 0.1f ) pCamera->mZoom = 0.1f;
+            f32 pan_magnitude = dir_len * 0.1f * pCamera->mZoom; 
+            dir = vec2_mul( &dir, pan_magnitude );
+
+            // dezoom in inverse direction of mouse
+            if( pZoom < 0 ) dir = vec2_neg( &dir );
+
+
+            pCamera->mPosition.x += dir.x;
+            pCamera->mPosition.y += dir.y;
+        }
 
         // recalculate projection matrix and warn every shaders using it
         Camera_calculateProjectionMatrix( pCamera );

@@ -59,6 +59,9 @@
     /// @return : pBuffer allocated size (file size + '\0' char)
     u32 ReadFile( char **pBuffer, const char *pFile );
 
+    /// Returns the hash of a given string
+    u32 GetHash( const char *pStr );
+
     /// Macro for snprintf
 #   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__) 
 

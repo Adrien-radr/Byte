@@ -16,12 +16,12 @@ void Texture_destroy( Texture *pTexture ) {
     }
 }
 
-bool Texture_loadFromFile( Texture *pTexture, const char *pFile ) { 
+bool Texture_loadFromFile( Texture *pTexture, const char *pFile, bool pMipmaps ) { 
     if( pTexture && pFile ) {
         u32 gl_id = SOIL_load_OGL_texture(  pFile, 
                                             SOIL_LOAD_AUTO,
                                             SOIL_CREATE_NEW_ID,
-                                            0 );
+                                            (pMipmaps ? SOIL_FLAG_MIPMAPS : 0) );
 
         check( gl_id, "Error while loading texture \"%s\" : %s\n", pFile, SOIL_last_result() );
 

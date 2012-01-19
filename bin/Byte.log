@@ -1,5 +1,5 @@
 Byte-Project Log v0.0.10
-Wed 18 Jan 2012 - 16:08:37
+Wed 18 Jan 2012 - 19:34:39
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.6.0 successfully initialized!
@@ -9,42 +9,11 @@ Wed 18 Jan 2012 - 16:08:37
 [INFO] Renderer successfully initialized!
 [INFO] Event manager successfully initialized!
 [INFO] Device successfully initialized!
-[INFO] FPS = 2128.008057
-[INFO] FPS = 495.019958
-[INFO] FPS = 2049.000488
-[INFO] FPS = 1969.156860
-[INFO] FPS = 471.906403
-[INFO] FPS = 2752.167969
-[INFO] FPS = 2432.890869
-[INFO] FPS = 1971.007568
-[INFO] FPS = 1892.736450
-[INFO] FPS = 2148.721191
-[INFO] FPS = 1820.444458
-[INFO] FPS = 1765.279419
-[INFO] FPS = 488.163879
-[INFO] FPS = 332.037994
-[INFO] FPS = 2399.487305
-[INFO] FPS = 1394.382935
-[INFO] FPS = 1675.041504
-[INFO] FPS = 3718.354492
-[INFO] FPS = 3236.345703
-[INFO] FPS = 2212.185547
-[INFO] FPS = 1771.243286
-[INFO] FPS = 2221.559326
-[INFO] FPS = 1872.457153
-[INFO] FPS = 1664.406372
-[INFO] FPS = 2496.609619
-[INFO] FPS = 1736.052979
-[INFO] FPS = 1839.607056
-[INFO] FPS = 1574.438477
-[INFO] FPS = 2299.508789
-[INFO] FPS = 2962.079102
-[INFO] FPS = 2212.185547
-[INFO] FPS = 2032.124023
-[INFO] FPS = 2131.251953
-[INFO] FPS = 558.942444
-[INFO] FPS = 2202.890869
-[INFO] FPS = 5041.230957
-[INFO] FPS = 2032.124023
-[INFO] FPS = 2114.064453
-[INFO] FPS = 907.072693
+[INFO] Resource "crate.jpg" loaded.
+[ERROR] Error while loading texture "hur.png" : Unable to open file
+[ERROR] Error in texture creation.
+[INFO] Resource "img_test.png" loaded.
+[INFO] FPS = 0.856623
+[INFO] FPS = 482.381134
+[INFO] FPS = 5053.378418
+[INFO] FPS = 1486.287720

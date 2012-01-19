@@ -40,14 +40,8 @@ void HandleManager_remove( HandleManager *pHm, u32 pHandle );
 /// @return : the data or NULL if any error occured
 void *HandleManager_get( HandleManager *pHm, u32 pHandle );
 
+/// Prints all the content of the handle manager
 void HandleManager_print( HandleManager *pHm );
-/*
-u32 revHandleManagerAdd( revHandleManager* pHM, void* pData );
-void revHandleManagerRemove( revHandleManager* pHM, u32 pData );
-void* revHandleManagerGet( revHandleManager* pHM, u32 pHandle );
-
-void printHM( revStrManager* hm);
-*/
 
 #endif // BYTE_HANDLEMANAGER
 
