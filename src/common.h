@@ -55,6 +55,9 @@
     /// Returns whether or not a file exists
     bool FileExist( const char *pFile );
 
+    /// Check if file extension is equal to the given one
+    bool CheckExtension( const char *pFile, const char *pExtension );
+
     /// Read an entire file in a buffer
     /// @return : pBuffer allocated size (file size + '\0' char)
     u32 ReadFile( char **pBuffer, const char *pFile );

@@ -1,5 +1,5 @@
 Byte-Project Log v0.0.10
-Wed 18 Jan 2012 - 19:34:39
+Thu 19 Jan 2012 - 03:07:16
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.6.0 successfully initialized!
@@ -10,10 +10,11 @@ Wed 18 Jan 2012 - 19:34:39
 [INFO] Event manager successfully initialized!
 [INFO] Device successfully initialized!
 [INFO] Resource "crate.jpg" loaded.
-[ERROR] Error while loading texture "hur.png" : Unable to open file
-[ERROR] Error in texture creation.
 [INFO] Resource "img_test.png" loaded.
-[INFO] FPS = 0.856623
-[INFO] FPS = 482.381134
-[INFO] FPS = 5053.378418
-[INFO] FPS = 1486.287720
+[INFO] Resource "defaultShader.json" loaded.
+[INFO] FPS = 4999.170410
+[INFO] FPS = 1631.390137
+[INFO] FPS = 499.024872
+[INFO] FPS = 1613.193848
+[INFO] FPS = 1162.501099
+[INFO] FPS = 1604.553955

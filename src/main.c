@@ -87,15 +87,14 @@ int main() {
     //      TEXTURE
     //int texture = Renderer_createTexture( "img_test.png" );
     int t1 = ResourceManager_load( resource_manager, RT_Texture, "crate.jpg" );
-    int texture = ResourceManager_load( resource_manager, RT_Texture, "hur.png" );
-    texture = ResourceManager_load( resource_manager, RT_Texture, "img_test.png" );
-    check( texture >= 0, "Error in texture creation. Exiting program!\n" );
+    int texture = ResourceManager_load( resource_manager, RT_Texture, "img_test.png" );
+    check( texture >= 0 && t1 >= 0, "Error in texture creation. Exiting program!\n" );
     Renderer_useTexture( t1, 0 );
 
 
     // ###############################3
     //      SHADER
-    int shader = Renderer_createShader( "default.vs", "default.fs" );
+    int shader = ResourceManager_load( resource_manager, RT_Shader, "defaultShader.json" );
     check( shader >= 0, "Error in shader creation. Exiting program!\n" );
 
 
@@ -189,7 +188,6 @@ int main() {
     return 0;
 
 error :
-    Camera_destroy( cam );
 
     ResourceManager_destroy( resource_manager );
     Device_destroy();

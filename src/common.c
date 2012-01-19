@@ -22,7 +22,7 @@ u32 ReadFile( char **pBuffer, const char *pFile ) {
     if( *pBuffer )
         DEL_PTR( *pBuffer );
 
-    FILE *file;
+    FILE *file = NULL;
     u32 file_size = 0;
 
     file = fopen( pFile, "r" );
@@ -43,8 +43,25 @@ u32 ReadFile( char **pBuffer, const char *pFile ) {
     return (file_size + 1);
 
 error:
-    fclose( file );
+    if( file ) fclose( file );
     return 0;
+}
+
+bool CheckExtension( const char *pFile, const char *pExtension ) {
+    if( pFile && pExtension ) {
+        int pos;
+        int file_len = strlen( pFile );
+        for( pos = file_len - 1; pos >= 0; --pos )
+            if( '.' == pFile[pos] )
+                break;
+
+        if( pos ) {
+            const char *f = pFile + pos + 1;
+            return (0 == (strstr( f, pExtension )  - f) ); 
+        }
+
+    }
+    return false;
 }
 
 void GetTime( char *t, int t_size,  const char *fmt ) {
