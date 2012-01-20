@@ -4,7 +4,10 @@
 #include "common.h"
 
 typedef struct {
-    void*   data;
+    union {
+        void*   data;
+        int     handle;
+    };
     int     next_free_index;
     bool    used;
 } Handle;
@@ -17,6 +20,7 @@ typedef struct {
 typedef struct {
     Handle  *mHandles;              ///< Handle entries
     u32     mCount;                 ///< Handle count
+    u32     mMaxIndex;              ///< Farthest index used in array
     u32     mSize;                  ///< Handle manager capacity
     int     mFirstFreeIndex;        ///< First free index that is writable
 } HandleManager;
@@ -27,10 +31,13 @@ HandleManager *HandleManager_init( u32 pSize );
 /// Destroy the given Handle Manager after having destroyed every used handle (with FreeFunc)
 void HandleManager_destroy( HandleManager *pHm );
 
-/// Add a new handle entry in the given handle manager and returns its index
+/// Add a new handle entry (with pointer data) in the given handle manager and returns its index
 /// @return : the handle of new data if successful. -1 if error.
-int  HandleManager_add( HandleManager *pHm, void *pData );
+int  HandleManager_addData( HandleManager *pHm, void *pData );
 
+/// Add a new handle entry (with u32 data) in the given handle manager and returns its index
+/// @return : the handle of new data if successful. -1 if error.
+int  HandleManager_addHandle( HandleManager *pHm, u32 pData );
 
 /// Remove a handle in given handle manager
 /// @param pHandle : the index of the handle to be removed
@@ -38,7 +45,16 @@ void HandleManager_remove( HandleManager *pHm, u32 pHandle );
 
 /// Returns the data contained in the given handle manager at the given index
 /// @return : the data or NULL if any error occured
-void *HandleManager_get( HandleManager *pHm, u32 pHandle );
+void *HandleManager_getData( HandleManager *pHm, u32 pHandle );
+
+/// Returns the handle contained in the given handle manager at a given index
+int HandleManager_getHandle( HandleManager *pHm, u32 pHandle );
+
+/// Returns whether or not the data at the given index is used or no
+bool HandleManager_isUsed( HandleManager *pHm, u32 pHandle );
+
+/// Clear the handle manager content
+void HandleManager_clear( HandleManager *pHm );
 
 /// Prints all the content of the handle manager
 void HandleManager_print( HandleManager *pHm );

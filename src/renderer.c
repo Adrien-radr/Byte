@@ -79,6 +79,10 @@ bool Renderer_init() {
     //glCullFace( GL_BACK );
     //glFrontFace( GL_CCW );
 
+    // enable alpha blend
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
 
     // clear gl errors
@@ -258,7 +262,7 @@ int  Renderer_createTexture( const char *pTFile, bool pMipmaps ) {
         check_mem( t );
 
         // texture creation from file
-        check( Texture_loadFromFile( t, pTFile, pMipmaps ), "Error in texture creation.\n" );
+        check( Texture_loadFromFile( t, pTFile, false ), "Error in texture creation.\n" );
 
         // storage
         int index = renderer->mTextures.cpt++;

@@ -12,7 +12,7 @@ HandleManager *HandleManager_init( u32 pSize ) {
     // every handle next free index point to the next handle
     for( u32 i = 0; i < pSize; ++i ) {
         hm->mHandles[i].next_free_index = i + 1;
-        hm->mHandles[i].used = false;
+        hm->mHandles[i].handle = -1;
     }
 
     // last handle does not have a next free index
@@ -31,29 +31,55 @@ void HandleManager_destroy( HandleManager *pHm ) {
     }
 }
 
-int  HandleManager_add( HandleManager *pHm, void *pData ) {
+void Resize( HandleManager *pHm ) {
+    // resize array
+    u32 nextHandle = pHm->mSize;
+
+    pHm->mHandles[nextHandle - 1].next_free_index = nextHandle;
+    pHm->mFirstFreeIndex = nextHandle;
+    pHm->mHandles = byte_realloc( pHm->mHandles, (pHm->mSize *= REALLOC_RATIO) * sizeof( Handle ) );
+    for( u32 i = nextHandle; i < pHm->mSize; ++i ) {
+        pHm->mHandles[i].next_free_index = i + 1;
+        pHm->mHandles[i].handle = -1;
+    }
+    pHm->mHandles[pHm->mSize - 1].next_free_index = -1;
+}
+
+int  HandleManager_addData( HandleManager *pHm, void *pData ) {
     int handle = -1;
 
     if( pHm ) {
-        if( pHm->mFirstFreeIndex < 0 ) {
-            // resize array
-            u32 nextHandle = pHm->mSize;
-
-            pHm->mHandles[nextHandle - 1].next_free_index = nextHandle;
-            pHm->mFirstFreeIndex = nextHandle;
-            pHm->mHandles = byte_realloc( pHm->mHandles, (pHm->mSize *= REALLOC_RATIO) * sizeof( Handle ) );
-            for( u32 i = nextHandle; i < pHm->mSize; ++i ) {
-                pHm->mHandles[i].next_free_index = i + 1;
-                pHm->mHandles[i].used = false;
-            }
-            pHm->mHandles[pHm->mSize - 1].next_free_index = -1;
-        }
+        if( pHm->mFirstFreeIndex < 0 ) 
+            Resize( pHm );
 
         handle = pHm->mFirstFreeIndex;
 
         pHm->mHandles[handle].data = pData;
         pHm->mHandles[handle].used = true;
         pHm->mFirstFreeIndex = pHm->mHandles[handle].next_free_index;
+
+        ++pHm->mCount;
+        ++pHm->mMaxIndex;
+    }     
+    
+    return handle;
+}
+
+int  HandleManager_addHandle( HandleManager *pHm, u32 pData ) {
+    int handle = -1;
+
+    if( pHm ) {
+        if( pHm->mFirstFreeIndex < 0 ) 
+            Resize( pHm );
+
+        handle = pHm->mFirstFreeIndex;
+
+        pHm->mHandles[handle].handle = pData;
+        pHm->mHandles[handle].used = true;
+        pHm->mFirstFreeIndex = pHm->mHandles[handle].next_free_index;
+
+        ++pHm->mCount;
+        ++pHm->mMaxIndex;
     }     
     
     return handle;
@@ -70,22 +96,52 @@ void HandleManager_remove( HandleManager *pHm, u32 pHandle ) {
 
         // remove the data in place
         pHm->mHandles[pHandle].data = NULL;
+        pHm->mHandles[pHandle].handle = -1;
         pHm->mHandles[pHandle].used = false;
+
+        --pHm->mCount;
     }
 }
 
-void *HandleManager_get( HandleManager *pHm, u32 pHandle ) {
+void *HandleManager_getData( HandleManager *pHm, u32 pHandle ) {
     if( pHm && pHandle < pHm->mSize )
         return pHm->mHandles[pHandle].data;
     return NULL;
 }
 
+int HandleManager_getHandle( HandleManager *pHm, u32 pHandle ) {
+    if( pHm && pHandle < pHm->mSize )
+        return pHm->mHandles[pHandle].handle;
+    return -1;
+}
+
+bool HandleManager_isUsed( HandleManager *pHm, u32 pHandle ) {
+    if( pHm && pHandle < pHm->mMaxIndex )
+        return pHm->mHandles[pHandle].used;
+    return false;
+}
+
+void HandleManager_clear( HandleManager *pHm ) {
+    if( pHm ) {
+        pHm->mCount = pHm->mFirstFreeIndex = pHm->mMaxIndex = 0;
+        for( u32 i = 0; i < pHm->mSize; ++i ) {
+            pHm->mHandles[i].next_free_index = i + 1;
+            pHm->mHandles[i].used = false;
+        }
+
+        // last handle does not have a next free index
+        pHm->mHandles[pHm->mSize - 1].next_free_index = -1;
+
+    }
+}
+
 void HandleManager_print( HandleManager *pHm ) {
     if( pHm ) {
-        for( u32 i = 0; i < pHm->mSize; ++i )
-            printf( "[%c]%p (n=%d)\n", (pHm->mHandles[i].used ? 'u' : 'x'), 
-                                        pHm->mHandles[i].data, 
-                                        pHm->mHandles[i].next_free_index );
+        for( u32 i = 0; i < pHm->mMaxIndex; ++i )
+            printf( "[%c] {%p||%d} (n=%d)\n", (pHm->mHandles[i].used ? 'u' : 'x'), 
+                                              pHm->mHandles[i].data, 
+                                              pHm->mHandles[i].handle,
+                                              pHm->mHandles[i].next_free_index );
         printf( "First free index : %d\n", pHm->mFirstFreeIndex );
     }
 }

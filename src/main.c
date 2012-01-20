@@ -123,8 +123,14 @@ int main() {
     mat3_scalef( &MM, 3.f, 3.f );
     mat3_translatef( &MM, 500.f, 400.f );
 
-    CheckGLError();
 
+
+    Scene *scene = Scene_new();
+    int entity = Scene_addEntity( scene, mesh, shader, t1, &ModelMatrix );
+    check( entity >= 0, "Failed to create entity!\n" );
+
+
+    int cpt = 0;
     f32 accum = 0;
 
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {
@@ -134,26 +140,27 @@ int main() {
             // stuff
             accum += Device_getFrameTime();
             if( accum > 1.f ) {
+                ++cpt;
                 accum = 0.f;
+
+                if( cpt == 2 ) {
+                    Scene_removeEntity( scene, entity );
+                }
+                if( cpt == 3 ) {
+                    Scene_addEntity( scene, mesh, shader, texture, &ModelMatrix );
+                }
                 //log_info( "Camera Position : <%f, %f>\n", cam->mPosition.x, cam->mPosition.y );
                 //log_info( "Cam zoom = %f\n", cam->mZoom );
             }
 
 
-
-            // rendering
-            Renderer_useShader( shader );
-                //Shader_sendMat3( "ModelMatrix", &MM );
-                //Renderer_renderMesh( mesh );
-
-                Shader_sendMat3( "ModelMatrix", &ModelMatrix );
-                Renderer_renderMesh( mesh );
-            Renderer_useShader( -1 );
+            Scene_render( scene );
         Device_endFrame();
     }
 
     Camera_destroy( cam );
 
+    Scene_destroy( scene );
     World_destroy( world );
     Device_destroy();
 
@@ -161,6 +168,7 @@ int main() {
 
 error :
 
+    Scene_destroy( scene );
     World_destroy( world );
     Device_destroy();
     return -1;

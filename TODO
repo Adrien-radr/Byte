@@ -6,12 +6,12 @@ Byte-Project : TODO File
 + Renderer with data managment
 + Textures
 + Basic VBO/VAO meshes (sprites)
-- Scene structure
++ Scene structure
 + Camera
 + Automatic Resource loading (from files)
 - Entity 
 - Phong Lighting
-- Dynamicla shadows
+- Dynamic shadows
 - Config file
 - Lua integration as a scripting language
 
