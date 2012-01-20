@@ -1,6 +1,5 @@
 #include "renderer.h"
 #include "mesh.h"
-#include "shader.h"
 #include "texture.h"
 
 #include "GL/glew.h"
@@ -217,10 +216,6 @@ int  Renderer_createShader( const char *pVFile, const char *pFFile ) {
         int index = renderer->mShaders.cpt++;
         renderer->mShaders.data[index] = s;
 
-        // Sets Albedo texture to use Texture target 0
-        Renderer_useShader( index );
-        Shader_sendInt( "Albedo", 0 );
-
         return index;
     }
 
@@ -234,6 +229,12 @@ void Renderer_useShader( int pShader ) {
         renderer->mCurrentShader = pShader;
         Shader_bind( pShader < 0 ? 0 : renderer->mShaders.data[pShader] );
     }
+}
+
+Shader *Renderer_getShader( u32 pShader ) {
+    if( renderer && pShader < renderer->mShaders.cpt )
+        return renderer->mShaders.data[pShader];
+    return NULL;
 }
 
 int  Renderer_currentShader() {

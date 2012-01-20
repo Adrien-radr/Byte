@@ -1,0 +1,8 @@
+{
+    "v_src" : "default.vs",
+    "f_src" : "default.fs",
+    "params" : [
+        { "name" : "Albedo",              "value" :  0 },
+        { "name" : "UseProjectionMatrix", "value" :  1 }
+    ]
+}

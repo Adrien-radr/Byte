@@ -7,8 +7,6 @@
 Shader *Shader_new() {
     Shader *s = byte_alloc( sizeof( Shader ) );
 
-    s->mUseProjectionMatrix = true;
-
     return s;
 }
 

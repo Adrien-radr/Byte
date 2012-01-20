@@ -3,6 +3,13 @@
 
 #include "common.h"
 
+
+// Directories where the resource manager look for resources
+extern const char ShaderDirectory[];
+extern const char MeshDirectory[];
+extern const char TextureDirectory[];
+
+/// ResourceManager struct declaration
 typedef struct s_ResourceManager ResourceManager;
 
 /// Different types of resource that can be loaded

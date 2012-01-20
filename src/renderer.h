@@ -4,6 +4,7 @@
 #include "common.h"
 #include "vector.h"
 #include "matrix.h"
+#include "shader.h"
 
 typedef struct s_Renderer Renderer;
 
@@ -52,6 +53,9 @@ bool Renderer_isInitialized();
     /// Sets the renderer to use a given shader
     /// @param pShader : shader index in renderer shader array. -1 to unbind all shaders
     void Renderer_useShader( int pShader );
+
+    /// Returns a pointer to the shader with the given handle
+    Shader *Renderer_getShader( u32 pShader );
 
     /// Returns the currently bound shader
     int  Renderer_currentShader();

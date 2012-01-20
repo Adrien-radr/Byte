@@ -2,6 +2,9 @@
 #include "renderer.h"
 #include "json/cJSON.h"
 
+const char ShaderDirectory[] = "data/shaders/";
+const char MeshDirectory[] = "data/meshes/";
+const char TextureDirectory[] = "data/textures/";
 
 // Array of u32 for the Hashes and Handles array of the resourcemanager
 SimpleArray( u32, u32 )
@@ -9,6 +12,7 @@ SimpleArray( u32, u32 )
 typedef struct s_ResourceManager {
     u32Array    mHashes;
     u32Array    mHandles;
+
 } ResourceManager;
 
 
@@ -35,11 +39,14 @@ void ResourceManager_destroy( ResourceManager *pRM ) {
     }
 }
 
+
+
 // internally used function (in ResourceManager_load)
 int LoadShader( const char *pFile ) {
     char *json_file = NULL;
     cJSON *root = NULL;
 
+    // read and parse json shader file
     ReadFile( &json_file, pFile );
     check( json_file, " " );
 
@@ -51,9 +58,49 @@ int LoadShader( const char *pFile ) {
 
     check( v_file && f_file, "Could not get Vertex and Fragment shader files fron JSON resource \"%s\".", pFile );
 
-    int handle = Renderer_createShader( v_file, f_file );
+    // get full path to shader files
+    str256 v_path, f_path;
+    v_path[0] = f_path[0] = 0;
+
+    strcat( v_path, ShaderDirectory );
+    strcat( v_path, v_file );
+
+    strcat( f_path, ShaderDirectory );
+    strcat( f_path, f_file );
+
+    // create shader from shader files
+    int handle = Renderer_createShader( v_path, f_path );
     check( handle >= 0, "Error while loading shader from \"%s\".", pFile );
 
+    // load shader parameters
+    Shader *s = Renderer_getShader( handle );
+    Renderer_useShader( handle );
+
+    cJSON *params = cJSON_GetObjectItem( root, "params" );
+
+    if( params ) {
+        int param_n = cJSON_GetArraySize( params );
+        for( u32 i = 0; i < param_n; ++i ) {
+            cJSON *item = cJSON_GetArrayItem( params, i );
+            cJSON *item_name = cJSON_GetObjectItem( item, "name" );
+            cJSON *item_value = cJSON_GetObjectItem( item, "value" );
+
+            if( !strcmp( item_name->valuestring, "Albedo" ) ) {
+                if( 0 <= item_value->valueint )
+                    Shader_sendInt( "Albedo", item_value->valueint );
+            } else if( !strcmp( item_name->valuestring, "UseProjectionMatrix" ) ) {
+                if( 0 < item_value->valueint )
+                    s->mUseProjectionMatrix = true;
+                else
+                    s->mUseProjectionMatrix = false;
+            }
+        }
+    } else {
+        s->mUseProjectionMatrix = false;
+
+    }
+
+    // free used memory
     DEL_PTR(json_file);
     if( root ) cJSON_Delete( root );
 
@@ -82,6 +129,10 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
             }
         }
 
+        // get full path to resource (in its corresponding data dir)
+        str256 file_path;
+        file_path[0] = 0;
+
         // if we find it, return its handle
         if( handle >= 0 ) { 
             log_info( "Resource \"%s\" is already present in resource manager!\n", pFile );
@@ -91,18 +142,28 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
         // else, load the data
         switch( pType ) {
             case RT_Texture:
-                handle = Renderer_createTexture( pFile, true ); 
+                // get complete file path
+                strcat( file_path, TextureDirectory );
+                strcat( file_path, pFile );
+
+                // load texture
+                handle = Renderer_createTexture( file_path, true ); 
                 break;
             case RT_Shader:
+                // get complete file path
+                strcat( file_path, ShaderDirectory );
+                strcat( file_path, pFile );
+
                 // parse json file to get both
-                if( CheckExtension( pFile, "json" ) ) {
-                    handle = LoadShader( pFile );
+                if( CheckExtension( file_path, "json" ) ) {
+                    handle = LoadShader( file_path );
                 } else 
                     log_err( "ResourceManager needs a .json file to load a shader!\n" );
                 break;
             default:
                 break;
         }
+
 
         // if creation went well, store the hash and the handle
         if( handle >= 0 ) {

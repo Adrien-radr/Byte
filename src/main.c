@@ -4,7 +4,7 @@
 #include "camera.h"
 #include "GL/glew.h"
 #include "scene.h"
-#include "resource.h"
+#include "world.h"
 
 /*
             TODO
@@ -49,52 +49,24 @@ int main() {
     strncat( date, time, 16 );
     printf( "%s\n\n", date );
 
-    // resourcemanager test
 
-    ResourceManager *resource_manager = ResourceManager_new();
-    check( resource_manager, "Error in initialization or resource manager. Exiting program!\n" );
 
-    /*/ json test
-    char *json_file;
-    ReadFile( &json_file, "test.json" );
-    check( json_file, "Cant open test.json\n");
 
-    cJSON *root = cJSON_Parse( json_file );
-    check( root, "JSON error before : [%s]\n.", cJSON_GetErrorPtr() );
-
-    cJSON *shaders = cJSON_GetObjectItem( root, "shaders" );
-    u32 shadercount = cJSON_GetArraySize( shaders );
-    cJSON *entities = cJSON_GetObjectItem( root, "entities" );
-    u32 entitycount = cJSON_GetArraySize( entities );
-
-    for( u32 i = 0; i < entitycount; ++i ) {
-        cJSON *item = cJSON_GetArrayItem( entities, i );
-        cJSON *render = cJSON_GetObjectItem( item, "render" );
-        log_info( "name : %s, render : (w:%d, h:%d,tex:%s,shader:%s)\n", 
-                cJSON_GetObjectItem( item, "name" )->valuestring,
-                cJSON_GetObjectItem( render, "width" )->valueint,
-                cJSON_GetObjectItem( render, "height" )->valueint,
-                cJSON_GetObjectItem( render, "texture" )->valuestring,
-                cJSON_GetObjectItem( render, "shader" )->valuestring );
-    }
-
-    log_info( "shaders : %d, entities : %d\n", shadercount, entitycount );
-    cJSON_Delete( root );
-    DEL_PTR( json_file );
-    */
+    World *world = World_new();
+    check( world, "Error in world creation!\n" );
 
     // ###############################3
     //      TEXTURE
     //int texture = Renderer_createTexture( "img_test.png" );
-    int t1 = ResourceManager_load( resource_manager, RT_Texture, "crate.jpg" );
-    int texture = ResourceManager_load( resource_manager, RT_Texture, "img_test.png" );
+    int t1 = World_loadResource( world, RT_Texture, "crate.jpg" );
+    int texture = World_loadResource( world, RT_Texture, "img_test.png" );
     check( texture >= 0 && t1 >= 0, "Error in texture creation. Exiting program!\n" );
     Renderer_useTexture( t1, 0 );
 
 
     // ###############################3
     //      SHADER
-    int shader = ResourceManager_load( resource_manager, RT_Shader, "defaultShader.json" );
+    int shader = World_loadResource( world, RT_Shader, "defaultShader.json" );
     check( shader >= 0, "Error in shader creation. Exiting program!\n" );
 
 
@@ -182,14 +154,13 @@ int main() {
 
     Camera_destroy( cam );
 
-    ResourceManager_destroy( resource_manager );
+    World_destroy( world );
     Device_destroy();
 
     return 0;
 
 error :
 
-    ResourceManager_destroy( resource_manager );
     Device_destroy();
     return -1;
 }
