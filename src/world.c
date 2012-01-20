@@ -22,7 +22,7 @@ void World_destroy( World *pWorld ) {
     }
 }   
 
-u32  World_loadResource( World *pWorld, ResourceType pType, const char *pFile ) {
+int  World_loadResource( World *pWorld, ResourceType pType, const char *pFile ) {
     int handle = -1;
     if( pFile && pWorld ) {
           handle = ResourceManager_load( pWorld->mResourceManager, pType, pFile );
@@ -33,3 +33,15 @@ error:
     return handle;
 }
 
+int  World_getResource( World *pWorld, const char *pFile ) {
+    if( pWorld && pFile) {
+        return ResourceManager_getResource( pWorld->mResourceManager, pFile ); 
+    }
+    return -1;
+}
+
+void World_loadAllResources( World *pWorld ) {
+    if( pWorld ) {
+       ResourceManager_loadAllResources( pWorld->mResourceManager );
+    }
+}

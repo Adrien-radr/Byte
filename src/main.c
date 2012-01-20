@@ -55,18 +55,19 @@ int main() {
     World *world = World_new();
     check( world, "Error in world creation!\n" );
 
+    World_loadAllResources( world );
+
     // ###############################3
     //      TEXTURE
-    //int texture = Renderer_createTexture( "img_test.png" );
-    int t1 = World_loadResource( world, RT_Texture, "crate.jpg" );
-    int texture = World_loadResource( world, RT_Texture, "img_test.png" );
+    int t1 = World_getResource( world, "crate.jpg" );
+    int texture = World_getResource( world, "img_test.png" );
     check( texture >= 0 && t1 >= 0, "Error in texture creation. Exiting program!\n" );
     Renderer_useTexture( t1, 0 );
 
 
     // ###############################3
     //      SHADER
-    int shader = World_loadResource( world, RT_Shader, "defaultShader.json" );
+    int shader = World_getResource( world, "defaultShader.json" ); //World_loadResource( world, RT_Shader, "defaultShader.json" );
     check( shader >= 0, "Error in shader creation. Exiting program!\n" );
 
 
@@ -78,7 +79,6 @@ int main() {
     Camera_registerUpdateFunction( cam, cameraUpdate );
 
     Device_setCamera( cam );
-
 
     // ###############################3
     //      MESH
@@ -161,6 +161,7 @@ int main() {
 
 error :
 
+    World_destroy( world );
     Device_destroy();
     return -1;
 }

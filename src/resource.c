@@ -2,6 +2,8 @@
 #include "renderer.h"
 #include "json/cJSON.h"
 
+#include <dirent.h>
+
 const char ShaderDirectory[] = "data/shaders/";
 const char MeshDirectory[] = "data/meshes/";
 const char TextureDirectory[] = "data/textures/";
@@ -173,29 +175,71 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                     log_err( "Error in Resource Manager, arrays are not parallel anymore!\n" );
                     handle = -1;
                 } else {
-                    // if 1st resource, just put it in place
-                    if( 1 == pRM->mHashes.cpt ) {
-                        pRM->mHashes.data[index] = hash;
-                        pRM->mHandles.data[index] = handle;
-                        log_info( "Resource \"%s\" loaded.\n", pFile );
-                    }
-                    // else, sort array
-                    else {
-                        // sort arrays in increasing order
-                        for( u32 i = pRM->mHashes.cpt-1; i >= 0; --i )
-                            if( pRM->mHashes.data[i-1] > hash ) {
-                                pRM->mHashes.data[i] = pRM->mHashes.data[i-1];
-                                pRM->mHandles.data[i] = pRM->mHandles.data[i-1];
-                            } else {
-                                pRM->mHashes.data[i] = hash;
-                                pRM->mHandles.data[i] = handle;
-                                log_info( "Resource \"%s\" loaded.\n", pFile );
+                    pRM->mHashes.data[index] = hash;
+                    pRM->mHandles.data[index] = handle;
+                    u32 tmp1, tmp2;
+                    // sort array after 2nd insertion, in increasing order
+                    if( 1 < pRM->mHashes.cpt ) 
+                        for( int i = pRM->mHashes.cpt-2; i >= 0; --i )
+                            if( pRM->mHashes.data[i] > pRM->mHashes.data[i+1] ) {
+                                // switch two  instances
+                                tmp1 = pRM->mHashes.data[i];
+                                tmp2 = pRM->mHandles.data[i];
+                                pRM->mHashes.data[i] = pRM->mHashes.data[i+1];
+                                pRM->mHandles.data[i] = pRM->mHandles.data[i+1];
+                                pRM->mHashes.data[i+1] = tmp1;
+                                pRM->mHandles.data[i+1] = tmp2;
+                            } else 
                                 break;
-                            }
-                    }
+                    log_info( "Resource \"%s\" loaded.\n", pFile );
                 }
             }
         }
     }
     return handle;
+}
+
+int ResourceManager_getResource( ResourceManager *pRM, const char *pFile ) {
+    int handle = -1;
+    if( pRM && pFile ) {
+        int hash = GetHash( pFile );
+        for( u32 i = 0; i < pRM->mHashes.cpt; ++i ) {
+            if( pRM->mHashes.data[i] > hash )
+                break;
+            else if ( pRM->mHashes.data[i] == hash ) {
+                handle = pRM->mHandles.data[i];
+                break;
+            }
+        }
+    }
+
+    return handle;
+}
+
+void ResourceManager_loadAllResources( ResourceManager *pRM ) {
+    if( pRM ) {
+        // Load shaders
+        DIR *shader_dir = opendir( ShaderDirectory );         
+
+        struct dirent *entry = NULL;
+
+        while( ( entry = readdir( shader_dir ) ) ) {
+            const char *shader_file = entry->d_name;
+
+            if( CheckExtension( shader_file, "json" ) )
+                ResourceManager_load( pRM, RT_Shader, shader_file );
+        }
+
+        closedir( shader_dir );
+
+        // Load textures
+        DIR *texture_dir = opendir( TextureDirectory );
+
+        while( ( entry = readdir( texture_dir ) ) ) {
+            const char *texture_file = entry->d_name;
+
+            if( CheckExtension( texture_file, "png" ) || CheckExtension( texture_file, "jpg" ) )
+                ResourceManager_load( pRM, RT_Texture, texture_file );
+        }
+    }
 }

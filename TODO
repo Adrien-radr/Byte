@@ -8,7 +8,7 @@ Byte-Project : TODO File
 + Basic VBO/VAO meshes (sprites)
 - Scene structure
 + Camera
-- Automatic Resource loading (from files)
++ Automatic Resource loading (from files)
 - Entity 
 - Phong Lighting
 - Dynamicla shadows

@@ -19,6 +19,13 @@ void World_destroy( World *pWorld );
 
 /// Load a resource from the given file name
 /// @return : the handle to the loaded resource. -1 if error ;
-u32  World_loadResource( World *pWorld, ResourceType pType, const char *pFile );
+int  World_loadResource( World *pWorld, ResourceType pType, const char *pFile );
+
+/// Returns a resource handle from its filename
+int  World_getResource( World *pWorld, const char *pFile );
+
+/// Load all resources found in resource directories
+void World_loadAllResources( World *pWorld );
+
 
 #endif // BYTE_WORLD

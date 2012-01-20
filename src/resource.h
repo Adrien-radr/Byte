@@ -29,6 +29,14 @@ void ResourceManager_destroy( ResourceManager *pRM );
 /// Load a resource in the given resource manager
 /// @param pType : Type of resource to be loaded (ResourceType)
 /// @param pFile : file on disk to be loaded
-int ResourceManager_load( ResourceManager *pRM, ResourceType pType,  const char *pFile );
+/// @return : the handle to the resource, or -1 if an error occured
+int  ResourceManager_load( ResourceManager *pRM, ResourceType pType,  const char *pFile );
+
+/// Returns a resource already loaded, by its file name
+/// @return : the handle to the resource, or -1 if inexistant
+int  ResourceManager_getResource( ResourceManager *pRM, const char *pFile );
+
+/// Load all resources available in resource directories
+void ResourceManager_loadAllResources( ResourceManager *pRM );
 
 #endif // BYTE_RESOURCE
