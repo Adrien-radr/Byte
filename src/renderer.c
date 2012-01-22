@@ -262,7 +262,7 @@ int  Renderer_createTexture( const char *pTFile, bool pMipmaps ) {
         check_mem( t );
 
         // texture creation from file
-        check( Texture_loadFromFile( t, pTFile, false ), "Error in texture creation.\n" );
+        check( Texture_loadFromFile( t, pTFile, pMipmaps ), "Error in texture creation.\n" );
 
         // storage
         int index = renderer->mTextures.cpt++;

@@ -144,7 +144,7 @@ int main() {
                 accum = 0.f;
 
                 if( cpt == 2 ) {
-                    Scene_removeEntity( scene, entity );
+                    Scene_removeEntity( scene, shader, entity );
                 }
                 if( cpt == 3 ) {
                     Scene_addEntity( scene, mesh, shader, texture, &ModelMatrix );
