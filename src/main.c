@@ -6,33 +6,6 @@
 #include "scene.h"
 #include "world.h"
 
-/*
-            TODO
-
-
-
-*/
-
-
-void cameraMouseListener( const Event *pEvent, void *pCamera ) {
-    Camera *cam = (Camera*)pCamera;
-    if( pEvent->Type == E_MouseWheelMoved ) 
-        Camera_zoom( cam, pEvent->Wheel );
-}
-
-void cameraUpdate( Camera *pCamera ) {
-    vec2 move = { .x = 0.f, .y = 0.f };
-    if( IsKeyDown( K_W ) )
-        move.y -= 1.f;
-    if( IsKeyDown( K_A ) )
-        move.x -= 1.f;
-    if( IsKeyDown( K_S ) )
-        move.y += 1.f;
-    if( IsKeyDown( K_D ) )
-        move.x += 1.f;
-
-    Camera_move( pCamera, &move );
-}
 
 int main() {
     check( Device_init(), "Error while creating Device, exiting program.\n" );
@@ -71,14 +44,6 @@ int main() {
     check( shader >= 0, "Error in shader creation. Exiting program!\n" );
 
 
-
-    // ###############################3
-    //      CAMERA
-    Camera *cam = Camera_new();
-    Camera_registerListener( cam, cameraMouseListener, LT_MouseListener );
-    Camera_registerUpdateFunction( cam, cameraUpdate );
-
-    Device_setCamera( cam );
 
     // ###############################3
     //      MESH
@@ -138,7 +103,7 @@ int main() {
 
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {
         Device_beginFrame();
-        Camera_update( cam );
+            Scene_update( scene );
 
             // stuff
             accum += Device_getFrameTime();
@@ -162,7 +127,6 @@ int main() {
         Device_endFrame();
     }
 
-    Camera_destroy( cam );
 
     Scene_destroy( scene );
     World_destroy( world );

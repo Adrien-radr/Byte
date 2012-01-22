@@ -45,6 +45,9 @@
     /// Destroy and free the given scene
     void Scene_destroy( Scene *pScene );
 
+    /// Update the scene (camera, etc)
+    void Scene_update( Scene *pScene );
+
     /// Render all entities in the scene
     void Scene_render();
 

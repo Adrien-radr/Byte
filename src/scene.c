@@ -1,5 +1,7 @@
 #include "scene.h"
 #include "renderer.h"
+#include "camera.h"
+#include "device.h"
 
 
 // ##########################################################################3
@@ -73,14 +75,42 @@
 //      SCENE
 // ##########################################################################3
 
-/// Array of EntityArray*
-HeapArray( EntityArray*, Entities, EntityArray_destroy );
+    /// Array of EntityArray*
+    HeapArray( EntityArray*, Entities, EntityArray_destroy );
 
+    // Camera listeners and update function
+        void cameraMouseListener( const Event *pEvent, void *pCamera ) {
+            Camera *cam = (Camera*)pCamera;
+            // manage zoom event 
+            if( pEvent->Type == E_MouseWheelMoved ) 
+                Camera_zoom( cam, pEvent->Wheel );
+        }
+
+        void cameraUpdate( Camera *pCamera ) {
+            // manage position pan 
+            vec2 move = { .x = 0.f, .y = 0.f };
+            if( IsKeyDown( K_W ) )
+                move.y -= 1.f;
+            if( IsKeyDown( K_A ) )
+                move.x -= 1.f;
+            if( IsKeyDown( K_S ) )
+                move.y += 1.f;
+            if( IsKeyDown( K_D ) )
+                move.x += 1.f;
+
+            Camera_move( pCamera, &move );
+        }
 
 /// Scene definition
+///     Bool shader array to know if the shader i is used(true) or not(false)
+///     Entity array corresponding to a particular shader (SCENE_SHADER_N Entity arrays).
+///     
+///     The scene also possess the scene camera
 typedef struct s_Scene {
-    bool                mShaders[SCENE_SHADER_N];
-    EntitiesArray       mEntities;
+    bool                mShaders[SCENE_SHADER_N];       ///< Shaders used by scene entities
+    EntitiesArray       mEntities;                      ///< Entities for each shader
+
+    Camera              *mCamera;
 } Scene;
 
 Scene *Scene_new() {
@@ -95,16 +125,31 @@ Scene *Scene_new() {
     // create empty entities array of the same size of shader array
     EntitiesArray_init( &s->mEntities, SCENE_SHADER_N );
 
+    // camera
+        s->mCamera = Camera_new();
+        check_mem( s->mCamera );
+
+        Camera_registerListener( s->mCamera, cameraMouseListener, LT_MouseListener );
+        Camera_registerUpdateFunction( s->mCamera, cameraUpdate );
+
+        Device_setCamera( s->mCamera );
         
-error:
     return s;
+error:
+    Scene_destroy( s );
+    return NULL;
 }
 
 void Scene_destroy( Scene *pScene ) {
     if( pScene ) {
         EntitiesArray_destroy( &pScene->mEntities );
+        Camera_destroy( pScene->mCamera );
         DEL_PTR( pScene );
     }   
+}
+
+void Scene_update( Scene *pScene ) {
+    Camera_update( pScene->mCamera );
 }
 
 void Scene_render( Scene *pScene ) {
