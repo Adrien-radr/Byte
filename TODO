@@ -9,7 +9,7 @@ Byte-Project : TODO File
 + Scene structure
 + Camera
 + Automatic Resource loading (from files)
-- Entity 
++ Entity 
 - Quad Tree for scene managment
 - Game 'class' containing : the device, the world, the scene, game states
 - Phong Lighting

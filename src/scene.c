@@ -37,10 +37,10 @@
         HandleManager_clear( pEA->mModelMatrices );
     }
 
-    u32 EntityArray_addEntity( EntityArray *pEA, u32 pMesh, u32 pTexture, mat3 *pMM ) {
-        int handle = HandleManager_addHandle( pEA->mMeshes, pMesh );
-        HandleManager_addHandle( pEA->mTextures, pTexture );
-        HandleManager_addData( pEA->mModelMatrices, pMM );
+    u32 EntityArray_addEntity( EntityArray *pEA, const Entity *pEntity ) {
+        int handle = HandleManager_addHandle( pEA->mMeshes, pEntity->mMesh );
+        HandleManager_addHandle( pEA->mTextures, pEntity->mTexture );
+        HandleManager_addData( pEA->mModelMatrices, pEntity->mModelMatrix );
 
         ++pEA->mMaxIndex;
         ++pEA->mCount;
@@ -79,8 +79,7 @@ HeapArray( EntityArray*, Entities, EntityArray_destroy );
 
 /// Scene definition
 typedef struct s_Scene {
-    bool                mShaders[10];
-    //HandleManager       *mShaders;
+    bool                mShaders[SCENE_SHADER_N];
     EntitiesArray       mEntities;
 } Scene;
 
@@ -91,11 +90,10 @@ Scene *Scene_new() {
     check_mem( s );
 
     // array of not-used shaders;
-    //s->mShaders = HandleManager_init( 10 );
-    memset( s->mShaders, false, 10 * sizeof( bool ) );
+    memset( s->mShaders, false, SCENE_SHADER_N * sizeof( bool ) );
 
     // create empty entities array of the same size of shader array
-    EntitiesArray_init( &s->mEntities, 10 );
+    EntitiesArray_init( &s->mEntities, SCENE_SHADER_N );
 
         
 error:
@@ -104,7 +102,6 @@ error:
 
 void Scene_destroy( Scene *pScene ) {
     if( pScene ) {
-        //HandleManager_destroy( pScene->mShaders );
         EntitiesArray_destroy( &pScene->mEntities );
         DEL_PTR( pScene );
     }   
@@ -112,7 +109,7 @@ void Scene_destroy( Scene *pScene ) {
 
 void Scene_render( Scene *pScene ) {
     if( pScene ) {
-        for( u32 i = 0; i < 10; ++i ) {
+        for( u32 i = 0; i < SCENE_SHADER_N; ++i ) {
             if( pScene->mShaders[i] ) {
                 // use this shader
                 Renderer_useShader( i );
@@ -132,36 +129,38 @@ void Scene_render( Scene *pScene ) {
     }
 }
 
-int  Scene_addEntity( Scene *pScene, u32 pShader, u32 pMesh, u32 pTexture, mat3 *pMM ) {
+int  Scene_addEntity( Scene *pScene, const Entity *pEntity ) {
     int handle = -1;
-    if( pScene && pMM ) {
-        if( pShader < 10 ) {
+    u32 shader = pEntity->mShader;
+
+    if( pScene && pEntity ) {
+        if( shader < SCENE_SHADER_N ) {
             // allocate entity array of corresponding shader if not used yet
-            if( !pScene->mShaders[pShader] ) {
-                pScene->mShaders[pShader] = true;
-                pScene->mEntities.data[pShader] = EntityArray_init( 50 );
+            if( !pScene->mShaders[shader] ) {
+                pScene->mShaders[shader] = true;
+                pScene->mEntities.data[shader] = EntityArray_init( SCENE_ENTITIES_N );
                 ++pScene->mEntities.cpt;
             }
 
             // insert entity
-            handle = EntityArray_addEntity( pScene->mEntities.data[pShader], pMesh, pTexture, pMM );
+            handle = EntityArray_addEntity( pScene->mEntities.data[shader], pEntity );
         } else
-            log_err( "Added an entity in scene with shader ID >= 10. D:\n" );
+            log_err( "Added an entity in scene with shader ID >= %d.\n", SCENE_SHADER_N );
     }
     return handle;
 }
 
 void Scene_removeEntity( Scene *pScene, u32 pShader, u32 pIndex ) {
-    if( pScene && pShader < 10) {
+    if( pScene && pShader < SCENE_SHADER_N ) {
         EntityArray_removeEntity( pScene->mEntities.data[pShader], pIndex );
     }
 }
 
 void Scene_clearEntities( Scene *pScene ) {
     if( pScene ) {
-        for( u32 i = 0; i < 10; ++i )
+        for( u32 i = 0; i < SCENE_SHADER_N ; ++i )
             EntityArray_clear( pScene->mEntities.data[i] );
-        memset( pScene->mShaders, false, 10 * sizeof( bool ) );
+        memset( pScene->mShaders, false, SCENE_SHADER_N  * sizeof( bool ) );
     }
 }
 

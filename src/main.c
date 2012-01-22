@@ -67,7 +67,7 @@ int main() {
 
     // ###############################3
     //      SHADER
-    int shader = World_getResource( world, "defaultShader.json" ); //World_loadResource( world, RT_Shader, "defaultShader.json" );
+    int shader = World_getResource( world, "defaultShader.json" ); 
     check( shader >= 0, "Error in shader creation. Exiting program!\n" );
 
 
@@ -126,7 +126,10 @@ int main() {
 
 
     Scene *scene = Scene_new();
-    int entity = Scene_addEntity( scene, mesh, shader, t1, &ModelMatrix );
+
+    Entity e = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &ModelMatrix, .mTexture = t1 };
+
+    int entity = Scene_addEntity( scene, &e );
     check( entity >= 0, "Failed to create entity!\n" );
 
 
@@ -147,7 +150,8 @@ int main() {
                     Scene_removeEntity( scene, shader, entity );
                 }
                 if( cpt == 3 ) {
-                    Scene_addEntity( scene, mesh, shader, texture, &ModelMatrix );
+                    e.mTexture = texture;
+                    Scene_addEntity( scene, &e );
                 }
                 //log_info( "Camera Position : <%f, %f>\n", cam->mPosition.x, cam->mPosition.y );
                 //log_info( "Cam zoom = %f\n", cam->mZoom );
