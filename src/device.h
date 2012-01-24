@@ -2,9 +2,10 @@
 #define BYTE_DEVICE_HPP
 
 #include "common.h"
-#include "context.h"
-#include "renderer.h"
 #include "camera.h"
+
+#include "ft2build.h"
+#include FT_FREETYPE_H
 
 /// Initialize the engine Device.
 /// @return : True if everything went well, false if error;
@@ -24,5 +25,8 @@ f32 Device_getFrameTime();
 
 /// Sets the device active camera
 void Device_setCamera( Camera *pCamera );
+
+/// Returns a pointer to freetype lib
+FT_Library *Device_getFreetype();
 
 #endif // BYTE_DEVICE

@@ -12,7 +12,7 @@ ARCH = 64
 
 CC = gcc
 
-CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -lX11 -lXrandr -lGL -llua -std=c99 -D_DEBUG
+CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -llua -std=c99 -D_DEBUG
 
 OBJ = \
 src/camera.o\
@@ -39,6 +39,7 @@ src/world.o
 LIB = \
 ext/libglfw$(ARCH).a\
 ext/libSOIL$(ARCH).a\
+ext/libfreetype.a\
 ext/GL/glew$(ARCH).o\
 ext/json/cJSON$(ARCH).o
 

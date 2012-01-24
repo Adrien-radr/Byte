@@ -1,5 +1,5 @@
 Byte-Project Log v0.0.11
-Sun 22 Jan 2012 - 17:45:45
+Mon 23 Jan 2012 - 22:23:05
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.6.0 successfully initialized!
@@ -9,14 +9,11 @@ Sun 22 Jan 2012 - 17:45:45
 [INFO] Renderer successfully initialized!
 [INFO] Event manager successfully initialized!
 [INFO] Device successfully initialized!
-[INFO] Resource "defaultShader.json" loaded.
-[INFO] Resource "crate.jpg" loaded.
-[INFO] Resource "img_test.png" loaded.
-[INFO] FPS = 1620.673828
-[INFO] FPS = 2096.104004
-[INFO] FPS = 2686.934082
-[INFO] FPS = 529.851440
-[INFO] FPS = 2505.557861
-[INFO] FPS = 482.436615
-[INFO] FPS = 2737.796387
-[INFO] FPS = 2284.479248
+[INFO] Resource "textShader.json" loaded.
+[INFO] FPS = 123.260376
+[INFO] FPS = 107.320610
+[INFO] FPS = 115.743256
+[INFO] FPS = 114.149361
+[INFO] FPS = 121.327858
+[INFO] FPS = 118.711197
+[INFO] FPS = 122.482887

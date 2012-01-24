@@ -176,6 +176,13 @@
 #   define M_PI 3.14159265358979323846
 #endif
 
+#ifndef max
+#   define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
+#endif
+
+#ifndef min
+#   define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
+#endif
 
     /// Returns the sign of a float
     inline int Sign( const f32 a, const f32 threshold ) {

@@ -1,6 +1,8 @@
 #include "device.h"
 #include "event.h"
 #include "clock.h"
+#include "context.h"
+#include "renderer.h"
 
 #include "GL/glew.h"
 
@@ -10,6 +12,8 @@ typedef struct s_Device {
     f32     mFrameTime;         ///< Time elapsed in last frame
 
     Camera  *mActiveCamera;     ///< Game active camera (one at a time)
+
+    FT_Library  mFreetype;
 } Device;
 
 Device *device = NULL;
@@ -50,6 +54,9 @@ bool Device_init() {
 
     // Initialize Event Manager
     check( EventManager_init(), "Error while creating Event Manager!\n" );
+
+    // Initialize Freetype
+    check( !FT_Init_FreeType( &device->mFreetype ), "Could not initialize Freetype library!\n" );
 
     // reset frame clock
     device->mCurrTime = 0.f;
@@ -120,4 +127,10 @@ void Device_setCamera( Camera *pCamera ) {
         device->mActiveCamera = pCamera;
         Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
     }
+}
+
+FT_Library *Device_getFreetype() {
+    if( device ) 
+        return &device->mFreetype;
+    return NULL;
 }

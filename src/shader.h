@@ -5,6 +5,7 @@
 #include "vector.h"
 #include "matrix.h"
 #include "texture.h"
+#include "color.h"
 
 typedef struct s_Shader {
     u32 mID;
@@ -47,5 +48,10 @@ void Shader_sendMat3( const char *pVarName, const mat3 *pMatrix );
 /// @param pVarName : Variable name in shader src
 /// @param pValue : Value to send in that variable
 void Shader_sendInt( const char *pVarName, int pValue );
+
+/// Send a uniform color to the shader
+/// @param pVarName : Variable name in shader src
+/// @param pValue : Color to send in that variable
+void Shader_sendColor( const char *pVarName, const Color *pColor );
 
 #endif // BYTE_SHADER

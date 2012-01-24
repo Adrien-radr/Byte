@@ -98,7 +98,8 @@
             if( IsKeyDown( K_D ) )
                 move.x += 1.f;
 
-            Camera_move( pCamera, &move );
+            if( move.x || move.y )
+                Camera_move( pCamera, &move );
         }
 
 /// Scene definition
