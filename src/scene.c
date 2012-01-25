@@ -168,7 +168,6 @@ void Scene_render( Scene *pScene ) {
 
                         Renderer_renderMesh( HandleManager_getHandle( pScene->mEntities.data[i]->mMeshes, j ) );
                     }
-
                 }
             }
         }

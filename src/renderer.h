@@ -5,6 +5,7 @@
 #include "vector.h"
 #include "matrix.h"
 #include "shader.h"
+#include "text.h"
 
 typedef struct s_Renderer Renderer;
 
@@ -70,8 +71,21 @@ bool Renderer_isInitialized();
     /// Create a new texture from file and return its ID
     int  Renderer_createTexture( const char *pTFile, bool pMipmaps );
 
+    /// Allocates and register an empty texture to be used afterwards
+    int  Renderer_allocateEmptyTexture( Texture **pTexture );
+
     /// Sets the renderer to use a given texture in the given unit
     void Renderer_useTexture( int pTexture, u32 pTarget );
+
+
+// ##########################################################################3
+//      FONT UTILS
+// ##########################################################################3
+    /// Create a new font from file and returns its ID
+    int  Renderer_createFont( const char *pFile, u32 pSize );
+
+    /// Returns a pointer to an indexed font
+    Font *Renderer_getFont( u32 pHandle );
 
 
 // OpenGL Error Handling

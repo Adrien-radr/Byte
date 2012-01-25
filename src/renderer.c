@@ -17,12 +17,16 @@ HeapArray( Shader*, Shader, Shader_destroy )
 // Array TextureArray with Texture* data type
 HeapArray( Texture*, Texture, Texture_destroy )
 
+// Array FontArray with Font* data type
+HeapArray( Font*, Font, Font_destroy )
+
 /// Application Renderer
 struct s_Renderer {
     VaoArray        mVaos;
     MeshArray       mMeshes;
     ShaderArray     mShaders;
     TextureArray    mTextures;
+    FontArray       mFonts;
 
     int             mCurrentMesh,
                     mCurrentShader,
@@ -41,9 +45,10 @@ bool Renderer_init() {
     
     // initial number of 10 vaos and 100 meshes
     VaoArray_init( &renderer->mVaos, 10 );
-    MeshArray_init( &renderer->mMeshes, 50 );
+    MeshArray_init( &renderer->mMeshes, 10 );
     ShaderArray_init( &renderer->mShaders, 10 );
     TextureArray_init( &renderer->mTextures, 10 );
+    FontArray_init( &renderer->mFonts, 10 );
 
     renderer->mCurrentMesh = -1;
     renderer->mCurrentShader = -1;
@@ -104,6 +109,7 @@ void Renderer_destroy() {
         MeshArray_destroy( &renderer->mMeshes );
         TextureArray_destroy( &renderer->mTextures );
         ShaderArray_destroy( &renderer->mShaders );
+        FontArray_destroy( &renderer->mFonts );
         DEL_PTR( renderer );
     }
 }
@@ -197,10 +203,10 @@ void Renderer_renderMesh( u32 pIndex ) {
         Mesh *m = renderer->mMeshes.data[pIndex];
 
         // bind mesh only if it isnt already
-        if( renderer->mCurrentMesh != pIndex ) {
+//        if( renderer->mCurrentMesh != pIndex ) {
             Mesh_bind( m );
-            renderer->mCurrentMesh = pIndex;
-        }
+//            renderer->mCurrentMesh = pIndex;
+//        }
 
         glDrawElements( GL_TRIANGLES, m->mIndexCount, GL_UNSIGNED_INT, 0 );
     }
@@ -224,7 +230,7 @@ int  Renderer_createShader( const char *pVFile, const char *pFFile ) {
     }
 
 error:
-    DEL_PTR( s );
+    Shader_destroy( s );
     return -1;
 }
 
@@ -272,7 +278,23 @@ int  Renderer_createTexture( const char *pTFile, bool pMipmaps ) {
     }
 
 error:
-    DEL_PTR( t );
+    Texture_destroy( t );
+    return -1;
+}
+
+int  Renderer_allocateEmptyTexture( Texture **t ) {
+    check( NULL == *t, "Renderer_allocateEmptyTexture needs a NULL texture as a parameter!\n" );
+    if( renderer ) {
+        *t = Texture_new();
+        check_mem( *t );
+
+        //storage
+        int index = renderer->mTextures.cpt++;
+        renderer->mTextures.data[index] = *t;
+
+        return index;
+    }
+error:
     return -1;
 }
 
@@ -288,6 +310,31 @@ void Renderer_useTexture( int pTexture, u32 pTarget ) {
     }
 }
 
+int  Renderer_createFont( const char *pFile, u32 pSize ) {
+    Font *f = NULL;
+
+    if( pFile && renderer && pSize > 0 ) {
+        f = Font_new();
+        check_mem( f );
+
+        check( Font_createAtlas( f, pFile, pSize ), "Error in font creation!\n" );
+
+        // storage
+        int index = renderer->mFonts.cpt++;
+        renderer->mFonts.data[index] = f;
+
+        return index;
+    }
+error:
+    Font_destroy( f );
+    return -1;
+}
+
+Font *Renderer_getFont( u32 pHandle ) {
+    if( renderer )
+        return renderer->mFonts.data[pHandle];
+    return NULL;
+}
 
 void CheckGLError_func( const char *pFile, u32 pLine ) {
 #ifdef _DEBUG

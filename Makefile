@@ -1,7 +1,7 @@
 NAME = Byte-Project
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
-VERSION_PATCH = 11
+VERSION_PATCH = 12
 VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 ARCH = 64
@@ -31,6 +31,7 @@ src/renderer.o\
 src/resource.o\
 src/shader.o\
 src/scene.o\
+src/text.o\
 src/texture.o\
 src/vector.o\
 src/world.o

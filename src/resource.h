@@ -8,6 +8,7 @@
 extern const char ShaderDirectory[];
 extern const char MeshDirectory[];
 extern const char TextureDirectory[];
+extern const char FontDirectory[];
 
 /// ResourceManager struct declaration
 typedef struct s_ResourceManager ResourceManager;
@@ -17,7 +18,8 @@ typedef enum {
     RT_Actor,
     RT_Shader,
     RT_Texture,
-    RT_Mesh
+    RT_Mesh,
+    RT_Font
 } ResourceType;
 
 /// Create and return a new ResourceManager instance

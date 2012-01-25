@@ -7,6 +7,7 @@
 const char ShaderDirectory[] = "data/shaders/";
 const char MeshDirectory[] = "data/meshes/";
 const char TextureDirectory[] = "data/textures/";
+const char FontDirectory[] = "data/fonts/";
 
 // Array of u32 for the Hashes and Handles array of the resourcemanager
 SimpleArray( u32, u32 )
@@ -41,6 +42,34 @@ void ResourceManager_destroy( ResourceManager *pRM ) {
     }
 }
 
+bool ResourceManager_addEntry( ResourceManager *pRM, u32 pHash, u32 pHandle ) {
+    if( pRM )
+        if( u32Array_checkSize( &pRM->mHashes ) && u32Array_checkSize( &pRM->mHandles ) ) {
+            u32 index = pRM->mHashes.cpt++;
+            if( index != (pRM->mHandles.cpt++) ) {
+                log_err( "Error in Resource Manager, arrays are not parallel anymore!\n" );
+            } else {
+                pRM->mHashes.data[index] = pHash;
+                pRM->mHandles.data[index] = pHandle;
+                u32 tmp1, tmp2;
+                // sort array after 2nd insertion, in increasing order
+                if( 1 < pRM->mHashes.cpt ) 
+                    for( int i = pRM->mHashes.cpt-2; i >= 0; --i )
+                        if( pRM->mHashes.data[i] > pRM->mHashes.data[i+1] ) {
+                            // switch two  instances
+                            tmp1 = pRM->mHashes.data[i];
+                            tmp2 = pRM->mHandles.data[i];
+                            pRM->mHashes.data[i] = pRM->mHashes.data[i+1];
+                            pRM->mHandles.data[i] = pRM->mHandles.data[i+1];
+                            pRM->mHashes.data[i+1] = tmp1;
+                            pRM->mHandles.data[i+1] = tmp2;
+                        } else 
+                            break;
+                return true;
+            }
+        }
+    return false;
+}
 
 
 // internally used function (in ResourceManager_load)
@@ -115,10 +144,67 @@ error:
     return -1;
 }
 
+int LoadFont( ResourceManager *pRM, const char *pFile ) {
+    // path
+    str256 file_path;
+    strcpy( file_path, FontDirectory );
+    strcat( file_path, pFile );
+
+    // load the font in 12, 20 and 32 sizes
+    int f_12_handle = Renderer_createFont( file_path, 12 );
+    int f_20_handle = Renderer_createFont( file_path, 20 );
+    int f_32_handle = Renderer_createFont( file_path, 32 );
+
+    check( f_12_handle >= 0, "Could not load font \"%s\" in size 12!\n", file_path );
+    check( f_20_handle >= 0, "Could not load font \"%s\" in size 20!\n", file_path );
+    check( f_32_handle >= 0, "Could not load font \"%s\" in size 32!\n", file_path );
+
+    // add the three fonts sizes to the manager
+    size_t f_len = strlen( pFile );
+    char *f_name = byte_alloc( f_len + 4 );
+    check_mem( f_name );
+    strcpy( f_name, pFile );
+
+    // size 12
+    strcat( f_name, "/12" );
+    u32 hash = GetHash( f_name );
+    ResourceManager_addEntry( pRM, hash, f_12_handle );
+
+    // size 20
+    strcpy( f_name + f_len, "/20" );
+    hash = GetHash( f_name );
+    ResourceManager_addEntry( pRM, hash, f_20_handle );
+
+    // size 32
+    strcpy( f_name + f_len, "/32" );
+    hash = GetHash( f_name );
+    ResourceManager_addEntry( pRM, hash, f_32_handle );
+
+
+
+    DEL_PTR( f_name );
+    return f_20_handle;
+
+error:
+    return -1;
+}
+
 int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *pFile ) {
     int handle = -1;
+    char *r_name = NULL;
+
     if( pRM && pFile && Renderer_isInitialized() ) {
-        u32 hash = GetHash( pFile );
+        // if type is font, search for the font with size 20 in resources.
+        if( RT_Font == pType ) {
+            r_name = byte_alloc( strlen( pFile ) + 4 );
+            strcpy( r_name, pFile );
+            strcat( r_name, "/20" );
+        } else {
+            r_name = byte_alloc( strlen( pFile ) + 1 );
+            strcpy( r_name, pFile );
+        }
+
+        u32 hash = GetHash( r_name );
 
         // search if wanted resource already exist
         for( int i = 0; i < pRM->mHashes.cpt; ++i )  {
@@ -126,8 +212,10 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
             if( pRM->mHashes.data[i] > hash )
                 break;
             else if( pRM->mHashes.data[i] == hash ) {
+                // if we find it, return its handle
                 handle = pRM->mHandles.data[i];
-                break;
+                log_info( "Resource \"%s\" is already present in resource manager!\n", pFile );
+                return handle;
             }
         }
 
@@ -135,11 +223,6 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
         str256 file_path;
         file_path[0] = 0;
 
-        // if we find it, return its handle
-        if( handle >= 0 ) { 
-            log_info( "Resource \"%s\" is already present in resource manager!\n", pFile );
-            return handle;
-        }
 
         // else, load the data
         switch( pType ) {
@@ -150,6 +233,14 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
 
                 // load texture
                 handle = Renderer_createTexture( file_path, true ); 
+
+                // if successfully loaded, add its hash and handle to the manager
+                if( handle >= 0 ) {
+                    if( ResourceManager_addEntry( pRM, hash, handle ) ) {
+                        log_info( "Resource \"%s\" loaded.\n", pFile );
+                    } else
+                        log_err( "Failed to load resource \"%s\".\n", pFile );
+                }
                 break;
             case RT_Shader:
                 // get complete file path
@@ -159,43 +250,39 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                 // parse json file to get both
                 if( CheckExtension( file_path, "json" ) ) {
                     handle = LoadShader( file_path );
+
+                    // if successfully loaded, add its hash and handle to the manager
+                    if( handle >= 0 ) {
+                        if( ResourceManager_addEntry( pRM, hash, handle ) ) {
+                            log_info( "Resource \"%s\" loaded.\n", pFile );
+                        } else
+                            log_err( "Failed to load resource \"%s\".\n", pFile );
+                    }
                 } else 
                     log_err( "ResourceManager needs a .json file to load a shader!\n" );
+                break;
+            case RT_Font:
+                // get complete file path
+                //strcat( file_path, FontDirectory );
+                //strcat( file_path, pFile );
+
+                // load font with freetype
+                if( CheckExtension( pFile, "ttf" ) ) {
+                    handle = LoadFont( pRM, pFile );
+
+                    if( handle >= 0 ) {
+                        log_info( "Resource \"%s\" loaded.\n", pFile );
+                    } else
+                        log_err( "Failed to load resource \"%s\".\n", pFile );
+                } else
+                    log_err( "ResourceManager can't handle \"%s\" as a font file!\n", pFile );
+
                 break;
             default:
                 break;
         }
-
-
-        // if creation went well, store the hash and the handle
-        if( handle >= 0 ) {
-            if( u32Array_checkSize( &pRM->mHashes ) && u32Array_checkSize( &pRM->mHandles ) ) {
-                u32 index = pRM->mHashes.cpt++;
-                if( index != (pRM->mHandles.cpt++) ) {
-                    log_err( "Error in Resource Manager, arrays are not parallel anymore!\n" );
-                    handle = -1;
-                } else {
-                    pRM->mHashes.data[index] = hash;
-                    pRM->mHandles.data[index] = handle;
-                    u32 tmp1, tmp2;
-                    // sort array after 2nd insertion, in increasing order
-                    if( 1 < pRM->mHashes.cpt ) 
-                        for( int i = pRM->mHashes.cpt-2; i >= 0; --i )
-                            if( pRM->mHashes.data[i] > pRM->mHashes.data[i+1] ) {
-                                // switch two  instances
-                                tmp1 = pRM->mHashes.data[i];
-                                tmp2 = pRM->mHandles.data[i];
-                                pRM->mHashes.data[i] = pRM->mHashes.data[i+1];
-                                pRM->mHandles.data[i] = pRM->mHandles.data[i+1];
-                                pRM->mHashes.data[i+1] = tmp1;
-                                pRM->mHandles.data[i+1] = tmp2;
-                            } else 
-                                break;
-                    log_info( "Resource \"%s\" loaded.\n", pFile );
-                }
-            }
-        }
     }
+    DEL_PTR( r_name );
     return handle;
 }
 
@@ -241,5 +328,19 @@ void ResourceManager_loadAllResources( ResourceManager *pRM ) {
             if( CheckExtension( texture_file, "png" ) || CheckExtension( texture_file, "jpg" ) )
                 ResourceManager_load( pRM, RT_Texture, texture_file );
         }
+
+        closedir( texture_dir );
+
+        // Load fonts
+        DIR *font_dir = opendir( FontDirectory );
+
+        while( ( entry = readdir( font_dir ) ) ) {
+            const char *font_file = entry->d_name;
+
+            if( CheckExtension( font_file, "ttf" ) )
+                ResourceManager_load( pRM, RT_Font, font_file );
+        }
+
+        closedir( font_dir );
     }
 }

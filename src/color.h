@@ -4,7 +4,7 @@
 #include "common.h"
 
 /// Typical Color structure 
-typedef struct s_Color {
+typedef struct {
     f32 r, g, b, a;
 } Color;
 
