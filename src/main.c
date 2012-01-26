@@ -153,9 +153,6 @@ int main() {
             
             Text_render( text );
 
-            //DrawText( textVbo, textShader, tex, "1234567890-=_+\\|}][{'\";:/?.>,<mM!@#$%^&**()HThe quick brown fox jumps over the lazy dog", -1*400*sx, -1*-288*sy );
-//            RenderText( textVbo, textShader, tex,  "Hello", -1 *400*sx, -1*-288*sy );
-            //RenderText( textVbo, textShader, tex,  "1234567890-=_+\\|}][{'\";:/?.>,<mM!@#$%^&**()HThe quick brown fox jumps over the lazy dog", -1 *400*sx, -1*-288*sy );
         Device_endFrame();
     }
 
