@@ -73,7 +73,7 @@ int main() {
     glEnableVertexAttribArray( 1 );
 
 
-    u32 mesh = Renderer_createMesh( indices, sizeof( indices ), data, sizeof( data ), texcoords, sizeof( texcoords ) );
+    u32 mesh = Renderer_createStaticMesh( indices, sizeof( indices ), data, sizeof( data ), texcoords, sizeof( texcoords ) );
     check( mesh >= 0, "Error while creating mesh!\n" );
 
     

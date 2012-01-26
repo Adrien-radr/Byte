@@ -38,8 +38,23 @@ bool Renderer_isInitialized();
     /// Bind a Vao given its index
     void Renderer_bindVao( u32 pIndex );
 
-    /// Create a new mesh and return its ID
-    int  Renderer_createMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
+    /// Create a new static mesh and return its ID
+    /// This mesh will be set one time and the corresponding VBO will be built directly
+    /// @param pIndices : Mesh Index data
+    /// @param pPositions : Mesh Position data
+    /// @param pTexcoords : Mesh Texture coordinates data
+    /// @param p*Size : Size of each array
+    /// @return : the handle to the created mesh.
+    int  Renderer_createStaticMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
+
+    /// Make a dynamic mesh (dont build it yet
+    int  Renderer_createDynamicMesh();
+
+    /// Change the data of given mesh, and rebuild VBO
+    /// @param pVData : Vertex data (position + texcoords)
+    /// @param pIData : Index data
+    /// @return : true if everything went well, false otherwise.
+    bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIData, u32 pISize );
 
     /// Render a mesh given its identifier
     void Renderer_renderMesh( u32 pIndex );

@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "color.h"
+#include "vector.h"
 #include "world.h"
 
 
@@ -44,6 +45,9 @@ void Text_setText( Text *t, const char *pStr );
 
 /// Sets the shader used to display the font
 void Text_setShader( Text *t, u32 pShader );
+
+/// Sets the posiiton in screen space of the text
+void Text_setPosition( Text *t, const vec2 *pPosition );
 
 
 

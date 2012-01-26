@@ -165,24 +165,21 @@ void Renderer_bindVao( u32 pIndex ) {
 
 
 
-int  Renderer_createMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize ) {
+int  Renderer_createStaticMesh( u32 *pIndices, u32 pIndiceSize, vec2 *pPositions, u32 pPositionSize, vec2 *pTexcoords, u32 pTexcoordSize ) {
+    Mesh *m = NULL;
     if( renderer ) {
-        check( pPositions, "In Renderer_createMesh : given Position array is NULL!\n" );
-        check( pIndices, "In Renderer_createMesh : given Indice array is NULL!\n" );
-
         if( MeshArray_checkSize( &renderer->mMeshes ) ) {
-            Mesh *m = Mesh_new();
+            m = Mesh_new();
             check_mem( m );
 
-            // add Position data
-            Mesh_addVbo( m, MA_Position, pPositions, pPositionsSize );
-            
-            // add Texcoords data if it exist
-            if( pTexcoords )
-                Mesh_addVbo( m, MA_Texcoord, pTexcoords, pTexcoordsSize );
+            // add Vertex Data
+            check( Mesh_addVertexData( m, pPositions, pPositionSize, pTexcoords, pTexcoordSize ), "Error in mesh creation when setting Vertex Data !\n" );
 
-            // add Indices data
-            Mesh_addIbo( m, pIndices, pIndicesSize );
+            // add Index data
+            check( Mesh_addIndexData( m, pIndices, pIndiceSize ), "Error in mesh creation when setting Index Data !\n" );
+
+            // build Mesh VBO
+            Mesh_build( m, false );
 
 
             // add the Mesh to the renderer array
@@ -192,10 +189,74 @@ int  Renderer_createMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32
             return index;
 
         } else
-            log_err( "In Renderer_createMesh : Error with MeshArray expansion!\n" );
+            log_err( "In Renderer_createStaticMesh : Error with MeshArray expansion!\n" );
     }
 error:
+    Mesh_destroy( m );
     return -1;
+}
+
+int  Renderer_createDynamicMesh() {
+    Mesh *m = NULL;
+    if( renderer ) {
+        if( MeshArray_checkSize( &renderer->mMeshes ) ) {
+            m = Mesh_new();
+            check_mem( m );
+
+            // storage
+            int index = renderer->mMeshes.cpt++;
+            renderer->mMeshes.data[index] = m;
+
+            return index;
+        } else
+            log_err( "In Renderer_createDynamicMesh : Error with MeshArray expansion!\n" );
+    }
+error:
+    Mesh_destroy( m );
+    return -1;
+}
+
+bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIData, u32 pISize ) {
+    if( renderer ) {
+        Mesh *m = renderer->mMeshes.data[pMesh];
+        check( m, "Wanted to change Dynamic Mesh Data of an unexisting mesh (handle = %d)\n", pMesh );
+
+        // Change vertex data if given
+        if( pVData && pVSize > 0 ) {
+            // delete previous data if it exists
+            if( m->mData )
+                DEL_PTR( m->mData );
+
+            // allocate new space for data, and copy array content
+            m->mData = byte_alloc( pVSize );
+            memcpy( m->mData, pVData, pVSize );
+
+            m->mTexcoordBegin = pVSize / 2;
+            // vertex count = 4 floats(px, py, tx, ty) by vertex
+            m->mVertexCount = pVSize / (sizeof( u32 ) * 4);
+        }
+
+        // Change index data if given
+        if( pIData && pISize > 0 ) {
+            // delete previous data if it exists
+            if( m->mIndices )
+                DEL_PTR( m->mIndices );
+
+            // allocate new space for data, and copy array content
+            m->mIndices = byte_alloc( pISize );
+            memcpy( m->mIndices, pIData, pISize );
+
+            m->mIndexCount = pISize / sizeof( u32 );
+        } 
+
+        // if any change, rebuild mesh
+        if( pVSize > 0 || pISize > 0 )
+            Mesh_build( m, true );
+
+        return true;
+    }
+error:
+    return false;
 }
 
 void Renderer_renderMesh( u32 pIndex ) {
@@ -208,7 +269,10 @@ void Renderer_renderMesh( u32 pIndex ) {
 //            renderer->mCurrentMesh = pIndex;
 //        }
 
-        glDrawElements( GL_TRIANGLES, m->mIndexCount, GL_UNSIGNED_INT, 0 );
+        if( m->mUseIndices )
+            glDrawElements( GL_TRIANGLES, m->mIndexCount, GL_UNSIGNED_INT, 0 );
+        else
+            glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
     }
 }
 

@@ -41,9 +41,6 @@ void Context_setVSync( bool pVal );
 void Context_showCursor( bool pVal ); 
 
 
-/// Returns the context projection matrix
-//const mat3* Context_getProjectionMatrix();
-
 
 
 

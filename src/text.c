@@ -27,6 +27,7 @@ typedef struct s_Text {
     u32         mMesh;          ///< Mesh used to render text
     int         mShader;        ///< Shader used to render text
 
+    vec2        mPosition;      ///< Screen space position of text
     Color       mColor;         ///< Font color
     str512      mStr;           ///< Message displayed
     u32         mStrLength;     ///< Size of the message
@@ -114,9 +115,6 @@ bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
             x += g->bitmap.width;
         }
 
-        // size of space is size of 'm' letter
-        pFont->mGlyphs[32].advance.x = pFont->mGlyphs[(int)'m'].advance.x;
-
         glPixelStorei( GL_UNPACK_ALIGNMENT, 4 );
 
         return true;
@@ -133,7 +131,10 @@ Text *Text_new() {
     check_mem( t );
 
     // generate font vbo
-    glGenBuffers( 1, &t->mMesh );
+    //glGenBuffers( 1, &t->mMesh );
+    t->mMesh = Renderer_createDynamicMesh();
+    check( t->mMesh >= 0, "Can't create text Mesh!\n" );
+
 
     t->mStr[0] = 0;
 
@@ -143,13 +144,15 @@ Text *Text_new() {
     // no shader at first
     t->mShader = -1;
 
-error:
     return t;
+
+error:
+    Text_destroy( t );
+    return NULL;
 }
 
 void Text_destroy( Text *t ) {
     if( t ) {
-        glDeleteBuffers( 1, &t->mMesh );
         DEL_PTR( t );
     }
 }
@@ -159,12 +162,14 @@ void Text_render( Text *t ) {
     Shader_sendColor( "Color", &t->mColor );
     Renderer_useTexture( t->mFont->mTexture, 0 );
 
-    glBindBuffer( GL_ARRAY_BUFFER, t->mMesh );
+    Renderer_renderMesh( t->mMesh );
+    /*glBindBuffer( GL_ARRAY_BUFFER, t->mMesh );
     glEnableVertexAttribArray( 0 );
     glEnableVertexAttribArray( 1 );
     glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, 0 );
     glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(f32)*t->mStrLength*6*2) );
     glDrawArrays( GL_TRIANGLES, 0, t->mStrLength * 6 );
+    */
 }
 
 void Text_setFont( Text *t, World *world, const char *pFontName, u32 pSize ) {
@@ -219,7 +224,7 @@ void Text_setText( Text *t, const char *pStr ) {
         const size_t text_data_size = c_size * newstr_len;
         f32 data[text_data_size];
 
-        glBindBuffer( GL_ARRAY_BUFFER, t->mMesh );
+        //glBindBuffer( GL_ARRAY_BUFFER, t->mMesh );
 
         int n_pos = 0, n_tex = text_data_size/2;
         int fw = t->mFont->mTextureSize.x, fh = t->mFont->mTextureSize.y;
@@ -276,7 +281,10 @@ void Text_setText( Text *t, const char *pStr ) {
                 
         }
 
-        glBufferData( GL_ARRAY_BUFFER, sizeof( data ), data, GL_DYNAMIC_DRAW );
+        // update mesh
+        Renderer_setDynamicMeshData( t->mMesh, data, sizeof( data ), NULL, 0 );
+
+        //glBufferData( GL_ARRAY_BUFFER, sizeof( data ), data, GL_DYNAMIC_DRAW );
     }
 }
 
