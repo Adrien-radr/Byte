@@ -30,11 +30,13 @@ typedef struct {
     InputState      mCurrState,         ///< Inputs of current frame
                     mPrevState;         ///< Inputs of previous frame
             
-    ListenerArray   mKeyListeners;      ///< List of all registered mouse listeners
-    ListenerArray   mMouseListeners;    ///< List of all registered key listeners
+    ListenerArray   mKeyListeners,      ///< List of all registered mouse listeners
+                    mMouseListeners,    ///< List of all registered key listeners
+                    mResizeListeners;   ///< List of all registered resize listeners
 
     EventArray      mFrameKeyEvents,    ///< All key events recorded during the frame
-                    mFrameMouseEvents;  ///< All mouse events recorded during the frame
+                    mFrameMouseEvents,  ///< All mouse events recorded during the frame
+                    mFrameResizeEvents; ///< All resize events recorded during the frame
    
 } EventManager;
 
@@ -63,9 +65,11 @@ bool EventManager_init() {
     // Init Listener arrays
     ListenerArray_init( &eventManager->mKeyListeners, 10 );
     ListenerArray_init( &eventManager->mMouseListeners, 10 );
+    ListenerArray_init( &eventManager->mResizeListeners, 5 );
 
     EventArray_init( &eventManager->mFrameKeyEvents, 50 );
     EventArray_init( &eventManager->mFrameMouseEvents, 50 );
+    EventArray_init( &eventManager->mFrameResizeEvents, 50 );
 
     
     log_info( "Event manager successfully initialized!\n" );
@@ -82,8 +86,10 @@ void EventManager_destroy() {
     if( eventManager ) {
         ListenerArray_destroy( &eventManager->mKeyListeners );
         ListenerArray_destroy( &eventManager->mMouseListeners );
+        ListenerArray_destroy( &eventManager->mResizeListeners );
         EventArray_destroy( &eventManager->mFrameKeyEvents );
         EventArray_destroy( &eventManager->mFrameMouseEvents );
+        EventArray_destroy( &eventManager->mFrameResizeEvents );
         DEL_PTR( eventManager );
     }
 }
@@ -108,6 +114,16 @@ void EventManager_update() {
         }
 
         EventArray_clear( &eventManager->mFrameMouseEvents );
+    }
+    // if there has been resize events during the frame, send them to all resizelisteners
+    if( eventManager->mFrameResizeEvents.cpt ) {
+        for( u32 i = 0; i < eventManager->mResizeListeners.cpt; ++i ) {
+            const ListenerStruct *ls = &eventManager->mResizeListeners.data[i];
+            for( u32 j = 0; j < eventManager->mFrameResizeEvents.cpt; ++j )
+                ls->function( &eventManager->mFrameResizeEvents.data[j], ls->data );
+        }
+
+        EventArray_clear( &eventManager->mFrameResizeEvents );
     }
 
 
@@ -180,6 +196,11 @@ bool EventManager_addListener( ListenerType pType, ListenerFunc pFunc, void *pDa
                 eventManager->mMouseListeners.data[eventManager->mMouseListeners.cpt++] = s;
             else
                 return false;
+        } else if( LT_ResizeListener == pType ) {
+            if( ListenerArray_checkSize( &eventManager->mResizeListeners ) ) 
+                eventManager->mResizeListeners.data[eventManager->mResizeListeners.cpt++] = s;
+            else
+                return false;
         } else
             return false;
 
@@ -196,9 +217,16 @@ void EventManager_propagateEvent( const Event pEvent ) {
             if( EventArray_checkSize( &eventManager->mFrameKeyEvents ) ) 
                 eventManager->mFrameKeyEvents.data[eventManager->mFrameKeyEvents.cpt++] = pEvent;
             break;
-        default:
+        case E_MouseMoved:
+        case E_MousePressed:
+        case E_MouseReleased:
+        case E_MouseWheelMoved:
             if( EventArray_checkSize( &eventManager->mFrameMouseEvents ) ) 
                 eventManager->mFrameMouseEvents.data[eventManager->mFrameMouseEvents.cpt++] = pEvent;
+            break;
+        case E_WindowResized:
+            if( EventArray_checkSize( &eventManager->mFrameResizeEvents ) ) 
+                eventManager->mFrameResizeEvents.data[eventManager->mFrameResizeEvents.cpt++] = pEvent;
             break;
     }
 }
@@ -209,14 +237,14 @@ void EventManager_propagateEvent( const Event pEvent ) {
         if( eventManager )
             eventManager->mCurrState.mKeyboard[pKey] = pValue ? true : false;
 
-        Event e = { .Type = ( pValue ? E_KeyPressed : E_KeyReleased ), .Key = (Key)pKey, .Char = pKey };
+        Event e = { .Type = ( pValue ? E_KeyPressed : E_KeyReleased ), .key = (Key)pKey, .i = pKey };
 
         EventManager_propagateEvent( e );
     }
 
     void CharPressedCallback( int pChar, int pValue ) {
         if( eventManager ) {
-            Event e = { .Type = E_CharPressed, .Char = pChar };
+            Event e = { .Type = E_CharPressed, .i = pChar };
 
             EventManager_propagateEvent( e );
         }
@@ -226,7 +254,7 @@ void EventManager_propagateEvent( const Event pEvent ) {
         if( eventManager ) {
             eventManager->mCurrState.mMouse[pButton] = pValue ? true : false;
 
-            Event e = { .Type = (pValue ? E_MousePressed : E_MouseReleased), .MouseButton = (MouseButton)pButton };
+            Event e = { .Type = (pValue ? E_MousePressed : E_MouseReleased), .button = (MouseButton)pButton };
 
             EventManager_propagateEvent( e );
         }
@@ -236,7 +264,7 @@ void EventManager_propagateEvent( const Event pEvent ) {
         if( eventManager ) {
             eventManager->mCurrState.mWheel = pWheel;
 
-            Event e = { .Type = E_MouseWheelMoved, .Wheel = (pWheel - eventManager->mPrevState.mWheel) };
+            Event e = { .Type = E_MouseWheelMoved, .i = (pWheel - eventManager->mPrevState.mWheel) };
 
             EventManager_propagateEvent( e );
         }
@@ -247,7 +275,15 @@ void EventManager_propagateEvent( const Event pEvent ) {
             eventManager->mCurrState.mMousePos.x = (f32)pX;
             eventManager->mCurrState.mMousePos.y = (f32)pY;
 
-            Event e = { .Type = E_MouseMoved, .MousePos = { .x = pX, .y = pY } };
+            Event e = { .Type = E_MouseMoved, .v = { .x = pX, .y = pY } };
+
+            EventManager_propagateEvent( e );
+        }
+    }
+
+    void WindowResizeCallback( int pWidth, int pHeight ) {
+        if( eventManager ) {
+            Event e = { .Type = E_WindowResized, .v = { .x = pWidth, .y = pHeight } };
 
             EventManager_propagateEvent( e );
         }

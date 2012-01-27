@@ -13,7 +13,9 @@ typedef enum {
     E_MouseWheelMoved,
     E_KeyPressed,
     E_KeyReleased,
-    E_CharPressed
+    E_CharPressed,
+
+    E_WindowResized
 } EventType;
 
 /// Event object binding a Type of Event to the value
@@ -23,11 +25,17 @@ typedef enum {
 typedef struct {
     EventType   Type;               ///< Type of the event
                         
-    vec2        MousePos;     	    ///< In case of MouseMoved
-    MouseButton MouseButton;   	    ///< In case of MousePressed/Released
-    int         Wheel;				///< In case of MouseWheelMoved
-    Key         Key;			    ///< In case of KeyPressed/Released
-    char        Char;				///< In case of CharPressed/KeyPressed/Released
+    vec2        v;
+    int         i;
+    union {
+        MouseButton button;
+        Key         key;
+    };
+    //vec2        MousePos;     	    ///< In case of MouseMoved
+    //MouseButton MouseButton;   	    ///< In case of MousePressed/Released
+    //int         Wheel;				///< In case of MouseWheelMoved
+    //Key         Key;			    ///< In case of KeyPressed/Released
+    //char        Char;				///< In case of CharPressed/KeyPressed/Released
 } Event;
 
 
@@ -73,7 +81,8 @@ void EventManager_update();
     /// Different types of listener
     typedef enum {
         LT_KeyListener,
-        LT_MouseListener
+        LT_MouseListener,
+        LT_ResizeListener
     } ListenerType;
 
     /// Listener registering function
@@ -86,6 +95,7 @@ void EventManager_update();
 
 
 // GLFW Event Callback functions
+    void WindowResizeCallback( int pWidth, int pHeight );
     void KeyPressedCallback( int pKey, int pValue );
     void CharPressedCallback( int pKey, int pValue );
     void MousePressedCallback( int pButton, int pValue );

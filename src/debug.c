@@ -17,10 +17,10 @@ bool MemoryManager_init() {
 
         mem_manager->alloc_cpt = 0;
         mem_manager->allocated_bytes = 0;
-        memset( mem_manager->alloc_stack, 0, 512 * sizeof( void* ) );
-        memset( mem_manager->alloc_sizes, 0, 512 * sizeof( size_t ) );
-        memset( mem_manager->alloc_files, 0, 512 * sizeof( char ) );
-        memset( mem_manager->alloc_lines, 0, 512 * sizeof( int ) );
+        memset( mem_manager->alloc_stack, 0, MEMORY_MANAGER_SIZE * sizeof( void* ) );
+        memset( mem_manager->alloc_sizes, 0, MEMORY_MANAGER_SIZE * sizeof( size_t ) );
+        memset( mem_manager->alloc_files, 0, MEMORY_MANAGER_SIZE * sizeof( char ) );
+        memset( mem_manager->alloc_lines, 0, MEMORY_MANAGER_SIZE * sizeof( int ) );
 
         return true;
     }
@@ -55,7 +55,7 @@ void MemoryManager_destroy() {
 void MemoryManager_allocation( void* ptr, size_t size, char file, int line ) {
     if( mem_manager ){
         u32 cpt = mem_manager->alloc_cpt++;
-        if( cpt < 512 ) {
+        if( cpt < MEMORY_MANAGER_SIZE ) {
             mem_manager->allocated_bytes += size;
             mem_manager->alloc_stack[cpt] = ptr;
             mem_manager->alloc_sizes[cpt] = size;

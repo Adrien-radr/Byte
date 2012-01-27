@@ -32,6 +32,8 @@ void Camera_registerListener( Camera *pCamera, ListenerFunc pFunc, ListenerType 
                 pCamera->mMouseListener = pFunc;
                 EventManager_addListener( pType, pCamera->mMouseListener, pCamera );
                 break;
+            default :
+                break;
         }
     }
 }
@@ -44,18 +46,21 @@ void Camera_registerUpdateFunction( Camera *pCamera, CameraUpdate pFunc ) {
 
 void Camera_calculateProjectionMatrix( Camera *pCamera ) {
     if( pCamera && Context_isInitialized() ) {
-       vec2 windowSize = Context_getSize();
-
-       f32 xoffset = (windowSize.x - pCamera->mZoom * windowSize.x) / 2.f, 
-           yoffset = (windowSize.y - pCamera->mZoom * windowSize.y) / 2.f,
-           width = windowSize.x - xoffset,
-           height = windowSize.y - yoffset;
+        vec2 windowSize = Context_getSize();
 
 
-       mat3_ortho( &pCamera->mProjectionMatrix, xoffset + pCamera->mPosition.x, 
-                                                width + pCamera->mPosition.x, 
-                                                height + pCamera->mPosition.y, 
-                                                yoffset + pCamera->mPosition.y );
+        f32 xoffset = (windowSize.x - pCamera->mZoom * windowSize.x) / 2.f;
+        f32 yoffset = (windowSize.y - pCamera->mZoom * windowSize.y) / 2.f;
+
+
+        f32 width = windowSize.x - xoffset,
+            height = windowSize.y - yoffset;
+
+
+        mat3_ortho( &pCamera->mProjectionMatrix, xoffset + pCamera->mPosition.x, 
+                                                 width + pCamera->mPosition.x, 
+                                                 height + pCamera->mPosition.y, 
+                                                 yoffset + pCamera->mPosition.y );
     }
 }
 

@@ -49,6 +49,10 @@ void Text_setShader( Text *t, u32 pShader );
 /// Sets the posiiton in screen space of the text
 void Text_setPosition( Text *t, const vec2 *pPosition );
 
+/// Asks the given text to remake its vbo from scratch from the same text
+/// Useful if window is resized for example
+void Text_updateText( Text *t );
+
 
 
 #endif // BYTE_TEXT

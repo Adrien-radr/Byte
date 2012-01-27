@@ -8,6 +8,12 @@
 #include "renderer.h"
 #include "context.h"
 
+Text *text = NULL;
+
+void textUpdate( const Event *pEvent, void *pData ) {
+    if( text )
+        Text_updateText( text );
+}
 
 int main() {
     check( Device_init(), "Error while creating Device, exiting program.\n" );
@@ -113,7 +119,8 @@ int main() {
     int textShader = World_getResource( world, "textShader.json" );
     check( textShader >= 0, "Error in text shader creation. Exiting!\n" );
 
-    Text *text = Text_new();
+    EventManager_addListener( LT_ResizeListener, textUpdate, NULL );
+    text = Text_new();
     Text_setFont( text, world, "DejaVuSans.ttf", 12 );
     Text_setShader( text, textShader );
 

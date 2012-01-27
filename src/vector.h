@@ -7,8 +7,8 @@ typedef struct s_vec2 {
     f32 x, y;
 } vec2;
 
-/// Returns a vector equal to the given one
-vec2 vec2_cpy( const vec2 *A );
+/// Copy a given vector in another (B->A)
+void vec2_cpy( vec2 *A, const vec2 *B );
 
 /// Returns the negate of a vector
 vec2 vec2_neg( const vec2 *A );

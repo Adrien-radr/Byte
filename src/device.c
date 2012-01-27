@@ -18,12 +18,11 @@ typedef struct s_Device {
 
 Device *device = NULL;
 
-// Definition of GLFW Window resize function declared in context.h
-void WindowResizeCallback( int pWidth, int pHeight ) {
-    vec2 newSize = { .x = pWidth, .y = pHeight };
-    Context_setSize( newSize );
+// listener to window resize callback
+void Device_windowResize( const Event *pEvent, void *pData ) {
+    Context_setSize( pEvent->v );
 
-    glViewport( 0, 0, (GLsizei)pWidth, (GLsizei)pHeight );
+    glViewport( 0, 0, (GLsizei)pEvent->v.x, (GLsizei)pEvent->v.y );
 
     if( device->mActiveCamera ) {
         Camera_calculateProjectionMatrix( device->mActiveCamera );
@@ -54,6 +53,8 @@ bool Device_init() {
 
     // Initialize Event Manager
     check( EventManager_init(), "Error while creating Event Manager!\n" );
+
+    EventManager_addListener( LT_ResizeListener, Device_windowResize, NULL );
 
     // Initialize Freetype
     check( !FT_Init_FreeType( &device->mFreetype ), "Could not initialize Freetype library!\n" );

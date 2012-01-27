@@ -89,7 +89,7 @@
             Camera *cam = (Camera*)pCamera;
             // manage zoom event 
             if( pEvent->Type == E_MouseWheelMoved ) 
-                Camera_zoom( cam, pEvent->Wheel );
+                Camera_zoom( cam, pEvent->i );
         }
 
         void cameraUpdate( Camera *pCamera ) {

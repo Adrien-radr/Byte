@@ -12,8 +12,7 @@ Byte-Project : TODO File
 + Entity 
 + Font rendering (Freetype)
 + Object Depth
-- Fix font rendering when resizing window!
-- Fix camera position when resizing window (messy)!
++ Fix font rendering when resizing window!
 - Quad Tree for scene managment
 - Game 'class' containing : the device, the world, the scene, game states
 - Phong Lighting
@@ -21,3 +20,6 @@ Byte-Project : TODO File
 - Config file
 - Lua integration as a scripting language
 
+????
+----
+- Fix camera position when resizing window (messy)!

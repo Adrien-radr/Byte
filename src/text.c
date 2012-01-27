@@ -205,23 +205,11 @@ void Text_setColor( Text *t, const Color *pColor ) {
         memcpy( &t->mColor.r, &pColor->r, 4 * sizeof( f32 ) );
 }
 
-void Text_setText( Text *t, const char *pStr ) {
-    //change only if two strings are not equal
-    if( t && pStr && strcmp( pStr, t->mStr ) ) {
-        const size_t newstr_len = strlen( pStr );
-        if( 512 <= newstr_len )
-            log_err( "String : \n\"%s\"\n\nis too long to be put as a Text string (max:512 chars)!\n", pStr );
-
-        strncpy( t->mStr, pStr, 512 );
-
-        t->mStrLength = newstr_len;
-
-
-        // create VBO from string
-
+void Text_updateText( Text *t ) {
+    if( t ) {
         // 6 vertices of 4 float(pos<x,y>, texCoord<s,t>), for each character
         const size_t c_size = 6 * 4;
-        const size_t text_data_size = c_size * newstr_len;
+        const size_t text_data_size = c_size * t->mStrLength;
         f32 data[text_data_size];
 
         //glBindBuffer( GL_ARRAY_BUFFER, t->mMesh );
@@ -241,7 +229,7 @@ void Text_setText( Text *t, const char *pStr ) {
         for( const char *p = t->mStr; *p; ++p ) {
             int i = (int)*p;
             if( '\n' == *p ) {
-                y -= (fh + 4) * sx;
+                y -= (fh + 4) * sy;
                 x = x_left;
                 continue;
             } else if ( 32 == *p ) {
@@ -283,8 +271,21 @@ void Text_setText( Text *t, const char *pStr ) {
 
         // update mesh
         Renderer_setDynamicMeshData( t->mMesh, data, sizeof( data ), NULL, 0 );
+    }
+}
 
-        //glBufferData( GL_ARRAY_BUFFER, sizeof( data ), data, GL_DYNAMIC_DRAW );
+void Text_setText( Text *t, const char *pStr ) {
+    //change only if two strings are not equal
+    if( t && pStr && strcmp( pStr, t->mStr ) ) {
+        const size_t newstr_len = strlen( pStr );
+        if( 512 <= newstr_len )
+            log_err( "String : \n\"%s\"\n\nis too long to be put as a Text string (max:512 chars)!\n", pStr );
+
+        strncpy( t->mStr, pStr, 512 );
+
+        t->mStrLength = newstr_len;
+
+        Text_updateText( t );
     }
 }
 

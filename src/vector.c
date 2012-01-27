@@ -1,8 +1,7 @@
 #include "vector.h"
 
-vec2 vec2_cpy( const vec2 *A ) {
-    vec2 ret = { .x = A->x, .y = A->y };
-    return ret;
+void vec2_cpy( vec2 *A, const vec2 *B ) {
+    memcpy( &A->x, &B->x, 2 * sizeof( f32 ) );
 }
 
 vec2 vec2_neg( const vec2 *A ) {
