@@ -40,8 +40,9 @@ int  World_getResource( World *pWorld, const char *pFile ) {
     return -1;
 }
 
-void World_loadAllResources( World *pWorld ) {
+bool World_loadAllResources( World *pWorld ) {
     if( pWorld ) {
-       ResourceManager_loadAllResources( pWorld->mResourceManager );
+       return ResourceManager_loadAllResources( pWorld->mResourceManager );
     }
+    return false;
 }

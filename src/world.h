@@ -25,7 +25,8 @@ int  World_loadResource( World *pWorld, ResourceType pType, const char *pFile );
 int  World_getResource( World *pWorld, const char *pFile );
 
 /// Load all resources found in resource directories
-void World_loadAllResources( World *pWorld );
+/// @return : True of all resources were loaded correctly.
+bool World_loadAllResources( World *pWorld );
 
 
 #endif // BYTE_WORLD

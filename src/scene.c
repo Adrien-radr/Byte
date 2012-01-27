@@ -13,6 +13,7 @@
         HandleManager   *mMeshes;
         HandleManager   *mTextures;
         HandleManager   *mModelMatrices;
+        HandleManager   *mDepths;
 
         u32             mCount;
         u32             mSize;
@@ -25,6 +26,7 @@
         arr->mMeshes = HandleManager_init( pArraySize );
         arr->mTextures = HandleManager_init( pArraySize );
         arr->mModelMatrices = HandleManager_init( pArraySize );
+        arr->mDepths = HandleManager_init( pArraySize );
 
         arr->mSize = pArraySize;
 
@@ -37,11 +39,13 @@
         HandleManager_clear( pEA->mMeshes );
         HandleManager_clear( pEA->mTextures );
         HandleManager_clear( pEA->mModelMatrices );
+        HandleManager_clear( pEA->mDepths );
     }
 
     u32 EntityArray_addEntity( EntityArray *pEA, const Entity *pEntity ) {
         int handle = HandleManager_addHandle( pEA->mMeshes, pEntity->mMesh );
         HandleManager_addHandle( pEA->mTextures, pEntity->mTexture );
+        HandleManager_addHandle( pEA->mDepths, pEntity->mDepth );
         HandleManager_addData( pEA->mModelMatrices, pEntity->mModelMatrix );
 
         ++pEA->mMaxIndex;
@@ -54,6 +58,7 @@
     void EntityArray_removeEntity( EntityArray *pEA, u32 pIndex ) {
        HandleManager_remove( pEA->mMeshes, pIndex ); 
        HandleManager_remove( pEA->mTextures, pIndex ); 
+       HandleManager_remove( pEA->mDepths, pIndex ); 
        HandleManager_remove( pEA->mModelMatrices, pIndex ); 
 
        --pEA->mCount;
@@ -63,6 +68,7 @@
         if( pEA ) {
             HandleManager_destroy( pEA->mMeshes );
             HandleManager_destroy( pEA->mTextures );
+            HandleManager_destroy( pEA->mDepths );
             HandleManager_destroy( pEA->mModelMatrices );
             DEL_PTR( pEA );
         }
@@ -165,6 +171,7 @@ void Scene_render( Scene *pScene ) {
                     if( HandleManager_isUsed( pScene->mEntities.data[i]->mMeshes, j ) ) {
                         Renderer_useTexture( HandleManager_getHandle( pScene->mEntities.data[i]->mTextures, j ), 0 );
                         Shader_sendMat3( "ModelMatrix", HandleManager_getData( pScene->mEntities.data[i]->mModelMatrices, j ) );
+                        Shader_sendInt( "Depth", HandleManager_getHandle( pScene->mEntities.data[i]->mDepths, j ) );
 
                         Renderer_renderMesh( HandleManager_getHandle( pScene->mEntities.data[i]->mMeshes, j ) );
                     }

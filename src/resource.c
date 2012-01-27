@@ -101,7 +101,7 @@ int LoadShader( const char *pFile ) {
 
     // create shader from shader files
     int handle = Renderer_createShader( v_path, f_path );
-    check( handle >= 0, "Error while loading shader from \"%s\".", pFile );
+    check( handle >= 0, "Error while loading shader from \"%s\".\n", pFile );
 
     // load shader parameters
     Shader *s = Renderer_getShader( handle );
@@ -303,7 +303,7 @@ int ResourceManager_getResource( ResourceManager *pRM, const char *pFile ) {
     return handle;
 }
 
-void ResourceManager_loadAllResources( ResourceManager *pRM ) {
+bool ResourceManager_loadAllResources( ResourceManager *pRM ) {
     if( pRM ) {
         // Load shaders
         DIR *shader_dir = opendir( ShaderDirectory );         
@@ -314,7 +314,7 @@ void ResourceManager_loadAllResources( ResourceManager *pRM ) {
             const char *shader_file = entry->d_name;
 
             if( CheckExtension( shader_file, "json" ) )
-                ResourceManager_load( pRM, RT_Shader, shader_file );
+                check( ResourceManager_load( pRM, RT_Shader, shader_file ) >= 0, "\n" );
         }
 
         closedir( shader_dir );
@@ -342,5 +342,10 @@ void ResourceManager_loadAllResources( ResourceManager *pRM ) {
         }
 
         closedir( font_dir );
+
+        return true;
     }
+
+error:
+    return false;
 }

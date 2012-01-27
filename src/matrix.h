@@ -21,6 +21,9 @@ inline mat3 mat3_new(   f32 x00, f32 x01, f32 x02,
 /// make the given matrix an identity matrix
 void mat3_identity( mat3 *A );
 
+/// Copy a matrix into another B->A
+void mat3_cpy( mat3 *A, const mat3 *B );
+
 /// Multiply AxB. Result is in A
 void mat3_mul( mat3 *A, const mat3 *B );
 

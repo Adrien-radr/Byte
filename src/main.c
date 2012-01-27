@@ -30,7 +30,7 @@ int main() {
     World *world = World_new();
     check( world, "Error in world creation!\n" );
 
-    World_loadAllResources( world );
+    check( World_loadAllResources( world ), "Error in resource loading, exiting program!\n" );
 
     // ###############################3
     //      TEXTURE
@@ -91,17 +91,25 @@ int main() {
     mat3_translatef( &MM, 500.f, 400.f );
 
 
-
     Scene *scene = Scene_new();
 
-    Entity e = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &ModelMatrix, .mTexture = t1 };
+    Entity e = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &ModelMatrix, .mTexture = t1, .mDepth = -1 };
 
     int entity = Scene_addEntity( scene, &e );
     check( entity >= 0, "Failed to create entity!\n" );
 
 
+    mat3_cpy( &MM, &ModelMatrix );
+    mat3_translatef( &MM, 9.f, 3.f );
+
+    Entity e2 = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &MM, .mTexture = texture, .mDepth = 0 };
+
+    int entity2 = Scene_addEntity( scene, &e2 );
+    check( entity2 >= 0, "Failed to create entity2!\n" );
 
 
+    // ###############################3
+    //      TEXT
     int textShader = World_getResource( world, "textShader.json" );
     check( textShader >= 0, "Error in text shader creation. Exiting!\n" );
 

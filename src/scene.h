@@ -22,6 +22,8 @@
                 mTexture;
 
         mat3    *mModelMatrix;
+
+        int     mDepth;
     } Entity;
 
 

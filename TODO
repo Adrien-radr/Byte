@@ -11,6 +11,9 @@ Byte-Project : TODO File
 + Automatic Resource loading (from files)
 + Entity 
 + Font rendering (Freetype)
++ Object Depth
+- Fix font rendering when resizing window!
+- Fix camera position when resizing window (messy)!
 - Quad Tree for scene managment
 - Game 'class' containing : the device, the world, the scene, game states
 - Phong Lighting

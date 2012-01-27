@@ -13,6 +13,11 @@ void mat3_identity( mat3 *A ) {
     }
 }
 
+void mat3_cpy( mat3 *A, const mat3 *B ) {
+    if( A && B ) 
+        memcpy( A->x, B->x, 9 * sizeof( f32 ) );
+}
+
 void mat3_mul( mat3 *A, const mat3 *B ) {
     if( A && B ) {
         mat3 m;
@@ -22,6 +27,8 @@ void mat3_mul( mat3 *A, const mat3 *B ) {
         m.x[3] = A->x[3] * B->x[0] + A->x[4] * B->x[3] + A->x[5] * B->x[6];
         m.x[4] = A->x[3] * B->x[1] + A->x[4] * B->x[4] + A->x[5] * B->x[7];
 
+        m.x[6] = A->x[6] * B->x[0] + A->x[7] * B->x[3] + A->x[8] * B->x[6];
+        m.x[7] = A->x[6] * B->x[1] + A->x[7] * B->x[4] + A->x[8] * B->x[7];
 
         memcpy( A->x, m.x, 9 * sizeof( f32 ) );
     }

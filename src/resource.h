@@ -39,6 +39,7 @@ int  ResourceManager_load( ResourceManager *pRM, ResourceType pType,  const char
 int  ResourceManager_getResource( ResourceManager *pRM, const char *pFile );
 
 /// Load all resources available in resource directories
-void ResourceManager_loadAllResources( ResourceManager *pRM );
+/// @return : True if all resources were loaded correctly. false otherwise
+bool ResourceManager_loadAllResources( ResourceManager *pRM );
 
 #endif // BYTE_RESOURCE
