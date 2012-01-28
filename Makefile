@@ -22,6 +22,7 @@ src/context.o\
 src/common.o\
 src/debug.o\
 src/device.o\
+src/entity.o\
 src/event.o\
 src/handlemanager.o\
 src/main.o\

@@ -217,15 +217,12 @@ error :
     return arr;
 }
 
-int TextArray_addText( TextArray *arr, const Font *pFont, Color pColor ) {
+int TextArray_add( TextArray *arr ) {
     int handle = -1;
-    if( arr && pFont ) {
+    if( arr ) {
         handle = HandleManager_addHandle( arr->mUsed, 1 );
 
         if( handle >= 0 ) {
-            arr->mFonts[handle] = pFont;
-            arr->mColors[handle] = pColor;
-
             // create mesh used by text
             check( (arr->mMeshes[handle] = Renderer_createDynamicMesh()) >= 0, "Failed to create mesh of Text!\n" );
 
@@ -242,7 +239,7 @@ error:
     return -1;
 }
 
-void TextArray_removeText( TextArray *arr, u32 pIndex ) {
+void TextArray_remove( TextArray *arr, u32 pIndex ) {
     if( arr && pIndex < arr->mUsed->mMaxIndex )  {
         HandleManager_remove( arr->mUsed, pIndex );
         DEL_PTR( arr->mStrings[pIndex] );

@@ -4,110 +4,33 @@
 #include "device.h"
 
 
-// ##########################################################################3
-//      Entity Array 
-// ##########################################################################3
-    /// Array containing a handle manager of meshes, textures and model matrices
-    /// In the scene, there is one EntityArray for each used shader
-    typedef struct {
-        HandleManager   *mMeshes;
-        HandleManager   *mTextures;
-        HandleManager   *mModelMatrices;
-        HandleManager   *mDepths;
 
-        u32             mCount;
-        u32             mSize;
-        u32             mMaxIndex;
-    } EntityArray;
+/// Array of EntityArray*
+HeapArray( EntityArray*, Entities, EntityArray_destroy );
 
-    EntityArray *EntityArray_init( u32 pArraySize ) {
-        EntityArray *arr = byte_alloc( sizeof( EntityArray ) );
-        check_mem( arr );
-        arr->mMeshes = HandleManager_init( pArraySize );
-        arr->mTextures = HandleManager_init( pArraySize );
-        arr->mModelMatrices = HandleManager_init( pArraySize );
-        arr->mDepths = HandleManager_init( pArraySize );
-
-        arr->mSize = pArraySize;
-
-    error:
-        return arr;
+// Camera listeners and update function
+    void cameraMouseListener( const Event *pEvent, void *pCamera ) {
+        Camera *cam = (Camera*)pCamera;
+        // manage zoom event 
+        if( pEvent->Type == E_MouseWheelMoved ) 
+            Camera_zoom( cam, pEvent->i );
     }
 
-    void EntityArray_clear( EntityArray *pEA ) {
-        pEA->mMaxIndex = 0;
-        HandleManager_clear( pEA->mMeshes );
-        HandleManager_clear( pEA->mTextures );
-        HandleManager_clear( pEA->mModelMatrices );
-        HandleManager_clear( pEA->mDepths );
+    void cameraUpdate( Camera *pCamera ) {
+        // manage position pan 
+        vec2 move = { .x = 0.f, .y = 0.f };
+        if( IsKeyDown( K_W ) )
+            move.y -= 1.f;
+        if( IsKeyDown( K_A ) )
+            move.x -= 1.f;
+        if( IsKeyDown( K_S ) )
+            move.y += 1.f;
+        if( IsKeyDown( K_D ) )
+            move.x += 1.f;
+
+        if( move.x || move.y )
+            Camera_move( pCamera, &move );
     }
-
-    u32 EntityArray_addEntity( EntityArray *pEA, const Entity *pEntity ) {
-        int handle = HandleManager_addHandle( pEA->mMeshes, pEntity->mMesh );
-        HandleManager_addHandle( pEA->mTextures, pEntity->mTexture );
-        HandleManager_addHandle( pEA->mDepths, pEntity->mDepth );
-        HandleManager_addData( pEA->mModelMatrices, pEntity->mModelMatrix );
-
-        ++pEA->mMaxIndex;
-        ++pEA->mCount;
-        pEA->mSize = pEA->mMeshes->mSize;
-
-        return handle;
-    }
-
-    void EntityArray_removeEntity( EntityArray *pEA, u32 pIndex ) {
-       HandleManager_remove( pEA->mMeshes, pIndex ); 
-       HandleManager_remove( pEA->mTextures, pIndex ); 
-       HandleManager_remove( pEA->mDepths, pIndex ); 
-       HandleManager_remove( pEA->mModelMatrices, pIndex ); 
-
-       --pEA->mCount;
-    }
-
-    void EntityArray_destroy( EntityArray *pEA ) {
-        if( pEA ) {
-            HandleManager_destroy( pEA->mMeshes );
-            HandleManager_destroy( pEA->mTextures );
-            HandleManager_destroy( pEA->mDepths );
-            HandleManager_destroy( pEA->mModelMatrices );
-            DEL_PTR( pEA );
-        }
-    }
-
-
-
-
-
-// ##########################################################################3
-//      SCENE
-// ##########################################################################3
-
-    /// Array of EntityArray*
-    HeapArray( EntityArray*, Entities, EntityArray_destroy );
-
-    // Camera listeners and update function
-        void cameraMouseListener( const Event *pEvent, void *pCamera ) {
-            Camera *cam = (Camera*)pCamera;
-            // manage zoom event 
-            if( pEvent->Type == E_MouseWheelMoved ) 
-                Camera_zoom( cam, pEvent->i );
-        }
-
-        void cameraUpdate( Camera *pCamera ) {
-            // manage position pan 
-            vec2 move = { .x = 0.f, .y = 0.f };
-            if( IsKeyDown( K_W ) )
-                move.y -= 1.f;
-            if( IsKeyDown( K_A ) )
-                move.x -= 1.f;
-            if( IsKeyDown( K_S ) )
-                move.y += 1.f;
-            if( IsKeyDown( K_D ) )
-                move.x += 1.f;
-
-            if( move.x || move.y )
-                Camera_move( pCamera, &move );
-        }
 
 /// Scene definition
 ///     Bool shader array to know if the shader i is used(true) or not(false)
@@ -115,15 +38,20 @@
 ///     
 ///     The scene also possess the scene camera
 typedef struct s_Scene {
-    bool                mShaders[SCENE_SHADER_N];       ///< Shaders used by scene entities
-    EntitiesArray       mEntities;                      ///< Entities for each shader
+//    bool                mShaders[SCENE_SHADER_N];       ///< Shaders used by scene entities
+//    EntitiesArray       mEntities;                      ///< Entities for each shader
+    u32             mEntityShader;
+    EntityArray     *mEntities;
 
-    u32                 mTextShader;                    ///< Shader used to render texts
-    TextArray           *mTexts;                        ///< Texts in the scene
+    u32             mTextShader;                    ///< Shader used to render texts
+    TextArray       *mTexts;                        ///< Texts in the scene
 
-    Camera              *mCamera;                       ///< Camera of the scene
-    World               *mWorld;                        ///< Pointer to the world
+    Camera          *mCamera;                       ///< Camera of the scene
+    World           *mWorld;                        ///< Pointer to the world
 } Scene;
+
+
+
 
 Scene *Scene_new( World *pWorld ) {
     Scene *s = NULL;
@@ -135,17 +63,22 @@ Scene *Scene_new( World *pWorld ) {
     s->mWorld = pWorld;
 
     // array of not-used shaders;
-    memset( s->mShaders, false, SCENE_SHADER_N * sizeof( bool ) );
+    //memset( s->mShaders, false, SCENE_SHADER_N * sizeof( bool ) );
 
-    // create empty entities array of the same size of shader array
-    EntitiesArray_init( &s->mEntities, SCENE_SHADER_N );
+    // create array of entities
+    s->mEntities = EntityArray_init( SCENE_ENTITIES_N );
+    //EntitiesArray_init( &s->mEntities, SCENE_SHADER_N );
+
+    // init default entity shader
+    int es = World_getResource( pWorld, "defaultShader.json" );
+    check( es >= 0, "Entity shader creation error!\n" );
 
     // create array of texts
     s->mTexts = TextArray_init( SCENE_TEXTS_N );
 
     // init default text shader
     int ts = World_getResource( pWorld, "textShader.json" );
-    check( ts >= 0, "Text shader does not exist. (data/shaders/textShader.json)!\n" );
+    check( ts >= 0, "Text shader creation error!\n" );
 
     s->mTextShader = ts;
 
@@ -166,7 +99,8 @@ error:
 
 void Scene_destroy( Scene *pScene ) {
     if( pScene ) {
-        EntitiesArray_destroy( &pScene->mEntities );
+        //EntitiesArray_destroy( &pScene->mEntities );
+        EntityArray_destroy( pScene->mEntities );
         TextArray_destroy( pScene->mTexts );
         Camera_destroy( pScene->mCamera );
         DEL_PTR( pScene );
@@ -181,21 +115,14 @@ void Scene_render( Scene *pScene ) {
     if( pScene ) {
         // ##################################################
         //      RENDER ENTITIES
-        for( u32 i = 0; i < SCENE_SHADER_N; ++i ) {
-            if( pScene->mShaders[i] ) {
-                // use this shader
-                Renderer_useShader( i );
+        Renderer_useShader( pScene->mEntityShader );
 
-                // draw all activated entities using this shader
-                for( u32 j = 0; j < pScene->mEntities.data[i]->mMaxIndex; ++j ) {
-                    if( HandleManager_isUsed( pScene->mEntities.data[i]->mMeshes, j ) ) {
-                        Renderer_useTexture( HandleManager_getHandle( pScene->mEntities.data[i]->mTextures, j ), 0 );
-                        Shader_sendMat3( "ModelMatrix", HandleManager_getData( pScene->mEntities.data[i]->mModelMatrices, j ) );
-                        Shader_sendInt( "Depth", HandleManager_getHandle( pScene->mEntities.data[i]->mDepths, j ) );
-
-                        Renderer_renderMesh( HandleManager_getHandle( pScene->mEntities.data[i]->mMeshes, j ) );
-                    }
-                }
+        for( u32 i = 0; i < pScene->mEntities->mMaxIndex; ++i ) {
+            if( HandleManager_isUsed( pScene->mEntities->mUsed, i ) ) {
+                Renderer_useTexture( pScene->mEntities->mTextures[i], 0 );
+                Shader_sendMat3( "ModelMatrix", &pScene->mEntities->mModelMatrices[i] );
+                Shader_sendInt( "Depth", pScene->mEntities->mDepths[i] );
+                Renderer_renderMesh( pScene->mEntities->mMeshes[i] );
             }
         }
 
@@ -203,6 +130,7 @@ void Scene_render( Scene *pScene ) {
         // ##################################################
         //      RENDER TEXTS
         Renderer_useShader( pScene->mTextShader );
+
         for( u32 i = 0; i < pScene->mTexts->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->mTexts->mUsed, i ) ) {
                 Renderer_useTexture( pScene->mTexts->mFonts[i]->mTexture, 0 );
@@ -213,48 +141,59 @@ void Scene_render( Scene *pScene ) {
     }
 }
 
-int  Scene_addEntity( Scene *pScene, const Entity *pEntity ) {
+//  =======================
+
+int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 pMM ) {
     int handle = -1;
-    u32 shader = pEntity->mShader;
 
-    if( pScene && pEntity ) {
-        if( shader < SCENE_SHADER_N ) {
-            // allocate entity array of corresponding shader if not used yet
-            if( !pScene->mShaders[shader] ) {
-                pScene->mShaders[shader] = true;
-                pScene->mEntities.data[shader] = EntityArray_init( SCENE_ENTITIES_N );
-                ++pScene->mEntities.cpt;
-            }
+    if( pScene ) {
+        handle = EntityArray_add( pScene->mEntities );
 
-            // insert entity
-            handle = EntityArray_addEntity( pScene->mEntities.data[shader], pEntity );
-        } else
-            log_err( "Added an entity in scene with shader ID >= %d.\n", SCENE_SHADER_N );
+        if( handle >= 0 ) {
+            pScene->mEntities->mMeshes[handle] = pMesh;
+            pScene->mEntities->mTextures[handle] = pTexture;
+            pScene->mEntities->mModelMatrices[handle] = pMM;
+        }
     }
     return handle;
 }
 
-void Scene_removeEntity( Scene *pScene, u32 pShader, u32 pIndex ) {
-    if( pScene && pShader < SCENE_SHADER_N ) {
-        EntityArray_removeEntity( pScene->mEntities.data[pShader], pIndex );
-    }
+void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void *pData ) {
+    if( pScene ) {
+        if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
+            switch( pAttrib ) {
+                case EA_Texture :
+                    pScene->mEntities->mTextures[pHandle] = *((u32*)pData);
+                    break;
+                case EA_Depth :
+                    pScene->mEntities->mDepths[pHandle] = *((u32*)pData);
+                    break;
+            }
+        }
+    }   
+}
+
+void Scene_removeEntity( Scene *pScene, u32 pIndex ) {
+    if( pScene ) 
+        EntityArray_remove( pScene->mEntities, pIndex );
 }
 
 void Scene_clearEntities( Scene *pScene ) {
-    if( pScene ) {
-        for( u32 i = 0; i < SCENE_SHADER_N ; ++i )
-            EntityArray_clear( pScene->mEntities.data[i] );
-        memset( pScene->mShaders, false, SCENE_SHADER_N  * sizeof( bool ) );
-    }
+    if( pScene ) 
+        EntityArray_clear( pScene->mEntities );
 }
+
+//  =======================
 
 int Scene_addText( Scene *pScene, const Font *pFont, Color pColor ) {
     int handle = -1;
 
     if( pScene ) {
-        handle = TextArray_addText( pScene->mTexts, pFont, pColor );
+        handle = TextArray_add( pScene->mTexts );
 
         if( handle >= 0 ) {
+            pScene->mTexts->mFonts[handle] = pFont;
+            pScene->mTexts->mColors[handle] = pColor;
         }
     }
 
@@ -282,11 +221,10 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
 
 void Scene_removeText( Scene *pScene, u32 pIndex ) {
     if( pScene ) 
-        TextArray_removeText( pScene->mTexts, pIndex );
+        TextArray_remove( pScene->mTexts, pIndex );
 }
 
 void Scene_clearTexts( Scene *pScene ) {
-    if( pScene ) {
+    if( pScene ) 
         TextArray_clear( pScene->mTexts );
-    }
 }

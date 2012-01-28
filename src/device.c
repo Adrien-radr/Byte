@@ -100,7 +100,7 @@ void Device_beginFrame() {
 
     if( fpsAccum > 1.f ) {
         fpsAccum = 0.f;
-        log_info( "FPS = %f\n", ( 1.f / device->mFrameTime ) );
+        //log_info( "FPS = %f\n", ( 1.f / device->mFrameTime ) );
     }
 
     // Update events and inputs

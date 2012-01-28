@@ -92,32 +92,40 @@ int main() {
 
     mat3_translatef( &ModelMatrix, 400.f, 300.f );
 
-    mat3_identity( &MM );
-    mat3_scalef( &MM, 3.f, 3.f );
-    mat3_translatef( &MM, 500.f, 400.f );
+    mat3_cpy( &MM, &ModelMatrix );
+    mat3_translatef( &MM, 9.f, 3.f );
 
 
     Scene *scene = Scene_new( world );
-
+/*
     Entity e = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &ModelMatrix, .mTexture = t1, .mDepth = -1 };
 
     int entity = Scene_addEntity( scene, &e );
     check( entity >= 0, "Failed to create entity!\n" );
 
 
-    mat3_cpy( &MM, &ModelMatrix );
-    mat3_translatef( &MM, 9.f, 3.f );
 
     Entity e2 = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &MM, .mTexture = texture, .mDepth = 0 };
 
     int entity2 = Scene_addEntity( scene, &e2 );
     check( entity2 >= 0, "Failed to create entity2!\n" );
+*/
+    int ent1 = Scene_addEntity( scene, mesh, t1, ModelMatrix );
+    check( ent1 >= 0, "error creating ent1!\n" );
+
+
+    int ent2 = Scene_addEntity( scene, mesh, texture, MM );
+    check( ent2 >= 0, "error creating ent2!\n" );
+
+    int ent2_depth = -2;
+
+    Scene_modifyEntity( scene, ent2, EA_Depth, &ent2_depth );
 
 
     // ###############################3
     //      TEXT
-    Font *f = Font_get( world, "DejaVuSans.ttf", 20 );
-    Color col = { 1.f, 1.f, 0.f, 1.f };
+    Font *f = Font_get( world, "DejaVuSans.ttf", 12 );
+    Color col = { 0.6f, 0.6f, 0.6f, 1.f };
     int text = Scene_addText( scene, f, col );
 
     check( text >= 0, "error creating text!\n" );
@@ -140,8 +148,15 @@ int main() {
             accum += Device_getFrameTime();
             if( accum > 1.f ) {
                 ++cpt;
-               /* accum = 0.f;
+                accum = 0.f;
 
+
+                str64 fps_str;
+                MSG( fps_str, 64, "FPS : %4.0f", (1.f/Device_getFrameTime()) );
+
+                Scene_modifyText( scene, text, TA_String, fps_str );
+
+                /*
                 if( cpt == 2 ) {
                     Scene_removeEntity( scene, shader, entity );
                 }
@@ -149,9 +164,9 @@ int main() {
                     e.mTexture = texture;
                     Scene_addEntity( scene, &e );
                 }
+                log_info( "Camera Position : <%f, %f>\n", cam->mPosition.x, cam->mPosition.y );
+                log_info( "Cam zoom = %f\n", cam->mZoom );
                 */
-                //log_info( "Camera Position : <%f, %f>\n", cam->mPosition.x, cam->mPosition.y );
-                //log_info( "Cam zoom = %f\n", cam->mZoom );
             }
 
 

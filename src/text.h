@@ -1,7 +1,6 @@
 #ifndef BYTE_TEXT_HPP
 #define BYTE_TEXT_HPP
 
-#include "common.h"
 #include "color.h"
 #include "vector.h"
 #include "world.h"
@@ -70,10 +69,10 @@ Font *Font_get( World *pWorld, const char *pName, u32 pSize );
     TextArray *TextArray_init( u32 pSize );
 
     /// Add a new text to the text array and returns its handle (or -1 if any error)
-    int TextArray_addText( TextArray *arr, const Font *pFont, Color pColor );
+    int TextArray_add( TextArray *arr );
 
     /// Remove a text from the given text array, by its index
-    void TextArray_removeText( TextArray *arr, u32 pIndex );
+    void TextArray_remove( TextArray *arr, u32 pIndex );
 
     /// Clears the whole given text array
     void TextArray_clear( TextArray *arr );
