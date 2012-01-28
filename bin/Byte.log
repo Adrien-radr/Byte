@@ -1,5 +1,5 @@
 Byte-Project Log v0.0.12
-Fri 27 Jan 2012 - 18:31:15
+Fri 27 Jan 2012 - 20:20:40
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.6.0 successfully initialized!
@@ -15,9 +15,12 @@ Fri 27 Jan 2012 - 18:31:15
 [INFO] Resource "img_test.png" loaded.
 [INFO] Resource "DejaVuSans.ttf" loaded.
 [INFO] Resource "visitor2.ttf" loaded.
-[INFO] FPS = 0.799099
-[INFO] FPS = 2882.683105
-[INFO] FPS = 1875.806763
-[INFO] FPS = 1945.410034
-[INFO] FPS = 3862.158447
-[INFO] FPS = 1872.457153
+[INFO] FPS = 0.952900
+[INFO] FPS = 2674.938721
+[INFO] FPS = 457.693573
+[INFO] FPS = 2937.187744
+[INFO] FPS = 475.221405
+[INFO] FPS = 1792.437622
+[INFO] FPS = 1938.218140
+[INFO] FPS = 1460.412231
+[INFO] FPS = 1906.501831

@@ -6,6 +6,7 @@
 #include "mesh.h"
 #include "shader.h"
 #include "texture.h"
+#include "text.h"
 
 
 // ##########################################################################3
@@ -33,8 +34,10 @@
 // ##########################################################################3
     /// Fixed number of shaders used to render scene entities
 #   define     SCENE_SHADER_N              10
-    /// Fixed number of begining size of each entity array (by shader)
+    /// Fixed number of each entity array (by shader) (at begining of execution)
 #   define     SCENE_ENTITIES_N            50
+    /// Fixed number of texts (at begining of execution)
+#   define     SCENE_TEXTS_N               50
 
 
     // Forward declaration
@@ -42,7 +45,7 @@
 
 
     /// Create and returns a new scene instance
-    Scene *Scene_new();
+    Scene *Scene_new( World *pWorld );
 
     /// Destroy and free the given scene
     void Scene_destroy( Scene *pScene );
@@ -62,8 +65,25 @@
         /// Remove an entity from the scene rendered entities (by its handle in the given shader array)
         void Scene_removeEntity( Scene *pScene, u32 pShader, u32 pIndex );
 
-        /// Clears the all entity array, to set a new scene
+        /// Clears the whole entity array, to set a new scene
         void Scene_clearEntities( Scene *pScene );
+
+    // ##########################################################################3
+    //      Texts Array
+        /// Add a text to be rendered each frame
+        /// @return : a handle to the given registered text;
+        int Scene_addText( Scene *pScene, const Font *pFont, Color pColor );
+
+        /// Modify one attribute of a Text (given by its handle)
+        /// @param pAttrib : the attribute type we want to change (TA_Font, TA_String or TA_Color)
+        /// @param pData   : data sets as the attrib(Font*, char* or Color* respectively)
+        void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pData );
+
+        /// Remove a text from the scene (by its handle).
+        void Scene_removeText( Scene *pScene, u32 pText );
+
+        /// Clears the whole text array, to set a new scene
+        void Scene_clearTexts( Scene *pScene );
 
 
 

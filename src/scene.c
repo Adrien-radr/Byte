@@ -77,6 +77,7 @@
 
 
 
+
 // ##########################################################################3
 //      SCENE
 // ##########################################################################3
@@ -117,20 +118,36 @@ typedef struct s_Scene {
     bool                mShaders[SCENE_SHADER_N];       ///< Shaders used by scene entities
     EntitiesArray       mEntities;                      ///< Entities for each shader
 
-    Camera              *mCamera;
+    u32                 mTextShader;                    ///< Shader used to render texts
+    TextArray           *mTexts;                        ///< Texts in the scene
+
+    Camera              *mCamera;                       ///< Camera of the scene
+    World               *mWorld;                        ///< Pointer to the world
 } Scene;
 
-Scene *Scene_new() {
+Scene *Scene_new( World *pWorld ) {
     Scene *s = NULL;
     
     s = byte_alloc( sizeof( Scene ) );
     check_mem( s );
+
+    // set world
+    s->mWorld = pWorld;
 
     // array of not-used shaders;
     memset( s->mShaders, false, SCENE_SHADER_N * sizeof( bool ) );
 
     // create empty entities array of the same size of shader array
     EntitiesArray_init( &s->mEntities, SCENE_SHADER_N );
+
+    // create array of texts
+    s->mTexts = TextArray_init( SCENE_TEXTS_N );
+
+    // init default text shader
+    int ts = World_getResource( pWorld, "textShader.json" );
+    check( ts >= 0, "Text shader does not exist. (data/shaders/textShader.json)!\n" );
+
+    s->mTextShader = ts;
 
     // camera
         s->mCamera = Camera_new();
@@ -150,6 +167,7 @@ error:
 void Scene_destroy( Scene *pScene ) {
     if( pScene ) {
         EntitiesArray_destroy( &pScene->mEntities );
+        TextArray_destroy( pScene->mTexts );
         Camera_destroy( pScene->mCamera );
         DEL_PTR( pScene );
     }   
@@ -161,6 +179,8 @@ void Scene_update( Scene *pScene ) {
 
 void Scene_render( Scene *pScene ) {
     if( pScene ) {
+        // ##################################################
+        //      RENDER ENTITIES
         for( u32 i = 0; i < SCENE_SHADER_N; ++i ) {
             if( pScene->mShaders[i] ) {
                 // use this shader
@@ -176,6 +196,18 @@ void Scene_render( Scene *pScene ) {
                         Renderer_renderMesh( HandleManager_getHandle( pScene->mEntities.data[i]->mMeshes, j ) );
                     }
                 }
+            }
+        }
+
+
+        // ##################################################
+        //      RENDER TEXTS
+        Renderer_useShader( pScene->mTextShader );
+        for( u32 i = 0; i < pScene->mTexts->mMaxIndex; ++i ) {
+            if( HandleManager_isUsed( pScene->mTexts->mUsed, i ) ) {
+                Renderer_useTexture( pScene->mTexts->mFonts[i]->mTexture, 0 );
+                Shader_sendColor( "Color", &pScene->mTexts->mColors[i] );
+                Renderer_renderMesh( pScene->mTexts->mMeshes[i] );
             }
         }
     }
@@ -216,3 +248,45 @@ void Scene_clearEntities( Scene *pScene ) {
     }
 }
 
+int Scene_addText( Scene *pScene, const Font *pFont, Color pColor ) {
+    int handle = -1;
+
+    if( pScene ) {
+        handle = TextArray_addText( pScene->mTexts, pFont, pColor );
+
+        if( handle >= 0 ) {
+        }
+    }
+
+    return handle;
+}
+
+void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pData ) {
+    if( pScene ) {
+        // check if the given handle is a used text
+        if( HandleManager_isUsed( pScene->mTexts->mUsed, pHandle ) ) {
+            switch( pAttrib ) {
+                case TA_Font :
+                    pScene->mTexts->mFonts[pHandle] = (const Font*)pData;
+                    break;
+                case TA_Color:
+                    pScene->mTexts->mColors[pHandle] = *((Color*)pData);
+                    break;
+                case TA_String:
+                    Text_setString( pScene->mTexts->mMeshes[pHandle], pScene->mTexts->mFonts[pHandle], (const char*)pData );
+                    break;
+            }
+        }
+    }
+}
+
+void Scene_removeText( Scene *pScene, u32 pIndex ) {
+    if( pScene ) 
+        TextArray_removeText( pScene->mTexts, pIndex );
+}
+
+void Scene_clearTexts( Scene *pScene ) {
+    if( pScene ) {
+        TextArray_clear( pScene->mTexts );
+    }
+}

@@ -1,37 +1,9 @@
 #include "text.h"
-#include "device.h"
 #include "texture.h"
 #include "renderer.h"
 #include "context.h"
 
 #include "GL/glew.h"
-
-typedef struct {
-    vec2    advance,        ///< Advance to this glyph
-            size,           ///< Size of this glyph
-            position;       ///< Position of this glyph after offset
-
-    f32     x_offset;       ///< X Offset of the glyph in the texture
-} Glyph;
-
-typedef struct s_Font {
-    Glyph   mGlyphs[128];   ///< 128 ASCII chars used in fonts
-    FT_Face mFace;          ///< Freetype font face
-
-    vec2    mTextureSize;   ///< Size of font texture atlas
-    u32     mTexture;       ///< Handle to the font texture
-} Font;
-
-typedef struct s_Text {
-    Font        *mFont;         ///< Used font to draw the text
-    u32         mMesh;          ///< Mesh used to render text
-    int         mShader;        ///< Shader used to render text
-
-    vec2        mPosition;      ///< Screen space position of text
-    Color       mColor;         ///< Font color
-    str512      mStr;           ///< Message displayed
-    u32         mStrLength;     ///< Size of the message
-} Text;
 
 
 Font *Font_new() {
@@ -125,56 +97,9 @@ error:
 }
 
 
-
-Text *Text_new() {
-    Text *t = byte_alloc( sizeof( Text ) );
-    check_mem( t );
-
-    // generate font vbo
-    //glGenBuffers( 1, &t->mMesh );
-    t->mMesh = Renderer_createDynamicMesh();
-    check( t->mMesh >= 0, "Can't create text Mesh!\n" );
-
-
-    t->mStr[0] = 0;
-
-    // black color
-    t->mColor.a = 1.f;
-
-    // no shader at first
-    t->mShader = -1;
-
-    return t;
-
-error:
-    Text_destroy( t );
-    return NULL;
-}
-
-void Text_destroy( Text *t ) {
-    if( t ) {
-        DEL_PTR( t );
-    }
-}
-
-void Text_render( Text *t ) {
-    Renderer_useShader( t->mShader );
-    Shader_sendColor( "Color", &t->mColor );
-    Renderer_useTexture( t->mFont->mTexture, 0 );
-
-    Renderer_renderMesh( t->mMesh );
-    /*glBindBuffer( GL_ARRAY_BUFFER, t->mMesh );
-    glEnableVertexAttribArray( 0 );
-    glEnableVertexAttribArray( 1 );
-    glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, 0 );
-    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(f32)*t->mStrLength*6*2) );
-    glDrawArrays( GL_TRIANGLES, 0, t->mStrLength * 6 );
-    */
-}
-
-void Text_setFont( Text *t, World *world, const char *pFontName, u32 pSize ) {
+Font *Font_get( World *world, const char *pName, u32 pSize ) {
     char *font = NULL;
-    if( t && pFontName ) {
+    if( world && pName ) {
         // string representation of the size
         u32 s = pSize;
         char size[4];
@@ -186,110 +111,166 @@ void Text_setFont( Text *t, World *world, const char *pFontName, u32 pSize ) {
             strcpy( size, "/20\0" );
 
         // string containing font name and size : "fontName.ttf/fontSize"
-        font = byte_alloc( strlen( pFontName ) + 4 );
-        strcpy( font, pFontName );
+        font = byte_alloc( strlen( pName ) + 4 );
+        strcpy( font, pName );
         strcat( font, size );
 
         // get resource and get the font associated to it from the renderer
         int font_resource = World_getResource( world, font );
-        check( font_resource >= 0, "Cant set font \"%s\", it has not been loaded as a resource!\n", pFontName );
-        t->mFont = Renderer_getFont( font_resource );
-            
+        check( font_resource >= 0, "Cant set font \"%s\", it has not been loaded as a resource!\n", pName );
+
+
+        DEL_PTR( font );
+        return Renderer_getFont( font_resource );
     }
 error:
     DEL_PTR( font );
+    return NULL;
 }
 
-void Text_setColor( Text *t, const Color *pColor ) {
-    if( t ) 
-        memcpy( &t->mColor.r, &pColor->r, 4 * sizeof( f32 ) );
-}
+void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr ) {
+    if( !pStr )
+        return;
 
-void Text_updateText( Text *t ) {
-    if( t ) {
-        // 6 vertices of 4 float(pos<x,y>, texCoord<s,t>), for each character
-        const size_t c_size = 6 * 4;
-        const size_t text_data_size = c_size * t->mStrLength;
-        f32 data[text_data_size];
+    // 6 vertices of 4 float(pos<x,y>, texCoord<s,t>), for each character
+    const size_t str_len = strlen( pStr );
+    const size_t c_size = 6 * 4;
+    const size_t text_data_size = c_size * str_len;
+    f32 data[text_data_size];
 
-        //glBindBuffer( GL_ARRAY_BUFFER, t->mMesh );
+    int n_pos = 0, n_tex = text_data_size/2;
+    int fw = pFont->mTextureSize.x, fh = pFont->mTextureSize.y;
 
-        int n_pos = 0, n_tex = text_data_size/2;
-        int fw = t->mFont->mTextureSize.x, fh = t->mFont->mTextureSize.y;
+    vec2 ws = Context_getSize();
+    f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
 
-        vec2 ws = Context_getSize();
-        f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
-
-        f32 x_left = -1;
-        f32 x = -1, y = (ws.y/2.f - fh)*sy;
+    f32 x_left = -1;
+    f32 x = -1, y = (ws.y/2.f - fh)*sy;
 
 
-        const Glyph *glyphs = t->mFont->mGlyphs;
+    const Glyph *glyphs = pFont->mGlyphs;
 
-        for( const char *p = t->mStr; *p; ++p ) {
-            int i = (int)*p;
-            if( '\n' == *p ) {
-                y -= (fh + 4) * sy;
-                x = x_left;
-                continue;
-            } else if ( 32 == *p ) {
-                x += (fh/3) * sx;
-                continue;
-            }
-
-            f32 x2 = x  + glyphs[i].position.x * sx;
-            f32 y2 = -y - glyphs[i].position.y * sy;
-            f32 w  = glyphs[i].size.x * sx;
-            f32 h  = glyphs[i].size.y * sy;
-
-            if( !w || !h ) continue;
-
-            x += glyphs[i].advance.x * sx;
-            y += glyphs[i].advance.y * sy;
-
-            // positions triangle 1
-            data[n_pos++] = x2;         data[n_pos++] = -y2;
-            data[n_pos++] = x2;         data[n_pos++] = -y2 - h;
-            data[n_pos++] = x2 + w;     data[n_pos++] = -y2 - h;
-
-            // positions triangle 2
-            data[n_pos++] = x2;         data[n_pos++] = -y2;
-            data[n_pos++] = x2 + w;     data[n_pos++] = -y2 - h;
-            data[n_pos++] = x2 + w;     data[n_pos++] = -y2;
-
-            // texcoords triangle 1
-            data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = 0;
-            data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = (f32)glyphs[i].size.y / (f32)fh;
-            data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = (f32)glyphs[i].size.y / (f32)fh;
-
-            // texcoords triangle 2
-            data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = 0;
-            data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = (f32)glyphs[i].size.y / (f32)fh;
-            data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = 0;
-                
+    for( const char *p = pStr; *p; ++p ) {
+        int i = (int)*p;
+        if( '\n' == *p ) {
+            y -= (fh + 4) * sy;
+            x = x_left;
+            continue;
+        } else if ( 32 == *p ) {
+            x += (fh/3) * sx;
+            continue;
         }
 
-        // update mesh
-        Renderer_setDynamicMeshData( t->mMesh, data, sizeof( data ), NULL, 0 );
+        f32 x2 = x  + glyphs[i].position.x * sx;
+        f32 y2 = -y - glyphs[i].position.y * sy;
+        f32 w  = glyphs[i].size.x * sx;
+        f32 h  = glyphs[i].size.y * sy;
+
+        if( !w || !h ) continue;
+
+        x += glyphs[i].advance.x * sx;
+        y += glyphs[i].advance.y * sy;
+
+        // positions triangle 1
+        data[n_pos++] = x2;         data[n_pos++] = -y2;
+        data[n_pos++] = x2;         data[n_pos++] = -y2 - h;
+        data[n_pos++] = x2 + w;     data[n_pos++] = -y2 - h;
+
+        // positions triangle 2
+        data[n_pos++] = x2;         data[n_pos++] = -y2;
+        data[n_pos++] = x2 + w;     data[n_pos++] = -y2 - h;
+        data[n_pos++] = x2 + w;     data[n_pos++] = -y2;
+
+        // texcoords triangle 1
+        data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = 0;
+        data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = (f32)glyphs[i].size.y / (f32)fh;
+        data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = (f32)glyphs[i].size.y / (f32)fh;
+
+        // texcoords triangle 2
+        data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = 0;
+        data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = (f32)glyphs[i].size.y / (f32)fh;
+        data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = 0;
+            
+    }
+
+    // update mesh
+    Renderer_setDynamicMeshData( pMeshVbo, data, sizeof( data ), NULL, 0 );
+}
+
+
+
+//////////////////////////////////////////////////////////
+
+TextArray *TextArray_init( u32 pSize ) {
+    TextArray *arr = byte_alloc( sizeof( TextArray ) );
+    check_mem( arr );
+
+    arr->mUsed = HandleManager_init( pSize );
+    arr->mFonts = byte_alloc( pSize * sizeof( Font* ) );
+    arr->mMeshes = byte_alloc( pSize * sizeof( u32 ) );
+    arr->mColors = byte_alloc( pSize * sizeof( Color ) );
+    arr->mStrings = byte_alloc( pSize * sizeof( char* ) );
+
+    arr->mSize = pSize;
+
+error :
+    return arr;
+}
+
+int TextArray_addText( TextArray *arr, const Font *pFont, Color pColor ) {
+    int handle = -1;
+    if( arr && pFont ) {
+        handle = HandleManager_addHandle( arr->mUsed, 1 );
+
+        if( handle >= 0 ) {
+            arr->mFonts[handle] = pFont;
+            arr->mColors[handle] = pColor;
+
+            // create mesh used by text
+            check( (arr->mMeshes[handle] = Renderer_createDynamicMesh()) >= 0, "Failed to create mesh of Text!\n" );
+
+            ++arr->mMaxIndex;
+            ++arr->mCount;
+            arr->mSize = arr->mUsed->mSize;
+
+            return handle;
+        }
+    }
+error:
+    if( handle >= 0 )
+        HandleManager_remove( arr->mUsed, handle );
+    return -1;
+}
+
+void TextArray_removeText( TextArray *arr, u32 pIndex ) {
+    if( arr && pIndex < arr->mUsed->mMaxIndex )  {
+        HandleManager_remove( arr->mUsed, pIndex );
+        DEL_PTR( arr->mStrings[pIndex] );
+        --arr->mCount;
     }
 }
 
-void Text_setText( Text *t, const char *pStr ) {
-    //change only if two strings are not equal
-    if( t && pStr && strcmp( pStr, t->mStr ) ) {
-        const size_t newstr_len = strlen( pStr );
-        if( 512 <= newstr_len )
-            log_err( "String : \n\"%s\"\n\nis too long to be put as a Text string (max:512 chars)!\n", pStr );
-
-        strncpy( t->mStr, pStr, 512 );
-
-        t->mStrLength = newstr_len;
-
-        Text_updateText( t );
+void TextArray_clear( TextArray *arr ) {
+    if( arr ) {
+        arr->mMaxIndex = 0;
+        HandleManager_clear( arr->mUsed );
+        for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
+            DEL_PTR( arr->mStrings[i] ); 
+        }
     }
 }
 
-void Text_setShader( Text *t, u32 pShader ) {
-    if( t )
-        t->mShader = pShader;
+void TextArray_destroy( TextArray *arr ) {
+    if( arr ) {
+        HandleManager_destroy( arr->mUsed );
+        DEL_PTR( arr->mFonts );
+        DEL_PTR( arr->mMeshes );
+        DEL_PTR( arr->mColors );
+        for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
+            DEL_PTR( arr->mStrings[i] ); 
+        }
+        DEL_PTR( arr->mStrings );
+        DEL_PTR( arr );
+    }
 }
+

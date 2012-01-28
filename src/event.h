@@ -31,11 +31,6 @@ typedef struct {
         MouseButton button;
         Key         key;
     };
-    //vec2        MousePos;     	    ///< In case of MouseMoved
-    //MouseButton MouseButton;   	    ///< In case of MousePressed/Released
-    //int         Wheel;				///< In case of MouseWheelMoved
-    //Key         Key;			    ///< In case of KeyPressed/Released
-    //char        Char;				///< In case of CharPressed/KeyPressed/Released
 } Event;
 
 

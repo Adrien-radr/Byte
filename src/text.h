@@ -5,11 +5,26 @@
 #include "color.h"
 #include "vector.h"
 #include "world.h"
+#include "device.h"
 
 
-// forward declarations (check C src file for defs)
-typedef struct s_Font Font;
-typedef struct s_Text Text;
+/// A Glyph is a single character in a font
+typedef struct {
+    vec2    advance,        ///< Advance to this glyph
+            size,           ///< Size of this glyph
+            position;       ///< Position of this glyph after offset
+
+    f32     x_offset;       ///< X Offset of the glyph in the texture
+} Glyph;
+
+/// This is a font loaded with freetype 
+typedef struct {
+    Glyph   mGlyphs[128];   ///< 128 ASCII chars used in fonts
+    FT_Face mFace;          ///< Freetype font face
+
+    vec2    mTextureSize;   ///< Size of font texture atlas
+    u32     mTexture;       ///< Handle to the font texture
+} Font;
 
 /// Creates and return a newly allocated font
 Font *Font_new();
@@ -21,38 +36,53 @@ void Font_destroy( Font *pFont );
 /// @return : True if everything went well. False otherwise
 bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize );
 
-
-/// Creates and returns a newly allocated text
-Text *Text_new();
-
-/// Destroy and free a given text
-void Text_destroy( Text *pText );
-
-/// Renders a given text
-void Text_render( Text *pText );
-
-/// Sets the font of the given text
-/// @param world : Pointer to the game world (it possesses the ResourceManager)
-/// @param pFontName : File of the font, must be present in data/fonts/)
-/// @param pSize : Size of the font, must be 12, 20 or 32 (for now )
-void Text_setFont( Text *t, World *world, const char *pFontName, u32 pSize );
-
-/// Sets the color used as the foreground color of the font
-void Text_setColor( Text *t, const Color *pColor );
-
-/// Sets what text string is displayed (creates the VBO here)
-void Text_setText( Text *t, const char *pStr );
-
-/// Sets the shader used to display the font
-void Text_setShader( Text *t, u32 pShader );
-
-/// Sets the posiiton in screen space of the text
-void Text_setPosition( Text *t, const vec2 *pPosition );
-
-/// Asks the given text to remake its vbo from scratch from the same text
-/// Useful if window is resized for example
-void Text_updateText( Text *t );
+/// Returns a Font* corresponding to the given font name and size, or NULL if not loaded
+Font *Font_get( World *pWorld, const char *pName, u32 pSize );
 
 
+
+// ##########################################################################3
+//      Text Array 
+// ##########################################################################3
+    /// Data-oriented array storing all text existing in the scene
+    typedef struct {
+        HandleManager   *mUsed;     ///< Handlemanager saying if an index is used
+
+        const Font      **mFonts;
+        u32             *mMeshes;
+        Color           *mColors;
+
+        char            **mStrings;
+
+        u32             mMaxIndex,
+                        mCount,
+                        mSize;
+    } TextArray;
+
+    /// Differents attributes of text that can be modified
+    typedef enum {
+        TA_Font,
+        TA_Color,
+        TA_String
+    } TextAttrib;
+
+    /// Initialize and allocate a new TextArray
+    TextArray *TextArray_init( u32 pSize );
+
+    /// Add a new text to the text array and returns its handle (or -1 if any error)
+    int TextArray_addText( TextArray *arr, const Font *pFont, Color pColor );
+
+    /// Remove a text from the given text array, by its index
+    void TextArray_removeText( TextArray *arr, u32 pIndex );
+
+    /// Clears the whole given text array
+    void TextArray_clear( TextArray *arr );
+
+    /// Destroy and free the given text array
+    void TextArray_destroy( TextArray *arr );
+
+
+    /// Sets what text string is displayed ( modify the given vbo )
+    void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr );
 
 #endif // BYTE_TEXT

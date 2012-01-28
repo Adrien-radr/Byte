@@ -8,12 +8,12 @@
 #include "renderer.h"
 #include "context.h"
 
-Text *text = NULL;
-
+/*
 void textUpdate( const Event *pEvent, void *pData ) {
     if( text )
         Text_updateText( text );
 }
+*/
 
 int main() {
     check( Device_init(), "Error while creating Device, exiting program.\n" );
@@ -97,7 +97,7 @@ int main() {
     mat3_translatef( &MM, 500.f, 400.f );
 
 
-    Scene *scene = Scene_new();
+    Scene *scene = Scene_new( world );
 
     Entity e = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &ModelMatrix, .mTexture = t1, .mDepth = -1 };
 
@@ -116,21 +116,13 @@ int main() {
 
     // ###############################3
     //      TEXT
-    int textShader = World_getResource( world, "textShader.json" );
-    check( textShader >= 0, "Error in text shader creation. Exiting!\n" );
+    Font *f = Font_get( world, "DejaVuSans.ttf", 20 );
+    Color col = { 1.f, 1.f, 0.f, 1.f };
+    int text = Scene_addText( scene, f, col );
 
-    EventManager_addListener( LT_ResizeListener, textUpdate, NULL );
-    text = Text_new();
-    Text_setFont( text, world, "DejaVuSans.ttf", 12 );
-    Text_setShader( text, textShader );
+    check( text >= 0, "error creating text!\n" );
 
-    Color c = { .r = 1.f, .g = 0.8f, .b = 0.f, .a = 1.f };
-    Text_setColor( text, &c );
-
-    Text_setText( text, "The Quick Brown \nFox!!!!!!!!@#$%^&*()+__|}}{]\"\"]pP{ ?<>.mNKJBFIEuefbuwieoJumps Over \nThe Lazy Dog" );
-
-
-
+    Scene_modifyText( scene, text, TA_String, "Hello World!!" );
 
 
 
@@ -164,16 +156,11 @@ int main() {
 
 
             Scene_render( scene );
-
-            
-            Text_render( text );
-
         Device_endFrame();
     }
 
 
     Scene_destroy( scene );
-    Text_destroy( text );
     World_destroy( world );
     Device_destroy();
 
@@ -182,7 +169,6 @@ int main() {
 error :
 
     Scene_destroy( scene );
-    Text_destroy( text );
     World_destroy( world );
     Device_destroy();
     return -1;
