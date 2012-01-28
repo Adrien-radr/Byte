@@ -76,6 +76,7 @@ bool ResourceManager_addEntry( ResourceManager *pRM, u32 pHash, u32 pHandle ) {
 int LoadShader( const char *pFile ) {
     char *json_file = NULL;
     cJSON *root = NULL;
+    int handle = -1;
 
     // read and parse json shader file
     ReadFile( &json_file, pFile );
@@ -100,7 +101,7 @@ int LoadShader( const char *pFile ) {
     strcat( f_path, f_file );
 
     // create shader from shader files
-    int handle = Renderer_createShader( v_path, f_path );
+    handle = Renderer_createShader( v_path, f_path );
     check( handle >= 0, "Error while loading shader from \"%s\".\n", pFile );
 
     // load shader parameters
@@ -131,17 +132,73 @@ int LoadShader( const char *pFile ) {
 
     }
 
-    // free used memory
-    DEL_PTR(json_file);
-    if( root ) cJSON_Delete( root );
-
-    return handle;
 
 error:
     DEL_PTR(json_file);
     if( root ) cJSON_Delete( root );
 
-    return -1;
+    return handle;
+}
+
+int LoadMesh( const char *pFile ) {
+    char *json_file = NULL;
+    cJSON *root = NULL;
+    int handle = -1;
+
+    // read and parse json file
+    ReadFile( &json_file, pFile );
+    check( json_file, " " );
+
+    root = cJSON_Parse( json_file );
+    check( root, "JSON parse error [%s] before :\n%s\n", pFile, cJSON_GetErrorPtr() );
+
+    cJSON *positions = cJSON_GetObjectItem( root, "positions" );
+    cJSON *texcoords = cJSON_GetObjectItem( root, "texcoords" );
+    cJSON *indices = cJSON_GetObjectItem( root, "indices" );
+
+    check( positions && texcoords , "Invalid mesh file. Needs positions and texcoords!\n" );
+
+    // prepare mesh arrays
+    vec2 *positions_v = NULL, *texcoords_v = NULL;
+    u32 *indices_v = NULL;
+
+    int position_n = cJSON_GetArraySize( positions );
+    positions_v = byte_alloc( position_n * sizeof( vec2 ) );
+    texcoords_v = byte_alloc( position_n * sizeof( vec2 ) );
+
+    for( u32 i = 0; i < position_n; ++i ) {
+        cJSON *pos = cJSON_GetArrayItem( positions, i );
+        cJSON *tex = cJSON_GetArrayItem( texcoords, i );
+
+        vec2 pos_v = { cJSON_GetArrayItem( pos, 0 )->valuedouble, cJSON_GetArrayItem( pos, 1 )->valuedouble };
+        positions_v[i] = pos_v;
+
+        vec2 tex_v = { cJSON_GetArrayItem( tex, 0 )->valuedouble, cJSON_GetArrayItem( tex, 1 )->valuedouble };
+        texcoords_v[i] = tex_v;
+    }
+
+    // if we got indices, get em
+    int indice_n = 0;
+    if( indices ) {
+        indice_n = cJSON_GetArraySize( indices );
+        indices_v = byte_alloc( indice_n * sizeof( u32 ) );
+
+        for( u32 i = 0; i < indice_n; ++i ) {
+            indices_v[i] = cJSON_GetArrayItem( indices, i )->valuedouble;
+        }
+    }
+
+    // create mesh (vbo) from the renderer
+    handle = Renderer_createStaticMesh( indices_v, indice_n * sizeof( u32 ), positions_v, position_n * sizeof( vec2 ), texcoords_v, position_n * sizeof( vec2 ) );
+    check( handle >= 0, "Error while creating mesh!\n" );
+
+error:
+    DEL_PTR( json_file );
+    DEL_PTR( positions_v );
+    DEL_PTR( texcoords_v );
+    DEL_PTR( indices_v );
+    if( root ) cJSON_Delete( root );
+    return handle;
 }
 
 int LoadFont( ResourceManager *pRM, const char *pFile ) {
@@ -261,6 +318,26 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                 } else 
                     log_err( "ResourceManager needs a .json file to load a shader!\n" );
                 break;
+            case RT_Mesh :
+                // get complete file path
+                strcat( file_path, MeshDirectory );
+                strcat( file_path, pFile );
+
+                // load mesh
+                if( CheckExtension( file_path, "json" ) ) {
+                    handle = LoadMesh( file_path );
+
+                    // if successfully loaded, add its hash and handle to the manager
+                    if( handle >= 0 ) {
+                        if( ResourceManager_addEntry( pRM, hash, handle ) ) {
+                            log_info( "Resource \"%s\" loaded.\n", pFile );
+                        } else
+                            log_err( "Failed to load resource \"%s\".\n", pFile );
+                    }
+                } else 
+                    log_err( "ResourceManager needs a .json file to load a mesh!\n" );
+
+                break;
             case RT_Font:
                 // get complete file path
                 //strcat( file_path, FontDirectory );
@@ -305,10 +382,10 @@ int ResourceManager_getResource( ResourceManager *pRM, const char *pFile ) {
 
 bool ResourceManager_loadAllResources( ResourceManager *pRM ) {
     if( pRM ) {
+        struct dirent *entry = NULL;
+
         // Load shaders
         DIR *shader_dir = opendir( ShaderDirectory );         
-
-        struct dirent *entry = NULL;
 
         while( ( entry = readdir( shader_dir ) ) ) {
             const char *shader_file = entry->d_name;
@@ -318,6 +395,21 @@ bool ResourceManager_loadAllResources( ResourceManager *pRM ) {
         }
 
         closedir( shader_dir );
+
+        // Load meshes
+        // init Renderer VAO
+        Renderer_initVao();
+
+        DIR *mesh_dir = opendir( MeshDirectory );         
+
+        while( ( entry = readdir( mesh_dir ) ) ) {
+            const char *mesh_file = entry->d_name;
+
+            if( CheckExtension( mesh_file, "json" ) )
+                check( ResourceManager_load( pRM, RT_Mesh, mesh_file ) >= 0, "\n" );
+        }
+
+        closedir( mesh_dir );
 
         // Load textures
         DIR *texture_dir = opendir( TextureDirectory );

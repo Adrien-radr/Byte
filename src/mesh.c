@@ -66,7 +66,6 @@ error :
 }
 
 void Mesh_build( Mesh *pMesh, bool pDynamic ) {
-    //// ERROR HERE !!!!!!
     check( pMesh->mData, "In Mesh_build, the given mesh is not complete. Please supply at least Vertex and Index Data before building the mesh!\n" );
 
     if( pMesh->mVbo ) {

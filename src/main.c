@@ -9,6 +9,7 @@
 #include "context.h"
 
 
+
 int main() {
     check( Device_init(), "Error while creating Device, exiting program.\n" );
 
@@ -26,7 +27,6 @@ int main() {
 
 
 
-
     World *world = World_new();
     check( world, "Error in world creation!\n" );
 
@@ -40,42 +40,8 @@ int main() {
     Renderer_useTexture( t1, 0 );
 
 
-    // ###############################3
-    //      SHADER
-    int shader = World_getResource( world, "defaultShader.json" ); 
-    check( shader >= 0, "Error in shader creation. Exiting program!\n" );
-
-
-
-    // ###############################3
-    //      MESH
-    vec2 data[] = {
-        { .x = -5.f, .y = -5.f },
-        { .x = -5.f, .y = 5.f },
-        { .x = 5.f, .y = 5.f },
-        { .x = 5.f, .y = -5.f }
-    };
-
-    vec2 texcoords[] = {
-        { .x = 0.f, .y = 0.f },
-        { .x = 0.f, .y = 1.f },
-        { .x = 1.f, .y = 1.f },
-        { .x = 1.f, .y = 0.f }
-    };
-    
-    u32 indices[] = {
-        0, 1, 2, 0, 2, 3
-    };
-
-    int vao = Renderer_beginVao();
-    check( vao >= 0, "Could not create vao!\n" );
-    glEnableVertexAttribArray( 0 );
-    glEnableVertexAttribArray( 1 );
-
-
-    u32 mesh = Renderer_createStaticMesh( indices, sizeof( indices ), data, sizeof( data ), texcoords, sizeof( texcoords ) );
-    check( mesh >= 0, "Error while creating mesh!\n" );
-
+    int mesh = World_getResource( world, "quadmesh.json" );
+    check( mesh >= 0, "QuadMesh.json resource does not exist\n" );
     
     // ###############################3
     //      MATRICES

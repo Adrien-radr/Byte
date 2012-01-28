@@ -5,9 +5,6 @@
 #include "GL/glew.h"
 
 
-// Array VaoArray with u32 data type
-SimpleArray( u32, Vao )
-
 // Array MeshArray with Mesh* data type
 HeapArray( Mesh*, Mesh, Mesh_destroy )
 
@@ -22,16 +19,20 @@ HeapArray( Font*, Font, Font_destroy )
 
 /// Application Renderer
 struct s_Renderer {
-    VaoArray        mVaos;
-    MeshArray       mMeshes;
-    ShaderArray     mShaders;
-    TextureArray    mTextures;
-    FontArray       mFonts;
+    int             mVao;                   ///< Global VAO used to render everything
 
-    int             mCurrentMesh,
-                    mCurrentShader,
-                    mCurrentTexture,
-                    mCurrentTextureTarget;
+    // These are array of the actual data used throughout the game
+    // All the data in these arrays is deleted/free'd at the end (Renderer_destroy()).
+    MeshArray       mMeshes;                ///< Array of created meshes
+    ShaderArray     mShaders;               ///< Array of loaded GL shader programs
+    TextureArray    mTextures;              ///< Array of GL textures (loaded with SOIL)
+    FontArray       mFonts;                 ///< Array of Font (loaded with freetype2 to GL Texs)
+
+    // these are state variables. -1 mean nothing is currently used
+    int             mCurrentMesh,           ///< The currently bound OpenGL VBO
+                    mCurrentShader,         ///< The currently bound OpenGL Shader Program
+                    mCurrentTexture,        ///< The currently bound OpenGL Texture
+                    mCurrentTextureTarget;  ///< The current OpenGL Texture targer
 };
 
 /// Renderer only instance definition
@@ -44,7 +45,6 @@ bool Renderer_init() {
     check_mem( renderer );
     
     // initial number of 10 vaos and 100 meshes
-    VaoArray_init( &renderer->mVaos, 10 );
     MeshArray_init( &renderer->mMeshes, 10 );
     ShaderArray_init( &renderer->mShaders, 10 );
     TextureArray_init( &renderer->mTextures, 10 );
@@ -54,6 +54,8 @@ bool Renderer_init() {
     renderer->mCurrentShader = -1;
     renderer->mCurrentTexture = -1;
     renderer->mCurrentTextureTarget = 0;
+
+    renderer->mVao = -1;
  
     // GLEW initialisation
     glewExperimental = 1;
@@ -105,7 +107,6 @@ error:
 
 void Renderer_destroy() {
     if( renderer ) {
-        VaoArray_destroy( &renderer->mVaos );
         MeshArray_destroy( &renderer->mMeshes );
         TextureArray_destroy( &renderer->mTextures );
         ShaderArray_destroy( &renderer->mShaders );
@@ -138,32 +139,21 @@ bool Renderer_isInitialized() {
     return ( NULL != renderer );
 }
 
-int Renderer_beginVao() {
-    if( renderer ) {
-        // check if Vao array is not already full
-        if( VaoArray_checkSize( &renderer->mVaos ) ) {
-            // create and bind a new VAO
-            glGenVertexArrays( 1, &renderer->mVaos.data[renderer->mVaos.cpt] );
-            glBindVertexArray( renderer->mVaos.data[renderer->mVaos.cpt] );
+void Renderer_initVao() {
+    if( renderer && renderer->mVao < 0 ) {
+        // gen a VAO ID
+        GLuint vao;
+        glGenVertexArrays( 1, &vao );
 
+        // place it in renderer and bind
+        renderer->mVao = vao;
 
-            return renderer->mVaos.cpt++;
-        }
-    }   
-    return -1;
+        // enable position & texcoords
+        glBindVertexArray( renderer->mVao );
+        glEnableVertexAttribArray( 0 );
+        glEnableVertexAttribArray( 1 );
+    }
 }
-
-void Renderer_endVao() {
-    if( renderer ) 
-        glBindVertexArray( 0 );
-}
-
-void Renderer_bindVao( u32 pIndex ) {
-    if( renderer )
-        glBindVertexArray( renderer->mVaos.data[pIndex] );
-}
-
-
 
 int  Renderer_createStaticMesh( u32 *pIndices, u32 pIndiceSize, vec2 *pPositions, u32 pPositionSize, vec2 *pTexcoords, u32 pTexcoordSize ) {
     Mesh *m = NULL;
@@ -175,8 +165,9 @@ int  Renderer_createStaticMesh( u32 *pIndices, u32 pIndiceSize, vec2 *pPositions
             // add Vertex Data
             check( Mesh_addVertexData( m, pPositions, pPositionSize, pTexcoords, pTexcoordSize ), "Error in mesh creation when setting Vertex Data !\n" );
 
-            // add Index data
-            check( Mesh_addIndexData( m, pIndices, pIndiceSize ), "Error in mesh creation when setting Index Data !\n" );
+            // add Index data if given
+            if( pIndices )
+                check( Mesh_addIndexData( m, pIndices, pIndiceSize ), "Error in mesh creation when setting Index Data !\n" );
 
             // build Mesh VBO
             Mesh_build( m, false );

@@ -28,15 +28,10 @@ bool Renderer_isInitialized();
 // ##########################################################################3
 //      MESH UTILS
 // ##########################################################################3
-    /// Begin a new VAO in the given Renderer
-    /// @return : the indice in the Renderer VAO array of the created VAO
-    int  Renderer_beginVao();
-
-    /// End the current VAO in the current Renderer
-    void Renderer_endVao();
-
-    /// Bind a Vao given its index
-    void Renderer_bindVao( u32 pIndex );
+    /// Initialize the unique VAO used to render meshes
+    /// All meshes are VBO bound in this VAO
+    /// This must be called AFTER shader creation, for some reasons... (ATI I believe)
+    void Renderer_initVao();
 
     /// Create a new static mesh and return its ID
     /// This mesh will be set one time and the corresponding VBO will be built directly
