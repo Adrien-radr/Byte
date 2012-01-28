@@ -90,7 +90,7 @@ bool Renderer_init() {
 
     glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
 
-    // clear gl errors
+    // clear init gl errors
     CheckGLError();
  
     log_info( "Renderer successfully initialized!\n" );
@@ -264,10 +264,10 @@ void Renderer_renderMesh( u32 pIndex ) {
         Mesh *m = renderer->mMeshes.data[pIndex];
 
         // bind mesh only if it isnt already
-//        if( renderer->mCurrentMesh != pIndex ) {
+        if( renderer->mCurrentMesh != pIndex ) {
             Mesh_bind( m );
-//            renderer->mCurrentMesh = pIndex;
-//        }
+            renderer->mCurrentMesh = pIndex;
+        }
 
         if( m->mUseIndices )
             glDrawElements( GL_TRIANGLES, m->mIndexCount, GL_UNSIGNED_INT, 0 );

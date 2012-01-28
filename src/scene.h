@@ -10,9 +10,7 @@
 #include "entity.h"
 
 
-/// Fixed number of shaders used to render scene entities
-#define     SCENE_SHADER_N              10
-/// Fixed number of each entity array (by shader) (at begining of execution)
+/// Fixed number of each entity array (at begining of execution)
 #define     SCENE_ENTITIES_N            50
 // Fixed number of texts (at begining of execution)
 #define     SCENE_TEXTS_N               50

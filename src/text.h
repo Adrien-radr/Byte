@@ -50,6 +50,7 @@ Font *Font_get( World *pWorld, const char *pName, u32 pSize );
         const Font      **mFonts;
         u32             *mMeshes;
         Color           *mColors;
+        vec2            *mPositions;
 
         char            **mStrings;
 
@@ -62,7 +63,8 @@ Font *Font_get( World *pWorld, const char *pName, u32 pSize );
     typedef enum {
         TA_Font,
         TA_Color,
-        TA_String
+        TA_String,
+        TA_Position
     } TextAttrib;
 
     /// Initialize and allocate a new TextArray

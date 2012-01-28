@@ -8,12 +8,6 @@
 #include "renderer.h"
 #include "context.h"
 
-/*
-void textUpdate( const Event *pEvent, void *pData ) {
-    if( text )
-        Text_updateText( text );
-}
-*/
 
 int main() {
     check( Device_init(), "Error while creating Device, exiting program.\n" );
@@ -97,19 +91,8 @@ int main() {
 
 
     Scene *scene = Scene_new( world );
-/*
-    Entity e = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &ModelMatrix, .mTexture = t1, .mDepth = -1 };
-
-    int entity = Scene_addEntity( scene, &e );
-    check( entity >= 0, "Failed to create entity!\n" );
 
 
-
-    Entity e2 = { .mMesh = mesh, .mShader = shader, .mModelMatrix = &MM, .mTexture = texture, .mDepth = 0 };
-
-    int entity2 = Scene_addEntity( scene, &e2 );
-    check( entity2 >= 0, "Failed to create entity2!\n" );
-*/
     int ent1 = Scene_addEntity( scene, mesh, t1, ModelMatrix );
     check( ent1 >= 0, "error creating ent1!\n" );
 
@@ -150,23 +133,10 @@ int main() {
                 ++cpt;
                 accum = 0.f;
 
-
                 str64 fps_str;
                 MSG( fps_str, 64, "FPS : %4.0f", (1.f/Device_getFrameTime()) );
 
                 Scene_modifyText( scene, text, TA_String, fps_str );
-
-                /*
-                if( cpt == 2 ) {
-                    Scene_removeEntity( scene, shader, entity );
-                }
-                if( cpt == 3 ) {
-                    e.mTexture = texture;
-                    Scene_addEntity( scene, &e );
-                }
-                log_info( "Camera Position : <%f, %f>\n", cam->mPosition.x, cam->mPosition.y );
-                log_info( "Cam zoom = %f\n", cam->mZoom );
-                */
             }
 
 

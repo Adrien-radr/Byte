@@ -210,6 +210,7 @@ TextArray *TextArray_init( u32 pSize ) {
     arr->mMeshes = byte_alloc( pSize * sizeof( u32 ) );
     arr->mColors = byte_alloc( pSize * sizeof( Color ) );
     arr->mStrings = byte_alloc( pSize * sizeof( char* ) );
+    arr->mPositions = byte_alloc( pSize * sizeof( vec2 ) );
 
     arr->mSize = pSize;
 
@@ -263,6 +264,7 @@ void TextArray_destroy( TextArray *arr ) {
         DEL_PTR( arr->mFonts );
         DEL_PTR( arr->mMeshes );
         DEL_PTR( arr->mColors );
+        DEL_PTR( arr->mPositions );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
             DEL_PTR( arr->mStrings[i] ); 
         }

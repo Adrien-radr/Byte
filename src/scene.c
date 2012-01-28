@@ -2,11 +2,21 @@
 #include "renderer.h"
 #include "camera.h"
 #include "device.h"
+#include "context.h"
+
+typedef struct s_Scene {
+    u32             mEntityShader;
+    EntityArray     *mEntities;
+
+    u32             mTextShader;                    ///< Shader used to render texts
+    TextArray       *mTexts;                        ///< Texts in the scene
+
+    Camera          *mCamera;                       ///< Camera of the scene
+    World           *mWorld;                        ///< Pointer to the world
+} Scene;
 
 
 
-/// Array of EntityArray*
-HeapArray( EntityArray*, Entities, EntityArray_destroy );
 
 // Camera listeners and update function
     void cameraMouseListener( const Event *pEvent, void *pCamera ) {
@@ -32,25 +42,16 @@ HeapArray( EntityArray*, Entities, EntityArray_destroy );
             Camera_move( pCamera, &move );
     }
 
-/// Scene definition
-///     Bool shader array to know if the shader i is used(true) or not(false)
-///     Entity array corresponding to a particular shader (SCENE_SHADER_N Entity arrays).
-///     
-///     The scene also possess the scene camera
-typedef struct s_Scene {
-//    bool                mShaders[SCENE_SHADER_N];       ///< Shaders used by scene entities
-//    EntitiesArray       mEntities;                      ///< Entities for each shader
-    u32             mEntityShader;
-    EntityArray     *mEntities;
+// Event Listener for window resizing
+    void sceneWindowResizing( const Event *pEvent, void *pData ) {
+        Scene *s = (Scene*)pData;
 
-    u32             mTextShader;                    ///< Shader used to render texts
-    TextArray       *mTexts;                        ///< Texts in the scene
-
-    Camera          *mCamera;                       ///< Camera of the scene
-    World           *mWorld;                        ///< Pointer to the world
-} Scene;
-
-
+        // update all texts with new window size
+        for( u32 i = 0; i < s->mTexts->mMaxIndex; ++i ) {
+            if( HandleManager_isUsed( s->mTexts->mUsed, i ) )
+                Text_setString( s->mTexts->mMeshes[i], s->mTexts->mFonts[i], s->mTexts->mStrings[i] );
+        }
+    }
 
 
 Scene *Scene_new( World *pWorld ) {
@@ -90,6 +91,9 @@ Scene *Scene_new( World *pWorld ) {
         Camera_registerUpdateFunction( s->mCamera, cameraUpdate );
 
         Device_setCamera( s->mCamera );
+
+    // Event listener
+    EventManager_addListener( LT_ResizeListener, sceneWindowResizing, s );
         
     return s;
 error:
@@ -135,6 +139,7 @@ void Scene_render( Scene *pScene ) {
             if( HandleManager_isUsed( pScene->mTexts->mUsed, i ) ) {
                 Renderer_useTexture( pScene->mTexts->mFonts[i]->mTexture, 0 );
                 Shader_sendColor( "Color", &pScene->mTexts->mColors[i] );
+                Shader_sendVec2( "Position", &pScene->mTexts->mPositions[i] );
                 Renderer_renderMesh( pScene->mTexts->mMeshes[i] );
             }
         }
@@ -205,14 +210,38 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
         // check if the given handle is a used text
         if( HandleManager_isUsed( pScene->mTexts->mUsed, pHandle ) ) {
             switch( pAttrib ) {
+                case TA_Position :
+                    {
+                        vec2 new_pos = *((vec2*)pData);
+
+                        vec2 ws = Context_getSize();
+                        f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
+
+                        new_pos.x *= sx;
+                        new_pos.y *= -sy;
+
+                        pScene->mTexts->mPositions[pHandle] = new_pos;
+                    }
+                    break;
+                case TA_String :
+                    {
+                        const char *s = (const char*)pData;
+
+                        // recreate VBO
+                        Text_setString( pScene->mTexts->mMeshes[pHandle], pScene->mTexts->mFonts[pHandle], s );
+
+                        // copy string inside textarray to keep track of current string
+                        DEL_PTR(pScene->mTexts->mStrings[pHandle] );
+
+                        pScene->mTexts->mStrings[pHandle] = byte_alloc( strlen( s ) + 1 );
+                        strcpy( pScene->mTexts->mStrings[pHandle], s );
+                    }
+                    break;
                 case TA_Font :
                     pScene->mTexts->mFonts[pHandle] = (const Font*)pData;
                     break;
                 case TA_Color:
                     pScene->mTexts->mColors[pHandle] = *((Color*)pData);
-                    break;
-                case TA_String:
-                    Text_setString( pScene->mTexts->mMeshes[pHandle], pScene->mTexts->mFonts[pHandle], (const char*)pData );
                     break;
             }
         }
