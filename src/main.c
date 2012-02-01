@@ -68,10 +68,15 @@ int main() {
 
     Scene_modifyEntity( scene, ent2, EA_Depth, &ent2_depth );
 
+    ent2_depth = -3;
+
     mat3 actor1_mat;
     mat3_translationMatrixfv( &actor1_mat, &actor1.mPosition );
     int actor1_entity = Scene_addEntity( scene, actor1.mMesh_id, actor1.mTexture_id, &actor1_mat );
     check( actor1_entity >= 0, "error creating actor1_entity!\n" );
+
+    Scene_modifyEntity( scene, actor1_entity, EA_Depth, &ent2_depth );
+
 
 
     // ###############################3
@@ -90,23 +95,31 @@ int main() {
     ////////////////////////////////////
 
     int cpt = 0;
-    f32 accum = 0;
+    f32 accum = 0, accum2 = 0;
+    f32 frame_time;
 
     while( !IsKeyUp( K_Escape ) && Context_isWindowOpen() ) {
         Device_beginFrame();
             Scene_update( scene );
 
-            // stuff
-            accum += Device_getFrameTime();
+            // Timer stuff
+            frame_time = Device_getFrameTime();
+            accum += frame_time;
+
             if( accum > 1.f ) {
                 ++cpt;
                 accum = 0.f;
 
                 str64 fps_str;
-                MSG( fps_str, 64, "FPS : %4.0f", (1.f/Device_getFrameTime()) );
+                MSG( fps_str, 64, "FPS : %4.0f", (1.f/frame_time) );
 
                 Scene_modifyText( scene, text, TA_String, fps_str );
             }
+            if( accum2 > 3.f && accum2 < 4.f ) {
+                mat3_translationMatrixf( &actor1_mat, 70.f, 110.f );
+                Scene_modifyEntity( scene, actor1_entity, EA_Matrix, &MM ); 
+            } else
+                accum2 += frame_time;
 
 
             Scene_render( scene );

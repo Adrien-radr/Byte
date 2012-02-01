@@ -6,13 +6,12 @@ VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 ARCH = 64
 
-
 ################################################################
-
 
 CC = gcc
 
 CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -llua -std=c99 -D_DEBUG
+
 
 OBJ = \
 src/actor.o\
@@ -47,10 +46,16 @@ ext/GL/glew$(ARCH).o\
 ext/json/cJSON$(ARCH).o
 
 
-.PHONY: all, clean, byte
+.PHONY: all, clean, byte, cleaner
 
 all: 
 	@echo "---- Building $(NAME) $(VERSION) ----"
+	@echo ""
+	@echo "	-- Building external libs --"
+	@echo "(This may take some time, please wait)"
+	@make -C ext/ ARCH=$(ARCH)
+	@echo "	-- External libs built --"
+	@echo ""
 	@make byte
 	@echo "---- $(NAME) $(VERSION) built ----"
 	
@@ -62,4 +67,7 @@ byte: $(OBJ)
 	@echo "CC	$@"
 
 clean:
-	rm $(OBJ)
+	rm -f $(OBJ)
+
+cleaner: clean
+	make -C ext/ ARCH=$(ARCH) clean

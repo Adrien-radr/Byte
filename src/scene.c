@@ -160,6 +160,9 @@ void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void 
     if( pScene ) {
         if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
             switch( pAttrib ) {
+                case EA_Matrix :
+                    pScene->mEntities->mModelMatrices[pHandle] = (mat3*)pData;
+                    break;
                 case EA_Texture :
                     pScene->mEntities->mTextures[pHandle] = *((u32*)pData);
                     break;
