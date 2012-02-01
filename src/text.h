@@ -3,7 +3,7 @@
 
 #include "color.h"
 #include "vector.h"
-#include "world.h"
+#include "handlemanager.h"
 #include "device.h"
 
 
@@ -36,7 +36,7 @@ void Font_destroy( Font *pFont );
 bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize );
 
 /// Returns a Font* corresponding to the given font name and size, or NULL if not loaded
-Font *Font_get( World *pWorld, const char *pName, u32 pSize );
+Font *Font_get( const char *pName, u32 pSize );
 
 
 

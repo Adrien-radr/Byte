@@ -14,7 +14,7 @@
         u32             *mMeshes;
         u32             *mTextures;
         u32             *mDepths;
-        mat3            *mModelMatrices;
+        mat3            **mModelMatrices;
 
         u32             mCount,
                         mSize,

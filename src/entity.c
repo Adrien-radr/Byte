@@ -8,7 +8,7 @@ EntityArray *EntityArray_init( u32 pSize ) {
     arr->mMeshes = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextures = byte_alloc( pSize * sizeof( u32 ) );
     arr->mDepths = byte_alloc( pSize * sizeof( u32 ) );
-    arr->mModelMatrices = byte_alloc( pSize * sizeof( mat3 ) );
+    arr->mModelMatrices = byte_alloc( pSize * sizeof( mat3* ) );
 
     arr->mSize = pSize;
 

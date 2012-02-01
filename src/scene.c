@@ -3,16 +3,16 @@
 #include "camera.h"
 #include "device.h"
 #include "context.h"
+#include "world.h"
 
 typedef struct s_Scene {
-    u32             mEntityShader;
-    EntityArray     *mEntities;
+    u32             mEntityShader;      ///< Shader used to render entities
+    EntityArray     *mEntities;         ///< Entities in the scene
 
-    u32             mTextShader;                    ///< Shader used to render texts
-    TextArray       *mTexts;                        ///< Texts in the scene
+    u32             mTextShader;        ///< Shader used to render texts
+    TextArray       *mTexts;            ///< Texts in the scene
 
-    Camera          *mCamera;                       ///< Camera of the scene
-    World           *mWorld;                        ///< Pointer to the world
+    Camera          *mCamera;           ///< Camera of the scene
 } Scene;
 
 
@@ -54,31 +54,24 @@ typedef struct s_Scene {
     }
 
 
-Scene *Scene_new( World *pWorld ) {
+Scene *Scene_new() {
     Scene *s = NULL;
     
     s = byte_alloc( sizeof( Scene ) );
     check_mem( s );
 
-    // set world
-    s->mWorld = pWorld;
-
-    // array of not-used shaders;
-    //memset( s->mShaders, false, SCENE_SHADER_N * sizeof( bool ) );
-
     // create array of entities
     s->mEntities = EntityArray_init( SCENE_ENTITIES_N );
-    //EntitiesArray_init( &s->mEntities, SCENE_SHADER_N );
 
     // init default entity shader
-    int es = World_getResource( pWorld, "defaultShader.json" );
+    int es = World_getResource( "defaultShader.json" );
     check( es >= 0, "Entity shader creation error!\n" );
 
     // create array of texts
     s->mTexts = TextArray_init( SCENE_TEXTS_N );
 
     // init default text shader
-    int ts = World_getResource( pWorld, "textShader.json" );
+    int ts = World_getResource( "textShader.json" );
     check( ts >= 0, "Text shader creation error!\n" );
 
     s->mTextShader = ts;
@@ -124,7 +117,7 @@ void Scene_render( Scene *pScene ) {
         for( u32 i = 0; i < pScene->mEntities->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->mEntities->mUsed, i ) ) {
                 Renderer_useTexture( pScene->mEntities->mTextures[i], 0 );
-                Shader_sendMat3( "ModelMatrix", &pScene->mEntities->mModelMatrices[i] );
+                Shader_sendMat3( "ModelMatrix", pScene->mEntities->mModelMatrices[i] );
                 Shader_sendInt( "Depth", pScene->mEntities->mDepths[i] );
                 Renderer_renderMesh( pScene->mEntities->mMeshes[i] );
             }
@@ -148,7 +141,7 @@ void Scene_render( Scene *pScene ) {
 
 //  =======================
 
-int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 pMM ) {
+int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
     int handle = -1;
 
     if( pScene ) {

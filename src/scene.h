@@ -21,7 +21,7 @@ typedef struct s_Scene Scene;
 
 
 /// Create and returns a new scene instance
-Scene *Scene_new( World *pWorld );
+Scene *Scene_new();
 
 /// Destroy and free the given scene
 void Scene_destroy( Scene *pScene );
@@ -39,7 +39,7 @@ void Scene_render();
     /// @param pTexture : The texture handle the entity use
     /// @param pMM : The ModelMatrix used to orient the entity
     /// @return : The handle to the given entity
-    int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 pMM );
+    int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM );
 
     /// Modify one attribute of a Entity (given by its handle)
     /// @param pAttrib : the attribute type we want to change (see entity.h)

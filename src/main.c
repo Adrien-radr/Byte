@@ -1,16 +1,16 @@
 #include "color.h"
-#include "shader.h"
 #include "device.h"
-#include "camera.h"
-#include "GL/glew.h"
 #include "scene.h"
 #include "world.h"
 #include "renderer.h"
 #include "context.h"
+#include "actor.h"
 
 
 
 int main() {
+    int return_val = -1;
+
     check( Device_init(), "Error while creating Device, exiting program.\n" );
 
 
@@ -27,22 +27,16 @@ int main() {
 
 
 
-    World *world = World_new();
-    check( world, "Error in world creation!\n" );
+    // World initialization
+    check( World_init(), "Error in world creation. Exiting program\n" );
+    check( World_loadAllResources(), "Error in resource loading, exiting program!\n" );
 
-    check( World_loadAllResources( world ), "Error in resource loading, exiting program!\n" );
-
-    // ###############################3
-    //      TEXTURE
-    int t1 = World_getResource( world, "crate.jpg" );
-    int texture = World_getResource( world, "img_test.png" );
-    check( texture >= 0 && t1 >= 0, "Error in texture creation. Exiting program!\n" );
-    Renderer_useTexture( t1, 0 );
-
-
-    int mesh = World_getResource( world, "quadmesh.json" );
-    check( mesh >= 0, "QuadMesh.json resource does not exist\n" );
+    Actor actor1;
+    check( Actor_load( &actor1, "data/actors/actor1.json" ), "Error while loading actor1!\n" );
     
+
+
+
     // ###############################3
     //      MATRICES
     mat3 ModelMatrix, MM;
@@ -56,24 +50,33 @@ int main() {
     mat3_translatef( &MM, 9.f, 3.f );
 
 
-    Scene *scene = Scene_new( world );
+    Scene *scene = Scene_new();
 
+    int t1 = World_getResource( "crate.jpg" );
+    int texture = World_getResource( "img_test.png" );
+    int mesh = World_getResource( "quadmesh.json" );
+    
 
-    int ent1 = Scene_addEntity( scene, mesh, t1, ModelMatrix );
+    int ent1 = Scene_addEntity( scene, mesh, t1, &ModelMatrix );
     check( ent1 >= 0, "error creating ent1!\n" );
 
 
-    int ent2 = Scene_addEntity( scene, mesh, texture, MM );
+    int ent2 = Scene_addEntity( scene, mesh, texture, &MM );
     check( ent2 >= 0, "error creating ent2!\n" );
 
     int ent2_depth = -2;
 
     Scene_modifyEntity( scene, ent2, EA_Depth, &ent2_depth );
 
+    mat3 actor1_mat;
+    mat3_translationMatrixfv( &actor1_mat, &actor1.mPosition );
+    int actor1_entity = Scene_addEntity( scene, actor1.mMesh_id, actor1.mTexture_id, &actor1_mat );
+    check( actor1_entity >= 0, "error creating actor1_entity!\n" );
+
 
     // ###############################3
     //      TEXT
-    Font *f = Font_get( world, "DejaVuSans.ttf", 12 );
+    Font *f = Font_get( "DejaVuSans.ttf", 12 );
     Color col = { 0.6f, 0.6f, 0.6f, 1.f };
     int text = Scene_addText( scene, f, col );
 
@@ -110,18 +113,13 @@ int main() {
         Device_endFrame();
     }
 
-
-    Scene_destroy( scene );
-    World_destroy( world );
-    Device_destroy();
-
-    return 0;
+    return_val = 0;
 
 error :
 
     Scene_destroy( scene );
-    World_destroy( world );
+    World_destroy();
     Device_destroy();
-    return -1;
+    return return_val;
 }
 

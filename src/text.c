@@ -2,6 +2,7 @@
 #include "texture.h"
 #include "renderer.h"
 #include "context.h"
+#include "world.h"
 
 #include "GL/glew.h"
 
@@ -97,9 +98,9 @@ error:
 }
 
 
-Font *Font_get( World *world, const char *pName, u32 pSize ) {
+Font *Font_get( const char *pName, u32 pSize ) {
     char *font = NULL;
-    if( world && pName ) {
+    if( pName ) {
         // string representation of the size
         u32 s = pSize;
         char size[4];
@@ -116,7 +117,7 @@ Font *Font_get( World *world, const char *pName, u32 pSize ) {
         strcat( font, size );
 
         // get resource and get the font associated to it from the renderer
-        int font_resource = World_getResource( world, font );
+        int font_resource = World_getResource( font );
         check( font_resource >= 0, "Cant set font \"%s\", it has not been loaded as a resource!\n", pName );
 
 

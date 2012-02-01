@@ -2,31 +2,20 @@
 #define BYTE_WORLD_HPP
 
 #include "common.h"
-#include "handlemanager.h"
-#include "resource.h"
 
-typedef struct {
-    HandleManager   mActors;
 
-    ResourceManager *mResourceManager;  
-} World;
+/// Initialize the game world
+bool World_init();
 
-/// Create and returns a new world instance
-World *World_new();
-
-/// Destroy the given world (pretty scary, heh?)
-void World_destroy( World *pWorld );
-
-/// Load a resource from the given file name
-/// @return : the handle to the loaded resource. -1 if error ;
-int  World_loadResource( World *pWorld, ResourceType pType, const char *pFile );
+/// Destroy the world (pretty scary, heh?)
+void World_destroy();
 
 /// Returns a resource handle from its filename
-int  World_getResource( World *pWorld, const char *pFile );
+int  World_getResource( const char *pFile );
 
 /// Load all resources found in resource directories
 /// @return : True of all resources were loaded correctly.
-bool World_loadAllResources( World *pWorld );
+bool World_loadAllResources();
 
 
 #endif // BYTE_WORLD
