@@ -68,7 +68,7 @@ int main() {
 
     Scene_modifyEntity( scene, ent2, EA_Depth, &ent2_depth );
 
-    ent2_depth = -3;
+    ent2_depth = -1;
 
     mat3 actor1_mat;
     mat3_translationMatrixfv( &actor1_mat, &actor1.mPosition );
@@ -116,11 +116,24 @@ int main() {
                 Scene_modifyText( scene, text, TA_String, fps_str );
             }
             if( accum2 > 3.f && accum2 < 4.f ) {
-                mat3_translationMatrixf( &actor1_mat, 70.f, 110.f );
-                Scene_modifyEntity( scene, actor1_entity, EA_Matrix, &MM ); 
+                mat3_cpy( &actor1_mat, &MM );
+                accum2 = 5.f;
             } else
                 accum2 += frame_time;
 
+            ////////////
+            //  object move (ent2)
+            vec2 ent2_move = { 0, 0 };
+            if( IsKeyDown( K_Up ) )
+                ent2_move.y -= 0.01;
+            if( IsKeyDown( K_Down ) )
+                ent2_move.y += 0.01;
+            if( IsKeyDown( K_Left ) )
+                ent2_move.x -= 0.01;
+            if( IsKeyDown( K_Right ) )
+                ent2_move.x += 0.01;
+            if( ent2_move.x != 0 || ent2_move.y != 0 )
+                mat3_translatefv( &MM, &ent2_move ); 
 
             Scene_render( scene );
         Device_endFrame();

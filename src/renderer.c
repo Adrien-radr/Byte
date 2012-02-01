@@ -87,8 +87,8 @@ bool Renderer_init() {
     glFrontFace( GL_CCW );
 
     // enable alpha blend
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
     glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
 

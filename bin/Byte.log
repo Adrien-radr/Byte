@@ -1,8 +1,8 @@
 Byte-Project Log v0.0.13
-Wed 01 Feb 2012 - 14:50:53
+Wed 01 Feb 2012 - 16:46:58
 ==========================
 [INFO] GLFW Window successfully initialized!
-[INFO] GLEW v1.6.0 successfully initialized!
+[INFO] GLEW v1.7.0 successfully initialized!
 [INFO] OpenGL 3.2
 [INFO] GLSL 4.20
 [INFO] Hardware : ATI Technologies Inc. - ATI Mobility Radeon HD 5800 Series 
