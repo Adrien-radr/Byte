@@ -26,3 +26,5 @@ Used tech
     - OpenGL 3.2 API
     - GLSL 3.30 
     - GLFW windowing library
+    - SOIL Image library
+    - JSON data format (with cJSON)
