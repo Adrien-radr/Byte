@@ -156,6 +156,21 @@ int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
     return handle;
 }
 
+int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor ) { 
+    int handle = -1;
+
+    if( pScene && pActor ) {
+        handle = EntityArray_add( pScene->mEntities );
+
+        if( handle >= 0 ) {
+            pScene->mEntities->mMeshes[handle] = pActor->mMesh_id;
+            pScene->mEntities->mTextures[handle] = pActor->mTexture_id;
+            pScene->mEntities->mModelMatrices[handle] = &pActor->mPosition;
+        }
+    }
+    return handle;
+}
+
 void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void *pData ) {
     if( pScene ) {
         if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {

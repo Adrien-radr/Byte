@@ -2,7 +2,7 @@
 #define BYTE_ACTOR_HPP
 
 #include "common.h"
-#include "vector.h"
+#include "matrix.h"
 
 typedef struct {
     // base
@@ -10,7 +10,8 @@ typedef struct {
             mLastname,
             mSurname;
 
-    vec2    mPosition;
+    mat3    mPosition;
+
 
     // rendering
     u32     mMesh_id,

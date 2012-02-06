@@ -35,8 +35,12 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
         subitem = cJSON_GetObjectItem( item, "position" );
         check( subitem, "Error while loading actor '%s', need subentry 'position' in entry 'init'.\n", pFile );
 
-        pActor->mPosition.x = cJSON_GetArrayItem( subitem, 0 )->valuedouble;
-        pActor->mPosition.y = cJSON_GetArrayItem( subitem, 1 )->valuedouble;
+        // calculate object position/orientation into actor matrix
+        vec2 position;
+        position.x = cJSON_GetArrayItem( subitem, 0 )->valuedouble;
+        position.y = cJSON_GetArrayItem( subitem, 1 )->valuedouble;
+
+        mat3_translationMatrixfv( &pActor->mPosition, &position );
 
 
         // get rendering data

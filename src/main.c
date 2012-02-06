@@ -31,14 +31,22 @@ int main() {
     check( World_init(), "Error in world creation. Exiting program\n" );
     check( World_loadAllResources(), "Error in resource loading, exiting program!\n" );
 
+    Scene *scene = Scene_new();
+
+
+
     Actor actor1;
     check( Actor_load( &actor1, "data/actors/actor1.json" ), "Error while loading actor1!\n" );
+
+    Actor actor2;
+    check( Actor_load( &actor2, "data/actors/actor2.json" ), "Error while loading actor2!\n" );
+
     
 
 
 
     // ###############################3
-    //      MATRICES
+    //      Entities
     mat3 ModelMatrix, MM;
     mat3_identity( &ModelMatrix );
     mat3_rotatef( &ModelMatrix, 45.f );
@@ -50,7 +58,6 @@ int main() {
     mat3_translatef( &MM, 9.f, 3.f );
 
 
-    Scene *scene = Scene_new();
 
     int t1 = World_getResource( "crate.jpg" );
     int texture = World_getResource( "img_test.png" );
@@ -70,13 +77,13 @@ int main() {
 
     ent2_depth = -1;
 
-    mat3 actor1_mat;
-    mat3_translationMatrixfv( &actor1_mat, &actor1.mPosition );
-    int actor1_entity = Scene_addEntity( scene, actor1.mMesh_id, actor1.mTexture_id, &actor1_mat );
+    int actor1_entity = Scene_addEntityFromActor( scene, &actor1 );
     check( actor1_entity >= 0, "error creating actor1_entity!\n" );
-
     Scene_modifyEntity( scene, actor1_entity, EA_Depth, &ent2_depth );
 
+    int actor2_entity = Scene_addEntityFromActor( scene, &actor2 );
+    check( actor2_entity >= 0, "error creating actor2_entity!\n" );
+    Scene_modifyEntity( scene, actor2_entity, EA_Depth, &ent2_depth );
 
 
     // ###############################3
@@ -116,7 +123,7 @@ int main() {
                 Scene_modifyText( scene, text, TA_String, fps_str );
             }
             if( accum2 > 3.f && accum2 < 4.f ) {
-                mat3_cpy( &actor1_mat, &MM );
+                mat3_cpy( &actor1.mPosition, &MM );
                 accum2 = 5.f;
             } else
                 accum2 += frame_time;
