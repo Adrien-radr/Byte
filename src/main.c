@@ -6,6 +6,7 @@
 #include "context.h"
 #include "actor.h"
 
+#include "GL/glew.h"
 
 
 int main() {
@@ -57,25 +58,7 @@ int main() {
     mat3_cpy( &MM, &ModelMatrix );
     mat3_translatef( &MM, 9.f, 3.f );
 
-
-
-    int t1 = World_getResource( "crate.jpg" );
-    int texture = World_getResource( "img_test.png" );
-    int mesh = World_getResource( "quadmesh.json" );
-    
-
-    int ent1 = Scene_addEntity( scene, mesh, t1, &ModelMatrix );
-    check( ent1 >= 0, "error creating ent1!\n" );
-
-
-    int ent2 = Scene_addEntity( scene, mesh, texture, &MM );
-    check( ent2 >= 0, "error creating ent2!\n" );
-
-    int ent2_depth = -2;
-
-    Scene_modifyEntity( scene, ent2, EA_Depth, &ent2_depth );
-
-    ent2_depth = -1;
+    int ent2_depth = -1;
 
     int actor1_entity = Scene_addEntityFromActor( scene, &actor1 );
     check( actor1_entity >= 0, "error creating actor1_entity!\n" );

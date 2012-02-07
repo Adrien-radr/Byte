@@ -20,6 +20,7 @@ Byte-Project : TODO File
 - Dynamic shadows
 - Config file
 - Lua integration as a scripting language
+- GUI (with Lua or json)
 
 ????
 ----
