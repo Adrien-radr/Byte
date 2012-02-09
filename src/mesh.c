@@ -31,7 +31,7 @@ bool Mesh_addVertexData( Mesh *pMesh, vec2 *pPositions, u32 pPositionSize, vec2 
         }
 
         pMesh->mData = byte_alloc( sizeInFloat * 2 * sizeof( f32 ) );
-        
+
         // Copy data from two arrays of vec2 into mesh data array of f32
         memcpy( pMesh->mData, pPositions, sizeInFloat * sizeof( f32 ) );
         memcpy( pMesh->mData + (size_t)sizeInFloat, pTexcoords, sizeInFloat * sizeof( f32 ) );
@@ -47,7 +47,7 @@ error:
 
 bool Mesh_addIndexData( Mesh *pMesh, u32 *pIndices, u32 pIndexSize ) {
     check( pIndices, "In Mesh_addMeshIndices : given Indices array is NULL!\n" );
-    
+
     if( pMesh ) {
         pMesh->mIndexCount = pIndexSize / sizeof( u32 );
 

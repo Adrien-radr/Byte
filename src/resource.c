@@ -12,11 +12,11 @@ const char FontDirectory[] = "data/fonts/";
 // Array of u32 for the Hashes and Handles array of the resourcemanager
 SimpleArray( u32, u32 )
 
-typedef struct s_ResourceManager {
+struct s_ResourceManager {
     u32Array    mHashes;
     u32Array    mHandles;
 
-} ResourceManager;
+ };
 
 
 ResourceManager *ResourceManager_new() {
@@ -53,7 +53,7 @@ bool ResourceManager_addEntry( ResourceManager *pRM, u32 pHash, u32 pHandle ) {
                 pRM->mHandles.data[index] = pHandle;
                 u32 tmp1, tmp2;
                 // sort array after 2nd insertion, in increasing order
-                if( 1 < pRM->mHashes.cpt ) 
+                if( 1 < pRM->mHashes.cpt )
                     for( int i = pRM->mHashes.cpt-2; i >= 0; --i )
                         if( pRM->mHashes.data[i] > pRM->mHashes.data[i+1] ) {
                             // switch two  instances
@@ -63,7 +63,7 @@ bool ResourceManager_addEntry( ResourceManager *pRM, u32 pHash, u32 pHandle ) {
                             pRM->mHandles.data[i] = pRM->mHandles.data[i+1];
                             pRM->mHashes.data[i+1] = tmp1;
                             pRM->mHandles.data[i+1] = tmp2;
-                        } else 
+                        } else
                             break;
                 return true;
             }
@@ -79,12 +79,12 @@ int LoadShader( const char *pFile ) {
     int handle = -1;
 
     // read and parse json shader file
-    ReadFile( &json_file, pFile );
+    Byte_ReadFile( &json_file, pFile );
     check( json_file, " " );
 
     root = cJSON_Parse( json_file );
     check( root, "JSON parse error [%s] before :\n%s\n", pFile, cJSON_GetErrorPtr() );
-    
+
     const char* v_file = cJSON_GetObjectItem( root, "v_src" )->valuestring;
     const char* f_file = cJSON_GetObjectItem( root, "f_src" )->valuestring;
 
@@ -146,7 +146,7 @@ int LoadMesh( const char *pFile ) {
     int handle = -1;
 
     // read and parse json file
-    ReadFile( &json_file, pFile );
+    Byte_ReadFile( &json_file, pFile );
     check( json_file, " " );
 
     root = cJSON_Parse( json_file );
@@ -289,7 +289,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                 strcat( file_path, pFile );
 
                 // load texture
-                handle = Renderer_createTexture( file_path, true ); 
+                handle = Renderer_createTexture( file_path, true );
 
                 // if successfully loaded, add its hash and handle to the manager
                 if( handle >= 0 ) {
@@ -315,7 +315,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                         } else
                             log_err( "Failed to load resource \"%s\".\n", pFile );
                     }
-                } else 
+                } else
                     log_err( "ResourceManager needs a .json file to load a shader!\n" );
                 break;
             case RT_Mesh :
@@ -334,7 +334,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                         } else
                             log_err( "Failed to load resource \"%s\".\n", pFile );
                     }
-                } else 
+                } else
                     log_err( "ResourceManager needs a .json file to load a mesh!\n" );
 
                 break;
@@ -385,7 +385,7 @@ bool ResourceManager_loadAllResources( ResourceManager *pRM ) {
         struct dirent *entry = NULL;
 
         // Load shaders
-        DIR *shader_dir = opendir( ShaderDirectory );         
+        DIR *shader_dir = opendir( ShaderDirectory );
 
         while( ( entry = readdir( shader_dir ) ) ) {
             const char *shader_file = entry->d_name;
@@ -400,7 +400,7 @@ bool ResourceManager_loadAllResources( ResourceManager *pRM ) {
         // init Renderer VAO
         Renderer_initVao();
 
-        DIR *mesh_dir = opendir( MeshDirectory );         
+        DIR *mesh_dir = opendir( MeshDirectory );
 
         while( ( entry = readdir( mesh_dir ) ) ) {
             const char *mesh_file = entry->d_name;

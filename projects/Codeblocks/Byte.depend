@@ -1,0 +1,519 @@
+# depslib dependency file v1.0
+1327762186 source:c:\users\beul\desktop\byte\src\camera.c
+	"camera.h"
+	"context.h"
+	"renderer.h"
+
+1327762186 c:\users\beul\desktop\byte\src\camera.h
+	"common.h"
+	"event.h"
+	"matrix.h"
+
+1327952133 c:\users\beul\desktop\byte\src\common.h
+	<stdlib.h>
+	<time.h>
+	"debug.h"
+	<math.h>
+
+1327762186 c:\users\beul\desktop\byte\src\debug.h
+	<stdio.h>
+	<errno.h>
+	<string.h>
+	<stdbool.h>
+
+1327958651 c:\users\beul\desktop\byte\src\event.h
+	"common.h"
+	"keys.h"
+	"vector.h"
+
+1327762186 c:\users\beul\desktop\byte\src\keys.h
+
+1327762186 c:\users\beul\desktop\byte\src\vector.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\byte\src\matrix.h
+	"common.h"
+	"vector.h"
+
+1327762186 c:\users\beul\desktop\byte\src\context.h
+	"common.h"
+	"matrix.h"
+
+1327762186 c:\users\beul\desktop\byte\src\renderer.h
+	"common.h"
+	"vector.h"
+	"matrix.h"
+	"shader.h"
+	"text.h"
+
+1327762186 c:\users\beul\desktop\byte\src\shader.h
+	"common.h"
+	"vector.h"
+	"matrix.h"
+	"texture.h"
+	"color.h"
+
+1327762186 c:\users\beul\desktop\byte\src\texture.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\byte\src\color.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\byte\src\text.h
+	"color.h"
+	"vector.h"
+	"world.h"
+	"device.h"
+
+1327762186 c:\users\beul\desktop\byte\src\world.h
+	"common.h"
+	"handlemanager.h"
+	"resource.h"
+
+1327958985 c:\users\beul\desktop\byte\src\handlemanager.h
+	"common.h"
+
+1328029135 c:\users\beul\desktop\byte\src\resource.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\byte\src\device.h
+	"common.h"
+	"camera.h"
+	"ft2build.h"
+
+1328132574 c:\users\beul\desktop\byte\ext\freetype\ft2build.h
+	<freetype/config/ftheader.h>
+
+1328132576 c:\users\beul\desktop\byte\ext\freetype\freetype\config\ftheader.h
+
+1327955653 source:c:\users\beul\desktop\byte\src\clock.c
+	"clock.h"
+	<Windows.h>
+	<sys/time.h>
+	<unistd.h>
+
+1327762186 c:\users\beul\desktop\byte\src\clock.h
+	"common.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\color.c
+	"color.h"
+
+1327952120 source:c:\users\beul\desktop\byte\src\common.c
+	<stdarg.h>
+	"common.h"
+
+1327955733 source:c:\users\beul\desktop\byte\src\context.c
+	"GL/glew.h"
+	"GL/glfw.h"
+	"context.h"
+	"event.h"
+	"vector.h"
+
+1328213870 c:\users\beul\desktop\byte\ext\gl\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1328208284 c:\users\beul\desktop\byte\ext\gl\glfw.h
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1327762186 source:c:\users\beul\desktop\byte\src\debug.c
+	"common.h"
+	"debug.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\device.c
+	"device.h"
+	"event.h"
+	"clock.h"
+	"context.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\entity.c
+	"entity.h"
+
+1327762186 c:\users\beul\desktop\byte\src\entity.h
+	"matrix.h"
+	"handlemanager.h"
+
+1327958550 source:c:\users\beul\desktop\byte\src\event.c
+	"event.h"
+
+1327959056 source:c:\users\beul\desktop\byte\src\handlemanager.c
+	"handlemanager.h"
+
+1328639609 source:c:\users\beul\desktop\byte\src\main.c
+	"color.h"
+	"shader.h"
+	"device.h"
+	"camera.h"
+	"GL/glew.h"
+	"scene.h"
+	"world.h"
+	"renderer.h"
+	"context.h"
+
+1327762186 c:\users\beul\desktop\byte\src\scene.h
+	"common.h"
+	"handlemanager.h"
+	"mesh.h"
+	"shader.h"
+	"texture.h"
+	"text.h"
+	"entity.h"
+
+1327762186 c:\users\beul\desktop\byte\src\mesh.h
+	"common.h"
+	"vector.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\matrix.c
+	"matrix.h"
+
+1328140751 source:c:\users\beul\desktop\byte\src\mesh.c
+	"mesh.h"
+	"GL/glew.h"
+
+1328639922 source:c:\users\beul\desktop\byte\src\renderer.c
+	"renderer.h"
+	"mesh.h"
+	"texture.h"
+	"GL/glew.h"
+
+1328141054 source:c:\users\beul\desktop\byte\src\resource.c
+	"resource.h"
+	"renderer.h"
+	"json/cJSON.h"
+	<dirent.h>
+
+1328129602 c:\users\beul\desktop\byte\ext\json\cjson.h
+
+1328120932 source:c:\users\beul\desktop\byte\src\scene.c
+	"scene.h"
+	"renderer.h"
+	"camera.h"
+	"device.h"
+	"context.h"
+
+1328141064 source:c:\users\beul\desktop\byte\src\shader.c
+	"shader.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\text.c
+	"text.h"
+	"texture.h"
+	"renderer.h"
+	"context.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\texture.c
+	"texture.h"
+	"renderer.h"
+	"GL/SOIL.h"
+	"GL/glew.h"
+
+1328635217 c:\users\beul\desktop\byte\ext\gl\soil.h
+
+1327762186 source:c:\users\beul\desktop\byte\src\vector.c
+	"vector.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\world.c
+	"world.h"
+
+1328213864 source:c:\users\beul\desktop\byte\ext\gl\glew.c
+	<GL/glew.h>
+	<GL/wglew.h>
+	<GL/glxew.h>
+	<dlfcn.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdlib.h>
+	<string.h>
+	<AvailabilityMacros.h>
+	<dlfcn.h>
+	<mach-o/dyld.h>
+
+1328125120 c:\users\beul\desktop\byte\ext\gl\wglew.h
+	<windows.h>
+
+1328125120 c:\users\beul\desktop\byte\ext\gl\glxew.h
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	<X11/Xmd.h>
+	<GL/glew.h>
+
+1328129602 source:c:\users\beul\desktop\byte\ext\json\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1328213864 source:c:\users\beul\desktop\code\byte\ext\gl\glew.c
+	<GL/glew.h>
+	<GL/wglew.h>
+	<GL/glxew.h>
+	<dlfcn.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdlib.h>
+	<string.h>
+	<AvailabilityMacros.h>
+	<dlfcn.h>
+	<mach-o/dyld.h>
+
+1328129602 source:c:\users\beul\desktop\code\byte\ext\json\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1328129602 c:\users\beul\desktop\code\byte\ext\json\cjson.h
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\camera.c
+	"camera.h"
+	"context.h"
+	"renderer.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\camera.h
+	"common.h"
+	"event.h"
+	"matrix.h"
+
+1327952133 c:\users\beul\desktop\code\byte\src\common.h
+	<stdlib.h>
+	<time.h>
+	"debug.h"
+	<math.h>
+
+1327762186 c:\users\beul\desktop\code\byte\src\debug.h
+	<stdio.h>
+	<errno.h>
+	<string.h>
+	<stdbool.h>
+
+1327958651 c:\users\beul\desktop\code\byte\src\event.h
+	"common.h"
+	"keys.h"
+	"vector.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\keys.h
+
+1327762186 c:\users\beul\desktop\code\byte\src\vector.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\matrix.h
+	"common.h"
+	"vector.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\context.h
+	"common.h"
+	"matrix.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\renderer.h
+	"common.h"
+	"vector.h"
+	"matrix.h"
+	"shader.h"
+	"text.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\shader.h
+	"common.h"
+	"vector.h"
+	"matrix.h"
+	"texture.h"
+	"color.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\texture.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\color.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\text.h
+	"color.h"
+	"vector.h"
+	"world.h"
+	"device.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\world.h
+	"common.h"
+	"handlemanager.h"
+	"resource.h"
+
+1327958985 c:\users\beul\desktop\code\byte\src\handlemanager.h
+	"common.h"
+
+1328029135 c:\users\beul\desktop\code\byte\src\resource.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\device.h
+	"common.h"
+	"camera.h"
+	"ft2build.h"
+
+1327955653 source:c:\users\beul\desktop\code\byte\src\clock.c
+	"clock.h"
+	<Windows.h>
+	<sys/time.h>
+	<unistd.h>
+
+1327762186 c:\users\beul\desktop\code\byte\src\clock.h
+	"common.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\color.c
+	"color.h"
+
+1327952120 source:c:\users\beul\desktop\code\byte\src\common.c
+	<stdarg.h>
+	"common.h"
+
+1327955733 source:c:\users\beul\desktop\code\byte\src\context.c
+	"GL/glew.h"
+	"GL/glfw.h"
+	"context.h"
+	"event.h"
+	"vector.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\debug.c
+	"common.h"
+	"debug.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\device.c
+	"device.h"
+	"event.h"
+	"clock.h"
+	"context.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\entity.c
+	"entity.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\entity.h
+	"matrix.h"
+	"handlemanager.h"
+
+1327958550 source:c:\users\beul\desktop\code\byte\src\event.c
+	"event.h"
+
+1327959056 source:c:\users\beul\desktop\code\byte\src\handlemanager.c
+	"handlemanager.h"
+
+1328639609 source:c:\users\beul\desktop\code\byte\src\main.c
+	"color.h"
+	"shader.h"
+	"device.h"
+	"camera.h"
+	"GL/glew.h"
+	"scene.h"
+	"world.h"
+	"renderer.h"
+	"context.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\scene.h
+	"common.h"
+	"handlemanager.h"
+	"mesh.h"
+	"shader.h"
+	"texture.h"
+	"text.h"
+	"entity.h"
+
+1327762186 c:\users\beul\desktop\code\byte\src\mesh.h
+	"common.h"
+	"vector.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\matrix.c
+	"matrix.h"
+
+1328745792 source:c:\users\beul\desktop\code\byte\src\mesh.c
+	"mesh.h"
+	"GL/glew.h"
+
+1328746224 source:c:\users\beul\desktop\code\byte\src\renderer.c
+	"renderer.h"
+	"mesh.h"
+	"texture.h"
+	"GL/glew.h"
+
+1328141054 source:c:\users\beul\desktop\code\byte\src\resource.c
+	"resource.h"
+	"renderer.h"
+	"json/cJSON.h"
+	<dirent.h>
+
+1328120932 source:c:\users\beul\desktop\code\byte\src\scene.c
+	"scene.h"
+	"renderer.h"
+	"camera.h"
+	"device.h"
+	"context.h"
+
+1328141064 source:c:\users\beul\desktop\code\byte\src\shader.c
+	"shader.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\text.c
+	"text.h"
+	"texture.h"
+	"renderer.h"
+	"context.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\texture.c
+	"texture.h"
+	"renderer.h"
+	"GL/SOIL.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\vector.c
+	"vector.h"
+
+1327762186 source:c:\users\beul\desktop\code\byte\src\world.c
+	"world.h"
+
+1328213870 c:\users\beul\desktop\code\byte\ext\gl\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1328125120 c:\users\beul\desktop\code\byte\ext\gl\wglew.h
+	<windows.h>
+
+1328125120 c:\users\beul\desktop\code\byte\ext\gl\glxew.h
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	<X11/Xmd.h>
+	<GL/glew.h>
+
+1328132574 c:\users\beul\desktop\code\byte\ext\freetype\ft2build.h
+	<freetype/config/ftheader.h>
+
+1328132576 c:\users\beul\desktop\code\byte\ext\freetype\freetype\config\ftheader.h
+
+1328208284 c:\users\beul\desktop\code\byte\ext\gl\glfw.h
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1328635217 c:\users\beul\desktop\code\byte\ext\gl\soil.h
+

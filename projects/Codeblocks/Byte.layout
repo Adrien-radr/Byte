@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="..\..\src\matrix.h" open="1" top="1" tabpos="1">
+		<Cursor position="1580" topLine="23" />
+	</File>
+	<File name="..\..\src\mesh.c" open="1" top="0" tabpos="2">
+		<Cursor position="404" topLine="30" />
+	</File>
+	<File name="..\..\src\renderer.c" open="1" top="0" tabpos="3">
+		<Cursor position="2768" topLine="45" />
+	</File>
+</CodeBlocks_layout_file>

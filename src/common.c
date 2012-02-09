@@ -6,16 +6,16 @@
 // Definitions of common.h
 const char DateFmt[] = "%a %d %b %Y";
 const char TimeFmt[] = "%H:%M:%S";
- 
+
 extern inline int Sign( const f32 a, const f32 threshold );
 extern inline f32 Abs( const f32 a );
 extern inline bool Eq( f32 a, f32 b, f32 e );
-extern inline f32 RandomValue( f32 a, f32 b ); 
+extern inline f32 RandomValue( f32 a, f32 b );
 extern inline f32 Deg2Rad( const f32 a );
 extern inline f32 Rad2Deg( const f32 a );
 
 
-u32 ReadFile( char **pBuffer, const char *pFile ) {
+u32 Byte_ReadFile( char **pBuffer, const char *pFile ) {
     check( pFile, "In ReadFile : given file name is uninitialized!\n" );
 
     // if buffer exists, destroy it
@@ -57,7 +57,7 @@ bool CheckExtension( const char *pFile, const char *pExtension ) {
 
         if( pos ) {
             const char *f = pFile + pos + 1;
-            return (0 == (strstr( f, pExtension )  - f) ); 
+            return (0 == (strstr( f, pExtension )  - f) );
         }
 
     }
@@ -75,10 +75,10 @@ void GetTime( char *t, int t_size,  const char *fmt ) {
 u32 GetHash( const char *pStr ) {
     unsigned long hash = 5381;
     int c;
-             
+
     while ((c = *pStr++))
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-                 
+
     return hash;
 }
 

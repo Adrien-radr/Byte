@@ -1,4 +1,5 @@
-#version 330
+#version 150
+#extension GL_ARB_explicit_attrib_location :  enable
 
 in vec2 texCoords;
 
@@ -7,9 +8,6 @@ out vec4 outColor;
 uniform sampler2D Albedo;
 
 void main() {
-    vec4 oColor = texture( Albedo, texCoords );
-    if( oColor.a < 0.5 )
-        discard;
-    outColor = oColor;
+    outColor = texture( Albedo, texCoords );
 }
 

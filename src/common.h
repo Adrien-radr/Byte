@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 0
-#define BYTE_PATCH 13
+#define BYTE_PATCH 12
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -61,13 +61,13 @@
 
     /// Read an entire file in a buffer
     /// @return : pBuffer allocated size (file size + '\0' char)
-    u32 ReadFile( char **pBuffer, const char *pFile );
+    u32 Byte_ReadFile( char **pBuffer, const char *pFile );
 
     /// Returns the hash of a given string
     u32 GetHash( const char *pStr );
 
     /// Macro for snprintf
-#   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__) 
+#   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__)
 
 // ##########################################################################################
 
@@ -77,33 +77,33 @@
 // One must choose if the objects in the array hate to be dynamically destroyed or not :
 //  - SimpleArray : no memory managment for individual data in array
 //  - HeapArray : individual data in array are destroyed with DEL_PTR when the array is destroyed
-// 
+//
 // Use :
 //  SimpleArray( float, Float );
 //  HeapArray( Mesh*, Mesh, Mesh_destroy );
-//  
+//
 //  int main .. {
 //      FloatArray arr;
 //      FloatArray_init( &arr, 10 );
-//      
+//
 //      if( FloatArray_checkSize( &arr ) ) {
 //          arr.data[arr.cpt] = 5.f;
 //          printf( "%f\n", arr.data[arr.cpt] );
 //          ++arr.cpt;
 //      }
-//      
+//
 //      FloatArray_destroy( &arr );
-//      
+//
 //      MeshArray m_arr;
 //      MeshArray_init( &m_arr, 10 );
 //      u32 index = 0;
-//      
+//
 //      if( MeshArray_checkSize( &m_arr ) ) {
 //          Mesh *m = Mesh_new();
 //          index = str_arr.cpt++;
 //          str_arr.data[index] = m;
 //      }
-//      
+//
 //      Mesh_bind( i&m_arr->data[index] );
 //      StringArray_destroy( &str_arr );
 //  }
@@ -134,7 +134,7 @@
         }                                                                       \
         return false;                                                           \
     }                                                                           \
-                                                                                
+
 
 
 #   define SimpleArray( type, name )                                            \
@@ -162,7 +162,7 @@
                 destructionFunc( arr->data[i] );                                \
         }                                                                       \
         DEL_PTR( arr->data );                                                   \
-    }                                                                           
+    }
 
 // ##########################################################################################
 
@@ -199,7 +199,7 @@
         return ( a >= 0.f ) ? a : -a;
     }
 
-    /// Test equality of two floating pt numbers    
+    /// Test equality of two floating pt numbers
     inline bool Eq( f32 a, f32 b, f32 e ) {
         return Abs( a - b ) < e;
     }
@@ -222,5 +222,5 @@
 // ##########################################################################################
 
 
-        
+
 #endif // COMMON_H

@@ -10,10 +10,11 @@
 
 // ==============================  //
 
-f64 GetSystemTime(){
+f64 Byte_GetSystemTime(){
     #if defined(BYTE_WIN32)
         static LARGE_INTEGER Frequency;
-        static BOOL          UseHighPerformanceTimer = QueryPerformanceFrequency(&Frequency);
+        static BOOL          UseHighPerformanceTimer;
+        UseHighPerformanceTimer = QueryPerformanceFrequency(&Frequency);    //FIXED initializer element is not constant
 
         if (UseHighPerformanceTimer)
         {
@@ -42,14 +43,14 @@ f64 GetSystemTime(){
 
 void Clock_sleep( f32 pTime ) {
     #if defined(BYTE_WIN32)
-       Sleep( (dword)( pTime ) );
+       Sleep( (DWORD)( pTime ) );       //FIXED DWORD in capitals.
     #else
        usleep( (u32)( pTime * 1000 ) );
     #endif
 }
-    
+
 void Clock_reset( Clock *pClock ) {
-    pClock->mLastFrameTime = GetSystemTime();
+    pClock->mLastFrameTime = Byte_GetSystemTime();
     pClock->mClockTime = 0.0;
     pClock->mPaused = false;
 }
@@ -60,13 +61,13 @@ void Clock_pause( Clock *pClock ) {
 
 void Clock_resume( Clock *pClock ) {
     pClock->mPaused = false;
-    pClock->mLastFrameTime = GetSystemTime();
+    pClock->mLastFrameTime = Byte_GetSystemTime();
 }
 
 f32 Clock_getElapsedTime( Clock *pClock ) {
     static f64 temp = 0.0;
     if( !pClock->mPaused ) {
-        temp = GetSystemTime();
+        temp = Byte_GetSystemTime();
         pClock->mClockTime += temp - pClock->mLastFrameTime;
         pClock->mLastFrameTime = temp;
     }

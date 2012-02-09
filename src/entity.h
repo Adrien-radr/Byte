@@ -14,7 +14,7 @@
         u32             *mMeshes;
         u32             *mTextures;
         u32             *mDepths;
-        mat3            **mModelMatrices;
+        mat3            *mModelMatrices;
 
         u32             mCount,
                         mSize,
@@ -24,8 +24,7 @@
     /// Differents attributes of entity that can be modified
     typedef enum {
         EA_Texture,
-        EA_Depth,
-        EA_Matrix
+        EA_Depth
     } EntityAttrib;
 
     /// Initialize and allocate a new EntityArray

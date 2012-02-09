@@ -5,7 +5,7 @@
 #include "event.h"
 #include "vector.h"
 
-/// GLFW Window/Context 
+/// GLFW Window/Context
 typedef struct {
     vec2    *mVideoModes;       ///< Video Modes width/height
     int     mVideoModesNb;      ///< Video Modes count
@@ -15,7 +15,7 @@ typedef struct {
 
 
     //bool    mSizeChanged;       ///< True if size has been changed
-    //mat3    mProjectionMatrix;  ///< Projection matrix used 
+    //mat3    mProjectionMatrix;  ///< Projection matrix used
 } Context;
 
 /// Context only instance definition
@@ -36,7 +36,7 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     context = (Context*)byte_alloc( sizeof( Context ) );
     check_mem( context );
 
-    // Initialize GLFW 
+    // Initialize GLFW
     check( glfwInit(), "Could not initialize GLFW\n" );
 
     // Get available videomodes
@@ -50,7 +50,7 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
         context->mVideoModes[i].x = vidmodes[i].Width;
         context->mVideoModes[i].y = vidmodes[i].Height;
 
-        if( !resolutionFound && 
+        if( !resolutionFound &&
                 context->mVideoModes[i].x == pWidth && context->mVideoModes[i].y == pHeight )
             resolutionFound = true;
     }
@@ -81,12 +81,12 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     u32 ms = pMultiSamples;
     if( ms != 2 || ms != 4 || ms != 8 )
         ms = 0;
-    
+
     context->mMultiSamples = ms;
     glfwOpenWindowHint( GLFW_FSAA_SAMPLES, ms );
 
 
-    int init = glfwOpenWindow(  context->mSize.x, context->mSize.y, 
+    int init = glfwOpenWindow(  context->mSize.x, context->mSize.y,
                                 8, 8, 8, 0,
                                 24, 8, pFullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW );
 
@@ -107,7 +107,7 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
 
     log_info( "GLFW Window successfully initialized!\n" );
     return true;
-        
+
 error:
     if( context ) Context_destroy( context );
     return false;
@@ -146,7 +146,7 @@ vec2 Context_getSize() {
         size.x = context->mSize.x;
         size.y = context->mSize.y;
     }
-        
+
     return size;
 }
 
