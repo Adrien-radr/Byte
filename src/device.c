@@ -1,7 +1,6 @@
 #include "device.h"
 #include "event.h"
 #include "clock.h"
-#include "context.h"
 #include "renderer.h"
 
 #include "GL/glew.h"
@@ -14,6 +13,7 @@ const str32 ConfigFile = "config.json";
 typedef struct {
     vec2    mWindowSize;
     u32     mMultiSamples;
+    bool    mFullscreen;
 } Config;
 
 
@@ -66,6 +66,10 @@ bool LoadConfig() {
     root = cJSON_Parse( json_file );
     check( root, "JSON Parse error [%s] before :\n%s\n", ConfigFile, cJSON_GetErrorPtr() );
 
+    // get fullscreen state
+    if( !LoadConfigItem( root, &item, "bFullscreen" ) ) goto error;
+    device->mConfig.mFullscreen = item->type > 0;
+
     // get window size
     if( !LoadConfigItem( root, &item, "iWindowWidth" ) ) goto error;
     device->mConfig.mWindowSize.x = (f32)item->valueint;
@@ -86,12 +90,6 @@ error:
 }
 
 bool Device_init() {
-#   ifdef _DEBUG
-    MemoryManager_init();
-#   endif
-
-    InitLog();
-
     check( !device, "Device already initialized!\n" );
 
     device = byte_alloc( sizeof( Device ) );
@@ -106,7 +104,7 @@ bool Device_init() {
 
     check( Context_init( device->mConfig.mWindowSize.x, 
                          device->mConfig.mWindowSize.y, 
-                         false, 
+                         device->mConfig.mFullscreen, 
                          title, 
                          device->mConfig.mMultiSamples ), "Error while creating Context!\n" );
 
@@ -126,12 +124,11 @@ bool Device_init() {
     Clock_reset( &device->mClock );
 
 
-    printf( "\n" );
     log_info( "Device successfully initialized!\n" );
-    printf( "\n\n" );
 
     return true;
 error:
+    Device_destroy();
     return false;
 }
 
@@ -143,11 +140,6 @@ void Device_destroy() {
 
         DEL_PTR( device );
     }
-
-    CloseLog();
-#   ifdef _DEBUG
-    MemoryManager_destroy();
-#   endif
 }
 
 void Device_beginFrame() {

@@ -134,11 +134,7 @@ void Context_swap() {
 bool Context_isWindowOpen() {
     return ( glfwGetWindowParam( GLFW_OPENED ) > 0 );
 }
-/*
-bool Context_sizeChanged() {
-    return context && context->mSizeChanged;
-}
-*/
+
 vec2 Context_getSize() {
     vec2 size = { .x = -1, .y = -1 };
 
@@ -158,7 +154,7 @@ void Context_setSize( vec2 pSize ) {
 }
 
 void Context_setVSync( bool pVal ) {
-    glfwSwapInterval( pVal );
+    glfwSwapInterval( pVal ? 60 : 0 );
 }
 
 void Context_showCursor( bool pVal ) {

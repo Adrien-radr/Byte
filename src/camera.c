@@ -8,7 +8,7 @@ Camera *Camera_new() {
 
     c = byte_alloc( sizeof( Camera ) );
 
-    c->mSpeed = 0.1f;
+    c->mSpeed = 1.f;
     c->mZoom = 1.f;
     c->mBaseZoomSpeed = 0.2f;
     Camera_calculateProjectionMatrix( c );

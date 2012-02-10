@@ -18,7 +18,7 @@ Byte-Project : TODO File
 - Game 'class' containing : the device, the world, the scene, game states
 - Phong Lighting
 - Dynamic shadows
-- Config file
++ Config file
 - Lua integration as a scripting language
 - GUI (with Lua or json)
 

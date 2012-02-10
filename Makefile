@@ -1,7 +1,7 @@
 NAME = Byte-Project
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
-VERSION_PATCH = 13
+VERSION_PATCH = 14
 VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 ARCH = 64
@@ -24,6 +24,7 @@ src/debug.o\
 src/device.o\
 src/entity.o\
 src/event.o\
+src/game.o\
 src/handlemanager.o\
 src/main.o\
 src/matrix.o\

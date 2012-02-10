@@ -41,6 +41,7 @@ void Resize( HandleManager *pHm ) {
     for( u32 i = nextHandle; i < pHm->mSize; ++i ) {
         pHm->mHandles[i].next_free_index = i + 1;
         pHm->mHandles[i].handle = -1;
+        pHm->mHandles[i].used = false;
     }
     pHm->mHandles[pHm->mSize - 1].next_free_index = -1;
 }

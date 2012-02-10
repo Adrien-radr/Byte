@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "camera.h"
+#include "context.h"
 
 #include "ft2build.h"
 #include FT_FREETYPE_H

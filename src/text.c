@@ -225,12 +225,21 @@ int TextArray_add( TextArray *arr ) {
         handle = HandleManager_addHandle( arr->mUsed, 1 );
 
         if( handle >= 0 ) {
+            // resize our text array if the handle manager had to be resized
+            if( arr->mUsed->mSize != arr->mSize ) {
+                arr->mSize = arr->mUsed->mSize;
+                arr->mFonts = byte_realloc( arr->mFonts, arr->mSize * sizeof( Font* ) );
+                arr->mMeshes = byte_realloc( arr->mMeshes, arr->mSize * sizeof( u32 ) );
+                arr->mColors = byte_realloc( arr->mColors, arr->mSize * sizeof( Color ) );
+                arr->mStrings = byte_realloc( arr->mStrings, arr->mSize * sizeof( char* ) );
+                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2* ) );
+            }
+
             // create mesh used by text
             check( (arr->mMeshes[handle] = Renderer_createDynamicMesh()) >= 0, "Failed to create mesh of Text!\n" );
 
             ++arr->mMaxIndex;
             ++arr->mCount;
-            arr->mSize = arr->mUsed->mSize;
 
             return handle;
         }

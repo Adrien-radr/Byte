@@ -60,15 +60,15 @@ Scene *Scene_new() {
     s = byte_alloc( sizeof( Scene ) );
     check_mem( s );
 
-    // create array of entities
-    s->mEntities = EntityArray_init( SCENE_ENTITIES_N );
+    // create array of entities (initial size = 50)
+    s->mEntities = EntityArray_init( 50 );
 
     // init default entity shader
     int es = World_getResource( "defaultShader.json" );
     check( es >= 0, "Entity shader creation error!\n" );
 
-    // create array of texts
-    s->mTexts = TextArray_init( SCENE_TEXTS_N );
+    // create array of texts (intial size = 50)
+    s->mTexts = TextArray_init( 50 );
 
     // init default text shader
     int ts = World_getResource( "textShader.json" );
@@ -117,7 +117,7 @@ void Scene_render( Scene *pScene ) {
         for( u32 i = 0; i < pScene->mEntities->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->mEntities->mUsed, i ) ) {
                 Renderer_useTexture( pScene->mEntities->mTextures[i], 0 );
-                Shader_sendMat3( "ModelMatrix", pScene->mEntities->mModelMatrices[i] );
+                Shader_sendMat3( "ModelMatrix", pScene->mEntities->mMatrices[i] );
                 Shader_sendInt( "Depth", pScene->mEntities->mDepths[i] );
                 Renderer_renderMesh( pScene->mEntities->mMeshes[i] );
             }
@@ -140,7 +140,7 @@ void Scene_render( Scene *pScene ) {
 }
 
 //  =======================
-
+ 
 int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
     int handle = -1;
 
@@ -150,7 +150,7 @@ int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
         if( handle >= 0 ) {
             pScene->mEntities->mMeshes[handle] = pMesh;
             pScene->mEntities->mTextures[handle] = pTexture;
-            pScene->mEntities->mModelMatrices[handle] = pMM;
+            pScene->mEntities->mMatrices[handle] = pMM; 
         }
     }
     return handle;
@@ -165,7 +165,7 @@ int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor ) {
         if( handle >= 0 ) {
             pScene->mEntities->mMeshes[handle] = pActor->mMesh_id;
             pScene->mEntities->mTextures[handle] = pActor->mTexture_id;
-            pScene->mEntities->mModelMatrices[handle] = &pActor->mPosition;
+            pScene->mEntities->mMatrices[handle] = &pActor->mPosition;
         }
     }
     return handle;
@@ -176,7 +176,7 @@ void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void 
         if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
             switch( pAttrib ) {
                 case EA_Matrix :
-                    pScene->mEntities->mModelMatrices[pHandle] = (mat3*)pData;
+                    pScene->mEntities->mMatrices[pHandle] = (mat3*)pData;
                     break;
                 case EA_Texture :
                     pScene->mEntities->mTextures[pHandle] = *((u32*)pData);

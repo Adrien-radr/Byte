@@ -10,13 +10,6 @@
 #include "entity.h"
 #include "actor.h"
 
-
-/// Fixed number of each entity array (at begining of execution)
-#define     SCENE_ENTITIES_N            50
-// Fixed number of texts (at begining of execution)
-#define     SCENE_TEXTS_N               50
-
-
 // Forward declaration
 typedef struct s_Scene Scene;
 

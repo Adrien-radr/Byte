@@ -1,5 +1,5 @@
-Byte-Project Log v0.0.13
-Tue 07 Feb 2012 - 15:11:33
+Byte-Project Log v0.0.14
+Fri 10 Feb 2012 - 18:15:29
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.7.0 successfully initialized!
@@ -16,3 +16,4 @@ Tue 07 Feb 2012 - 15:11:33
 [INFO] Resource "img_test.png" loaded.
 [INFO] Resource "DejaVuSans.ttf" loaded.
 [INFO] Resource "visitor2.ttf" loaded.
+[INFO] Game successfully initialized!
