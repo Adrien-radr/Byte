@@ -22,9 +22,10 @@
 					<Add directory="..\..\ext\json" />
 				</Compiler>
 				<Linker>
-					<Add option="-lglfw" />
-					<Add option="-lsoil" />
-					<Add option="-lfreetype" />
+					<Add option="-lglfwWIN" />
+					<Add option="-lsoilWIN" />
+					<Add option="-lfreetypeWIN" />
+					<Add option="-lzWIN" />
 					<Add option="-lopengl32" />
 					<Add directory="..\..\ext" />
 				</Linker>
@@ -53,12 +54,16 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="..\..\ext\GL\glew.c">
+		<Unit filename="..\..\ext\GL\glewWIN.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="..\..\ext\json\cJSON.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="..\..\src\actor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\src\actor.h" />
 		<Unit filename="..\..\src\camera.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -95,6 +100,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="..\..\src\event.h" />
+		<Unit filename="..\..\src\game.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\src\game.h" />
 		<Unit filename="..\..\src\handlemanager.c">
 			<Option compilerVar="CC" />
 		</Unit>

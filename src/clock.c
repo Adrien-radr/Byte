@@ -14,7 +14,7 @@ f64 Byte_GetSystemTime(){
     #if defined(BYTE_WIN32)
         static LARGE_INTEGER Frequency;
         static BOOL          UseHighPerformanceTimer;
-        UseHighPerformanceTimer = QueryPerformanceFrequency(&Frequency);    //FIXED initializer element is not constant
+        UseHighPerformanceTimer = QueryPerformanceFrequency(&Frequency);
 
         if (UseHighPerformanceTimer)
         {
@@ -43,7 +43,7 @@ f64 Byte_GetSystemTime(){
 
 void Clock_sleep( f32 pTime ) {
     #if defined(BYTE_WIN32)
-       Sleep( (DWORD)( pTime ) );       //FIXED DWORD in capitals.
+       Sleep( (DWORD)( pTime ) );
     #else
        usleep( (u32)( pTime * 1000 ) );
     #endif

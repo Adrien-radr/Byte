@@ -24,13 +24,13 @@ typedef enum {
 /// to distribute the event recorded to all Listeners
 typedef struct {
     EventType   Type;               ///< Type of the event
-
+                        
     vec2        v;
     int         i;
     union {
         MouseButton button;
         Key         key;
-    } press;                    //FIXED compiler doesn't accept unnamed union
+    };
 } Event;
 
 
@@ -63,7 +63,7 @@ void EventManager_update();
 
 
 // Listeners
-// To create a event listener, one must register it to the Eventmanager
+// To create a event listener, one must register it to the Eventmanager 
 // You can send a void* when registering. It will be available everytime the callback is used
 // Exemple : if pData is a pointer on Camera, one could do this in his listener func :
 //         ((Camera*)pData).mPosition.x = pEvent.MousePos.x;
@@ -72,7 +72,7 @@ void EventManager_update();
     /// @param pEvent : Event recorded that can be processed
     /// @parma pData : Void pointer on anything that could be usefull in the callback
     typedef void (*ListenerFunc)( const Event *pEvent, void *pData );
-
+    
     /// Different types of listener
     typedef enum {
         LT_KeyListener,

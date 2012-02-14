@@ -8,7 +8,7 @@ EntityArray *EntityArray_init( u32 pSize ) {
     arr->mMeshes = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextures = byte_alloc( pSize * sizeof( u32 ) );
     arr->mDepths = byte_alloc( pSize * sizeof( u32 ) );
-    arr->mModelMatrices = byte_alloc( pSize * sizeof( mat3 ) );
+    arr->mMatrices = byte_alloc( pSize * sizeof( mat3* ) );
 
     arr->mSize = pSize;
 
@@ -22,10 +22,17 @@ int EntityArray_add( EntityArray *arr ) {
         handle = HandleManager_addHandle( arr->mUsed, 1 );
 
         if( handle >= 0 ) {
+            // resize our entity array if the handle manager had to be resized
+            if( arr->mUsed->mSize != arr->mSize ) {
+                arr->mSize = arr->mUsed->mSize;
+                arr->mMeshes = byte_realloc( arr->mMeshes, arr->mSize * sizeof( u32 ) );
+                arr->mTextures = byte_realloc( arr->mTextures, arr->mSize * sizeof( u32 ) );
+                arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( u32 ) );
+                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
+            }
+
             ++arr->mMaxIndex;
             ++arr->mCount;
-            arr->mSize = arr->mUsed->mSize;
-
         }
     }
 
@@ -52,7 +59,7 @@ void EntityArray_destroy( EntityArray *arr ) {
         DEL_PTR( arr->mTextures );
         DEL_PTR( arr->mMeshes );
         DEL_PTR( arr->mDepths );
-        DEL_PTR( arr->mModelMatrices );
+        DEL_PTR( arr->mMatrices );
         DEL_PTR( arr );
     }
 }

@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 0
-#define BYTE_PATCH 12
+#define BYTE_PATCH 14
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -25,9 +25,11 @@
 // ##########################################################################################
 //      MISC
     // Types shortcuts
-	typedef unsigned char		u8;
-	typedef unsigned short		u16;
-	typedef unsigned int	    u32;
+    #include <stdint.h>
+	typedef uint8_t		        u8;
+	typedef uint16_t    		u16;
+	typedef uint32_t    	    u32;
+	typedef uint64_t    	    u64;
 
 	typedef float f32;
 	typedef double f64;
@@ -64,7 +66,7 @@
     u32 Byte_ReadFile( char **pBuffer, const char *pFile );
 
     /// Returns the hash of a given string
-    u32 GetHash( const char *pStr );
+    u32 Byte_GetHash( const char *pStr );
 
     /// Macro for snprintf
 #   define MSG( str, n, M, ... ) snprintf( (str), (n), M, ##__VA_ARGS__)

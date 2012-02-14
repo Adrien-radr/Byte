@@ -9,7 +9,7 @@
 //  ##########################################3
 //      MEMORY MANAGER
 //  ##########################################3x
-# define MEMORY_MANAGER_SIZE 4096
+# define MEMORY_MANAGER_SIZE 8192
 typedef struct {
     size_t  allocated_bytes;
     void*   alloc_stack[MEMORY_MANAGER_SIZE];

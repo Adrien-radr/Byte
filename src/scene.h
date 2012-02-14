@@ -8,20 +8,14 @@
 #include "texture.h"
 #include "text.h"
 #include "entity.h"
-
-
-/// Fixed number of each entity array (at begining of execution)
-#define     SCENE_ENTITIES_N            50
-// Fixed number of texts (at begining of execution)
-#define     SCENE_TEXTS_N               50
-
+#include "actor.h"
 
 // Forward declaration
 typedef struct s_Scene Scene;
 
 
 /// Create and returns a new scene instance
-Scene *Scene_new( World *pWorld );
+Scene *Scene_new();
 
 /// Destroy and free the given scene
 void Scene_destroy( Scene *pScene );
@@ -39,7 +33,12 @@ void Scene_render();
     /// @param pTexture : The texture handle the entity use
     /// @param pMM : The ModelMatrix used to orient the entity
     /// @return : The handle to the given entity
-    int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 pMM );
+    int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM );
+
+    /// Add an entity to be rendered each frame in the scene
+    /// @param pActor : the Actor that must be drawn as an entity
+    /// @return : The handle to the given entity 
+    int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor );
 
     /// Modify one attribute of a Entity (given by its handle)
     /// @param pAttrib : the attribute type we want to change (see entity.h)

@@ -2,6 +2,7 @@
 #include "texture.h"
 #include "renderer.h"
 #include "context.h"
+#include "world.h"
 
 #include "GL/glew.h"
 
@@ -97,9 +98,9 @@ error:
 }
 
 
-Font *Font_get( World *world, const char *pName, u32 pSize ) {
+Font *Font_get( const char *pName, u32 pSize ) {
     char *font = NULL;
-    if( world && pName ) {
+    if( pName ) {
         // string representation of the size
         u32 s = pSize;
         char size[4];
@@ -116,7 +117,7 @@ Font *Font_get( World *world, const char *pName, u32 pSize ) {
         strcat( font, size );
 
         // get resource and get the font associated to it from the renderer
-        int font_resource = World_getResource( world, font );
+        int font_resource = World_getResource( font );
         check( font_resource >= 0, "Cant set font \"%s\", it has not been loaded as a resource!\n", pName );
 
 
@@ -224,12 +225,21 @@ int TextArray_add( TextArray *arr ) {
         handle = HandleManager_addHandle( arr->mUsed, 1 );
 
         if( handle >= 0 ) {
+            // resize our text array if the handle manager had to be resized
+            if( arr->mUsed->mSize != arr->mSize ) {
+                arr->mSize = arr->mUsed->mSize;
+                arr->mFonts = byte_realloc( arr->mFonts, arr->mSize * sizeof( Font* ) );
+                arr->mMeshes = byte_realloc( arr->mMeshes, arr->mSize * sizeof( u32 ) );
+                arr->mColors = byte_realloc( arr->mColors, arr->mSize * sizeof( Color ) );
+                arr->mStrings = byte_realloc( arr->mStrings, arr->mSize * sizeof( char* ) );
+                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2* ) );
+            }
+
             // create mesh used by text
             check( (arr->mMeshes[handle] = Renderer_createDynamicMesh()) >= 0, "Failed to create mesh of Text!\n" );
 
             ++arr->mMaxIndex;
             ++arr->mCount;
-            arr->mSize = arr->mUsed->mSize;
 
             return handle;
         }

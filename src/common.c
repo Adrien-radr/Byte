@@ -72,7 +72,7 @@ void GetTime( char *t, int t_size,  const char *fmt ) {
     strftime( t, t_size, fmt, lt );
 }
 
-u32 GetHash( const char *pStr ) {
+u32 Byte_GetHash( const char *pStr ) {
     unsigned long hash = 5381;
     int c;
 

@@ -12,11 +12,11 @@ const char FontDirectory[] = "data/fonts/";
 // Array of u32 for the Hashes and Handles array of the resourcemanager
 SimpleArray( u32, u32 )
 
-struct s_ResourceManager {
+typedef struct s_ResourceManager {
     u32Array    mHashes;
     u32Array    mHandles;
 
- };
+} ResourceManager;
 
 
 ResourceManager *ResourceManager_new() {
@@ -224,17 +224,17 @@ int LoadFont( ResourceManager *pRM, const char *pFile ) {
 
     // size 12
     strcat( f_name, "/12" );
-    u32 hash = GetHash( f_name );
+    u32 hash = Byte_GetHash( f_name );
     ResourceManager_addEntry( pRM, hash, f_12_handle );
 
     // size 20
     strcpy( f_name + f_len, "/20" );
-    hash = GetHash( f_name );
+    hash = Byte_GetHash( f_name );
     ResourceManager_addEntry( pRM, hash, f_20_handle );
 
     // size 32
     strcpy( f_name + f_len, "/32" );
-    hash = GetHash( f_name );
+    hash = Byte_GetHash( f_name );
     ResourceManager_addEntry( pRM, hash, f_32_handle );
 
 
@@ -261,7 +261,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
             strcpy( r_name, pFile );
         }
 
-        u32 hash = GetHash( r_name );
+        u32 hash = Byte_GetHash( r_name );
 
         // search if wanted resource already exist
         for( int i = 0; i < pRM->mHashes.cpt; ++i )  {
@@ -366,7 +366,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
 int ResourceManager_getResource( ResourceManager *pRM, const char *pFile ) {
     int handle = -1;
     if( pRM && pFile ) {
-        int hash = GetHash( pFile );
+        int hash = Byte_GetHash( pFile );
         for( u32 i = 0; i < pRM->mHashes.cpt; ++i ) {
             if( pRM->mHashes.data[i] > hash )
                 break;

@@ -1,19 +1,32 @@
 #include "device.h"
 #include "event.h"
 #include "clock.h"
-#include "context.h"
 #include "renderer.h"
 
 #include "GL/glew.h"
+#include "json/cJSON.h"
 
-typedef struct s_Device {
-    Clock   mClock;             ///< Clock accumulating time since context creation
-    f32     mCurrTime;          ///< Current time since context creation
-    f32     mFrameTime;         ///< Time elapsed in last frame
+const str32 ConfigFile = "config.json";
 
-    Camera  *mActiveCamera;     ///< Game active camera (one at a time)
+/// Config structure. Loaded from ConfigFile
+/// Stores the different parameters of the engine/game
+typedef struct {
+    vec2    mWindowSize;
+    u32     mMultiSamples;
+    bool    mFullscreen;
+} Config;
 
-    FT_Library  mFreetype;
+
+typedef struct {
+    Clock       mClock;             ///< Clock accumulating time since context creation
+    f32         mCurrTime;          ///< Current time since context creation
+    f32         mFrameTime;         ///< Time elapsed in last frame
+
+    Camera      *mActiveCamera;     ///< Game active camera (one at a time)
+
+    FT_Library  mFreetype;          ///< Instance of the Freetype library.
+
+    Config      mConfig;            ///< Device/Game configuration parameters
 } Device;
 
 Device *device = NULL;
@@ -30,23 +43,70 @@ void Device_windowResize( const Event *pEvent, void *pData ) {
     }
 }
 
+bool LoadConfigItem( cJSON *root, cJSON **item, const char *param ) {
+    *item = cJSON_GetObjectItem( root, param );
+    check( *item, "Error while getting parameter %s from config file.\n", param );
+    return true;
+error:
+    return false;
+}
+
+// Config loading function
+bool LoadConfig() {
+    if( !device ) return false;
+
+    cJSON *root = NULL, *item = NULL;
+    char *json_file = NULL;
+
+    bool return_val = false;
+
+    Byte_ReadFile( &json_file, ConfigFile );
+    check( json_file, "Error when loading config file!\n" );
+
+    root = cJSON_Parse( json_file );
+    check( root, "JSON Parse error [%s] before :\n%s\n", ConfigFile, cJSON_GetErrorPtr() );
+
+    // get fullscreen state
+    if( !LoadConfigItem( root, &item, "bFullscreen" ) ) goto error;
+    device->mConfig.mFullscreen = item->type > 0;
+
+    // get window size
+    if( !LoadConfigItem( root, &item, "iWindowWidth" ) ) goto error;
+    device->mConfig.mWindowSize.x = (f32)item->valueint;
+
+    if( !LoadConfigItem( root, &item, "iWindowHeight" ) ) goto error;
+    device->mConfig.mWindowSize.y = (f32)item->valueint;
+
+    // get multisamples
+    if( !LoadConfigItem( root, &item, "iMultiSamples" ) ) goto error;
+    device->mConfig.mMultiSamples = item->valueint;
+
+    return_val = true;
+
+error:
+    DEL_PTR( json_file );
+    if( root ) cJSON_Delete( root );
+    return return_val;
+}
+
 bool Device_init() {
-#   ifdef _DEBUG
-    MemoryManager_init();
-#   endif
-
-    InitLog();
-
     check( !device, "Device already initialized!\n" );
 
     device = byte_alloc( sizeof( Device ) );
     check_mem( device );
 
+    // Load config file
+    LoadConfig();
+
     // Initialize Context
     str32 title;
     MSG( title, 32, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
 
-    check( Context_init( 800, 600, false, title, 0 ), "Error while creating Context!\n" );
+    check( Context_init( device->mConfig.mWindowSize.x,
+                         device->mConfig.mWindowSize.y,
+                         device->mConfig.mFullscreen,
+                         title,
+                         device->mConfig.mMultiSamples ), "Error while creating Context!\n" );
 
     // Initialize Renderer
     check( Renderer_init(), "Error while creating Renderer!\n" );
@@ -64,12 +124,11 @@ bool Device_init() {
     Clock_reset( &device->mClock );
 
 
-    printf( "\n" );
     log_info( "Device successfully initialized!\n" );
-    printf( "\n\n" );
 
     return true;
 error:
+    Device_destroy();
     return false;
 }
 
@@ -81,11 +140,6 @@ void Device_destroy() {
 
         DEL_PTR( device );
     }
-
-    CloseLog();
-#   ifdef _DEBUG
-    MemoryManager_destroy();
-#   endif
 }
 
 void Device_beginFrame() {
@@ -131,7 +185,7 @@ void Device_setCamera( Camera *pCamera ) {
 }
 
 FT_Library *Device_getFreetype() {
-    if( device ) 
+    if( device )
         return &device->mFreetype;
     return NULL;
 }

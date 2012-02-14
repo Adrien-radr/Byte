@@ -1,0 +1,19 @@
+Byte-Project Log v0.0.14
+Tue 14 Feb 2012 - 21:10:03
+==========================
+[INFO] GLFW Window successfully initialized!
+[INFO] GLEW v1.6.0 successfully initialized!
+[INFO] OpenGL 3.2
+[INFO] GLSL 1.50 NVIDIA via Cg compiler
+[INFO] Hardware : NVIDIA Corporation - GeForce GTX 285/PCI/SSE2
+[INFO] Renderer successfully initialized!
+[INFO] Event manager successfully initialized!
+[INFO] Device successfully initialized!
+[INFO] Resource "defaultShader.json" loaded.
+[INFO] Resource "textShader.json" loaded.
+[INFO] Resource "quadmesh.json" loaded.
+[INFO] Resource "crate.jpg" loaded.
+[INFO] Resource "img_test.png" loaded.
+[INFO] Resource "DejaVuSans.ttf" loaded.
+[INFO] Resource "visitor2.ttf" loaded.
+[INFO] Game successfully initialized!

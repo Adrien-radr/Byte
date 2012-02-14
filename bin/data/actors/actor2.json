@@ -1,0 +1,16 @@
+{
+    "firstname" : "Actor",
+    "lastname"  : "2",
+    "surname"   : "A2",
+
+    "init"      : {
+        "position" : [ 50.0, 50.0 ]
+    },
+
+    "entity"    : {
+        "mesh"    : "quadmesh.json",
+        "texture" : "img_test.png",
+        "width"   : 4,
+        "height"  : 6
+    }
+}

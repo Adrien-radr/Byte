@@ -7,12 +7,12 @@ typedef struct {
     union {
         void*   data;
         int     handle;
-    } handle;
+    };
     int     next_free_index;
     bool    used;
 } Handle;
 
-/// Container using indices and dynamic directing to store single entries
+/// Container using indices and dynamic directing to store single entries 
 /// containing a unique sort of data. The user of the HM provides the Data he wants
 /// to store and the HM returns him a handle(u32) directing him to it.
 /// The HM does not care about memory managment and this should be done elsewhere.
