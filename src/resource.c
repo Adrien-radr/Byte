@@ -53,7 +53,7 @@ bool ResourceManager_addEntry( ResourceManager *pRM, u32 pHash, u32 pHandle ) {
                 pRM->mHandles.data[index] = pHandle;
                 u32 tmp1, tmp2;
                 // sort array after 2nd insertion, in increasing order
-                if( 1 < pRM->mHashes.cpt ) 
+                if( 1 < pRM->mHashes.cpt )
                     for( int i = pRM->mHashes.cpt-2; i >= 0; --i )
                         if( pRM->mHashes.data[i] > pRM->mHashes.data[i+1] ) {
                             // switch two  instances
@@ -63,7 +63,7 @@ bool ResourceManager_addEntry( ResourceManager *pRM, u32 pHash, u32 pHandle ) {
                             pRM->mHandles.data[i] = pRM->mHandles.data[i+1];
                             pRM->mHashes.data[i+1] = tmp1;
                             pRM->mHandles.data[i+1] = tmp2;
-                        } else 
+                        } else
                             break;
                 return true;
             }
@@ -79,12 +79,12 @@ int LoadShader( const char *pFile ) {
     int handle = -1;
 
     // read and parse json shader file
-    ReadFile( &json_file, pFile );
+    Byte_ReadFile( &json_file, pFile );
     check( json_file, " " );
 
     root = cJSON_Parse( json_file );
     check( root, "JSON parse error [%s] before :\n%s\n", pFile, cJSON_GetErrorPtr() );
-    
+
     const char* v_file = cJSON_GetObjectItem( root, "v_src" )->valuestring;
     const char* f_file = cJSON_GetObjectItem( root, "f_src" )->valuestring;
 
@@ -146,7 +146,7 @@ int LoadMesh( const char *pFile ) {
     int handle = -1;
 
     // read and parse json file
-    ReadFile( &json_file, pFile );
+    Byte_ReadFile( &json_file, pFile );
     check( json_file, " " );
 
     root = cJSON_Parse( json_file );
@@ -224,17 +224,17 @@ int LoadFont( ResourceManager *pRM, const char *pFile ) {
 
     // size 12
     strcat( f_name, "/12" );
-    u32 hash = GetHash( f_name );
+    u32 hash = Byte_GetHash( f_name );
     ResourceManager_addEntry( pRM, hash, f_12_handle );
 
     // size 20
     strcpy( f_name + f_len, "/20" );
-    hash = GetHash( f_name );
+    hash = Byte_GetHash( f_name );
     ResourceManager_addEntry( pRM, hash, f_20_handle );
 
     // size 32
     strcpy( f_name + f_len, "/32" );
-    hash = GetHash( f_name );
+    hash = Byte_GetHash( f_name );
     ResourceManager_addEntry( pRM, hash, f_32_handle );
 
 
@@ -261,7 +261,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
             strcpy( r_name, pFile );
         }
 
-        u32 hash = GetHash( r_name );
+        u32 hash = Byte_GetHash( r_name );
 
         // search if wanted resource already exist
         for( int i = 0; i < pRM->mHashes.cpt; ++i )  {
@@ -289,7 +289,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                 strcat( file_path, pFile );
 
                 // load texture
-                handle = Renderer_createTexture( file_path, true ); 
+                handle = Renderer_createTexture( file_path, true );
 
                 // if successfully loaded, add its hash and handle to the manager
                 if( handle >= 0 ) {
@@ -315,7 +315,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                         } else
                             log_err( "Failed to load resource \"%s\".\n", pFile );
                     }
-                } else 
+                } else
                     log_err( "ResourceManager needs a .json file to load a shader!\n" );
                 break;
             case RT_Mesh :
@@ -334,7 +334,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
                         } else
                             log_err( "Failed to load resource \"%s\".\n", pFile );
                     }
-                } else 
+                } else
                     log_err( "ResourceManager needs a .json file to load a mesh!\n" );
 
                 break;
@@ -366,7 +366,7 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
 int ResourceManager_getResource( ResourceManager *pRM, const char *pFile ) {
     int handle = -1;
     if( pRM && pFile ) {
-        int hash = GetHash( pFile );
+        int hash = Byte_GetHash( pFile );
         for( u32 i = 0; i < pRM->mHashes.cpt; ++i ) {
             if( pRM->mHashes.data[i] > hash )
                 break;
@@ -385,7 +385,7 @@ bool ResourceManager_loadAllResources( ResourceManager *pRM ) {
         struct dirent *entry = NULL;
 
         // Load shaders
-        DIR *shader_dir = opendir( ShaderDirectory );         
+        DIR *shader_dir = opendir( ShaderDirectory );
 
         while( ( entry = readdir( shader_dir ) ) ) {
             const char *shader_file = entry->d_name;
@@ -400,7 +400,7 @@ bool ResourceManager_loadAllResources( ResourceManager *pRM ) {
         // init Renderer VAO
         Renderer_initVao();
 
-        DIR *mesh_dir = opendir( MeshDirectory );         
+        DIR *mesh_dir = opendir( MeshDirectory );
 
         while( ( entry = readdir( mesh_dir ) ) ) {
             const char *mesh_file = entry->d_name;

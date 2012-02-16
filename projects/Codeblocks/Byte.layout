@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="..\..\src\actor.c" open="0" top="0" tabpos="15">
+		<Cursor position="318" topLine="0" />
+	</File>
+	<File name="..\..\src\clock.c" open="0" top="0" tabpos="6">
+		<Cursor position="1707" topLine="32" />
+	</File>
+	<File name="..\..\src\clock.h" open="0" top="0" tabpos="10">
+		<Cursor position="146" topLine="0" />
+	</File>
+	<File name="..\..\src\common.c" open="0" top="0" tabpos="9">
+		<Cursor position="447" topLine="10" />
+	</File>
+	<File name="..\..\src\common.h" open="0" top="0" tabpos="8">
+		<Cursor position="1695" topLine="40" />
+	</File>
+	<File name="..\..\src\device.c" open="0" top="0" tabpos="13">
+		<Cursor position="3701" topLine="100" />
+	</File>
+	<File name="..\..\src\event.h" open="0" top="0" tabpos="5">
+		<Cursor position="697" topLine="11" />
+	</File>
+	<File name="..\..\src\main.c" open="0" top="0" tabpos="14">
+		<Cursor position="151" topLine="0" />
+	</File>
+	<File name="..\..\src\matrix.h" open="0" top="0" tabpos="2">
+		<Cursor position="1637" topLine="27" />
+	</File>
+	<File name="..\..\src\mesh.c" open="0" top="0" tabpos="3">
+		<Cursor position="404" topLine="30" />
+	</File>
+	<File name="..\..\src\renderer.c" open="0" top="0" tabpos="4">
+		<Cursor position="2768" topLine="45" />
+	</File>
+	<File name="..\..\src\resource.c" open="0" top="0" tabpos="11">
+		<Cursor position="4831" topLine="104" />
+	</File>
+	<File name="..\..\src\shader.c" open="0" top="0" tabpos="16">
+		<Cursor position="1553" topLine="30" />
+	</File>
+	<File name="..\..\src\text.c" open="0" top="0" tabpos="12">
+		<Cursor position="554" topLine="9" />
+	</File>
+</CodeBlocks_layout_file>

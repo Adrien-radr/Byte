@@ -26,8 +26,8 @@ GLuint BuildShader( const char *pSrc, GLenum pType ) {
         GLchar *log = byte_alloc( len );
         glGetShaderInfoLog( shader, len, NULL, log );
 
-                        
-        log_err( "Shader compilation error : \n" 
+
+        log_err( "Shader compilation error : \n"
                  "-----------------------------------------------------\n"
                  "%s"
                  "-----------------------------------------------------\n", log );
@@ -47,10 +47,10 @@ bool Shader_buildFromFile( Shader *pShader, const char *pVFile, const char *pFFi
     // Get shaders source
     char *v_src = NULL, *f_src = NULL;
 
-    u32 v_src_size = ReadFile( &v_src, pVFile );
+    u32 v_src_size = Byte_ReadFile( &v_src, pVFile );
     check( v_src_size, "Failed to read Vertex Shader file \"%s\"!\n", pVFile );
 
-    u32 f_src_size = ReadFile( &f_src, pFFile );
+    u32 f_src_size = Byte_ReadFile( &f_src, pFFile );
     check( f_src_size, "Failed to read Fragment Shader file \"%s\"!\n", pFFile );
 
     // create shader from sources
@@ -58,7 +58,7 @@ bool Shader_buildFromFile( Shader *pShader, const char *pVFile, const char *pFFi
 
 
     DEL_PTR( v_src );
-    DEL_PTR( f_src ); 
+    DEL_PTR( f_src );
 
     return 1;
 
@@ -91,7 +91,7 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
 
     glDeleteShader( v_shader );
     glDeleteShader( f_shader );
-    
+
 
     // Check link status
     glLinkProgram( pShader->mID );
@@ -111,7 +111,7 @@ bool Shader_build( Shader *pShader, const char *pVSrc, const char *pFSrc ) {
                  "%s"
                  "-----------------------------------------------------\n", log );
 
-        
+
         DEL_PTR( log );
     }
     CheckGLError();

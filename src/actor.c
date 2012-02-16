@@ -9,7 +9,7 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
 
     if( pActor && pFile ) {
         // read and parse json file
-        ReadFile( &json_file, pFile );
+        Byte_ReadFile( &json_file, pFile );
         check( json_file, "Error in actor loading!\n" );
 
         root = cJSON_Parse( json_file );
@@ -48,7 +48,7 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
 
         pActor->mMesh_id = World_getResource( subitem->valuestring );
         check( pActor->mMesh_id >= 0, "Error while loading actor '%s', its mesh '%s' is not a loaded resource.\n", pFile, subitem->valuestring );
-        
+
 
         subitem = cJSON_GetObjectItem( item, "texture" );
         check( subitem, "Error while loading actor '%s', need subentry 'texture' in entry 'entity'.\n", pFile );
