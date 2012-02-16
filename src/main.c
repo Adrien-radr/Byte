@@ -51,7 +51,7 @@ int main() {
             actor_ent = Scene_addEntityFromActor( game->mScene, &actors[i*ACT_NUM + j] );
             check( actor_ent >= 0, "error creating actor_ent(%d)!\n", i*ACT_NUM+j );
             Scene_modifyEntity( game->mScene, actor_ent, EA_Depth, &ent2_depth );
-            mat3_translatef( &actors[i*ACT_NUM + j].mPosition, i * 10.f, j * 10.f );
+            Actor_setPositionf( &actors[i*ACT_NUM + j], 50 + i * 10.f, 50 + j * 10.f );
         }
     }
 
@@ -96,8 +96,8 @@ int main() {
                     ent2_move.x -= 1;
                 if( IsKeyDown( K_Right ) )
                     ent2_move.x += 1;
-                if( ent2_move.x != 0 || ent2_move.y != 0 )
-                    mat3_translatefv( &actors[0].mPosition, &ent2_move ); 
+                if( ent2_move.x != 0 || ent2_move.y != 0 ) 
+                    Actor_move( &actors[0], &ent2_move );
 
                 Scene_update( game->mScene );
 

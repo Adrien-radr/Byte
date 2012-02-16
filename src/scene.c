@@ -117,7 +117,7 @@ void Scene_render( Scene *pScene ) {
         for( u32 i = 0; i < pScene->mEntities->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->mEntities->mUsed, i ) ) {
                 Renderer_useTexture( pScene->mEntities->mTextures[i], 0 );
-                Shader_sendMat3( "ModelMatrix", pScene->mEntities->mMatrices[i] );
+                Shader_sendMat3( "ModelMatrix", &pScene->mEntities->mMatrices[i] );
                 Shader_sendInt( "Depth", pScene->mEntities->mDepths[i] );
                 Renderer_renderMesh( pScene->mEntities->mMeshes[i] );
             }
@@ -150,7 +150,7 @@ int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
         if( handle >= 0 ) {
             pScene->mEntities->mMeshes[handle] = pMesh;
             pScene->mEntities->mTextures[handle] = pTexture;
-            pScene->mEntities->mMatrices[handle] = pMM; 
+            memcpy( &pScene->mEntities->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
         }
     }
     return handle;
@@ -163,9 +163,12 @@ int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor ) {
         handle = EntityArray_add( pScene->mEntities );
 
         if( handle >= 0 ) {
+            pActor->mUsedEntity = handle;
             pScene->mEntities->mMeshes[handle] = pActor->mMesh_id;
             pScene->mEntities->mTextures[handle] = pActor->mTexture_id;
-            pScene->mEntities->mMatrices[handle] = &pActor->mPosition;
+            mat3 m;
+            mat3_translationMatrixfv( &m, &pActor->mPosition );
+            memcpy( pScene->mEntities->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
         }
     }
     return handle;
@@ -176,7 +179,7 @@ void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void 
         if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
             switch( pAttrib ) {
                 case EA_Matrix :
-                    pScene->mEntities->mMatrices[pHandle] = (mat3*)pData;
+                    memcpy( &pScene->mEntities->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
                     break;
                 case EA_Texture :
                     pScene->mEntities->mTextures[pHandle] = *((u32*)pData);
@@ -187,6 +190,14 @@ void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void 
             }
         }
     }   
+}
+
+void Scene_transformEntity( Scene *pScene, u32 pHandle, mat3 *pTransform ) {
+    if( pScene && pTransform ) {
+        if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
+            mat3_mul( &pScene->mEntities->mMatrices[pHandle], pTransform );
+        }
+    }
 }
 
 void Scene_removeEntity( Scene *pScene, u32 pIndex ) {

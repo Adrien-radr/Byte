@@ -45,6 +45,9 @@ void Scene_render();
     /// @param pData   : data set as the attrib
     void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void *pData );
 
+    /// Transform an entity matrix with a given one. (just matrix multiplication)
+    void Scene_transformEntity( Scene *pScene, u32 pHandle, mat3 *pTransform );
+
     /// Remove an entity from the scene rendered entities (by its handle)
     void Scene_removeEntity( Scene *pScene, u32 pIndex );
 
