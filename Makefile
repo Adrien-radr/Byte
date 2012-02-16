@@ -10,7 +10,7 @@ ARCH = 64
 
 CC = gcc
 
-CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -llua -std=c99 -D_DEBUG
+CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -llua -lm -lpthread -std=c99 -D_DEBUG
 
 
 OBJ = \

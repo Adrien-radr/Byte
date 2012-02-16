@@ -60,7 +60,7 @@ bool LoadConfig() {
 
     bool return_val = false;
 
-    ReadFile( &json_file, ConfigFile ); 
+    Byte_ReadFile( &json_file, ConfigFile );
     check( json_file, "Error when loading config file!\n" );
 
     root = cJSON_Parse( json_file );
@@ -102,10 +102,10 @@ bool Device_init() {
     str32 title;
     MSG( title, 32, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
 
-    check( Context_init( device->mConfig.mWindowSize.x, 
-                         device->mConfig.mWindowSize.y, 
-                         device->mConfig.mFullscreen, 
-                         title, 
+    check( Context_init( device->mConfig.mWindowSize.x,
+                         device->mConfig.mWindowSize.y,
+                         device->mConfig.mFullscreen,
+                         title,
                          device->mConfig.mMultiSamples ), "Error while creating Context!\n" );
 
     // Initialize Renderer
@@ -185,7 +185,7 @@ void Device_setCamera( Camera *pCamera ) {
 }
 
 FT_Library *Device_getFreetype() {
-    if( device ) 
+    if( device )
         return &device->mFreetype;
     return NULL;
 }
