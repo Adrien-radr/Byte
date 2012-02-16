@@ -1,6 +1,6 @@
 Byte : a C/OpenGL 2D Game Project
 =================================
-Author(s) : Adrian 'Revk' Dubouchet <greunne@gmail.com>
+Author(s) : Adrian 'Revk' Dubouchet <greunne@gmail.com>, Matthias 'Beulard' Duboucher <beulard@gmail.com>
 
 **NOTE to readers** : Feel free to fork/watch and give me comments on my work. If you're interested in my project, feel free to contact me!!
 
@@ -16,7 +16,7 @@ Will focus on engine framework (rendering) first. Things I expect :
 * Dynamic lighting (with faked shadow casting)
 * 2.5D with fake height
 
-Linux version only for now. But Windows will follow shortly.
+Windows and Linux support.
 
 ----------
 Used tech
