@@ -19,8 +19,11 @@ struct s_Camera {
 
     f32             mSpeed;             ///< Camera movement speed
 
-    f32             mZoom,              ///< Camera absolute zoom level
-                    mBaseZoomSpeed;     ///< Zoom speed for each zoom action (constant)
+    f32             mZoomX,             ///< Variable to compute the zoom as a function of ZoomX
+                    mZoom,              ///< Camera absolute zoom level
+                    mZoomSpeed,         ///< Zoom speed for each zoom action (constant)
+                    mZoomMax,           ///< Max zoom level
+                    mZoomMin;           ///< Min zoom level
                     
 
     ListenerFunc    mKeyListener,       ///< Camera event listener for keyboard

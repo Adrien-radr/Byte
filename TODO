@@ -13,14 +13,16 @@ Byte-Project : TODO File
 + Font rendering (Freetype)
 + Object Depth
 + Fix font rendering when resizing window!
++ Config file
++ Game 'class' containing : the device, the world, the scene, game states
+
+- Sprite animation system
 - Clean the main
 - Quad Tree for scene managment
-+ Game 'class' containing : the device, the world, the scene, game states
 - Phong Lighting
 - Dynamic shadows
-+ Config file
 - Lua integration as a scripting language
-- GUI (with Lua or json)
+- GUI (with Lua or json) (Handled by Beulard)
 
 ????
 ----

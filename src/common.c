@@ -13,6 +13,8 @@ extern inline bool Eq( f32 a, f32 b, f32 e );
 extern inline f32 RandomValue( f32 a, f32 b );
 extern inline f32 Deg2Rad( const f32 a );
 extern inline f32 Rad2Deg( const f32 a );
+extern inline void Clamp( int *x, const int min, const int max );
+extern inline void Clampf( f32 *x, const f32 min, const f32 max );
 
 
 u32 Byte_ReadFile( char **pBuffer, const char *pFile ) {

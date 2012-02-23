@@ -221,6 +221,17 @@
     inline f32 Rad2Deg( const f32 a ) {
         return a * ( 180.f / M_PI );
     }
+
+    /// Clamp the given int between two other
+    inline void Clamp( int *x, const int min, const int max ) {
+        *x = *x > max ? max : ( *x < min ? min : *x );
+    }
+
+    /// Clamp the given float between two other
+    inline void Clampf( f32 *x, const f32 min, const f32 max ) {
+        *x = *x > max ? max : ( *x < min ? min : *x );
+    }
+
 // ##########################################################################################
 
 
