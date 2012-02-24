@@ -28,6 +28,9 @@ ResourceManager *ResourceManager_new();
 /// Destroy the given ResourceManager
 void ResourceManager_destroy( ResourceManager *pRM );
 
+/// Add a resource in the given resource manager
+void ResourceManager_add( ResourceManager *pRM, const char *pName, u32 pResource );
+
 /// Load a resource in the given resource manager
 /// @param pType : Type of resource to be loaded (ResourceType)
 /// @param pFile : file on disk to be loaded

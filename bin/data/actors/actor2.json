@@ -9,8 +9,8 @@
 
     "entity"    : {
         "mesh"    : "quadmesh.json",
-        "texture" : "img_test.png",
-        "width"   : 4,
-        "height"  : 6
+        "texture" : "hextile.png",
+        "width"   : 128,
+        "height"  : 64
     }
 }

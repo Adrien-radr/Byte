@@ -1,14 +1,16 @@
 #ifndef BYTE_WORLD_HPP
 #define BYTE_WORLD_HPP
 
-#include "common.h"
-
+#include "resource.h"
 
 /// Initialize the game world
 bool World_init();
 
 /// Destroy the world (pretty scary, heh?)
 void World_destroy();
+
+/// Adds a resource to the World Resource Manager
+void World_addResource( const char *pName, u32 pResource );
 
 /// Returns a resource handle from its filename
 int  World_getResource( const char *pFile );

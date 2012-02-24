@@ -1,5 +1,6 @@
 #include "actor.h"
 #include "game.h"
+#include "renderer.h"
 #include "json/cJSON.h"
 
 bool Actor_load( Actor *pActor, const char *pFile ) {
@@ -40,21 +41,54 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
 
 
         // get rendering data
-        item = cJSON_GetObjectItem( root, "entity" );
-        check( item, "Error while loading actor '%s', need entry 'entity'.\n", pFile );
+            item = cJSON_GetObjectItem( root, "entity" );
+            check( item, "Error while loading actor '%s', need entry 'entity'.\n", pFile );
 
-        subitem = cJSON_GetObjectItem( item, "mesh" );
-        check( subitem, "Error while loading actor '%s', need subentry 'mesh' in entry 'entity'.\n", pFile );
+            subitem = cJSON_GetObjectItem( item, "width" );
+            check( subitem, "Error while loading actor '%s', need subentry 'width' in entry 'entity'.\n", pFile );
 
-        pActor->mMesh_id = World_getResource( subitem->valuestring );
-        check( pActor->mMesh_id >= 0, "Error while loading actor '%s', its mesh '%s' is not a loaded resource.\n", pFile, subitem->valuestring );
+            pActor->mSize.x = subitem->valueint;
 
+            subitem = cJSON_GetObjectItem( item, "height" );
+            check( subitem, "Error while loading actor '%s', need subentry 'height' in entry 'entity'.\n", pFile );
 
-        subitem = cJSON_GetObjectItem( item, "texture" );
-        check( subitem, "Error while loading actor '%s', need subentry 'texture' in entry 'entity'.\n", pFile );
+            pActor->mSize.y = subitem->valueint;
 
-        pActor->mTexture_id = World_getResource( subitem->valuestring );
-        check( pActor->mTexture_id >= 0, "Error while loading actor '%s', its texture '%s' is not a loaded resource.\n", pFile, subitem->valuestring );
+            // get mesh and resize it to the entity size of the actor
+            str256 mesh_str;
+            str16 mesh_size;
+            MSG( mesh_size, 16, "%d.%d", (int)pActor->mSize.x, (int)pActor->mSize.y );
+
+            subitem = cJSON_GetObjectItem( item, "mesh" );
+            check( subitem, "Error while loading actor '%s', need subentry 'mesh' in entry 'entity'.\n", pFile );
+
+            strcpy( mesh_str, subitem->valuestring );
+            strcat( mesh_str, mesh_size );
+
+            pActor->mMesh_id = World_getResource( mesh_str );
+            // if correctly sized mesh is not yet loaded, create it
+            if( -1 == pActor->mMesh_id ) {
+                log_info( "loading %s\n", mesh_str );
+                pActor->mMesh_id = World_getResource( subitem->valuestring );
+                check( pActor->mMesh_id >= 0, "Error while loading actor '%s', its mesh '%s' is not a loaded resource.\n", pFile, subitem->valuestring );
+
+                // resize
+                int scaled_mesh = Renderer_createRescaledMesh( pActor->mMesh_id, &pActor->mSize );
+                check( scaled_mesh >= 0, "Error while creating scaled mesh for actor '%s'.\n", pFile );
+
+                pActor->mMesh_id = scaled_mesh;
+
+                // add it to the resource manager
+                World_addResource( mesh_str, scaled_mesh );
+            }
+
+                
+
+            subitem = cJSON_GetObjectItem( item, "texture" );
+            check( subitem, "Error while loading actor '%s', need subentry 'texture' in entry 'entity'.\n", pFile );
+
+            pActor->mTexture_id = World_getResource( subitem->valuestring );
+            check( pActor->mTexture_id >= 0, "Error while loading actor '%s', its texture '%s' is not a loaded resource.\n", pFile, subitem->valuestring );
 
         pActor->mUsedEntity = -1;
 

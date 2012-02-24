@@ -6,6 +6,7 @@
 #include "matrix.h"
 #include "shader.h"
 #include "text.h"
+#include "mesh.h"
 
 typedef struct s_Renderer Renderer;
 
@@ -42,6 +43,10 @@ bool Renderer_isInitialized();
     /// @return : the handle to the created mesh.
     int  Renderer_createStaticMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
 
+    /// Create a new static mesh and return its ID
+    /// This mesh will be a rescaled copy of the given one
+    int  Renderer_createRescaledMesh( u32 pMesh, const vec2 *pScale );
+
     /// Make a dynamic mesh (dont build it yet
     int  Renderer_createDynamicMesh();
 
@@ -50,6 +55,9 @@ bool Renderer_isInitialized();
     /// @param pIData : Index data
     /// @return : true if everything went well, false otherwise.
     bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIData, u32 pISize );
+
+    /// Returns a pointer to the mesh with the given handle
+    Mesh *Renderer_getMesh( u32 pMesh );
 
     /// Render a mesh given its identifier
     void Renderer_renderMesh( u32 pIndex );

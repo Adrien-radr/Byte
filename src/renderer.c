@@ -1,5 +1,4 @@
 #include "renderer.h"
-#include "mesh.h"
 #include "texture.h"
 
 #include "GL/glew.h"
@@ -187,6 +186,34 @@ error:
     return -1;
 }
 
+int  Renderer_createRescaledMesh( u32 pMesh, const vec2 *pScale ) {
+    Mesh *m = NULL;
+    if( renderer && pMesh < renderer->mMeshes.cpt ) {
+        if( MeshArray_checkSize( &renderer->mMeshes ) ) {
+            m = Mesh_new();
+            check_mem( m );
+    
+            // copy given mesh and rescale it
+            Mesh_cpy( m, renderer->mMeshes.data[pMesh] );
+            Mesh_resize( m, pScale );
+
+            // build mesh VBO
+            Mesh_build( m, false );
+
+            // storage
+            int index = renderer->mMeshes.cpt++;
+            renderer->mMeshes.data[index] = m;
+
+            return index;
+
+        } else
+            log_err( "In Renderer_createRescaledMesh : Error with MeshArray expansion!\n" );
+    }
+error:
+    Mesh_destroy( m );
+    return -1;
+}
+
 int  Renderer_createDynamicMesh() {
     Mesh *m = NULL;
     if( renderer ) {
@@ -248,6 +275,12 @@ bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIDat
     }
 error:
     return false;
+}
+
+Mesh *Renderer_getMesh( u32 pMesh ) {
+    if( renderer && pMesh < renderer->mMeshes.cpt )
+        return renderer->mMeshes.data[pMesh];
+    return NULL;
 }
 
 void Renderer_renderMesh( u32 pIndex ) {

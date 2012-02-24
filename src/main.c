@@ -2,6 +2,7 @@
 
 #include "color.h"
 #include "actor.h"
+#include "renderer.h"
 
 #include "GL/glew.h"
 
@@ -24,10 +25,16 @@ int main() {
     strncat( date, time, 16 );
     printf( "%s\n\n", date );
 
-
     Actor actor1;
-    check( Actor_load( &actor1, "data/actors/actor1.json" ), "Error while loading actor1!\n" );
+    check( Actor_load( &actor1, "data/actors/actor2.json" ), "Error while loading actor1!\n" );
+    // ###############################34096
+    //      Entities
+    int ent2_depth = -1;
 
+    int actor1_entity = Scene_addEntityFromActor( game->mScene, &actor1 );
+    check( actor1_entity >= 0, "error creating actor1_entity!\n" );
+    Scene_modifyEntity( game->mScene, actor1_entity, EA_Depth, &ent2_depth );
+/*
     Actor actors[ACT_NUM*ACT_NUM];
     for( int i = 0; i < ACT_NUM*ACT_NUM; ++i )
         check( Actor_load( &actors[i], "data/actors/actor2.json" ), "Error while loading actors[%d]!\n", i );
@@ -37,13 +44,6 @@ int main() {
 
 
 
-    // ###############################34096
-    //      Entities
-    int ent2_depth = -1;
-
-    int actor1_entity = Scene_addEntityFromActor( game->mScene, &actor1 );
-    check( actor1_entity >= 0, "error creating actor1_entity!\n" );
-    Scene_modifyEntity( game->mScene, actor1_entity, EA_Depth, &ent2_depth );
 
     int actor_ent;
     for( int i = 0; i < ACT_NUM; ++i ) {
@@ -54,7 +54,7 @@ int main() {
             Actor_setPositionf( &actors[i*ACT_NUM + j], 50 + i * 10.f, 50 + j * 10.f );
         }
     }
-
+*/
     // ###############################3
     //      TEXT
     Font *f = Font_get( "DejaVuSans.ttf", 12 );
@@ -96,8 +96,8 @@ int main() {
                     ent2_move.x -= 1;
                 if( IsKeyDown( K_Right ) )
                     ent2_move.x += 1;
-                if( ent2_move.x != 0 || ent2_move.y != 0 ) 
-                    Actor_move( &actors[0], &ent2_move );
+            //    if( ent2_move.x != 0 || ent2_move.y != 0 ) 
+             //       Actor_move( &actors[0], &ent2_move );
 
                 Scene_update( game->mScene );
 

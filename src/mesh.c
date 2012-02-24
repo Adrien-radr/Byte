@@ -17,6 +17,43 @@ void Mesh_destroy( Mesh *pMesh ) {
     }
 }
 
+void Mesh_cpy( Mesh *dest, const Mesh *src ) {
+    if( dest && src ) {
+        dest->mVbo = dest->mIbo = 0;
+        dest->mIndexCount = src->mIndexCount;
+        dest->mVertexCount = src->mVertexCount;
+
+        DEL_PTR( dest->mData );
+
+        dest->mData = byte_alloc( src->mVertexCount * 4 * sizeof( f32 ) );
+        memcpy( dest->mData, src->mData, src->mVertexCount * 4 * sizeof( f32 ) );
+
+        if( src->mUseIndices ) {
+            DEL_PTR( dest->mIndices );
+
+            dest->mIndices = byte_alloc( src->mIndexCount * sizeof( u32 ) );
+            memcpy( dest->mIndices, src->mIndices, src->mIndexCount * sizeof( u32 ) );
+        }
+
+        dest->mTexcoordBegin = src->mTexcoordBegin;
+        dest->mUseIndices = src->mUseIndices;
+    }
+}
+
+void Mesh_resize( Mesh *pMesh, const vec2 *pSize ) {
+    if( pMesh && pSize ) {
+        for( u32 i = 0; i < pMesh->mVertexCount; ++i ) {
+            pMesh->mData[2*i] *= pSize->x;
+            pMesh->mData[2*i+1] *= pSize->y;
+        }
+        
+        for( u32 i = 0; i < pMesh->mVertexCount * 4;  ) {
+            printf( "%f, %f\n", pMesh->mData[i], pMesh->mData[i+1] );
+            i += 2;
+        }
+    }
+}
+
 bool Mesh_addVertexData( Mesh *pMesh, vec2 *pPositions, u32 pPositionSize, vec2 *pTexcoords, u32 pTexcoordSize ) {
     check( pPositions, "In Mesh_addMeshData : given Position array is NULL!\n" );
     check( pTexcoords, "In Mesh_addMeshData : given Texcoords array is NULL!\n" );

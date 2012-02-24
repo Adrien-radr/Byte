@@ -363,6 +363,13 @@ int ResourceManager_load( ResourceManager *pRM, ResourceType pType, const char *
     return handle;
 }
 
+void ResourceManager_add( ResourceManager *pRM, const char *pName, u32 pResource ) {
+    if( pRM && pName ) {
+        int hash = Byte_GetHash( pName );
+        ResourceManager_addEntry( pRM, hash, pResource );
+    }
+}
+
 int ResourceManager_getResource( ResourceManager *pRM, const char *pFile ) {
     int handle = -1;
     if( pRM && pFile ) {

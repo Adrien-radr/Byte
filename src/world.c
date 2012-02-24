@@ -31,8 +31,13 @@ void World_destroy() {
     }
 }   
 
+void World_addResource( const char *pName, u32 pResource ) {
+    if( world ) 
+        ResourceManager_add( world->mResourceManager, pName, pResource );
+}
+
 int  World_getResource( const char *pFile ) {
-    if( world && pFile) {
+    if( world ) {
         return ResourceManager_getResource( world->mResourceManager, pFile ); 
     }
     return -1;

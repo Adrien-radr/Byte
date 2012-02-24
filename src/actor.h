@@ -15,8 +15,9 @@ typedef struct {
 
     // Rendering variables
         int     mUsedEntity;    ///< Entity used to render the actor (-1 if none)
-        u32     mMesh_id,       ///< Mesh Resource ID used by the actor
+        int     mMesh_id,       ///< Mesh Resource ID used by the actor
                 mTexture_id;    ///< Texture resource ID used by the actor
+        vec2    mSize;          ///< Sprite size
 } Actor;
 
 /// Loads an actor from a JSON file and extract all components
