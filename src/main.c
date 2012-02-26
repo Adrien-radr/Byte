@@ -25,15 +25,22 @@ int main() {
     strncat( date, time, 16 );
     printf( "%s\n\n", date );
 
-    Actor actor1;
-    check( Actor_load( &actor1, "data/actors/actor2.json" ), "Error while loading actor1!\n" );
+    Actor hextile;
+    check( Actor_load( &hextile, "data/actors/hex.json" ), "Error while loading actor1!\n" );
     // ###############################34096
     //      Entities
-    int ent2_depth = -1;
+    int ent2_depth = 1;
 
-    int actor1_entity = Scene_addEntityFromActor( game->mScene, &actor1 );
-    check( actor1_entity >= 0, "error creating actor1_entity!\n" );
-    Scene_modifyEntity( game->mScene, actor1_entity, EA_Depth, &ent2_depth );
+    int hex_entity = Scene_addEntityFromActor( game->mScene, &hextile );
+    check( hex_entity >= 0, "error creating actor1_entity!\n" );
+    Scene_modifyEntity( game->mScene, hex_entity, EA_Depth, &ent2_depth );
+
+    Actor man;
+    check( Actor_load( &man, "data/actors/man.json" ), "Error while loading man!\n" );
+
+    int man_entity = Scene_addEntityFromActor( game->mScene, &man );
+    check( man_entity >= 0, "man error\n" );
+    
 /*
     Actor actors[ACT_NUM*ACT_NUM];
     for( int i = 0; i < ACT_NUM*ACT_NUM; ++i )

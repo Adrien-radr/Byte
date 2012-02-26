@@ -68,7 +68,6 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
             pActor->mMesh_id = World_getResource( mesh_str );
             // if correctly sized mesh is not yet loaded, create it
             if( -1 == pActor->mMesh_id ) {
-                log_info( "loading %s\n", mesh_str );
                 pActor->mMesh_id = World_getResource( subitem->valuestring );
                 check( pActor->mMesh_id >= 0, "Error while loading actor '%s', its mesh '%s' is not a loaded resource.\n", pFile, subitem->valuestring );
 

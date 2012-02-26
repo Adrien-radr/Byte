@@ -10,7 +10,7 @@ Camera *Camera_new() {
 
     c->mSpeed = c->mZoom = c->mZoomX = 1.f;
     c->mZoomSpeed = .05f;
-    c->mZoomMax = 2.f;
+    c->mZoomMax = 1.1f;
     c->mZoomMin = .75f;
     Camera_calculateProjectionMatrix( c );
 

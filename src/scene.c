@@ -5,6 +5,8 @@
 #include "context.h"
 #include "world.h"
 
+#include "GL/glew.h"
+
 typedef struct s_Scene {
     u32             mEntityShader;      ///< Shader used to render entities
     EntityArray     *mEntities;         ///< Entities in the scene

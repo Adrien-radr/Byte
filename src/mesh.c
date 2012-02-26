@@ -46,11 +46,6 @@ void Mesh_resize( Mesh *pMesh, const vec2 *pSize ) {
             pMesh->mData[2*i] *= pSize->x;
             pMesh->mData[2*i+1] *= pSize->y;
         }
-        
-        for( u32 i = 0; i < pMesh->mVertexCount * 4;  ) {
-            printf( "%f, %f\n", pMesh->mData[i], pMesh->mData[i+1] );
-            i += 2;
-        }
     }
 }
 

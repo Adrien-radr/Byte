@@ -351,7 +351,7 @@ u32  Renderer_currentGLProgram() {
 int  Renderer_createTexture( const char *pTFile, bool pMipmaps ) {
     Texture *t = NULL;
 
-    if( renderer && pTFile ) {
+    if( renderer && TextureArray_checkSize( &renderer->mTextures ) ) {
         t = Texture_new();
         check_mem( t );
 
@@ -372,7 +372,8 @@ error:
 
 int  Renderer_allocateEmptyTexture( Texture **t ) {
     check( NULL == *t, "Renderer_allocateEmptyTexture needs a NULL texture as a parameter!\n" );
-    if( renderer ) {
+
+    if( renderer && TextureArray_checkSize( &renderer->mTextures ) ) {
         *t = Texture_new();
         check_mem( *t );
 
@@ -401,7 +402,7 @@ void Renderer_useTexture( int pTexture, u32 pTarget ) {
 int  Renderer_createFont( const char *pFile, u32 pSize ) {
     Font *f = NULL;
 
-    if( pFile && renderer && pSize > 0 ) {
+    if( renderer && pSize > 0 && FontArray_checkSize( &renderer->mFonts ) ) {
         f = Font_new();
         check_mem( f );
 

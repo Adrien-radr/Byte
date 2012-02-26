@@ -1,0 +1,16 @@
+{
+    "firstname" : "hex",
+    "lastname"  : "tile",
+    "surname"   : "",
+
+    "init"      : {
+        "position" : [ 400.0, 300.0 ]
+    },
+
+    "entity"    : {
+        "mesh"    : "quadmesh.json",
+        "texture" : "hextile.png",
+        "width"   : 32,
+        "height"  : 16
+    }
+}

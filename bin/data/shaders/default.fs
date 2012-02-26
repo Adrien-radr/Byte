@@ -9,7 +9,7 @@ uniform sampler2D Albedo;
 
 void main() {
     vec4 oColor = texture( Albedo, texCoords );
-    if( oColor.a < 0.5 )
+    if( 1.0 < oColor.a )
         discard;
     outColor = oColor;
 }
