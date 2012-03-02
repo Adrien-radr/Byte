@@ -10,7 +10,7 @@ Camera *Camera_new() {
 
     c->mSpeed = c->mZoom = c->mZoomX = 1.f;
     c->mZoomSpeed = .05f;
-    c->mZoomMax = 1.1f;
+    c->mZoomMax = 1.f;
     c->mZoomMin = .75f;
     Camera_calculateProjectionMatrix( c );
 
@@ -84,6 +84,8 @@ void Camera_move( Camera *pCamera, vec2 *pVector ) {
 
 void Camera_zoom( Camera *pCamera, int pZoom ) {
     if( pCamera ) {
+        static int reached_min = 0, reached_max = 0;
+
         // clamp pZoom (no rapid zoom
         Clamp( &pZoom, -1.f, 1.f );
 
@@ -92,13 +94,17 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
         pCamera->mZoomX += pCamera->mZoomSpeed * pZoom;
 
         // Clamp X (min and max zoom levels)
-        if( pCamera->mZoomX < pCamera->mZoomMin )
+        if( pCamera->mZoomX < pCamera->mZoomMin ) {
             pCamera->mZoomX = pCamera->mZoomMin;
-        else if( pCamera->mZoomX > pCamera->mZoomMax )
+            if( !reached_min ) reached_min = 1;
+        } else if( pCamera->mZoomX > pCamera->mZoomMax ) {
             pCamera->mZoomX = pCamera->mZoomMax;
+            if( !reached_max ) reached_max = 1;
+        } else {
+            reached_min = reached_max = 0;
+        }
 
-        else {
-            f32 oldzoom = pCamera->mZoom;
+        if( reached_min < 2 && reached_max < 2 ) {
             // Zoom level = 1 / (x^3) 
             pCamera->mZoom = (1.f / (pCamera->mZoomX*pCamera->mZoomX*pCamera->mZoomX));
 
@@ -114,8 +120,6 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
                 my = GetMouseY();
 
 
-            f32 dirZ = - Abs(oldzoom - pCamera->mZoom);
-
             // here we zoom in the direction from the window center to the mouse position, with a 
             // magnitude depending on the zoom level (less magnitude if near ground)
             vec2 dir = { .x = (mx - ( windowSize.x / 2.f ) ), .y = (my - ( windowSize.y / 2.f ) ) };
@@ -128,6 +132,9 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
 
             pCamera->mPosition.x += dir.x;
             pCamera->mPosition.y += dir.y;
+
+            if( 1 == reached_min ) reached_min = 2;
+            if( 1 == reached_max ) reached_max = 2;
         }
 
         // recalculate projection matrix and warn every shaders using it

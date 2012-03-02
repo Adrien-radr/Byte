@@ -9,7 +9,7 @@
 
     "entity"    : {
         "mesh"    : "quadmesh.json",
-        "texture" : "man.png",
+        "texture" : "mansh.png",
         "width"   : 32,
         "height"  : 64
     }
