@@ -1,4 +1,10 @@
+//#include "GL/glew.h"
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
 #include "GL/glew.h"
+#endif
+
 #include "GL/glfw.h"
 
 #include "context.h"

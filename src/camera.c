@@ -111,7 +111,6 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
             x = (1.f / (x*x*x));
 
             f32 change = pCamera->mZoom - x;
-            log_info( "change = %f\n", change );
 
 
             // modify cameraposition to zoom on mouse

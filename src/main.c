@@ -4,7 +4,11 @@
 #include "actor.h"
 #include "renderer.h"
 
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
 #include "GL/glew.h"
+#endif
 
 #define ACT_NUM 50
 

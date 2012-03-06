@@ -1,8 +1,11 @@
 #include "renderer.h"
 #include "texture.h"
 
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
 #include "GL/glew.h"
-
+#endif
 
 // Array MeshArray with Mesh* data type
 HeapArray( Mesh*, Mesh, Mesh_destroy )
@@ -56,7 +59,13 @@ bool Renderer_init() {
 
     renderer->mVao = -1;
  
-    // GLEW initialisation
+    // GLEW/GLDL initialisation
+#ifdef USE_GLDL
+    int error = gldlInit();
+
+    check( !error, "Failed to initialize GLDL!\n" );
+    log_info( "GLDL successfully initialized!\n" );
+#else
     glewExperimental = 1;
     GLenum glerr = glewInit();
 
@@ -64,8 +73,8 @@ bool Renderer_init() {
     glGetError();
 
     check( GLEW_OK == glerr, "GLEW Error : %s\n", glewGetErrorString( glerr ) );
-
     log_info( "GLEW v%s successfully initialized!\n", glewGetString( GLEW_VERSION ) );
+#endif
 
     // GL Version 
     int majV, minV;
@@ -456,13 +465,12 @@ void CheckGLError_func( const char *pFile, u32 pLine ) {
                 break;
             }
 
-            case GL_STACK_OVERFLOW :
+            /*case GL_STACK_OVERFLOW :
             {
                 strncpy( errorStr, "GL_STACK_OVERFLOW", 64 );
                 strncpy( description, "This command would cause a stack overflow.", 256 );
                 break;
             }
-
             case GL_STACK_UNDERFLOW :
             {
                 strncpy( errorStr, "GL_STACK_UNDERFLOW", 64 );
@@ -470,6 +478,7 @@ void CheckGLError_func( const char *pFile, u32 pLine ) {
                 break;
             }
 
+            */
             case GL_OUT_OF_MEMORY :
             {
                 strncpy( errorStr, "GL_OUT_OF_MEMORY", 64 );

@@ -3,7 +3,12 @@
 #include "clock.h"
 #include "renderer.h"
 
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
 #include "GL/glew.h"
+#endif
+
 #include "json/cJSON.h"
 
 const str32 ConfigFile = "config.json";

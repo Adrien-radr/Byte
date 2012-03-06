@@ -5,7 +5,11 @@
 #include "context.h"
 #include "world.h"
 
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
 #include "GL/glew.h"
+#endif
 
 typedef struct s_Scene {
     u32             mEntityShader;      ///< Shader used to render entities

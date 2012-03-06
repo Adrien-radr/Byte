@@ -4,7 +4,11 @@
 #include "context.h"
 #include "world.h"
 
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
 #include "GL/glew.h"
+#endif
 
 
 Font *Font_new() {

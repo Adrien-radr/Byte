@@ -16,12 +16,14 @@ Byte-Project : TODO File
 + Config file
 + Game 'class' containing : the device, the world, the scene, game states
 
+- Hex tiles system
 - Sprite animation system
 - Clean the main
 - Quad Tree for scene managment
 - Phong Lighting
 - Dynamic shadows
-- Lua integration as a scripting language
+- Procedurally created map
+- Lua integration as a scripting language (??)
 - GUI (with Lua or json) (Handled by Beulard)
 
 ????

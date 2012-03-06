@@ -2,7 +2,11 @@
 #include "renderer.h"
 
 #include "GL/SOIL.h"
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
 #include "GL/glew.h"
+#endif
 
 Texture *Texture_new() {
     Texture *t = byte_alloc( sizeof( Texture ) );

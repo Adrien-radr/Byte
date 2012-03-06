@@ -10,7 +10,18 @@ ARCH = 64
 
 CC = gcc
 
-CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -llua -std=c99 -D_DEBUG -lm -lpthread
+USE_GLDL = 0
+
+# Use GLDL lib for debug if wanted, instead of glew
+ifeq ($(USE_GLDL), 1)
+GL_LIB = ext/GL/gldl.o
+GL_FLAG = -DUSE_GLDL
+else
+GL_LIB = ext/GL/glew$(ARCH).o
+GL_FLAG = 
+endif
+
+CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -llua -std=c99 -D_DEBUG -lm -lpthread -ldl $(GL_FLAG)
 
 
 OBJ = \
@@ -43,8 +54,8 @@ LIB = \
 ext/libglfw$(ARCH).a\
 ext/libSOIL$(ARCH).a\
 ext/libfreetype.a\
-ext/GL/glew$(ARCH).o\
-ext/json/cJSON$(ARCH).o
+ext/json/cJSON$(ARCH).o\
+$(GL_LIB)
 
 
 .PHONY: all, clean, byte, cleaner

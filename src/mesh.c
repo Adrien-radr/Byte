@@ -1,5 +1,10 @@
 #include "mesh.h"
+
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
 #include "GL/glew.h"
+#endif
 
 Mesh* Mesh_new() {
     Mesh *mesh = byte_alloc( sizeof( Mesh ) );
