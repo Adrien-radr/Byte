@@ -424,7 +424,7 @@ bool ResourceManager_loadAllResources( ResourceManager *pRM ) {
         while( ( entry = readdir( texture_dir ) ) ) {
             const char *texture_file = entry->d_name;
 
-            if( CheckExtension( texture_file, "png" ) || CheckExtension( texture_file, "jpg" ) )
+            if( CheckExtension( texture_file, "png" )/* || CheckExtension( texture_file, "jpg" )*/ )
                 ResourceManager_load( pRM, RT_Texture, texture_file );
         }
 

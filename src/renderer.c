@@ -27,7 +27,7 @@ struct s_Renderer {
     // All the data in these arrays is deleted/free'd at the end (Renderer_destroy()).
     MeshArray       mMeshes;                ///< Array of created meshes
     ShaderArray     mShaders;               ///< Array of loaded GL shader programs
-    TextureArray    mTextures;              ///< Array of GL textures (loaded with SOIL)
+    TextureArray    mTextures;              ///< Array of GL textures
     FontArray       mFonts;                 ///< Array of Font (loaded with freetype2 to GL Texs)
 
     // these are state variables. -1 mean nothing is currently used

@@ -44,6 +44,8 @@ int main() {
 
     int man_entity = Scene_addEntityFromActor( game->mScene, &man );
     check( man_entity >= 0, "man error\n" );
+
+    Actor_setPositionf( &man, 0, 0 );
     
 /*
     Actor actors[ACT_NUM*ACT_NUM];
@@ -66,6 +68,37 @@ int main() {
         }
     }
 */
+
+    int map[9] = { 
+        0, 0, 0,
+        0, 1, 0,
+        0, 0, 0
+    };
+
+    vec2 pos[]  = {
+        { 0, 0 }, {1, 0}, {2, 0},
+        { 0, 1 }, {1, 1}, {2, 1},
+        { 0, 2 }, {1, 2}, {2, 2},
+    };
+
+    u32 indices[] = { 
+        0, 3, 4, 0, 4, 1,
+        1, 4, 5, 1, 5, 2,
+        3, 6, 7, 3, 7, 4,
+        4, 7, 8, 4, 8, 5
+    };
+
+    u32 mesh = Renderer_createStaticMesh( indices, sizeof( indices ), pos, sizeof( pos ), pos, sizeof( pos ) );
+    u32 tex = World_getResource( "map.png" );
+
+    mat3 m;
+    mat3_identity( &m ); 
+    mat3_rotatef( &m, 45.f );
+    mat3_scalef( &m, 64, 32 );
+    
+
+    u32 map_ent = Scene_addEntity( game->mScene, mesh, tex, &m );
+
     // ###############################3
     //      TEXT
     Font *f = Font_get( "DejaVuSans.ttf", 12 );
@@ -75,7 +108,6 @@ int main() {
     check( text >= 0, "error creating text!\n" );
 
     Scene_modifyText( game->mScene, text, TA_String, "Hello World!!" );
-
 
 
 
@@ -126,6 +158,9 @@ int main() {
             }
 
             // Render Frame
+
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
             Scene_render( game->mScene );
         Device_endFrame();
     }
@@ -135,6 +170,10 @@ int main() {
 error :
 
     Game_destroy();
+
+#ifdef USE_GLDL
+    gldlTerminate();
+#endif
     return return_val;
 }
 
