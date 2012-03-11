@@ -1,5 +1,5 @@
 Byte-Project Log v0.1.0
-Sat 10 Mar 2012 - 17:36:43
+Sat 10 Mar 2012 - 20:22:06
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.7.0 successfully initialized!
@@ -9,29 +9,22 @@ Sat 10 Mar 2012 - 17:36:43
 [INFO] Renderer successfully initialized!
 [INFO] Event manager successfully initialized!
 [INFO] Device successfully initialized!
-[INFO] Resource "defaultShader.json" loaded.
-[INFO] Resource "textShader.json" loaded.
+[INFO] Resource "map_shader.json" loaded.
+[INFO] Resource "sprite_shader.json" loaded.
+[INFO] Resource "text_shader.json" loaded.
 [INFO] Resource "map.json" loaded.
 [INFO] Resource "quadmesh.json" loaded.
-[INFO] fmt = 1908, int_fmt = 1908
 [INFO] Resource "hextile.png" loaded.
-[INFO] fmt = 1908, int_fmt = 1908
 [INFO] Resource "img_test.png" loaded.
-[INFO] fmt = 1908, int_fmt = 1908
 [INFO] Resource "man-template.png" loaded.
-[INFO] fmt = 1908, int_fmt = 1908
 [INFO] Resource "man-v5.png" loaded.
-[INFO] fmt = 1908, int_fmt = 1908
 [INFO] Resource "man.png" loaded.
-[INFO] fmt = 1908, int_fmt = 1908
 [INFO] Resource "mans.png" loaded.
-[INFO] fmt = 1908, int_fmt = 1908
 [INFO] Resource "mansh.png" loaded.
-[INFO] fmt = 1908, int_fmt = 1908
 [INFO] Resource "mansh2.png" loaded.
-[INFO] fmt = 1907, int_fmt = 1907
 [INFO] Resource "map.png" loaded.
-[INFO] fmt = 1907, int_fmt = 1907
+[INFO] Resource "tile-up-west.png" loaded.
+[INFO] Resource "tile.png" loaded.
 [INFO] Resource "unknown.png" loaded.
 [INFO] Resource "DejaVuSans.ttf" loaded.
 [INFO] Resource "visitor2.ttf" loaded.

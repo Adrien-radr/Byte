@@ -24,31 +24,7 @@ endif
 CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -lpng -llua -std=c99 -D_DEBUG -lm -lpthread -ldl $(GL_FLAG)
 
 
-OBJ = \
-src/actor.o\
-src/camera.o\
-src/clock.o\
-src/color.o\
-src/context.o\
-src/common.o\
-src/debug.o\
-src/device.o\
-src/entity.o\
-src/event.o\
-src/game.o\
-src/handlemanager.o\
-src/main.o\
-src/matrix.o\
-src/mesh.o\
-src/renderer.o\
-src/resource.o\
-src/shader.o\
-src/scene.o\
-src/text.o\
-src/texture.o\
-src/vector.o\
-src/world.o
-
+OBJ = $(patsubst %.c, %.o, $(wildcard src/*.c) )
 
 LIB = \
 ext/libglfw$(ARCH).a\

@@ -18,16 +18,22 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
 
         // get basic actor info
         item = cJSON_GetObjectItem( root, "firstname" );
-        check( item, "Error while loading actor '%s', need entry 'firstname'.\n", pFile );
-        strncpy( pActor->mFirstname, item->valuestring, 32 );
+        if( item ) 
+            strncpy( pActor->mFirstname, item->valuestring, 32 );
+        else
+            strncpy( pActor->mFirstname, "???", 32 );
 
         item = cJSON_GetObjectItem( root, "lastname" );
-        check( item, "Error while loading actor '%s', need entry 'lastname'.\n", pFile );
-        strncpy( pActor->mLastname, item->valuestring, 32 );
+        if( item ) 
+            strncpy( pActor->mLastname, item->valuestring, 32 );
+        else
+            strncpy( pActor->mLastname, "unknown", 32 );
 
         item = cJSON_GetObjectItem( root, "surname" );
-        check( item, "Error while loading actor '%s', need entry 'surname'.\n", pFile );
-        strncpy( pActor->mSurname, item->valuestring, 32 );
+        if( item )
+            strncpy( pActor->mSurname, item->valuestring, 32 );
+        else
+            strncpy( pActor->mSurname, "", 32 );
 
         // get game initial data
         item = cJSON_GetObjectItem( root, "init" );
@@ -41,26 +47,26 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
 
 
         // get rendering data
-            item = cJSON_GetObjectItem( root, "entity" );
-            check( item, "Error while loading actor '%s', need entry 'entity'.\n", pFile );
+            item = cJSON_GetObjectItem( root, "sprite" );
+            check( item, "Error while loading actor '%s', need entry 'sprite'.\n", pFile );
 
             subitem = cJSON_GetObjectItem( item, "width" );
-            check( subitem, "Error while loading actor '%s', need subentry 'width' in entry 'entity'.\n", pFile );
+            check( subitem, "Error while loading actor '%s', need subentry 'width' in entry 'sprite'.\n", pFile );
 
             pActor->mSize.x = subitem->valueint;
 
             subitem = cJSON_GetObjectItem( item, "height" );
-            check( subitem, "Error while loading actor '%s', need subentry 'height' in entry 'entity'.\n", pFile );
+            check( subitem, "Error while loading actor '%s', need subentry 'height' in entry 'sprite'.\n", pFile );
 
             pActor->mSize.y = subitem->valueint;
 
-            // get mesh and resize it to the entity size of the actor
+            // get mesh and resize it to the sprite size of the actor
             str256 mesh_str;
             str16 mesh_size;
             MSG( mesh_size, 16, "%d.%d", (int)pActor->mSize.x, (int)pActor->mSize.y );
 
             subitem = cJSON_GetObjectItem( item, "mesh" );
-            check( subitem, "Error while loading actor '%s', need subentry 'mesh' in entry 'entity'.\n", pFile );
+            check( subitem, "Error while loading actor '%s', need subentry 'mesh' in entry 'sprite'.\n", pFile );
 
             strcpy( mesh_str, subitem->valuestring );
             strcat( mesh_str, mesh_size );
@@ -84,12 +90,12 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
                 
 
             subitem = cJSON_GetObjectItem( item, "texture" );
-            check( subitem, "Error while loading actor '%s', need subentry 'texture' in entry 'entity'.\n", pFile );
+            check( subitem, "Error while loading actor '%s', need subentry 'texture' in entry 'sprite'.\n", pFile );
 
             pActor->mTexture_id = World_getResource( subitem->valuestring );
             check( pActor->mTexture_id >= 0, "Error while loading actor '%s', its texture '%s' is not a loaded resource.\n", pFile, subitem->valuestring );
 
-        pActor->mUsedEntity = -1;
+        pActor->mUsedSprite = -1;
 
         return_val = true;
     }
@@ -115,10 +121,10 @@ void Actor_setPositionf( Actor *pActor, f32 x, f32 y ) {
 void Actor_setPositionfv( Actor *pActor, vec2 *v ) {
     if( pActor ) {
         vec2_cpy( &pActor->mPosition, v );
-        if( pActor->mUsedEntity >= 0 ) {
+        if( pActor->mUsedSprite >= 0 ) {
             mat3 m;
             mat3_translationMatrixfv( &m, &pActor->mPosition );
-            Scene_modifyEntity( game->mScene, pActor->mUsedEntity, EA_Matrix, &m );
+            Scene_modifySprite( game->mScene, pActor->mUsedSprite, SA_Matrix, &m );
         }
     }
 }

@@ -112,7 +112,6 @@ static texture_t *Byte_LoadPNG( const char *filename ) {
 
     Byte_GetPNGInfo( color_type, t );
 
-    log_info( "fmt = %x, int_fmt = %x\n", t->fmt, t->int_fmt );
 
     // create actual texel array
     int rowbytes = png_get_rowbytes( img, img_info );

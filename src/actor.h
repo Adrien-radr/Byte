@@ -14,7 +14,7 @@ typedef struct {
 
 
     // Rendering variables
-        int     mUsedEntity;    ///< Entity used to render the actor (-1 if none)
+        int     mUsedSprite;    ///< Sprite used to render the actor (-1 if none)
         int     mMesh_id,       ///< Mesh Resource ID used by the actor
                 mTexture_id;    ///< Texture resource ID used by the actor
         vec2    mSize;          ///< Sprite size
@@ -23,10 +23,10 @@ typedef struct {
 /// Loads an actor from a JSON file and extract all components
 bool Actor_load( Actor *pActor, const char *pFile );
 
-/// Move an actor by a vector, and correctly update its entity if one exist
+/// Move an actor by a vector, and correctly update its sprite if one exist
 void Actor_move( Actor *pActor, vec2 *v );
 
-/// Set the position of an actor and correctly update its entity if one exist
+/// Set the position of an actor and correctly update its sprite if one exist
 void Actor_setPositionfv( Actor *pActor, vec2 *v );
 void Actor_setPositionf( Actor *pActor, f32 x, f32 y );
 

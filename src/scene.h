@@ -7,7 +7,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "text.h"
-#include "entity.h"
+#include "sprite.h"
 #include "actor.h"
 
 // Forward declaration
@@ -23,36 +23,36 @@ void Scene_destroy( Scene *pScene );
 /// Update the scene (camera, etc)
 void Scene_update( Scene *pScene );
 
-/// Render all entities in the scene
+/// Render all sprites & texts in the scene
 void Scene_render();
 
 // ##########################################################################3
-//      Entities Array
-    /// Add an entity to be rendered each frame in the scene
-    /// @param pMesh : The mesh handle the entity use
-    /// @param pTexture : The texture handle the entity use
-    /// @param pMM : The ModelMatrix used to orient the entity
-    /// @return : The handle to the given entity
-    int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM );
+//      Sprite Array
+    /// Add a sprite to be rendered each frame in the scene
+    /// @param pMesh : The mesh handle the sprite use
+    /// @param pTexture : The texture handle the sprite use
+    /// @param pMM : The ModelMatrix used to orient the sprite
+    /// @return : The handle to the given sprite
+    int  Scene_addSprite( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM );
 
-    /// Add an entity to be rendered each frame in the scene
-    /// @param pActor : the Actor that must be drawn as an entity
-    /// @return : The handle to the given entity 
-    int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor );
+    /// Add a sprite to be rendered each frame in the scene
+    /// @param pActor : the Actor that must be drawn as a sprite
+    /// @return : The handle to the given sprite 
+    int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor );
 
-    /// Modify one attribute of a Entity (given by its handle)
-    /// @param pAttrib : the attribute type we want to change (see entity.h)
+    /// Modify one attribute of a Sprite (given by its handle)
+    /// @param pAttrib : the attribute type we want to change (see sprite.h)
     /// @param pData   : data set as the attrib
-    void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void *pData );
+    void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void *pData );
 
-    /// Transform an entity matrix with a given one. (just matrix multiplication)
-    void Scene_transformEntity( Scene *pScene, u32 pHandle, mat3 *pTransform );
+    /// Transform a sprite matrix with a given one. (just matrix multiplication)
+    void Scene_transformSprite( Scene *pScene, u32 pHandle, mat3 *pTransform );
 
-    /// Remove an entity from the scene rendered entities (by its handle)
-    void Scene_removeEntity( Scene *pScene, u32 pIndex );
+    /// Remove a sprite from the scene rendered sprites (by its handle)
+    void Scene_removeSprite( Scene *pScene, u32 pIndex );
 
-    /// Clears the whole entity array, to set a new scene
-    void Scene_clearEntities( Scene *pScene );
+    /// Clears the whole sprite array, to set a new scene
+    void Scene_clearSprites( Scene *pScene );
 
 // ##########################################################################3
 //      Texts Array

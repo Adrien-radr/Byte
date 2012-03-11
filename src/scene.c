@@ -12,8 +12,8 @@
 #endif
 
 typedef struct s_Scene {
-    u32             mEntityShader;      ///< Shader used to render entities
-    EntityArray     *mEntities;         ///< Entities in the scene
+    u32             mSpriteShader;      ///< Shader used to render sprites
+    SpriteArray     *mSprites;          ///< Sprites in the scene
 
     u32             mTextShader;        ///< Shader used to render texts
     TextArray       *mTexts;            ///< Texts in the scene
@@ -67,17 +67,19 @@ Scene *Scene_new() {
     check_mem( s );
 
     // create array of entities (initial size = 50)
-    s->mEntities = EntityArray_init( 50 );
+    s->mSprites = SpriteArray_init( 50 );
 
-    // init default entity shader
-    int es = World_getResource( "defaultShader.json" );
-    check( es >= 0, "Entity shader creation error!\n" );
+    // init default sprite shader
+    int ss = World_getResource( "sprite_shader.json" );
+    check( ss >= 0, "Sprite shader creation error!\n" );
+
+    s->mSpriteShader = ss;
 
     // create array of texts (intial size = 50)
     s->mTexts = TextArray_init( 50 );
 
     // init default text shader
-    int ts = World_getResource( "textShader.json" );
+    int ts = World_getResource( "text_shader.json" );
     check( ts >= 0, "Text shader creation error!\n" );
 
     s->mTextShader = ts;
@@ -102,8 +104,7 @@ error:
 
 void Scene_destroy( Scene *pScene ) {
     if( pScene ) {
-        //EntitiesArray_destroy( &pScene->mEntities );
-        EntityArray_destroy( pScene->mEntities );
+        SpriteArray_destroy( pScene->mSprites );
         TextArray_destroy( pScene->mTexts );
         Camera_destroy( pScene->mCamera );
         DEL_PTR( pScene );
@@ -117,15 +118,15 @@ void Scene_update( Scene *pScene ) {
 void Scene_render( Scene *pScene ) {
     if( pScene ) {
         // ##################################################
-        //      RENDER ENTITIES
-        Renderer_useShader( pScene->mEntityShader );
+        //      RENDER SPRITES
+        Renderer_useShader( pScene->mSpriteShader );
 
-        for( u32 i = 0; i < pScene->mEntities->mMaxIndex; ++i ) {
-            if( HandleManager_isUsed( pScene->mEntities->mUsed, i ) ) {
-                Renderer_useTexture( pScene->mEntities->mTextures[i], 0 );
-                Shader_sendMat3( "ModelMatrix", &pScene->mEntities->mMatrices[i] );
-                Shader_sendInt( "Depth", pScene->mEntities->mDepths[i] );
-                Renderer_renderMesh( pScene->mEntities->mMeshes[i] );
+        for( u32 i = 0; i < pScene->mSprites->mMaxIndex; ++i ) {
+            if( HandleManager_isUsed( pScene->mSprites->mUsed, i ) ) {
+                Renderer_useTexture( pScene->mSprites->mTextures[i], 0 );
+                Shader_sendMat3( "ModelMatrix", &pScene->mSprites->mMatrices[i] );
+                Shader_sendInt( "Depth", pScene->mSprites->mDepths[i] );
+                Renderer_renderMesh( pScene->mSprites->mMeshes[i] );
             }
         }
 
@@ -147,73 +148,73 @@ void Scene_render( Scene *pScene ) {
 
 //  =======================
  
-int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
+int  Scene_addSprite( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
     int handle = -1;
 
     if( pScene ) {
-        handle = EntityArray_add( pScene->mEntities );
+        handle = SpriteArray_add( pScene->mSprites );
 
         if( handle >= 0 ) {
-            pScene->mEntities->mMeshes[handle] = pMesh;
-            pScene->mEntities->mTextures[handle] = pTexture;
-            memcpy( &pScene->mEntities->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
+            pScene->mSprites->mMeshes[handle] = pMesh;
+            pScene->mSprites->mTextures[handle] = pTexture;
+            memcpy( &pScene->mSprites->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
         }
     }
     return handle;
 }
 
-int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor ) { 
+int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) { 
     int handle = -1;
 
     if( pScene && pActor ) {
-        handle = EntityArray_add( pScene->mEntities );
+        handle = SpriteArray_add( pScene->mSprites );
 
         if( handle >= 0 ) {
-            pActor->mUsedEntity = handle;
-            pScene->mEntities->mMeshes[handle] = pActor->mMesh_id;
-            pScene->mEntities->mTextures[handle] = pActor->mTexture_id;
+            pActor->mUsedSprite = handle;
+            pScene->mSprites->mMeshes[handle] = pActor->mMesh_id;
+            pScene->mSprites->mTextures[handle] = pActor->mTexture_id;
             mat3 m;
             mat3_translationMatrixfv( &m, &pActor->mPosition );
-            memcpy( pScene->mEntities->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
+            memcpy( pScene->mSprites->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
         }
     }
     return handle;
 }
 
-void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void *pData ) {
+void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void *pData ) {
     if( pScene ) {
-        if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
+        if( HandleManager_isUsed( pScene->mSprites->mUsed, pHandle ) ) {
             switch( pAttrib ) {
-                case EA_Matrix :
-                    memcpy( &pScene->mEntities->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
+                case SA_Matrix :
+                    memcpy( &pScene->mSprites->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
                     break;
-                case EA_Texture :
-                    pScene->mEntities->mTextures[pHandle] = *((u32*)pData);
+                case SA_Texture :
+                    pScene->mSprites->mTextures[pHandle] = *((u32*)pData);
                     break;
-                case EA_Depth :
-                    pScene->mEntities->mDepths[pHandle] = *((u32*)pData);
+                case SA_Depth :
+                    pScene->mSprites->mDepths[pHandle] = *((u32*)pData);
                     break;
             }
         }
     }   
 }
 
-void Scene_transformEntity( Scene *pScene, u32 pHandle, mat3 *pTransform ) {
+void Scene_transformSprite( Scene *pScene, u32 pHandle, mat3 *pTransform ) {
     if( pScene && pTransform ) {
-        if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
-            mat3_mul( &pScene->mEntities->mMatrices[pHandle], pTransform );
+        if( HandleManager_isUsed( pScene->mSprites->mUsed, pHandle ) ) {
+            mat3_mul( &pScene->mSprites->mMatrices[pHandle], pTransform );
         }
     }
 }
 
-void Scene_removeEntity( Scene *pScene, u32 pIndex ) {
+void Scene_removeSprite( Scene *pScene, u32 pIndex ) {
     if( pScene ) 
-        EntityArray_remove( pScene->mEntities, pIndex );
+        SpriteArray_remove( pScene->mSprites, pIndex );
 }
 
-void Scene_clearEntities( Scene *pScene ) {
+void Scene_clearSprites( Scene *pScene ) {
     if( pScene ) 
-        EntityArray_clear( pScene->mEntities );
+        SpriteArray_clear( pScene->mSprites );
 }
 
 //  =======================
