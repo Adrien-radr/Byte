@@ -51,6 +51,9 @@ bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
         glActiveTexture( GL_TEXTURE0 );
         glGenTextures( 1, &t->mID );
         glBindTexture( GL_TEXTURE_2D, t->mID );
+
+        GLint curr_alignment;
+        glGetIntegerv( GL_UNPACK_ALIGNMENT, &curr_alignment );
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -92,7 +95,7 @@ bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
             x += g->bitmap.width;
         }
 
-        glPixelStorei( GL_UNPACK_ALIGNMENT, 4 );
+        glPixelStorei( GL_UNPACK_ALIGNMENT, curr_alignment );
 
         return true;
     }

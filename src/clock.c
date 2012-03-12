@@ -1,7 +1,7 @@
 #include "clock.h"
 
 
-#if defined(BYTE_WIN32)
+#ifdef BYTE_WIN32
 #	include <Windows.h>
 #else
 #   include <sys/time.h>
@@ -45,7 +45,7 @@ void Clock_sleep( f32 pTime ) {
     #if defined(BYTE_WIN32)
        Sleep( (DWORD)( pTime ) );
     #else
-       usleep( (u32)( pTime * 1000 ) );
+       usleep( (u32)( pTime * 1000000.f ) );
     #endif
 }
 

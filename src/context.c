@@ -82,6 +82,8 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     // OpenGL profile
     glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
     glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 2 );
+    glfwOpenWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+    glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
     // Multisamples
     u32 ms = pMultiSamples;

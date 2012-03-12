@@ -23,12 +23,12 @@ typedef struct {
 static void Byte_GetPNGInfo( int color_type, texture_t *ti ) {
     switch( color_type ) {
     case PNG_COLOR_TYPE_GRAY :
-        ti->fmt = GL_LUMINANCE;
-        ti->int_fmt = 1;
+        ti->fmt = GL_RED;
+        ti->int_fmt = GL_RED;
         break;
     case PNG_COLOR_TYPE_GRAY_ALPHA :
-        ti->fmt = GL_LUMINANCE_ALPHA;
-        ti->int_fmt = 2;
+        ti->fmt = GL_RG;
+        ti->int_fmt = GL_RG;
         break;
     case PNG_COLOR_TYPE_RGB :
         ti->fmt = GL_RGB;

@@ -3,6 +3,8 @@
 #include "color.h"
 #include "actor.h"
 #include "renderer.h"
+#include "server.h"
+#include "clock.h"
 
 #ifdef USE_GLDL
 #include "GL/gldl.h"
@@ -10,11 +12,77 @@
 #include "GL/glew.h"
 #endif
 
-#define ACT_NUM 50
+#include <pthread.h>
+
+void *sv_run_th( void* data ) {
+    printf( "Launching sv thread..\n" );
+    check( sv_init(), "Error during server initialization\n" );
+    sv_run();
+
+error:
+    sv_shutdown();
+    return NULL;
+}
 
 int main() {
     int return_val = -1;
+///*
+    pthread_t th;
+    pthread_create( &th, NULL, sv_run_th, NULL );
 
+
+    int noerr = net_init();
+    if( !noerr ) {
+        pthread_cancel( th );
+        goto error;
+    }
+
+    Clock_sleep( 2.f );
+    printf( "Launching client...\n" );
+
+    net_socket cl = 0;
+    char packet[256];
+
+    noerr = net_open_socket( &cl, 1992 );
+    if( !noerr ) {
+        pthread_cancel( th );
+        goto error;
+    }
+
+    u32_to_bytes( server.protocol_id, (u8*)packet );
+    strcpy( &packet[4], "Hello" );
+    net_send_packet( &cl, &server.sv_addr, (const void*)packet, 252 );
+
+    net_addr sv;
+    int bytes = 0;
+    while( bytes <= 0 ) {
+        bytes = net_receive_packet( &cl, &sv, packet, 256 );
+        Clock_sleep( 0.2f );
+        printf( "Client Frame\n" );
+    }
+    printf( "CL : %s\n", packet+4 );
+
+    Clock_sleep( 0.5f );
+
+    strcpy( &packet[4], "close" );
+    net_send_packet( &cl, &server.sv_addr, (const void*)packet, 252 );
+
+
+    net_close_socket( &cl );
+   
+    net_shutdown();
+
+
+    //pthread_cancel( th );
+    pthread_join( th, NULL );
+
+
+    return_val = 0;
+
+error:
+    return return_val;
+//*/
+/*
     check( Game_init(), "Error while initializing Game. Exiting program!\n" );
 
 
@@ -37,27 +105,6 @@ int main() {
     check( man_sprite >= 0, "man error\n" );
 
     
-/*
-    Actor actors[ACT_NUM*ACT_NUM];
-    for( int i = 0; i < ACT_NUM*ACT_NUM; ++i )
-        check( Actor_load( &actors[i], "data/actors/actor2.json" ), "Error while loading actors[%d]!\n", i );
-    //Actor actor2;
-
-    
-
-
-
-
-    int actor_ent;
-    for( int i = 0; i < ACT_NUM; ++i ) {
-        for( int j = 0; j < ACT_NUM; ++j ) {
-            actor_ent = Scene_addEntityFromActor( game->mScene, &actors[i*ACT_NUM + j] );
-            check( actor_ent >= 0, "error creating actor_ent(%d)!\n", i*ACT_NUM+j );
-            Scene_modifyEntity( game->mScene, actor_ent, EA_Depth, &ent2_depth );
-            Actor_setPositionf( &actors[i*ACT_NUM + j], 50 + i * 10.f, 50 + j * 10.f );
-        }
-    }
-*/
 
 
     vec2 pts[] = {
@@ -137,8 +184,6 @@ int main() {
 
             // Render Frame
 
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
             Scene_render( game->mScene );
 
             Renderer_useShader( shader );
@@ -169,5 +214,6 @@ error :
     gldlTerminate();
 #endif
     return return_val;
+    */
 }
 
