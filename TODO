@@ -16,16 +16,28 @@ Byte-Project : TODO File
 + Config file
 + Game 'class' containing : the device, the world, the scene, game states
 
-- Hex tiles system
-- Sprite animation system
-- Clean the main
-- Quad Tree for scene managment
-- Phong Lighting
-- Dynamic shadows
-- Procedurally created map
-- Lua integration as a scripting language (??)
-- GUI (with Lua or json) (Handled by Beulard)
+    Client-Server
+    ------------
+    - Client part
+    - Msg struct for msg transmission
+    - Dedicated server & server+client & client-only
 
-????
-----
-- Fix camera position when resizing window (messy)!
+    Map System
+    ----------
+    - Squared tiles map (3d?)
+    - Mouse picking support
+    - Quad-Tree 
+    - Procedurally created map (world-map and scene-map)
+
+    Lighting
+    --------
+    - Point-lights (phong shader)
+    - 2D Normal maps of sprites ?
+    - Dynamic shadows
+
+    Misc
+    ----
+    - Clean the main
+    - Lua integration as a scripting language (??)
+    - GUI (with Lua or json) (Handled by Beulard)
+    - Fix camera position when resizing window (messy)! (maybe no rescale)
