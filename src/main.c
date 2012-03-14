@@ -4,6 +4,7 @@
 #include "actor.h"
 #include "renderer.h"
 #include "server.h"
+#include "client.h"
 #include "clock.h"
 
 #ifdef USE_GLDL
@@ -24,66 +25,51 @@ error:
     return NULL;
 }
 
+void *sv_connection( void* data ) {
+    if( !sv_init() )
+        return NULL;
+
+
+    sv_run();
+    sv_shutdown();
+    
+    return NULL;
+}
+
 int main() {
     int return_val = -1;
+
+    check( Game_init(), "Error while initializing Game. Exiting program!\n" );
+
 ///*
     pthread_t th;
-    pthread_create( &th, NULL, sv_run_th, NULL );
-
-
-    int noerr = net_init();
-    if( !noerr ) {
-        pthread_cancel( th );
-        goto error;
-    }
+    pthread_create( &th, NULL, sv_connection, NULL );
 
     Clock_sleep( 2.f );
     printf( "Launching client...\n" );
 
-    net_socket cl = 0;
-    char packet[256];
-
-    noerr = net_open_socket( &cl, 1992 );
-    if( !noerr ) {
+    if( !cl_init() ) {
         pthread_cancel( th );
         goto error;
     }
 
-    u32_to_bytes( server.protocol_id, (u8*)packet );
-    strcpy( &packet[4], "Hello" );
-    net_send_packet( &cl, &server.sv_addr, (const void*)packet, 252 );
+    cl_run();
 
-    net_addr sv;
-    int bytes = 0;
-    while( bytes <= 0 ) {
-        bytes = net_receive_packet( &cl, &sv, packet, 256 );
-        Clock_sleep( 0.2f );
-        printf( "Client Frame\n" );
-    }
-    printf( "CL : %s\n", packet+4 );
-
-    Clock_sleep( 0.5f );
-
-    strcpy( &packet[4], "close" );
-    net_send_packet( &cl, &server.sv_addr, (const void*)packet, 252 );
-
-
-    net_close_socket( &cl );
-   
-    net_shutdown();
-
-
-    //pthread_cancel( th );
     pthread_join( th, NULL );
-
 
     return_val = 0;
 
 error:
+    cl_shutdown();
+
+    Game_destroy();
+
+#ifdef USE_GLDL
+    gldlTerminate();
+#endif
     return return_val;
 //*/
 /*
-    check( Game_init(), "Error while initializing Game. Exiting program!\n" );
 
 
     printf( "Hello, Byte World!!\n" );
@@ -207,12 +193,6 @@ error:
     return_val = 0;
 
 error :
-
-    Game_destroy();
-
-#ifdef USE_GLDL
-    gldlTerminate();
-#endif
     return return_val;
     */
 }

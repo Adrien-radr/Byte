@@ -3,9 +3,6 @@
 
 #ifdef BYTE_WIN32
 #	include <Windows.h>
-#else
-#   include <sys/time.h>
-#   include <unistd.h>
 #endif
 
 // ==============================  //
@@ -30,15 +27,11 @@ f64 Byte_GetSystemTime(){
             return GetTickCount() * 0.001;
         }
     #else
-        struct timeval Time = {0, 0};
-        gettimeofday(&Time, NULL);
-
-        return Time.tv_sec + Time.tv_usec * 0.000001;
+        struct timespec time;
+        clock_gettime( CLOCK_MONOTONIC, &time );
+        return (f64)time.tv_sec + (f64)time.tv_nsec / 1000000000L;// / 1000000.0;
     #endif
 }
-
-// ==============================  //
-
 
 
 void Clock_sleep( f32 pTime ) {
@@ -48,6 +41,10 @@ void Clock_sleep( f32 pTime ) {
        usleep( (u32)( pTime * 1000000.f ) );
     #endif
 }
+
+// ==============================  //
+
+
 
 void Clock_reset( Clock *pClock ) {
     pClock->mLastFrameTime = Byte_GetSystemTime();
@@ -65,11 +62,11 @@ void Clock_resume( Clock *pClock ) {
 }
 
 f32 Clock_getElapsedTime( Clock *pClock ) {
-    static f64 temp = 0.0;
+    static f64 now = 0.0;
     if( !pClock->mPaused ) {
-        temp = Byte_GetSystemTime();
-        pClock->mClockTime += temp - pClock->mLastFrameTime;
-        pClock->mLastFrameTime = temp;
+        now = Byte_GetSystemTime();
+        pClock->mClockTime += now - pClock->mLastFrameTime;
+        pClock->mLastFrameTime = now;
     }
     return (f32)pClock->mClockTime;
 }

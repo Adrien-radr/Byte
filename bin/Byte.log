@@ -1,8 +1,8 @@
-Byte-Project Log v0.1.0
-Mon 12 Mar 2012 - 16:11:45
+Byte-Project Log v0.1.2
+Tue 13 Mar 2012 - 22:48:38
 ==========================
 [INFO] GLFW Window successfully initialized!
-[INFO] GLDL successfully initialized!
+[INFO] GLEW v1.7.0 successfully initialized!
 [INFO] OpenGL 3.2
 [INFO] GLSL 4.20
 [INFO] Hardware : ATI Technologies Inc. - ATI Mobility Radeon HD 5800 Series 
@@ -29,3 +29,15 @@ Mon 12 Mar 2012 - 16:11:45
 [INFO] Resource "DejaVuSans.ttf" loaded.
 [INFO] Resource "visitor2.ttf" loaded.
 [INFO] Game successfully initialized!
+[INFO] IP : 127.0.0.1 (lo)
+[INFO] IP : 192.168.1.2 (wlan0)
+[INFO] Server Listening...
+[INFO] Server started connection on port 1991
+[INFO] IP : 127.0.0.1 (lo)
+[INFO] IP : 192.168.1.2 (wlan0)
+[INFO] Connecting to 192.168.1.2:1991
+[INFO] Server accepting connection from 192.168.1.2:1992
+[INFO] Packet received from client : Hello server!
+[INFO] Client connected with server
+[INFO] Packet received from server : Hello client!
+[INFO] Packet received from client : close

@@ -4,13 +4,14 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 1
-#define BYTE_PATCH 0
+#define BYTE_PATCH 2
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
 #   define BYTE_WIN32
 #else
 #   define BYTE_UNIX
+#   include <unistd.h>
 #endif
 
 // Common includes
