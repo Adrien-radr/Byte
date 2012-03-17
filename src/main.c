@@ -40,7 +40,6 @@ int main() {
     int return_val = -1;
 
     check( Game_init(), "Error while initializing Game. Exiting program!\n" );
-
 ///*
     pthread_t th;
     pthread_create( &th, NULL, sv_connection, NULL );
@@ -56,6 +55,7 @@ int main() {
     cl_run();
 
     pthread_join( th, NULL );
+
 
     return_val = 0;
 

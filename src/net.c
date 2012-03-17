@@ -21,14 +21,14 @@ const u32 protocol_id = 1910167069;
 
 const f32 connection_timeout = 10.f;
 
-local_addr local_ips[MAX_IPS];
+net_ip local_ips[MAX_IPS];
 static int numIP;
 
 
 
   
 
-static void add_local_addr( char *ifname, struct sockaddr *addr, struct sockaddr *mask ) {
+static void add_local_ip( char *ifname, struct sockaddr *addr, struct sockaddr *mask ) {
     int addrlen;
     sa_family_t family;
 
@@ -61,7 +61,7 @@ static void show_ip() {
 }
 
 
-static void get_local_addrs() {
+static void get_local_ips() {
     struct ifaddrs *ifap, *search;
 
     if( getifaddrs( &ifap ) ) 
@@ -70,7 +70,7 @@ static void get_local_addrs() {
         numIP = 0;
         for( search = ifap; search; search = search->ifa_next ) {
             if( search->ifa_flags & 0x01 ) 
-                add_local_addr( search->ifa_name, search->ifa_addr, search->ifa_netmask );
+                add_local_ip( search->ifa_name, search->ifa_addr, search->ifa_netmask );
         }
         freeifaddrs( ifap );
     }
@@ -117,8 +117,8 @@ bool net_init() {
 #else
     ret = true;
 #endif
-
-    get_local_addrs();
+ 
+    get_local_ips();
 
     return ret;
 }
@@ -129,6 +129,9 @@ void net_shutdown() {
 #endif
 }
 
+
+////////////////////////////////////////////////////////////////////////////
+//                      CONNECTION
 
 static void net_connection_clear( connection_t *c ) {
     c->state = Disconnected;
@@ -271,6 +274,92 @@ int  net_connection_receive( connection_t *c, u8 *packet, u32 size ) {
 error:
     return -1;
 }
+
+
+////////////////////////////////////////////////////////////////////////////
+//                      PACKET QUEUE
+
+/// Returns true if sequence a is more recent than sequence b
+/// Takes into account the fact that buffers cycle after MAX_SEQUENCE
+bool sequence_more_recent( u32 a, u32 b ) {
+    return ( a > b && ( a - b ) <= MAX_SEQUENCE/2 )
+        || ( a < b && ( b - a ) >  MAX_SEQUENCE/2 );
+}
+
+void net_packet_queue_init( net_packet_queue *q ) {
+    if( q ) {
+        q->count = 0;
+        q->tail = 0;
+        for( int i = 0; i < 256; ++i )
+            q->list[i] = &q->arr[i];
+    }
+}
+
+void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p ) {
+    if( !q || !p ) return;
+
+    if( !q->count ) {
+        memcpy( &q->arr[0], p, sizeof(net_packet_info) );
+        ++q->count;
+
+    } else {
+        bool full = false;
+
+        if( 256 == q->count )
+            full = true;
+
+        if( sequence_more_recent( q->list[q->tail]->seq, p->seq ) ) {
+            if( !full ) {
+                memcpy( &q->arr[q->count], p, sizeof(net_packet_info) );
+                q->tail = q->count++;
+            }
+            return;
+        }
+
+        u16 i;
+        for( i = 0; i < q->count; ++i ) {
+            if( sequence_more_recent( p->seq, q->list[i]->seq ) ) {
+                // we have space, put new one at end of array and redo linking
+                if( !full ) {
+                    memcpy( &q->arr[q->count], p, sizeof(net_packet_info) );
+                    q->list[q->count] = q->list[q->tail];
+                    for( int j = q->count-1; j > i; --j ) {
+                        q->list[j] = q->list[j-1];
+                    }
+                    q->list[i] = &q->arr[q->count];
+                    q->tail = q->count++;
+
+                // no more space in array, replace the older packet with the newone
+                } else {
+                    memcpy( q->list[q->tail], p, sizeof(net_packet_info) );
+                    net_packet_info *tmp = q->list[q->tail];
+                    for( int j = q->tail; j > i; --j ) {
+                        q->list[j] = q->list[j-1];
+                    }
+                    q->list[i] = tmp;
+                }
+                return;
+            }   
+        }
+        // error
+        printf( "ARR ERROR\n" );
+    }
+}
+
+bool net_packet_queue_exists( net_packet_queue *q, u32 seq ) {
+    if( !q ) return false;
+
+    for( int i = 0; i < q->count; ++i ) 
+        if( q->arr[i].seq == seq )
+            return true;
+
+    return false;
+}
+void net_packet_queue_verify( net_packet_queue *q );
+
+
+////////////////////////////////////////////////////////////////////////////
+//                      SOCKETS
 
 bool net_open_socket( net_socket *s, u16 port ) {
     check( !*s, "Socket already opened." );

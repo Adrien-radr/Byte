@@ -18,8 +18,8 @@ Byte-Project : TODO File
 
     Client-Server
     ------------
-    - Client part
-    - Msg struct for msg transmission
+    + Client part
+    + Msg struct for msg transmission
     - Dedicated server & server+client & client-only
 
     Map System

@@ -59,7 +59,7 @@ void cl_run() {
 
                     strcpy( (char*)packet, "close" );
                     net_connection_send( &client.connection, packet, 252 );
-                    break;
+                    return;
                 }
                 Clock_sleep( 0.2f );
             }

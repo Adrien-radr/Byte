@@ -4,14 +4,31 @@
 #include "common.h"
 #include <arpa/inet.h>
 
-// Max sequence number, after that, go to 0
+// Max sequence number, after that, go to 0 (for u32 here)
 #define MAX_SEQUENCE 0xFFFFFFFF
 
+/// Application Protocol ID
+extern const u32 protocol_id;
+
+typedef int net_socket;
+
+
+/// Information about a net packet
 typedef struct {
-    u32     seq;    ///< sequence number of packet
-    u32     size;   ///< data size in bytes
-    f32     time;   ///< time offset since packet was sent or received
-} net_msg_info;
+    u32             seq;    ///< sequence number of packet
+    u32             size;   ///< data size in bytes
+    f32             time;   ///< time offset since packet was sent or received
+} net_packet_info;
+
+/// Fixed-size list for net_packet_info
+typedef struct {
+    net_packet_info             arr[256];   
+    net_packet_info             *list[256];
+    u16                         tail;
+    u16                         count;
+} net_packet_queue;
+
+
 
 typedef struct {
     u8  ip[4];
@@ -23,15 +40,12 @@ typedef struct {
     sa_family_t                 family;
     struct sockaddr_storage     addr;
     struct sockaddr_storage     mask;
-} local_addr;
+} net_ip;
 
 #define MAX_IPS 8
-extern local_addr local_ips[MAX_IPS];
+extern net_ip local_ips[MAX_IPS];
 
-typedef int net_socket;
 
-/// Application Protocol ID
-extern const u32 protocol_id;
 
 typedef struct {
     bool                running;
@@ -41,6 +55,10 @@ typedef struct {
 
 
 
+    net_packet_queue    sent_queue,
+                        received_queue,
+                        pending_acks,
+                        acked_queue;
     enum {
         Disconnected,
         Connected, 
@@ -60,6 +78,12 @@ void net_connection_update( connection_t *c, f32 dt );
 bool net_connection_send( connection_t *c, const u8 *packet, u32 size );
 int  net_connection_receive( connection_t *c, u8 *packet, u32 size );
 
+void net_packet_queue_init( net_packet_queue *q );
+
+/// Inserts a new packet into the queue, in sorted order (more recent first)
+void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p );
+bool net_packet_queue_exists( net_packet_queue *q, u32 seq );
+void net_packet_queue_verify( net_packet_queue *q );
 
 bool net_addr_equal( const net_addr *a, const net_addr *b );
 void net_addr_fill( net_addr *a, u8 ip1, u8 ip2, u8 ip3, u8 ip4, u16 port );
