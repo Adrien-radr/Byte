@@ -130,158 +130,13 @@ void net_shutdown() {
 }
 
 
-////////////////////////////////////////////////////////////////////////////
-//                      CONNECTION
-
-static void net_connection_clear( connection_t *c ) {
-    c->state = Disconnected;
-    c->timeout_accum = 0.f;
-    memset( c->address.ip, 0, 4 );
-    c->address.port = 0;
-}
-
-bool net_connection_init( connection_t *c, u16 port ) {
-    check( c, "Given connection not allocated\n" );
-
-    c->running = false;
-    c->socket = 0;
-
-    net_connection_clear( c );
-
-    bool noerr = net_open_socket( &c->socket, port );
-    check( noerr, "Failed to open connection socket\n" );
-
-    c->running = true;
-
-    return true;
-
-error:
-    net_connection_shutdown( c );
-    return false;
-}
-
-void net_connection_shutdown( connection_t *c ) {
-    if( c && c->running ) {
-        net_connection_clear( c );
-        c->running = false;
-
-        if( c->socket )
-            net_close_socket( &c->socket );
-    }
-}
-
-void net_connection_listen( connection_t *c ) {
-    if( !c ) return;
-
-    log_info( "Server Listening...\n" );
-    c->state = Listening;
-}
-
-void net_connection_connect( connection_t *c, net_addr *addr ) {
-    if( !c || !addr ) return;
-
-    log_info( "Connecting to %d.%d.%d.%d:%d\n", 
-            addr->ip[0], addr->ip[1], addr->ip[2], addr->ip[3], addr->port ); 
-
-    c->state = Connecting;
-    memcpy( &c->address, addr, sizeof(net_addr) );
-}
-
-void net_connection_update( connection_t *c, f32 dt ) {
-    if( !c || !c->running ) return;
-
-    c->timeout_accum += dt;
-    if( c->timeout_accum > connection_timeout ) {
-        if( c->state == Connecting ) {
-            log_info( "Connecting timed out\n" );
-            net_connection_clear( c );
-            c->state = ConnectFail;
-        } else if( c->state == Connected ) {
-            log_info( "Connection timed out\n" );
-            net_connection_clear( c );
-        }
-    }
-}
-
-bool net_connection_send( connection_t *c, const u8 *packet, u32 size ) {
-    if( !c || !packet ) return false;
-
-    u8 msg[size+4];
-
-    check( c->running, "Connection not running\n" );
-    
-    u32 address;
-    bytes_to_u32( c->address.ip, &address );
-    check( address != 0, "Invalid destination address\n" );
-
-
-    // add protocol id to message
-    u32_to_bytes( protocol_id, msg );
-    
-    // add packet data to message
-    memcpy( &msg[4], packet, size );
-
-    // send the message
-    return net_send_packet( c->socket, &c->address, msg, size + 4 );
-
-error:
-    return false;
-}
-
-int  net_connection_receive( connection_t *c, u8 *packet, u32 size ) {
-    if( !c || !packet ) return -1;
-
-    u8 msg[size+4];
-    net_addr sender;
-
-    check( c->running, "Connection not running\n" );
-
-
-    int bytes_read = net_receive_packet( c->socket, &sender, msg, size + 4 );
-    if( bytes_read <= 4 )
-        return 0;
-
-    u32 id;
-    bytes_to_u32( msg, &id );
-
-    // bad header
-    if( id != protocol_id )
-        return 0;
-
-    // client connecting to server
-    if( c->state == Listening ) {
-        log_info( "Server accepting connection from %d.%d.%d.%d:%d\n",
-                sender.ip[0], sender.ip[1], sender.ip[2], sender.ip[3], sender.port ); 
-        c->state = Connected;
-        memcpy( &c->address, &sender, sizeof(net_addr) );
-    } 
-
-    if( net_addr_equal( &c->address, &sender ) ) {
-        // Client connecting, finalize connection
-        if( c->state == Connecting ) {
-            log_info( "Client connected with server\n" );
-            c->state = Connected;
-        }
-
-        // timeout reset
-        c->timeout_accum = 0.f;
-
-        // get packet data
-        memcpy( packet, &msg[4], bytes_read - 4 );
-        return bytes_read - 4;
-    }
-
-error:
-    return -1;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////
 //                      PACKET QUEUE
 
 /// Returns true if sequence a is more recent than sequence b
 /// Takes into account the fact that buffers cycle after MAX_SEQUENCE
-bool sequence_more_recent( u32 a, u32 b ) {
+static bool sequence_more_recent( u32 a, u32 b ) {
     return ( a > b && ( a - b ) <= MAX_SEQUENCE/2 )
         || ( a < b && ( b - a ) >  MAX_SEQUENCE/2 );
 }
@@ -355,7 +210,282 @@ bool net_packet_queue_exists( net_packet_queue *q, u32 seq ) {
 
     return false;
 }
+
 void net_packet_queue_verify( net_packet_queue *q );
+
+void net_packet_queue_print( net_packet_queue *q ) {
+    if( !q ) return;
+
+    for( int i = 0; i < q->count; ++i )
+        printf( " + %d\n", q->list[i]->seq );
+}
+
+bool net_packet_queue_empty( net_packet_queue *q ) {
+    return q && q->count;
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+//                      CONNECTION
+
+static void net_connection_clear( connection_t *c ) {
+    c->state = Disconnected;
+    c->timeout_accum = 0.f;
+    memset( c->address.ip, 0, 4 );
+    c->address.port = 0;
+}
+
+bool net_connection_init( connection_t *c, connection_mode mode, u16 port ) {
+    check( c, "Given connection not allocated\n" );
+
+    c->running = false;
+    c->socket = 0;
+    c->mode = mode;
+
+    c->seq_local = 0;
+    c->seq_remote = 0;
+
+    net_packet_queue_init( &c->sent_queue );
+    net_packet_queue_init( &c->recv_queue );
+    net_packet_queue_init( &c->pending_acks );
+    net_packet_queue_init( &c->ackd_queue );
+
+    c->sent_packets = 0;
+    c->recv_packets = 0;
+    c->lost_packets = 0;
+    c->ackd_packets = 0;
+
+    c->sent_bw = 0.f;
+    c->ackd_bw = 0.f;
+    c->rtt= 0.f;
+
+    net_connection_clear( c );
+
+    bool noerr = net_open_socket( &c->socket, port );
+    check( noerr, "Failed to open connection socket\n" );
+
+    c->running = true;
+
+    return true;
+
+error:
+    net_connection_shutdown( c );
+    return false;
+}
+
+void net_connection_shutdown( connection_t *c ) {
+    if( c && c->running ) {
+        net_connection_clear( c );
+        c->running = false;
+
+        if( c->socket )
+            net_close_socket( &c->socket );
+    }
+}
+
+void net_connection_listen( connection_t *c ) {
+    if( !c ) return;
+
+
+    if( c->mode == Server )
+        log_info( "Server Listening...\n" );
+    
+    if( c->mode == Client )
+        log_info( "Client getting in Listening mode. WTF?\n" );
+
+    c->state = Listening;
+}
+
+void net_connection_connect( connection_t *c, net_addr *addr ) {
+    if( !c || !addr ) return;
+
+    log_info( "Connecting to %d.%d.%d.%d:%d\n", 
+            addr->ip[0], addr->ip[1], addr->ip[2], addr->ip[3], addr->port ); 
+
+    c->state = Connecting;
+    memcpy( &c->address, addr, sizeof(net_addr) );
+}
+
+void net_connection_update( connection_t *c, f32 dt ) {
+    if( !c || !c->running ) return;
+
+    c->timeout_accum += dt;
+    if( c->timeout_accum > connection_timeout ) {
+        if( c->state == Connecting ) {
+            log_info( "Connecting timed out\n" );
+            net_connection_clear( c );
+            c->state = ConnectFail;
+        } else if( c->state == Connected ) {
+            log_info( "Connection timed out\n" );
+            net_connection_clear( c );
+        }
+    }
+}
+
+static void nc_packet_sent( connection_t *c, u32 size ) {
+    if( !c ) return;
+
+    if( net_packet_queue_exists( &c->sent_queue, c->seq_local ) ) {
+        log_info( "Local sequence %d exists\n", c->seq_local );
+        net_packet_queue_print( &c->sent_queue );
+        return;
+    }
+    
+    if( net_packet_queue_exists( &c->pending_acks, c->seq_local ) )
+        return;
+
+    // add a new sent packet info
+    net_packet_info pi;
+    pi.seq = c->seq_local;
+    pi.time = 0.f;
+    pi.size = size;
+
+    net_packet_queue_insert( &c->sent_queue, &pi );
+    net_packet_queue_insert( &c->pending_acks, &pi );
+
+    if( c->mode == Server ) 
+        printf( "Server sent packet with seq %d\n", pi.seq );
+    else
+        printf( "Client sent packet with seq %d\n", pi.seq );
+
+    c->sent_packets++;
+    c->seq_local++;
+    if( c->seq_local > MAX_SEQUENCE )
+        c->seq_local = 0;
+
+
+}
+
+static void nc_packet_received( connection_t *c, u32 seq, u32 size ) {
+    if( !c ) return;
+
+    c->recv_packets++;
+    if( net_packet_queue_exists( &c->recv_queue, seq ) ) 
+        return;
+
+    // add new received packet info
+    net_packet_info pi;
+    pi.seq = seq;
+    pi.time = 0.f;
+    pi.size = size;
+
+    net_packet_queue_insert( &c->recv_queue, &pi );
+
+    if( c->mode == Server ) 
+        printf( "Server received packet with seq %d\n", pi.seq );
+    else
+        printf( "Client received packet with seq %d\n", pi.seq );
+
+    // update remote sequence if necessary
+    if( sequence_more_recent( seq, c->seq_remote ) )
+        c->seq_remote = seq;
+}
+
+static void nc_write_header( u8 *packet, u32 seq, u32 ack ) {
+    if( !packet ) return;
+
+    u32_to_bytes( protocol_id, packet );
+    u32_to_bytes( seq,         packet + 4 );
+    u32_to_bytes( ack,         packet + 8 );
+}
+
+static void nc_read_header( const u8 *packet, u32 *seq, u32 *ack ) {
+    if( !packet || !seq || !ack ) return;
+
+    bytes_to_u32( packet + 4, seq );
+    bytes_to_u32( packet + 8, ack );
+}
+
+bool net_connection_send( connection_t *c, const u8 *packet, u32 size ) {
+    if( !c || !packet ) return false;
+
+    // header : protocol id + sequence + ack + ack_bits
+    const int header = 12;
+    u8 msg[size+header];
+
+    check( c->running, "Connection not running\n" );
+    
+    u32 address;
+    bytes_to_u32( c->address.ip, &address );
+    check( address != 0, "Invalid destination address\n" );
+
+
+    // write packet header
+    nc_write_header( msg, c->seq_local, c->seq_remote );
+    
+    // add data 
+    memcpy( &msg[header], packet, size );
+
+    // send the message
+    if( !net_send_packet( c->socket, &c->address, msg, size + header ) )
+        return false;
+
+    // update connection
+    nc_packet_sent( c, size );
+
+    return true;
+
+error:
+    return false;
+}
+
+int  net_connection_receive( connection_t *c, u8 *packet, u32 size ) {
+    if( !c || !packet ) return -1;
+
+    // header : protocol id + sequence + ack + ack_bits
+    const int header = 12;
+
+    u8 msg[size+header];
+    net_addr sender;
+
+    check( c->running, "Connection not running\n" );
+    check( size > header, "Receiving buffer too small\n" );
+
+
+    int bytes_read = net_receive_packet( c->socket, &sender, msg, size + header );
+    if( bytes_read <= header )
+        return 0;
+
+    u32 id;
+    bytes_to_u32( msg, &id );
+
+    // bad header protocol
+    if( id != protocol_id )
+        return 0;
+
+    // get header
+    u32 seq, ack;
+    nc_read_header( msg, &seq, &ack );
+
+    // update connection
+    nc_packet_received( c, seq, bytes_read - header );
+
+    // client connecting to server
+    if( c->mode == Server ) {
+        log_info( "Server accepting connection from %d.%d.%d.%d:%d\n",
+                sender.ip[0], sender.ip[1], sender.ip[2], sender.ip[3], sender.port ); 
+        c->state = Connected;
+        memcpy( &c->address, &sender, sizeof(net_addr) );
+    } 
+
+    if( net_addr_equal( &c->address, &sender ) ) {
+        // Client connecting, finalize connection
+        if( c->mode == Client && c->state == Connecting ) {
+            log_info( "Client connected with server\n" );
+            c->state = Connected;
+        }
+
+        // timeout reset
+        c->timeout_accum = 0.f;
+
+        // get packet data
+        memcpy( packet, &msg[header], bytes_read - header );
+        return bytes_read - header;
+    }
+
+error:
+    return -1;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////

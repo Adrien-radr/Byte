@@ -1,5 +1,5 @@
 Byte-Project Log v0.1.2
-Sat 17 Mar 2012 - 18:43:31
+Sat 17 Mar 2012 - 20:52:00
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.7.0 successfully initialized!
@@ -40,4 +40,5 @@ Sat 17 Mar 2012 - 18:43:31
 [INFO] Packet received from client : Hello server!
 [INFO] Client connected with server
 [INFO] Packet received from server : Hello client!
+[INFO] Server accepting connection from 192.168.1.2:1992
 [INFO] Packet received from client : close

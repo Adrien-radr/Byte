@@ -5,14 +5,11 @@
 bool cl_init() {
     bool noerr;
 
-    client.seq_local = 0;
-    client.seq_remote = 0;
-
     noerr = net_init();
     check( noerr, "Failed to init sockets\n" );
 
     // create client connection
-    net_connection_init( &client.connection, 1992 );
+    net_connection_init( &client.connection, Client, 1992 );
 
     net_addr sv_addr = { { 192,168,1,2 }, 1991 };
 
@@ -32,7 +29,9 @@ void cl_shutdown() {
 void cl_run() {
     Clock clk;
     f32 curr_time = 0.f;
-    u8 packet[252];
+
+    const int size = 256 - 12;
+    u8 packet[size];
     int bytes_read;
 
     Clock_reset( &clk );
@@ -47,18 +46,18 @@ void cl_run() {
         Clock_sleep( 0.5f );
 
         strcpy( (char*)packet, "Hello server!" );
-        bool sent = net_connection_send( &client.connection, packet, 252 );
+        bool sent = net_connection_send( &client.connection, packet, size );
 
         if( sent ) {
             Clock_sleep( 1.f );
             while( 1 ) {
-                bytes_read = net_connection_receive( &client.connection, packet, 252);
+                bytes_read = net_connection_receive( &client.connection, packet, size);
 
                 if( bytes_read ) {
                     log_info( "Packet received from server : %s\n", packet );
 
                     strcpy( (char*)packet, "close" );
-                    net_connection_send( &client.connection, packet, 252 );
+                    net_connection_send( &client.connection, packet, size );
                     return;
                 }
                 Clock_sleep( 0.2f );

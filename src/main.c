@@ -40,7 +40,8 @@ int main() {
     int return_val = -1;
 
     check( Game_init(), "Error while initializing Game. Exiting program!\n" );
-///*
+
+//*
     pthread_t th;
     pthread_create( &th, NULL, sv_connection, NULL );
 
@@ -56,6 +57,30 @@ int main() {
 
     pthread_join( th, NULL );
 
+/*
+    net_packet_queue q;
+    net_packet_queue_init( &q );
+    net_packet_info p;
+
+    p.seq = 1;
+    net_packet_queue_insert( &q, &p );
+    p.seq = 19;
+    net_packet_queue_insert( &q, &p );
+    p.seq = 84;
+    net_packet_queue_insert( &q, &p );
+    p.seq = 44;
+    net_packet_queue_insert( &q, &p );
+    p.seq = 40;
+    net_packet_queue_insert( &q, &p );
+    p.seq = 0;
+    net_packet_queue_insert( &q, &p );
+    p.seq = 100;
+    net_packet_queue_insert( &q, &p );
+    p.seq = 55;
+    net_packet_queue_insert( &q, &p );
+
+    net_packet_queue_print( &q );
+    */
 
     return_val = 0;
 

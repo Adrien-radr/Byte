@@ -239,7 +239,7 @@ int TextArray_add( TextArray *arr ) {
                 arr->mMeshes = byte_realloc( arr->mMeshes, arr->mSize * sizeof( u32 ) );
                 arr->mColors = byte_realloc( arr->mColors, arr->mSize * sizeof( Color ) );
                 arr->mStrings = byte_realloc( arr->mStrings, arr->mSize * sizeof( char* ) );
-                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2* ) );
+                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2 ) );
             }
 
             // create mesh used by text
