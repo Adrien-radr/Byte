@@ -41,7 +41,6 @@ int main() {
 
     check( Game_init(), "Error while initializing Game. Exiting program!\n" );
 
-//*
     pthread_t th;
     pthread_create( &th, NULL, sv_connection, NULL );
 
@@ -64,24 +63,49 @@ int main() {
 
     p.seq = 1;
     net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
     p.seq = 19;
     net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
     p.seq = 84;
     net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
     p.seq = 44;
     net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
     p.seq = 40;
     net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
     p.seq = 0;
     net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
     p.seq = 100;
     net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
     p.seq = 55;
     net_packet_queue_insert( &q, &p );
-
     net_packet_queue_print( &q );
-    */
+    printf( "\n" );
 
+    p.seq = 197;
+    net_packet_queue_remove( &q, 4 );
+    net_packet_queue_print( &q );
+    printf( "\n" );
+    net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
+    p.seq = 76;
+    net_packet_queue_insert( &q, &p );
+    net_packet_queue_print( &q );
+    printf( "\n" );
+*/
     return_val = 0;
 
 error:
@@ -218,7 +242,13 @@ error:
     return_val = 0;
 
 error :
+
+    Game_destroy();
+
+#ifdef USE_GLDL
+    gldlTerminate();
+#endif
     return return_val;
-    */
+  */ 
 }
 

@@ -180,7 +180,7 @@
 //      MATH
 #include <math.h>
 
-#   define M_EPS  1.0e-5
+#   define M_EPS  1.0e-4
 #ifndef M_PI
 #   define M_PI 3.14159265358979323846
 #endif

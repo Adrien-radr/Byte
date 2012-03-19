@@ -97,10 +97,13 @@ void net_packet_queue_init( net_packet_queue *q );
 
 /// Inserts a new packet into the queue, in sorted order (more recent first)
 void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p );
+void net_packet_queue_remove( net_packet_queue *q, u32 index );
 bool net_packet_queue_exists( net_packet_queue *q, u32 seq );
 void net_packet_queue_verify( net_packet_queue *q );
 void net_packet_queue_print( net_packet_queue *q );
 bool net_packet_queue_empty( net_packet_queue *q );
+
+void net_packet_queue_update( net_packet_queue *q, f32 dt );
 
 bool net_addr_equal( const net_addr *a, const net_addr *b );
 void net_addr_fill( net_addr *a, u8 ip1, u8 ip2, u8 ip3, u8 ip4, u16 port );

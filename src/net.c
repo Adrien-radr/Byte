@@ -165,32 +165,36 @@ void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p ) {
 
         if( sequence_more_recent( q->list[q->tail]->seq, p->seq ) ) {
             if( !full ) {
-                memcpy( &q->arr[q->count], p, sizeof(net_packet_info) );
+                memcpy( q->list[q->count], p, sizeof(net_packet_info) );
                 q->tail = q->count++;
             }
+            // dont handle the case where arr is full
             return;
         }
 
         u16 i;
         for( i = 0; i < q->count; ++i ) {
             if( sequence_more_recent( p->seq, q->list[i]->seq ) ) {
-                // we have space, put new one at end of array and redo linking
+                // we have space, put new one at first available spot and redo linking
                 if( !full ) {
-                    memcpy( &q->arr[q->count], p, sizeof(net_packet_info) );
+                    memcpy( q->list[q->count], p, sizeof(net_packet_info) );
+                    net_packet_info *tmp = &(*q->list[q->count]);
                     q->list[q->count] = q->list[q->tail];
-                    for( int j = q->count-1; j > i; --j ) {
+
+                    for( int j = q->count-1; j > i; --j ) 
                         q->list[j] = q->list[j-1];
-                    }
-                    q->list[i] = &q->arr[q->count];
+
+                    q->list[i] = tmp;
                     q->tail = q->count++;
 
                 // no more space in array, replace the older packet with the newone
                 } else {
                     memcpy( q->list[q->tail], p, sizeof(net_packet_info) );
                     net_packet_info *tmp = q->list[q->tail];
-                    for( int j = q->tail; j > i; --j ) {
+
+                    for( int j = q->tail; j > i; --j ) 
                         q->list[j] = q->list[j-1];
-                    }
+
                     q->list[i] = tmp;
                 }
                 return;
@@ -199,6 +203,19 @@ void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p ) {
         // error
         printf( "ARR ERROR\n" );
     }
+}
+
+void net_packet_queue_remove( net_packet_queue *q, u32 index ) {
+    if( !q ) return;
+
+    for( u32 i = index; i < q->tail; ++i ) {
+        q->list[i] = q->list[i+1];
+    }
+
+    q->list[q->tail] = &q->arr[index];
+    q->list[q->tail]->seq = 0;
+    q->count--;
+    q->tail--;
 }
 
 bool net_packet_queue_exists( net_packet_queue *q, u32 seq ) {
@@ -224,6 +241,12 @@ bool net_packet_queue_empty( net_packet_queue *q ) {
     return q && q->count;
 }
 
+void net_packet_queue_update( net_packet_queue *q, f32 dt ) {
+    if( !q ) return;
+
+    for( u32 i = 0; i < q->count; ++i )
+        q->arr[i].time += dt;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 //                      CONNECTION
@@ -309,6 +332,7 @@ void net_connection_connect( connection_t *c, net_addr *addr ) {
 void net_connection_update( connection_t *c, f32 dt ) {
     if( !c || !c->running ) return;
 
+    // check connection timeout
     c->timeout_accum += dt;
     if( c->timeout_accum > connection_timeout ) {
         if( c->state == Connecting ) {
@@ -319,6 +343,34 @@ void net_connection_update( connection_t *c, f32 dt ) {
             log_info( "Connection timed out\n" );
             net_connection_clear( c );
         }
+        return;
+    }
+
+    // update queues packet time
+    net_packet_queue_update( &c->sent_queue, dt );
+    net_packet_queue_update( &c->recv_queue, dt );
+    net_packet_queue_update( &c->ackd_queue, dt );
+    net_packet_queue_update( &c->pending_acks, dt );
+
+    // remove outdated packets from all queues
+    while( !net_packet_queue_empty( &c->sent_queue ) && c->sent_queue.arr[c->sent_queue.tail].time > (1.f + M_EPS) )
+        c->sent_queue.count--;
+
+    if( !net_packet_queue_empty( &c->recv_queue ) ) {
+        const u32 last_seq = c->recv_queue.arr[0].seq;
+        const u32 min_seq = last_seq >= 34 ? (last_seq - 34) : (MAX_SEQUENCE - (34 - last_seq));
+
+        while( !net_packet_queue_empty( &c->recv_queue ) && !sequence_more_recent( c->recv_queue.arr[c->recv_queue.tail].seq, min_seq ) )
+            c->recv_queue.count--;
+    }
+
+    while( !net_packet_queue_empty( &c->ackd_queue ) && c->ackd_queue.arr[c->ackd_queue.tail].time > (2.f - M_EPS) )
+        c->ackd_queue.count--;
+
+    while( !net_packet_queue_empty( &c->pending_acks ) && c->pending_acks.arr[c->pending_acks.tail].time > (1.f + M_EPS) ) {
+        c->pending_acks.count--;
+        c->lost_packets++;
+        printf( "Lost packet\n" );
     }
 }
 
@@ -394,6 +446,57 @@ static void nc_read_header( const u8 *packet, u32 *seq, u32 *ack ) {
 
     bytes_to_u32( packet + 4, seq );
     bytes_to_u32( packet + 8, ack );
+}
+
+static int bit_index_for_seq( u32 seq, u32 ack ) {
+    if( seq > ack )
+        return ack + ( MAX_SEQUENCE - seq );
+    else
+        return ack - 1 - seq;
+}
+
+static u32 nc_get_ackbits( connection_t *c ) {
+    if( !c ) return 0;
+
+    u32 ack_bits = 0;
+    const u32 ack = c->seq_remote;
+
+    for( u32 i = c->recv_queue.tail; i >= 0; --i ) {
+        if( c->recv_queue.arr[i].seq == ack || sequence_more_recent( c->recv_queue.arr[i].seq, ack ) )
+            break;
+
+        int bit_index = bit_index_for_seq( c->recv_queue.arr[i].seq, ack );
+
+        if( bit_index <= 31 )
+            ack_bits |= 1 << bit_index;
+    }
+    return ack_bits;
+}
+
+static void nc_process_ackbits( connection_t *c, u32 ack, u32 ack_bits ) {
+    if( !c ) return; 
+    if( net_packet_queue_empty( &c->pending_acks ) ) return;
+
+    u32 i = c->pending_acks.tail;
+    while( i >= 0 ) {
+        bool acked = false;
+
+        if( c->pending_acks.arr[i].seq == ack )
+            acked = true;
+        else if( !sequence_more_recent( c->pending_acks.arr[i].seq, ack ) ) {
+            int bit_index = bit_index_for_seq( c->pending_acks.arr[i].seq, ack );
+            if( bit_index <= 31 )
+                acked = ( ack_bits >> bit_index ) & 1;
+        }
+
+        if( acked ) {
+            c->rtt += ( c->pending_acks.arr[i].time - c->rtt ) * 0.1f;
+
+            net_packet_queue_insert( &c->ackd_queue, c->pending_acks.list[i] );
+            c->ackd_packets++;
+        } else
+            ++i;
+    }
 }
 
 bool net_connection_send( connection_t *c, const u8 *packet, u32 size ) {
