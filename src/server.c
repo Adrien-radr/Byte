@@ -47,11 +47,13 @@ void sv_run() {
 
         send_accum += dt;
 
-        while( send_accum > 0.1f ) {
+        const f32 send_rate = server.connection.flow == Good ? 30.f : 10.f;
+
+        while( send_accum > 1.f / send_rate ) {
             u8 pack[size];
             strcpy( (char*)pack, "FROM SERVER" );
             net_connection_send( &server.connection, pack, size ); 
-            send_accum -= 0.1f;
+            send_accum -= 1.f / send_rate;
         }
 
         while( true ) {
@@ -74,14 +76,13 @@ void sv_run() {
         while( stat_accum >= 0.25f && server.connection.state == Connected ) {
             connection_t *c = &server.connection;
             printf( "SV : rtt %.1fms, sent %d, ackd %d, lost %d(%.1f%%), sent_bw = %.1fkbps, ackd_bw = %.1fkbps\n\n",
-                    c->rtt / 1000.f, c->sent_packets, c->ackd_packets, c->lost_packets, 
+                    c->rtt * 1000.f, c->sent_packets, c->ackd_packets, c->lost_packets, 
                     c->sent_packets > 0.f ? ((f32)c->lost_packets / (f32)c->sent_packets * 100.f) : 0.f,
                     c->sent_bw, c->ackd_bw );
 
             stat_accum -= 0.25f;
         }
 
-        Clock_sleep( dt );
     }
 }
 

@@ -10,6 +10,9 @@
 // Max expected RTT(round trip time)
 #define MAX_RTT 1.f
 
+// RTT Threshold, after that, pass flow to Bad Mode
+#define RTT_THRESHOLD 250.f
+
 /// Application Protocol ID
 extern const u32 protocol_id;
 
@@ -82,8 +85,21 @@ typedef struct {
         Listening,
         Connecting,
         ConnectFail
-    }                   state;      ///< Connection state
-    connection_mode     mode;       ///< Connection mode
+    }                   state;          ///< Connection state
+
+    connection_mode     mode;           ///< Connection mode
+
+
+    // Flow Control
+    enum {
+        Good,
+        Bad
+    }                   flow;           ///< Flow control mode
+
+    f32                 penalty_time,   ///< Penalty time (in sec)
+                        good_cond_time, ///< Time spent in good mode
+                        penalty_accum;  ///< Penaly reduction accumulator
+
 } connection_t;
 
 bool net_connection_init( connection_t *c, connection_mode mode, u16 port );

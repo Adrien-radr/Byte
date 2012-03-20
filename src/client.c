@@ -11,7 +11,7 @@ bool cl_init() {
     // create client connection
     net_connection_init( &client.connection, Client, 1992 );
 
-    net_addr sv_addr = { { 192,168,1,2 }, 1991 };
+    net_addr sv_addr = { { 127,0,0,1 }, 1991 };
 
     net_connection_connect( &client.connection, &sv_addr );
 
@@ -46,12 +46,14 @@ void cl_run() {
         f32 dt = now - curr_time;
         curr_time = now;
 
+        const f32 send_rate = server.connection.flow == Good ? 30.f : 10.f;
+
         send_accum += dt;
 
-        while( send_accum > 0.1f ) {
+        while( send_accum > 1.f / send_rate ) {
             u8 pack[size];
 
-            if( recv_packets == 100 ) {
+            if( recv_packets >= 180 ) {
                 printf( "SENDING CLOSE SIGNAL!!!!!!\n" );
                 strcpy( (char*)pack, "close" );
                 run = false;
@@ -59,7 +61,7 @@ void cl_run() {
                 strcpy( (char*)pack, "FROM CLIENT" );
 
             net_connection_send( &client.connection, pack, size ); 
-            send_accum -= 0.1f;
+            send_accum -= 1.f / send_rate;
         }
 
         while( true ) {
@@ -81,13 +83,12 @@ void cl_run() {
         while( stat_accum >= 0.25f && client.connection.state == Connected ) {
             connection_t *c = &client.connection;
             printf( "CL : rtt %.1fms, sent %d, ackd %d, lost %d(%.1f%%), sent_bw = %.1fkbps, ackd_bw = %.1fkbps\n",
-                    c->rtt / 1000.f, c->sent_packets, c->ackd_packets, c->lost_packets, 
+                    c->rtt * 1000.f, c->sent_packets, c->ackd_packets, c->lost_packets, 
                     c->sent_packets > 0.f ? ((f32)c->lost_packets / (f32)c->sent_packets * 100.f) : 0.f,
                     c->sent_bw, c->ackd_bw );
 
             stat_accum -= 0.25f;
         }
 
-        Clock_sleep( dt );
     }
 }

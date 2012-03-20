@@ -1,7 +1,7 @@
 NAME = Byte-Project
 VERSION_MAJOR = 0
 VERSION_MINOR = 1
-VERSION_PATCH = 2
+VERSION_PATCH = 3
 VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 ARCH = 64
@@ -10,6 +10,7 @@ ARCH = 64
 
 CC = gcc
 
+SERVER = 0
 USE_GLDL = 0
 
 # Use GLDL lib for debug if wanted, instead of glew
@@ -21,7 +22,14 @@ GL_LIB = ext/GL/glew$(ARCH).o
 GL_FLAG = 
 endif
 
-CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -lpng -llua -std=c99 -D_DEBUG -lm -lpthread -ldl -lrt $(GL_FLAG) -D_POSIX_C_SOURCE=200112L
+# If SERVER is defined, compile dedicated server
+ifeq ($(SERVER), 1)
+SERVER_F = -DBYTE_SERVER
+else
+SERVER_F = 
+endif
+
+CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -lpng -llua -std=c99 -D_DEBUG -lm -lpthread -ldl -lrt $(GL_FLAG) $(SERVER_F) -D_POSIX_C_SOURCE=200112L
 
 
 OBJ = $(patsubst %.c, %.o, $(wildcard src/*.c) )

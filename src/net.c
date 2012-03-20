@@ -293,6 +293,11 @@ bool net_connection_init( connection_t *c, connection_mode mode, u16 port ) {
     c->ackd_bw = 0.f;
     c->rtt= 0.f;
 
+    c->flow = Bad;
+    c->penalty_time = 4.f;
+    c->good_cond_time = 0.f;
+    c->penalty_accum = 0.f;
+
     net_connection_clear( c );
 
     bool noerr = net_open_socket( &c->socket, port );
@@ -349,23 +354,7 @@ void net_packet_queue_popback( net_packet_queue *q ) {
     q->count--;
 }
 
-void net_connection_update( connection_t *c, f32 dt ) {
-    if( !c || !c->running ) return;
-
-    // check connection timeout
-    c->timeout_accum += dt;
-    if( c->timeout_accum > connection_timeout ) {
-        if( c->state == Connecting ) {
-            log_info( "Connecting timed out\n" );
-            net_connection_clear( c );
-            c->state = ConnectFail;
-        } else if( c->state == Connected ) {
-            log_info( "Connection timed out\n" );
-            net_connection_clear( c );
-        }
-        return;
-    }
-
+static void nc_update_queues( connection_t *c, f32 dt ) {
     // update queues packet time
     net_packet_queue_update( &c->sent_queue, dt );
     net_packet_queue_update( &c->recv_queue, dt );
@@ -392,6 +381,82 @@ void net_connection_update( connection_t *c, f32 dt ) {
         net_packet_queue_popback( &c->pending_acks );
         c->lost_packets++;
     }
+}
+
+static void nc_update_flow( connection_t *c, f32 dt ) {
+    const f32 rtt = c->rtt * 1000.f;
+
+    if( c->flow == Good ) {
+        // if bad condition, go to Bad
+        if( rtt > RTT_THRESHOLD ) {
+            log_info( "Connection going to Bad Mode\n" );
+            c->flow = Bad;
+            
+            // Increase penalty time if oscillating between Good & Bad to often
+            if( c->good_cond_time < 10.f && c->penalty_time < 60.f ) {
+                c->penalty_time *= 2.f;
+                if( c->penalty_time > 60.f )
+                    c->penalty_time = 60.f;
+                log_info( "Penalty time increased to %f\n", c->penalty_time );
+            }
+
+            c->good_cond_time = 0.f;
+            c->penalty_accum = 0.f;
+            return;
+        }
+        
+        // else, update flow variables
+        c->good_cond_time += dt;
+        c->penalty_accum += dt;
+
+        // decrease penalty if in good mode for some time
+        if( c->penalty_accum > 10.f && c->penalty_time > 1.f ) {
+            c->penalty_accum = 0.f;
+            c->penalty_time *= 0.5f;
+            if( c->penalty_time < 1.f )
+                c->penalty_time = 1.f;
+            log_info( "Penalty time decreased to %f\n", c->penalty_time );
+        }
+    }
+
+    if( c->flow == Bad ) {
+        if( rtt <= RTT_THRESHOLD )
+            c->good_cond_time += dt;
+        else
+            c->good_cond_time = 0.f;
+
+        // if good condition for some time, go to Good
+        if( c->good_cond_time > c->penalty_time ) {
+            log_info( "Connection going to Good Mode\n" );
+            c->good_cond_time = 0.f;
+            c->penalty_accum = 0.f;
+            c->flow = Good;
+        }
+    }
+}
+
+void net_connection_update( connection_t *c, f32 dt ) {
+    if( !c || !c->running ) return;
+
+    // update reliability system and flow control
+    nc_update_queues( c, dt );
+    if( c->state == Connected )
+        nc_update_flow( c, dt );
+
+    // check connection timeout
+    c->timeout_accum += dt;
+    if( c->timeout_accum > connection_timeout ) {
+        if( c->state == Connecting ) {
+            log_info( "Connecting timed out\n" );
+            net_connection_clear( c );
+            c->state = ConnectFail;
+        } else if( c->state == Connected ) {
+            log_info( "Connection timed out\n" );
+            net_connection_clear( c );
+        }
+        return;
+    }
+
 
 
     // Update connection stats
