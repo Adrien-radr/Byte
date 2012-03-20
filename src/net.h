@@ -7,6 +7,9 @@
 // Max sequence number, after that, go to 0 (for u32 here)
 #define MAX_SEQUENCE 0xFFFFFFFF
 
+// Max expected RTT(round trip time)
+#define MAX_RTT 1.f
+
 /// Application Protocol ID
 extern const u32 protocol_id;
 
@@ -102,6 +105,7 @@ bool net_packet_queue_exists( net_packet_queue *q, u32 seq );
 void net_packet_queue_verify( net_packet_queue *q );
 void net_packet_queue_print( net_packet_queue *q );
 bool net_packet_queue_empty( net_packet_queue *q );
+void net_packet_queue_popback( net_packet_queue *q );
 
 void net_packet_queue_update( net_packet_queue *q, f32 dt );
 

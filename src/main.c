@@ -44,7 +44,7 @@ int main() {
     pthread_t th;
     pthread_create( &th, NULL, sv_connection, NULL );
 
-    Clock_sleep( 2.f );
+    Clock_sleep( 0.5f );
     printf( "Launching client...\n" );
 
     if( !cl_init() ) {

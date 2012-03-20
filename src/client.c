@@ -30,43 +30,64 @@ void cl_run() {
     Clock clk;
     f32 curr_time = 0.f;
 
-    const int size = 256 - 12;
+    const int size = 256 - 16;
     u8 packet[size];
     int bytes_read;
+    
+    int recv_packets = 0;
+
+    f32 stat_accum = 0.f, send_accum = 0.f;
 
     Clock_reset( &clk );
+    bool run = true;
 
-    while( 1 ) {
+    while( run ) {
         f32 now = Clock_getElapsedTime( &clk );
         f32 dt = now - curr_time;
         curr_time = now;
-        
-        net_connection_update( &client.connection, dt );
 
-        Clock_sleep( 0.5f );
+        send_accum += dt;
 
-        strcpy( (char*)packet, "Hello server!" );
-        bool sent = net_connection_send( &client.connection, packet, size );
+        while( send_accum > 0.1f ) {
+            u8 pack[size];
 
-        if( sent ) {
-            Clock_sleep( 1.f );
-            while( 1 ) {
-                bytes_read = net_connection_receive( &client.connection, packet, size);
+            if( recv_packets == 100 ) {
+                printf( "SENDING CLOSE SIGNAL!!!!!!\n" );
+                strcpy( (char*)pack, "close" );
+                run = false;
+            } else
+                strcpy( (char*)pack, "FROM CLIENT" );
 
-                if( bytes_read ) {
-                    log_info( "Packet received from server : %s\n", packet );
-
-                    strcpy( (char*)packet, "close" );
-                    net_connection_send( &client.connection, packet, size );
-                    return;
-                }
-                Clock_sleep( 0.2f );
-            }
+            net_connection_send( &client.connection, pack, size ); 
+            send_accum -= 0.1f;
         }
 
+        while( true ) {
+            bytes_read = net_connection_receive( &client.connection, packet, size );
+            if( !bytes_read )
+                break;
+            else {
+                recv_packets++;
+            }
+        }
+        
 
-        if( client.connection.state == ConnectFail ||
-                client.connection.state == Connected )
+        if( client.connection.state == ConnectFail )
             break;
+
+        net_connection_update( &client.connection, dt );
+
+        stat_accum += dt;
+        while( stat_accum >= 0.25f && client.connection.state == Connected ) {
+            connection_t *c = &client.connection;
+            printf( "CL : rtt %.1fms, sent %d, ackd %d, lost %d(%.1f%%), sent_bw = %.1fkbps, ackd_bw = %.1fkbps\n",
+                    c->rtt / 1000.f, c->sent_packets, c->ackd_packets, c->lost_packets, 
+                    c->sent_packets > 0.f ? ((f32)c->lost_packets / (f32)c->sent_packets * 100.f) : 0.f,
+                    c->sent_bw, c->ackd_bw );
+
+            stat_accum -= 0.25f;
+        }
+
+        Clock_sleep( dt );
     }
 }

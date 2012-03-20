@@ -32,8 +32,9 @@ void sv_shutdown() {
 void sv_run() {
     Clock clk;
     f32 curr_time = 0.f;
+    f32 stat_accum = 0.f, send_accum = 0.f;
 
-    const int size = 256 - 12;
+    const int size = 256 - 16;
     u8 packet[size];
     int bytes_read;
 
@@ -44,22 +45,43 @@ void sv_run() {
         f32 dt = now - curr_time;
         curr_time = now;
 
-        bytes_read = net_connection_receive( &server.connection, packet, size );
+        send_accum += dt;
 
-        if( bytes_read ) {
-            log_info( "Packet received from client : %s\n", packet );
-            
-            if( strstr( (char*)packet, "Hello" ) ) {
-                strcpy( (char*)packet, "Hello client!" );
-                net_connection_send( &server.connection, packet, size );
-            }
-            else if( !strcmp( (char*)packet, "close" ) )
+        while( send_accum > 0.1f ) {
+            u8 pack[size];
+            strcpy( (char*)pack, "FROM SERVER" );
+            net_connection_send( &server.connection, pack, size ); 
+            send_accum -= 0.1f;
+        }
+
+        while( true ) {
+            bytes_read = net_connection_receive( &server.connection, packet, size );
+            if( !bytes_read )
                 break;
+            else  {
+                if( !strcmp( (char*)packet, "close" ) ) {
+                    printf( "Server back to Listening...\n" );
+                    server.connection.state = Listening;
+                }
+            }
         }
 
         net_connection_update( &server.connection, dt );
         
-        Clock_sleep( 0.5f );
+        
+
+        stat_accum += dt;
+        while( stat_accum >= 0.25f && server.connection.state == Connected ) {
+            connection_t *c = &server.connection;
+            printf( "SV : rtt %.1fms, sent %d, ackd %d, lost %d(%.1f%%), sent_bw = %.1fkbps, ackd_bw = %.1fkbps\n\n",
+                    c->rtt / 1000.f, c->sent_packets, c->ackd_packets, c->lost_packets, 
+                    c->sent_packets > 0.f ? ((f32)c->lost_packets / (f32)c->sent_packets * 100.f) : 0.f,
+                    c->sent_bw, c->ackd_bw );
+
+            stat_accum -= 0.25f;
+        }
+
+        Clock_sleep( dt );
     }
 }
 
