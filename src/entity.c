@@ -8,7 +8,7 @@ EntityArray *EntityArray_init( u32 pSize ) {
     arr->mMeshes = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextures = byte_alloc( pSize * sizeof( u32 ) );
     arr->mDepths = byte_alloc( pSize * sizeof( u32 ) );
-    arr->mMatrices = byte_alloc( pSize * sizeof( mat3 ) );
+    arr->mMatrices = byte_alloc( pSize * sizeof( mat3* ) );
 
     arr->mSize = pSize;
 
@@ -28,7 +28,7 @@ int EntityArray_add( EntityArray *arr ) {
                 arr->mMeshes = byte_realloc( arr->mMeshes, arr->mSize * sizeof( u32 ) );
                 arr->mTextures = byte_realloc( arr->mTextures, arr->mSize * sizeof( u32 ) );
                 arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( u32 ) );
-                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3 ) );
+                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
             }
 
             ++arr->mMaxIndex;

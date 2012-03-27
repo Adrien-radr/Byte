@@ -33,7 +33,7 @@ int main() {
         check( Actor_load( &actors[i], "data/actors/actor2.json" ), "Error while loading actors[%d]!\n", i );
     //Actor actor2;
 
-    
+
 
 
 
@@ -51,7 +51,7 @@ int main() {
             actor_ent = Scene_addEntityFromActor( game->mScene, &actors[i*ACT_NUM + j] );
             check( actor_ent >= 0, "error creating actor_ent(%d)!\n", i*ACT_NUM+j );
             Scene_modifyEntity( game->mScene, actor_ent, EA_Depth, &ent2_depth );
-            Actor_setPositionf( &actors[i*ACT_NUM + j], 50 + i * 10.f, 50 + j * 10.f );
+            mat3_translatef( &actors[i*ACT_NUM + j].mPosition, i * 10.f, j * 10.f );
         }
     }
 
@@ -63,9 +63,28 @@ int main() {
 
     check( text >= 0, "error creating text!\n" );
 
+    vec2 textOffset;
+    textOffset.x = 10;
+    textOffset.y = 10;
+
     Scene_modifyText( game->mScene, text, TA_String, "Hello World!!" );
+    Scene_modifyText( game->mScene, text, TA_Position, &textOffset );
 
 
+    u32 mesh = -1;
+    mesh =  World_getResource("widgetmesh.json");
+    u32 tex = -1;
+    tex = World_getResource("widgettexture.jpg");
+
+    mat3 widgetPos;
+    mat3_identity(&widgetPos);
+    mat3_translatef(&widgetPos, 50, 50);
+
+    int widget = -1;
+    widget = Scene_addWidget( game->mScene, mesh, tex, &widgetPos, f, col);
+    Scene_modifyWidget( game->mScene, widget, WA_String, "Widget1" );
+    Scene_modifyWidget( game->mScene, widget, WA_TextOffset, &textOffset );
+    Scene_modifyWidget( game->mScene, widget, WA_Matrix, &widgetPos );
 
 
     ////////////////////////////////////
@@ -96,9 +115,10 @@ int main() {
                     ent2_move.x -= 1;
                 if( IsKeyDown( K_Right ) )
                     ent2_move.x += 1;
-                if( ent2_move.x != 0 || ent2_move.y != 0 ) 
-                    Actor_move( &actors[0], &ent2_move );
-
+                if( ent2_move.x != 0 || ent2_move.y != 0 ){
+                    mat3_translatefv( &actor1.mPosition, &ent2_move );
+                    //Scene_modifyWidget( game->mScene, widget, WA_Matrix, &widgetPos );
+                }
                 Scene_update( game->mScene );
 
                 p_update -= dt;

@@ -6,27 +6,18 @@
 
 typedef struct {
     // base
-    str32   mFirstname,     ///< Actor first name
-            mLastname,      ///< Actor last name
-            mSurname;       ///< Actor surname
+    str32   mFirstname,
+            mLastname,
+            mSurname;
 
-    vec2    mPosition;      ///< Actor position on map (absolute)
+    mat3    mPosition;
 
 
-    // Rendering variables
-        int     mUsedEntity;    ///< Entity used to render the actor (-1 if none)
-        u32     mMesh_id,       ///< Mesh Resource ID used by the actor
-                mTexture_id;    ///< Texture resource ID used by the actor
+    // rendering
+    u32     mMesh_id,
+            mTexture_id;
 } Actor;
 
-/// Loads an actor from a JSON file and extract all components
 bool Actor_load( Actor *pActor, const char *pFile );
-
-/// Move an actor by a vector, and correctly update its entity if one exist
-void Actor_move( Actor *pActor, vec2 *v );
-
-/// Set the position of an actor and correctly update its entity if one exist
-void Actor_setPositionfv( Actor *pActor, vec2 *v );
-void Actor_setPositionf( Actor *pActor, f32 x, f32 y );
 
 #endif // BYTE_ACTOR

@@ -1,5 +1,5 @@
 #include "actor.h"
-#include "game.h"
+#include "world.h"
 #include "json/cJSON.h"
 
 bool Actor_load( Actor *pActor, const char *pFile ) {
@@ -35,8 +35,12 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
         subitem = cJSON_GetObjectItem( item, "position" );
         check( subitem, "Error while loading actor '%s', need subentry 'position' in entry 'init'.\n", pFile );
 
-        pActor->mPosition.x = cJSON_GetArrayItem( subitem, 0 )->valuedouble;
-        pActor->mPosition.y = cJSON_GetArrayItem( subitem, 1 )->valuedouble;
+        // calculate object position/orientation into actor matrix
+        vec2 position;
+        position.x = cJSON_GetArrayItem( subitem, 0 )->valuedouble;
+        position.y = cJSON_GetArrayItem( subitem, 1 )->valuedouble;
+
+        mat3_translationMatrixfv( &pActor->mPosition, &position );
 
 
         // get rendering data
@@ -56,8 +60,6 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
         pActor->mTexture_id = World_getResource( subitem->valuestring );
         check( pActor->mTexture_id >= 0, "Error while loading actor '%s', its texture '%s' is not a loaded resource.\n", pFile, subitem->valuestring );
 
-        pActor->mUsedEntity = -1;
-
         return_val = true;
     }
 
@@ -65,27 +67,4 @@ error:
     DEL_PTR( json_file );
     if( root ) cJSON_Delete( root );
     return return_val;
-}
-
-void Actor_move( Actor *pActor, vec2 *v ) {
-    if( pActor ) {
-        pActor->mPosition = vec2_add( &pActor->mPosition, v );
-        Actor_setPositionfv( pActor, &pActor->mPosition );
-    }
-}
-
-void Actor_setPositionf( Actor *pActor, f32 x, f32 y ) {
-    vec2 v = { x, y };
-    Actor_setPositionfv( pActor, &v );
-}
-
-void Actor_setPositionfv( Actor *pActor, vec2 *v ) {
-    if( pActor ) {
-        vec2_cpy( &pActor->mPosition, v );
-        if( pActor->mUsedEntity >= 0 ) {
-            mat3 m;
-            mat3_translationMatrixfv( &m, &pActor->mPosition );
-            Scene_modifyEntity( game->mScene, pActor->mUsedEntity, EA_Matrix, &m );
-        }
-    }
 }

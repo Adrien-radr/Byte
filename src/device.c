@@ -37,9 +37,13 @@ void Device_windowResize( const Event *pEvent, void *pData ) {
 
     glViewport( 0, 0, (GLsizei)pEvent->v.x, (GLsizei)pEvent->v.y );
 
+
     if( device->mActiveCamera ) {
         Camera_calculateProjectionMatrix( device->mActiveCamera );
-        Renderer_updateProjectionMatrix( &device->mActiveCamera->mProjectionMatrix );
+        Renderer_updateProjectionMatrix( &device->mActiveCamera->mProjectionMatrix, GameMatrix );
+        mat3 uiMatrix;
+        mat3_ortho( &uiMatrix, 0, Context_getSize().x, Context_getSize().y, 0 );
+        Renderer_updateProjectionMatrix( &uiMatrix, UIMatrix);
     }
 }
 
@@ -180,7 +184,10 @@ f32 Device_getFrameTime() {
 void Device_setCamera( Camera *pCamera ) {
     if( device && pCamera ) {
         device->mActiveCamera = pCamera;
-        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
+        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix, GameMatrix );
+        mat3 uiMatrix;
+        mat3_ortho( &uiMatrix, 0, Context_getSize().x, Context_getSize().y, 0 );
+        Renderer_updateProjectionMatrix( &uiMatrix, UIMatrix);
     }
 }
 

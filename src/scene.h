@@ -9,6 +9,7 @@
 #include "text.h"
 #include "entity.h"
 #include "actor.h"
+#include "widget.h"
 
 // Forward declaration
 typedef struct s_Scene Scene;
@@ -37,16 +38,13 @@ void Scene_render();
 
     /// Add an entity to be rendered each frame in the scene
     /// @param pActor : the Actor that must be drawn as an entity
-    /// @return : The handle to the given entity 
+    /// @return : The handle to the given entity
     int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor );
 
     /// Modify one attribute of a Entity (given by its handle)
     /// @param pAttrib : the attribute type we want to change (see entity.h)
     /// @param pData   : data set as the attrib
     void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void *pData );
-
-    /// Transform an entity matrix with a given one. (just matrix multiplication)
-    void Scene_transformEntity( Scene *pScene, u32 pHandle, mat3 *pTransform );
 
     /// Remove an entity from the scene rendered entities (by its handle)
     void Scene_removeEntity( Scene *pScene, u32 pIndex );
@@ -71,6 +69,15 @@ void Scene_render();
     /// Clears the whole text array, to set a new scene
     void Scene_clearTexts( Scene *pScene );
 
+// ##########################################################################3
+//      Widgets Array
+    int Scene_addWidget( Scene *pScene, u32 pMesh, u32 pTexture, mat3* pMM, const Font *pFont, Color pColor );
+
+    void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void *pData );
+
+    void Scene_removeWidget( Scene *pScene, u32 pWidget );
+
+    void Scene_clearWidgets( Scene *pScene );
 
 
 #endif // BYTE_SCENE

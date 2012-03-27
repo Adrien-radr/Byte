@@ -15,7 +15,7 @@ Byte-Project : TODO File
 + Fix font rendering when resizing window!
 - Clean the main
 - Quad Tree for scene managment
-+ Game 'class' containing : the device, the world, the scene, game states
+- Game 'class' containing : the device, the world, the scene, game states
 - Phong Lighting
 - Dynamic shadows
 + Config file

@@ -8,7 +8,7 @@
 /// Forward declaration
 typedef struct s_Camera Camera;
 
-/// Camera Update function (take the camera as parameter to modify it
+/// Camera Update function (take the camera as parameter to modify it)
 typedef void (*CameraUpdate)(Camera *);
 
 
@@ -21,7 +21,7 @@ struct s_Camera {
 
     f32             mZoom,              ///< Camera absolute zoom level
                     mBaseZoomSpeed;     ///< Zoom speed for each zoom action (constant)
-                    
+
 
     ListenerFunc    mKeyListener,       ///< Camera event listener for keyboard
                     mMouseListener;     ///< Camera event listener for mouse
@@ -44,8 +44,8 @@ void Camera_registerListener( Camera *pCamera, ListenerFunc pFunc, ListenerType 
 /// Register an update function
 void Camera_registerUpdateFunction( Camera *pCamera, CameraUpdate pFunc );
 
-/// Ask the given camera to recalculate its projection matrix (if the window size has 
-/// changed for example.
+/// Ask the given camera to recalculate its projection matrix (if the window size has
+/// changed for example).
 void Camera_calculateProjectionMatrix( Camera *pCamera );
 
 void Camera_update( Camera *pCamera );

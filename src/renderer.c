@@ -33,6 +33,10 @@ struct s_Renderer {
                     mCurrentShader,         ///< The currently bound OpenGL Shader Program
                     mCurrentTexture,        ///< The currently bound OpenGL Texture
                     mCurrentTextureTarget;  ///< The current OpenGL Texture targer
+
+    //  Projection matrices for the game and for the widgets.
+    mat3 projection_matrix_game;
+    mat3 projection_matrix_ui;
 };
 
 /// Renderer only instance definition
@@ -43,7 +47,7 @@ bool Renderer_init() {
 
     renderer = byte_alloc( sizeof( Renderer ) );
     check_mem( renderer );
-    
+
     // initial number of 10 vaos and 100 meshes
     MeshArray_init( &renderer->mMeshes, 10 );
     ShaderArray_init( &renderer->mShaders, 10 );
@@ -56,7 +60,7 @@ bool Renderer_init() {
     renderer->mCurrentTextureTarget = 0;
 
     renderer->mVao = -1;
- 
+
     // GLEW initialisation
     glewExperimental = 1;
     GLenum glerr = glewInit();
@@ -68,7 +72,7 @@ bool Renderer_init() {
 
     log_info( "GLEW v%s successfully initialized!\n", glewGetString( GLEW_VERSION ) );
 
-    // GL Version 
+    // GL Version
     int majV, minV;
     glGetIntegerv( GL_MAJOR_VERSION, &majV );
     glGetIntegerv( GL_MINOR_VERSION, &minV );
@@ -94,7 +98,7 @@ bool Renderer_init() {
 
     // clear init gl errors
     CheckGLError();
- 
+
     log_info( "Renderer successfully initialized!\n" );
 
     return true;
@@ -119,12 +123,24 @@ void Renderer_beginFrame() {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
-void Renderer_updateProjectionMatrix( const mat3 *pm ) {
+mat3 Renderer_getProjectionMatrix( ProjectionMatrix pPm ){
+    switch (pPm) {
+        case GameMatrix :
+            return renderer->projection_matrix_game;
+            break;
+        case UIMatrix :
+            return renderer->projection_matrix_ui;
+            break;
+    }
+}
+
+void Renderer_updateProjectionMatrix( const mat3 *pm, ProjectionMatrix pPm ) {
+    /*
     if( renderer ) {
         u32 currShader = renderer->mCurrentShader;
 
         // update every shader using projection matrix
-        for( u32 i = 0; renderer && (i < renderer->mShaders.cpt); ++i ) 
+        for( u32 i = 0; renderer && (i < renderer->mShaders.cpt); ++i )
             if( renderer->mShaders.data[i]->mUseProjectionMatrix ) {
                 Renderer_useShader( i );
                 Shader_sendMat3( "ProjectionMatrix", pm );
@@ -132,6 +148,16 @@ void Renderer_updateProjectionMatrix( const mat3 *pm ) {
 
         // returns to shader used before update
         Renderer_useShader( currShader );
+    }*/
+    if(renderer){
+        switch (pPm) {
+            case GameMatrix :
+                memcpy( &renderer->projection_matrix_game, pm, 9 * sizeof(f32) );
+                break;
+            case UIMatrix :
+                memcpy( &renderer->projection_matrix_ui, pm, 9 * sizeof(f32) );
+                break;
+        }
     }
 }
 
@@ -238,7 +264,7 @@ bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIDat
             memcpy( m->mIndices, pIData, pISize );
 
             m->mIndexCount = pISize / sizeof( u32 );
-        } 
+        }
 
         // if any change, rebuild mesh
         if( pVSize > 0 || pISize > 0 )
@@ -289,7 +315,7 @@ error:
     return -1;
 }
 
-void Renderer_useShader( int pShader ) { 
+void Renderer_useShader( int pShader ) {
     if( renderer && pShader < renderer->mShaders.cpt && pShader != renderer->mCurrentShader ) {
         renderer->mCurrentShader = pShader;
         Shader_bind( pShader < 0 ? 0 : renderer->mShaders.data[pShader] );
@@ -303,7 +329,7 @@ Shader *Renderer_getShader( u32 pShader ) {
 }
 
 int  Renderer_currentShader() {
-    if( renderer ) 
+    if( renderer )
         return renderer->mCurrentShader;
     return -1;
 }
@@ -358,7 +384,7 @@ void Renderer_useTexture( int pTexture, u32 pTarget ) {
         renderer->mCurrentTexture = pTexture;
 
         int target = -1;
-        if( pTarget != renderer->mCurrentTextureTarget ) 
+        if( pTarget != renderer->mCurrentTextureTarget )
             renderer->mCurrentTextureTarget = target = pTarget;
 
         Texture_bind( pTexture < 0 ? 0 : renderer->mTextures.data[pTexture], target );
@@ -450,7 +476,7 @@ void CheckGLError_func( const char *pFile, u32 pLine ) {
                 break;
             }
 
-            default : 
+            default :
             {
                 strncpy( errorStr, "UNKNOWN", 64 );
                 strncpy( description, "Unknown GL Error", 256 );

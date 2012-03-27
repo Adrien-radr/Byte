@@ -19,7 +19,12 @@ void Renderer_destroy();
 void Renderer_beginFrame();
 
 /// Update the projection matrix used to render in shaders
-void Renderer_updateProjectionMatrix( const mat3 *pm );
+typedef enum {
+    GameMatrix,
+    UIMatrix
+} ProjectionMatrix;
+mat3 Renderer_getProjectionMatrix( ProjectionMatrix pPm );
+void Renderer_updateProjectionMatrix( const mat3 *pm, ProjectionMatrix pPm );
 
 /// Returns whether or not the renderer is initialized
 bool Renderer_isInitialized();
@@ -42,7 +47,7 @@ bool Renderer_isInitialized();
     /// @return : the handle to the created mesh.
     int  Renderer_createStaticMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
 
-    /// Make a dynamic mesh (dont build it yet
+    /// Make a dynamic mesh (dont build it yet)
     int  Renderer_createDynamicMesh();
 
     /// Change the data of given mesh, and rebuild VBO

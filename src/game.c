@@ -39,6 +39,7 @@ bool Game_init() {
     return true;
 
 error:
+    Game_destroy();
     return false;
 }
 

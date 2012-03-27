@@ -12,6 +12,10 @@ typedef struct s_Scene {
     u32             mTextShader;        ///< Shader used to render texts
     TextArray       *mTexts;            ///< Texts in the scene
 
+    u32 mWidgetShader;                 ///< Shader used to render widgets
+    u32 mWidgetTextShader;
+    WidgetArray  *mWidgets;         ///< Widgets in the scene
+
     Camera          *mCamera;           ///< Camera of the scene
 } Scene;
 
@@ -21,13 +25,13 @@ typedef struct s_Scene {
 // Camera listeners and update function
     void cameraMouseListener( const Event *pEvent, void *pCamera ) {
         Camera *cam = (Camera*)pCamera;
-        // manage zoom event 
-        if( pEvent->Type == E_MouseWheelMoved ) 
+        // manage zoom event
+        if( pEvent->Type == E_MouseWheelMoved )
             Camera_zoom( cam, pEvent->i );
     }
 
     void cameraUpdate( Camera *pCamera ) {
-        // manage position pan 
+        // manage position pan
         vec2 move = { .x = 0.f, .y = 0.f };
         if( IsKeyDown( K_W ) )
             move.y -= 1.f;
@@ -51,12 +55,16 @@ typedef struct s_Scene {
             if( HandleManager_isUsed( s->mTexts->mUsed, i ) )
                 Text_setString( s->mTexts->mMeshes[i], s->mTexts->mFonts[i], s->mTexts->mStrings[i] );
         }
+        for( u32 i = 0; i < s->mWidgets->mMaxIndex; ++i ) {
+            if( HandleManager_isUsed( s->mWidgets->mUsed, i ) )
+                Text_setString( s->mWidgets->mTextMeshes[i], s->mWidgets->mFonts[i], s->mWidgets->mStrings[i] );
+        }
     }
 
 
 Scene *Scene_new() {
     Scene *s = NULL;
-    
+
     s = byte_alloc( sizeof( Scene ) );
     check_mem( s );
 
@@ -67,14 +75,30 @@ Scene *Scene_new() {
     int es = World_getResource( "defaultShader.json" );
     check( es >= 0, "Entity shader creation error!\n" );
 
+
+
     // create array of texts (intial size = 50)
     s->mTexts = TextArray_init( 50 );
+
+
+    s->mWidgets = WidgetArray_init(50);
+    int ws = World_getResource( "widgetShader.json" );
+    int wts = World_getResource( "widgetTextShader.json" );
+    s->mWidgetShader = ws;
+    s->mWidgetTextShader = wts;
+
 
     // init default text shader
     int ts = World_getResource( "textShader.json" );
     check( ts >= 0, "Text shader creation error!\n" );
 
     s->mTextShader = ts;
+
+    //int ws = World_getResource( "defaultShader.json" );
+    //check( ws >= 0, "bla bla bla" );
+
+
+    //s->mWidgetShader = es;
 
     // camera
         s->mCamera = Camera_new();
@@ -87,7 +111,7 @@ Scene *Scene_new() {
 
     // Event listener
     EventManager_addListener( LT_ResizeListener, sceneWindowResizing, s );
-        
+
     return s;
 error:
     Scene_destroy( s );
@@ -99,9 +123,10 @@ void Scene_destroy( Scene *pScene ) {
         //EntitiesArray_destroy( &pScene->mEntities );
         EntityArray_destroy( pScene->mEntities );
         TextArray_destroy( pScene->mTexts );
+        WidgetArray_destroy( pScene->mWidgets );
         Camera_destroy( pScene->mCamera );
         DEL_PTR( pScene );
-    }   
+    }
 }
 
 void Scene_update( Scene *pScene ) {
@@ -117,7 +142,9 @@ void Scene_render( Scene *pScene ) {
         for( u32 i = 0; i < pScene->mEntities->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->mEntities->mUsed, i ) ) {
                 Renderer_useTexture( pScene->mEntities->mTextures[i], 0 );
-                Shader_sendMat3( "ModelMatrix", &pScene->mEntities->mMatrices[i] );
+                mat3 projMat = Renderer_getProjectionMatrix( GameMatrix );
+                Shader_sendMat3( "ProjectionMatrix",  &projMat );
+                Shader_sendMat3( "ModelMatrix", pScene->mEntities->mMatrices[i] );
                 Shader_sendInt( "Depth", pScene->mEntities->mDepths[i] );
                 Renderer_renderMesh( pScene->mEntities->mMeshes[i] );
             }
@@ -136,11 +163,53 @@ void Scene_render( Scene *pScene ) {
                 Renderer_renderMesh( pScene->mTexts->mMeshes[i] );
             }
         }
+
+
+        // ##################################################
+        //      RENDER WIDGETS
+
+        for( u32 i = 0; i < pScene->mWidgets->mMaxIndex; ++i ){
+            if( HandleManager_isUsed( pScene->mWidgets->mUsed, i ) ) {
+                //  Rendering of the texture
+                Renderer_useShader( pScene->mEntityShader );
+                mat3 projMat = Renderer_getProjectionMatrix( UIMatrix );
+                Shader_sendMat3( "ProjectionMatrix", &projMat );
+                Renderer_useTexture( pScene->mWidgets->mTextures[i], 0 );
+                Shader_sendMat3( "ModelMatrix", pScene->mWidgets->mMatrices[i] );
+                Shader_sendInt( "Depth", pScene->mWidgets->mDepth );
+                Renderer_renderMesh( pScene->mWidgets->mTextureMeshes[i] );
+
+                //  Rendering of the text
+                Renderer_useShader( pScene->mTextShader );
+
+                Renderer_useTexture( pScene->mWidgets->mFonts[i]->mTexture, 0 );
+                Shader_sendColor( "Color", &pScene->mWidgets->mColors[i] );
+                pScene->mWidgets->mTextPositions[i].x = pScene->mWidgets->mMatrices[i]->x[6];
+                pScene->mWidgets->mTextPositions[i].y = pScene->mWidgets->mMatrices[i]->x[7];
+                vec2 new_pos = pScene->mWidgets->mTextPositions[i];
+                //vec2 halfTextSize;
+                //vec2 halfTexturePos;
+                //halfTextSize.x = 1/2 * new_pos.x;
+                //halfTextSize.y = 1/2 * new_pos.y;
+                //halfTexturePos.x = 1/2 * pScene->mWidgets->mMatrices[i]->x[6];
+                //halfTexturePos.y = 1/2 * pScene->mWidgets->mMatrices[i]->x[7];
+
+
+                vec2 ws = Context_getSize();
+                f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
+
+                new_pos.x *= sx;
+                new_pos.y *= -sy;
+                Shader_sendVec2( "Position", &new_pos );
+
+                Renderer_renderMesh( pScene->mWidgets->mTextMeshes[i] );
+            }
+        }
     }
 }
 
 //  =======================
- 
+
 int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
     int handle = -1;
 
@@ -150,25 +219,22 @@ int  Scene_addEntity( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
         if( handle >= 0 ) {
             pScene->mEntities->mMeshes[handle] = pMesh;
             pScene->mEntities->mTextures[handle] = pTexture;
-            memcpy( &pScene->mEntities->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
+            pScene->mEntities->mMatrices[handle] = pMM;
         }
     }
     return handle;
 }
 
-int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor ) { 
+int  Scene_addEntityFromActor( Scene *pScene, Actor *pActor ) {
     int handle = -1;
 
     if( pScene && pActor ) {
         handle = EntityArray_add( pScene->mEntities );
 
         if( handle >= 0 ) {
-            pActor->mUsedEntity = handle;
             pScene->mEntities->mMeshes[handle] = pActor->mMesh_id;
             pScene->mEntities->mTextures[handle] = pActor->mTexture_id;
-            mat3 m;
-            mat3_translationMatrixfv( &m, &pActor->mPosition );
-            memcpy( pScene->mEntities->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
+            pScene->mEntities->mMatrices[handle] = &pActor->mPosition;
         }
     }
     return handle;
@@ -179,7 +245,7 @@ void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void 
         if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
             switch( pAttrib ) {
                 case EA_Matrix :
-                    memcpy( &pScene->mEntities->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
+                    pScene->mEntities->mMatrices[pHandle] = (mat3*)pData;
                     break;
                 case EA_Texture :
                     pScene->mEntities->mTextures[pHandle] = *((u32*)pData);
@@ -189,24 +255,16 @@ void Scene_modifyEntity( Scene *pScene, u32 pHandle, EntityAttrib pAttrib, void 
                     break;
             }
         }
-    }   
-}
-
-void Scene_transformEntity( Scene *pScene, u32 pHandle, mat3 *pTransform ) {
-    if( pScene && pTransform ) {
-        if( HandleManager_isUsed( pScene->mEntities->mUsed, pHandle ) ) {
-            mat3_mul( &pScene->mEntities->mMatrices[pHandle], pTransform );
-        }
     }
 }
 
 void Scene_removeEntity( Scene *pScene, u32 pIndex ) {
-    if( pScene ) 
+    if( pScene )
         EntityArray_remove( pScene->mEntities, pIndex );
 }
 
 void Scene_clearEntities( Scene *pScene ) {
-    if( pScene ) 
+    if( pScene )
         EntityArray_clear( pScene->mEntities );
 }
 
@@ -271,11 +329,109 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
 }
 
 void Scene_removeText( Scene *pScene, u32 pIndex ) {
-    if( pScene ) 
+    if( pScene )
         TextArray_remove( pScene->mTexts, pIndex );
 }
 
 void Scene_clearTexts( Scene *pScene ) {
-    if( pScene ) 
+    if( pScene )
         TextArray_clear( pScene->mTexts );
+}
+
+
+//////////////////////////////
+
+int Scene_addWidget( Scene *pScene, u32 pMesh, u32 pTexture, mat3* pMM, const Font* pFont, Color pColor ) {
+    int handle = -1;
+
+    if( pScene ){
+        handle = WidgetArray_add( pScene->mWidgets );
+
+        if( handle >= 0 ){
+            pScene->mWidgets->mTextureMeshes[handle] = pMesh;
+            pScene->mWidgets->mTextures[handle] = pTexture;
+            pScene->mWidgets->mMatrices[handle] = pMM;
+            pScene->mWidgets->mFonts[handle] = pFont;
+            pScene->mWidgets->mColors[handle] = pColor;
+        }
+    }
+
+    return handle;
+}
+
+void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void *pData ) {
+    if( pScene ) {
+        if( HandleManager_isUsed( pScene->mWidgets->mUsed, pHandle ) ) {
+            switch( pAttrib ) {
+                case WA_Texture :
+                    {
+                        u32 new_texture = *((u32*)pData);
+                        pScene->mWidgets->mTextures[pHandle] = new_texture;
+                    }
+                    break;
+                case WA_Matrix :
+                    pScene->mWidgets->mMatrices[pHandle] = (mat3*)pData;
+                    break;
+                case WA_Bounds :
+                    {
+                        vec2 new_bounds = *((vec2*)pData);
+                        pScene->mWidgets->mBounds[pHandle] = new_bounds;
+                    }
+                    break;
+                case WA_Font :
+                    {
+                        const Font* new_font = ((const Font*)pData);
+                        pScene->mWidgets->mFonts[pHandle] = new_font;
+                    }
+                    break;
+                case WA_Color :
+                    pScene->mWidgets->mColors[pHandle] = *((Color*)pData);
+                    break;
+                case WA_TextOffset :
+                    {
+                        vec2 new_pos = *((vec2*)pData);
+
+                        new_pos.x += pScene->mWidgets->mMatrices[pHandle]->x[6];
+                        new_pos.y += pScene->mWidgets->mMatrices[pHandle]->x[7];
+
+                        pScene->mWidgets->mTextPositions[pHandle] = new_pos;
+                    }
+                    break;
+                case WA_String :
+                    {
+                        const char *s = (const char*)pData;
+
+                        // recreate VBO
+                        Text_setString( pScene->mWidgets->mTextMeshes[pHandle], pScene->mWidgets->mFonts[pHandle], s );
+
+                        // copy string inside textarray to keep track of current string
+                        DEL_PTR(pScene->mWidgets->mStrings[pHandle] );
+
+                        pScene->mWidgets->mStrings[pHandle] = byte_alloc( strlen( s ) + 1 );
+                        strcpy( pScene->mWidgets->mStrings[pHandle], s );
+                    }
+                    break;
+                case WA_Type :
+                    {
+                        WidgetType new_wa = *((WidgetType*)pData);
+                        pScene->mWidgets->mWidgetTypes[pHandle] = new_wa;
+                    }
+                    break;
+            }
+        }
+    }
+}
+
+
+
+void Scene_removeWidget( Scene *pScene, u32 pWidget ) {
+    if( pScene ){
+        WidgetArray_remove( pScene->mWidgets, pWidget );
+    }
+}
+
+void Scene_clearWidgets( Scene *pScene) {
+    if( pScene ){
+        WidgetArray_clear( pScene->mWidgets );
+    }
 }

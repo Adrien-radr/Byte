@@ -1,19 +1,21 @@
-Byte-Project Log v0.1.0
-Wed 15 Feb 2012 - 20:22:34
+Byte-Project Log v0.0.14
+Tue 27 Mar 2012 - 17:09:25
 ==========================
 [INFO] GLFW Window successfully initialized!
-[INFO] GLEW v1.7.0 successfully initialized!
+[INFO] GLEW v1.6.0 successfully initialized!
 [INFO] OpenGL 3.2
-[INFO] GLSL 4.20
-[INFO] Hardware : ATI Technologies Inc. - ATI Mobility Radeon HD 5800 Series 
+[INFO] GLSL 1.50 NVIDIA via Cg compiler
+[INFO] Hardware : NVIDIA Corporation - GeForce GTX 285/PCI/SSE2
 [INFO] Renderer successfully initialized!
 [INFO] Event manager successfully initialized!
 [INFO] Device successfully initialized!
 [INFO] Resource "defaultShader.json" loaded.
 [INFO] Resource "textShader.json" loaded.
 [INFO] Resource "quadmesh.json" loaded.
+[INFO] Resource "widgetmesh.json" loaded.
 [INFO] Resource "crate.jpg" loaded.
 [INFO] Resource "img_test.png" loaded.
+[INFO] Resource "widgettexture.jpg" loaded.
 [INFO] Resource "DejaVuSans.ttf" loaded.
 [INFO] Resource "visitor2.ttf" loaded.
 [INFO] Game successfully initialized!

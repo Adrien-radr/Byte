@@ -27,6 +27,7 @@
 					<Add option="-lfreetypeWIN" />
 					<Add option="-lzWIN" />
 					<Add option="-lopengl32" />
+					<Add option="-static-libgcc" />
 					<Add directory="..\..\ext" />
 				</Linker>
 				<MakeCommands>
@@ -148,6 +149,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="..\..\src\vector.h" />
+		<Unit filename="..\..\src\widget.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\src\widget.h" />
 		<Unit filename="..\..\src\world.c">
 			<Option compilerVar="CC" />
 		</Unit>

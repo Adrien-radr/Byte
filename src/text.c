@@ -24,7 +24,7 @@ void Font_destroy( Font *pFont ) {
 
 bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
     if( pFont && pFile ) {
-        FT_Library *ft = Device_getFreetype(); 
+        FT_Library *ft = Device_getFreetype();
 
         check( !FT_New_Face( *ft, pFile, 0, &pFont->mFace ), "Could not open font file \"%s\"!\n", pFile );
 
@@ -54,11 +54,11 @@ bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-        
+
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, pFont->mTextureSize.x,
                                                 pFont->mTextureSize.y,
                                                 0,
-                                                GL_RED, 
+                                                GL_RED,
                                                 GL_UNSIGNED_BYTE,
                                                 0 );
 
@@ -70,7 +70,7 @@ bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
 
             glTexSubImage2D( GL_TEXTURE_2D, 0, x, 0, g->bitmap.width,
                                                      g->bitmap.rows,
-                                                     GL_RED, 
+                                                     GL_RED,
                                                      GL_UNSIGNED_BYTE,
                                                      g->bitmap.buffer );
 
@@ -191,7 +191,7 @@ void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr ) {
         data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = 0;
         data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = (f32)glyphs[i].size.y / (f32)fh;
         data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = 0;
-            
+
     }
 
     // update mesh
@@ -232,7 +232,7 @@ int TextArray_add( TextArray *arr ) {
                 arr->mMeshes = byte_realloc( arr->mMeshes, arr->mSize * sizeof( u32 ) );
                 arr->mColors = byte_realloc( arr->mColors, arr->mSize * sizeof( Color ) );
                 arr->mStrings = byte_realloc( arr->mStrings, arr->mSize * sizeof( char* ) );
-                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2* ) );
+                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2 ) );
             }
 
             // create mesh used by text
@@ -263,7 +263,7 @@ void TextArray_clear( TextArray *arr ) {
         arr->mMaxIndex = 0;
         HandleManager_clear( arr->mUsed );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
-            DEL_PTR( arr->mStrings[i] ); 
+            DEL_PTR( arr->mStrings[i] );
         }
     }
 }
@@ -276,7 +276,7 @@ void TextArray_destroy( TextArray *arr ) {
         DEL_PTR( arr->mColors );
         DEL_PTR( arr->mPositions );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
-            DEL_PTR( arr->mStrings[i] ); 
+            DEL_PTR( arr->mStrings[i] );
         }
         DEL_PTR( arr->mStrings );
         DEL_PTR( arr );

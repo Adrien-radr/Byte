@@ -57,15 +57,15 @@ void Camera_calculateProjectionMatrix( Camera *pCamera ) {
             height = windowSize.y - yoffset;
 
 
-        mat3_ortho( &pCamera->mProjectionMatrix, xoffset + pCamera->mPosition.x, 
-                                                 width + pCamera->mPosition.x, 
-                                                 height + pCamera->mPosition.y, 
+        mat3_ortho( &pCamera->mProjectionMatrix, xoffset + pCamera->mPosition.x,
+                                                 width + pCamera->mPosition.x,
+                                                 height + pCamera->mPosition.y,
                                                  yoffset + pCamera->mPosition.y );
     }
 }
 
 void Camera_update( Camera *pCamera ) {
-    if( pCamera ) 
+    if( pCamera )
         pCamera->mUpdateFunc( pCamera );
 }
 
@@ -76,7 +76,7 @@ void Camera_move( Camera *pCamera, vec2 *pVector ) {
 
         // recalculate projection matrix and warn every shaders using it
         Camera_calculateProjectionMatrix( pCamera );
-        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
+        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix, GameMatrix );
     }
 }
 
@@ -96,19 +96,19 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
         // bottom zoom limit
         if( pCamera->mZoom <= 0.1f ) pCamera->mZoom = 0.1f;
         else {
-            // if we are not at the bottom limit, 
+            // if we are not at the bottom limit,
             // modify cameraposition to zoom on mouse
             vec2 windowSize = Context_getSize();
             f32 mx = GetMouseX(),
                 my = GetMouseY();
 
-            // here we zoom in the direction from the window center to the mouse position, with a 
+            // here we zoom in the direction from the window center to the mouse position, with a
             // magnitude depending on the zoom level (less magnitude if near ground)
             vec2 dir = { .x = (mx - ( windowSize.x / 2.f ) ), .y = (my - ( windowSize.y / 2.f ) ) };
             f32 dir_len = vec2_len( &dir );
             vec2_normalize( &dir );
 
-            f32 pan_magnitude = dir_len * 0.1f * pCamera->mZoom; 
+            f32 pan_magnitude = dir_len * 0.1f * pCamera->mZoom;
             dir = vec2_mul( &dir, pan_magnitude );
 
             // dezoom in inverse direction of mouse
@@ -121,6 +121,6 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
 
         // recalculate projection matrix and warn every shaders using it
         Camera_calculateProjectionMatrix( pCamera );
-        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
+        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix, GameMatrix );
     }
 }
