@@ -71,7 +71,10 @@ void Scene_render();
 
 // ##########################################################################3
 //      Widgets Array
-    int Scene_addWidget( Scene *pScene, u32 pMesh, u32 pTexture, mat3* pMM, const Font *pFont, Color pColor );
+    /// Add a widget to be rendered
+    /// @param pWT : the type of the widget (see widget.h).
+    /// @param pData : the corresponding data structure to set the widget (see widget.h).
+    int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct );
 
     void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void *pData );
 

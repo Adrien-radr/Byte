@@ -35,13 +35,13 @@
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="..\..\src\context.h" open="1" top="0" tabpos="15">
-		<Cursor position="746" topLine="7" />
+		<Cursor position="746" topLine="6" />
 	</File>
 	<File name="..\..\src\debug.c" open="0" top="0" tabpos="12">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="..\..\src\debug.h" open="0" top="0" tabpos="26">
-		<Cursor position="2765" topLine="62" />
+	<File name="..\..\src\debug.h" open="1" top="0" tabpos="20">
+		<Cursor position="5146" topLine="116" />
 	</File>
 	<File name="..\..\src\device.c" open="1" top="0" tabpos="13">
 		<Cursor position="1240" topLine="21" />
@@ -49,8 +49,8 @@
 	<File name="..\..\src\device.h" open="0" top="0" tabpos="27">
 		<Cursor position="565" topLine="0" />
 	</File>
-	<File name="..\..\src\entity.c" open="0" top="0" tabpos="16">
-		<Cursor position="1165" topLine="0" />
+	<File name="..\..\src\entity.c" open="1" top="0" tabpos="17">
+		<Cursor position="128" topLine="0" />
 	</File>
 	<File name="..\..\src\entity.h" open="0" top="0" tabpos="15">
 		<Cursor position="604" topLine="0" />
@@ -67,29 +67,29 @@
 	<File name="..\..\src\game.h" open="0" top="0" tabpos="29">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="..\..\src\handlemanager.c" open="0" top="0" tabpos="4">
-		<Cursor position="2199" topLine="57" />
+	<File name="..\..\src\handlemanager.c" open="1" top="0" tabpos="19">
+		<Cursor position="478" topLine="0" />
 	</File>
-	<File name="..\..\src\handlemanager.h" open="0" top="0" tabpos="3">
-		<Cursor position="1091" topLine="6" />
+	<File name="..\..\src\handlemanager.h" open="1" top="0" tabpos="18">
+		<Cursor position="1066" topLine="7" />
 	</File>
 	<File name="..\..\src\keys.h" open="0" top="0" tabpos="5">
 		<Cursor position="1190" topLine="61" />
 	</File>
 	<File name="..\..\src\main.c" open="1" top="0" tabpos="1">
-		<Cursor position="2172" topLine="49" />
+		<Cursor position="2785" topLine="67" />
 	</File>
 	<File name="..\..\src\matrix.c" open="1" top="0" tabpos="9">
-		<Cursor position="3307" topLine="93" />
+		<Cursor position="3307" topLine="92" />
 	</File>
 	<File name="..\..\src\matrix.h" open="1" top="0" tabpos="8">
 		<Cursor position="1632" topLine="22" />
 	</File>
-	<File name="..\..\src\mesh.c" open="0" top="0" tabpos="12">
-		<Cursor position="2023" topLine="44" />
+	<File name="..\..\src\mesh.c" open="1" top="0" tabpos="16">
+		<Cursor position="889" topLine="0" />
 	</File>
 	<File name="..\..\src\mesh.h" open="0" top="0" tabpos="23">
-		<Cursor position="611" topLine="0" />
+		<Cursor position="242" topLine="0" />
 	</File>
 	<File name="..\..\src\renderer.c" open="1" top="0" tabpos="11">
 		<Cursor position="4251" topLine="115" />
@@ -104,10 +104,10 @@
 		<Cursor position="528" topLine="0" />
 	</File>
 	<File name="..\..\src\scene.c" open="1" top="1" tabpos="3">
-		<Cursor position="7083" topLine="166" />
+		<Cursor position="13218" topLine="365" />
 	</File>
 	<File name="..\..\src\scene.h" open="1" top="0" tabpos="2">
-		<Cursor position="2068" topLine="40" />
+		<Cursor position="2916" topLine="42" />
 	</File>
 	<File name="..\..\src\shader.c" open="0" top="0" tabpos="20">
 		<Cursor position="4473" topLine="114" />
@@ -119,7 +119,7 @@
 		<Cursor position="8333" topLine="192" />
 	</File>
 	<File name="..\..\src\text.h" open="1" top="0" tabpos="6">
-		<Cursor position="2725" topLine="46" />
+		<Cursor position="2725" topLine="45" />
 	</File>
 	<File name="..\..\src\texture.c" open="0" top="0" tabpos="16">
 		<Cursor position="934" topLine="4" />
@@ -134,10 +134,10 @@
 		<Cursor position="109" topLine="0" />
 	</File>
 	<File name="..\..\src\widget.c" open="1" top="0" tabpos="5">
-		<Cursor position="1060" topLine="9" />
+		<Cursor position="6401" topLine="106" />
 	</File>
 	<File name="..\..\src\widget.h" open="1" top="0" tabpos="4">
-		<Cursor position="1263" topLine="11" />
+		<Cursor position="1542" topLine="15" />
 	</File>
 	<File name="..\..\src\world.c" open="0" top="0" tabpos="21">
 		<Cursor position="762" topLine="0" />

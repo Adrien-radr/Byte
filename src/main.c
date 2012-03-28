@@ -63,12 +63,12 @@ int main() {
 
     check( text >= 0, "error creating text!\n" );
 
-    vec2 textOffset;
-    textOffset.x = 10;
-    textOffset.y = 10;
+    vec2 textPos;
+    textPos.x = 10;
+    textPos.y = 10;
 
     Scene_modifyText( game->mScene, text, TA_String, "Hello World!!" );
-    Scene_modifyText( game->mScene, text, TA_Position, &textOffset );
+    Scene_modifyText( game->mScene, text, TA_Position, &textPos );
 
 
     u32 mesh = -1;
@@ -81,9 +81,15 @@ int main() {
     mat3_translatef(&widgetPos, 50, 50);
 
     int widget = -1;
-    widget = Scene_addWidget( game->mScene, mesh, tex, &widgetPos, f, col);
+    WidgetButtonAttributes wba;
+    wba.mMesh = mesh;
+    wba.mTexture = tex;
+    wba.mMM = &widgetPos;
+    wba.mFont = f;
+    wba.mColor = col;
+    widget = Scene_addWidget( game->mScene, WT_Button, &wba );
     Scene_modifyWidget( game->mScene, widget, WA_String, "Widget1" );
-    Scene_modifyWidget( game->mScene, widget, WA_TextOffset, &textOffset );
+    Scene_modifyWidget( game->mScene, widget, WA_TextPosition, &textPos );
     Scene_modifyWidget( game->mScene, widget, WA_Matrix, &widgetPos );
 
 
