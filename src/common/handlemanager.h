@@ -10,6 +10,7 @@ typedef struct {
     };
     int     next_free_index;
     bool    used;
+    bool    manage;
 } Handle;
 
 /// Container using indices and dynamic directing to store single entries 
@@ -32,8 +33,10 @@ HandleManager *HandleManager_init( u32 pSize );
 void HandleManager_destroy( HandleManager *pHm );
 
 /// Add a new handle entry (with pointer data) in the given handle manager and returns its index
+/// @param manage : true if the data must be destroyed at manager destruction
+/// @param data_size : sizeof the given data, only if managment wanted. else, set to 0
 /// @return : the handle of new data if successful. -1 if error.
-int  HandleManager_addData( HandleManager *pHm, void *pData );
+int  HandleManager_addData( HandleManager *pHm, void *pData, bool manage, u32 data_size );
 
 /// Add a new handle entry (with u32 data) in the given handle manager and returns its index
 /// @return : the handle of new data if successful. -1 if error.

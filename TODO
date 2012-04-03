@@ -22,6 +22,9 @@ Byte-Project : TODO File
     + Msg struct for msg transmission
     - Dedicated server & server+client & client-only
 
+    - Add free port finding (several connection from single machine )
+    - Handle server refusing because not enough slot
+
     Map System
     ----------
     - Squared tiles map (3d?)

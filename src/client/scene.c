@@ -71,7 +71,7 @@ Scene *Scene_new() {
     s->mSprites = SpriteArray_init( 50 );
 
     // init default sprite shader
-    int ss = ResourceManager_getResource( "sprite_shader.json" );
+    int ss = ResourceManager_get( "sprite_shader.json" );
     check( ss >= 0, "Sprite shader creation error!\n" );
 
     s->mSpriteShader = ss;
@@ -80,7 +80,7 @@ Scene *Scene_new() {
     s->mTexts = TextArray_init( 50 );
 
     // init default text shader
-    int ts = ResourceManager_getResource( "text_shader.json" );
+    int ts = ResourceManager_get( "text_shader.json" );
     check( ts >= 0, "Text shader creation error!\n" );
 
     s->mTextShader = ts;

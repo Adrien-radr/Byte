@@ -4,6 +4,28 @@
 #include "common.h"
 #include <arpa/inet.h>
 
+/// GAME NET PACKAGES TYPES
+typedef enum {
+    CONNECT_ASKID,
+    CONNECT_SESSIONID,
+    CONNECT_TRY,
+    CONNECT_ACCEPT,
+    CONNECT_REFUSE,
+    CONNECT_CLOSE,
+    CONNECT_CLOSEOK,
+
+    KEEP_ALIVE,
+
+    PT_ARRAYEND
+} PacketType;
+
+extern str32 PacketTypeStr[PT_ARRAYEND];
+
+
+// Packet header size in bytes
+// [protocolID, sessionID, msgType, sequence, ack, ack bits]
+#define PACKET_HEADER_SIZE 24
+
 // Max sequence number, after that, go to 0 (for u32 here)
 #define MAX_SEQUENCE 0xFFFFFFFF
 
@@ -18,6 +40,11 @@ extern const u32 protocol_id;
 
 typedef int net_socket;
 
+typedef struct {
+    u8  ip[4];
+    u16 port;
+} net_addr;
+
 
 /// Information about a net packet
 typedef struct {
@@ -30,16 +57,23 @@ typedef struct {
 typedef struct {
     net_packet_info             arr[256];   
     net_packet_info             *list[256];
-    u16                         tail;
-    u16                         count;
-} net_packet_queue;
+    u32                         tail;
+    u32                         count;
+} net_packet_info_queue;
 
-
-
+/// Circular buffer for packets
 typedef struct {
-    u8  ip[4];
-    u16 port;
-} net_addr;
+    struct {
+        u8          data[256];
+        u32         stack_pos;
+
+        net_addr    addr;           
+        u32         sequence;
+    }                           packets[256];
+
+    u32                         start,
+                                count;
+} net_packet_queue;
 
 typedef struct {
     str16                       ifname;
@@ -52,94 +86,120 @@ typedef struct {
 extern net_ip local_ips[MAX_IPS];
 
 
+
 typedef enum {
     Server,
     Client
 } connection_mode;
 
+/// Informations concerning a connection to an address
+///  Ex: A client has only one connection_info
+///      The server has MAX_CLIENT connection_info to manage them separtly
 typedef struct {
-    bool                running;
-    net_socket          socket;
-    net_addr            address;
-    f32                 timeout_accum;
+    bool                    running;
+    net_addr                address;        ///< Address of destination
+    u32                     session_id;     ///< Session ID. 
 
-    u32                 seq_local,
-                        seq_remote;
+    net_packet_queue        guaranteed,     ///< Ordered and acknowledged packets to send
+                            unguaranteed;   ///< other packets to send
 
-    u32                 sent_packets,
-                        recv_packets,
-                        lost_packets,
-                        ackd_packets;
+    net_packet_info_queue   sent_queue,
+                            recv_queue,
+                            pending_acks,
+                            ackd_queue;
 
-    f32                 sent_bw,
-                        ackd_bw,
-                        rtt;        
+    f32                     timeout_accum;
 
-    net_packet_queue    sent_queue,
-                        recv_queue,
-                        pending_acks,
-                        ackd_queue;
-    enum {
-        Disconnected,
-        Connected, 
-        Listening,
-        Connecting,
-        ConnectFail
-    }                   state;          ///< Connection state
+    u32                     seq_local,
+                            seq_remote;
 
-    connection_mode     mode;           ///< Connection mode
+    u32                     sent_packets,
+                            recv_packets,
+                            lost_packets,
+                            ackd_packets;
 
+    f32                     sent_bw,
+                            ackd_bw,
+                            rtt;        
 
     // Flow Control
     enum {
         Good,
         Bad
-    }                   flow;           ///< Flow control mode
+    }                       flow;           ///< Flow control mode
+    f32                     flow_speed;     ///< Speed depending on flow mode
 
-    f32                 penalty_time,   ///< Penalty time (in sec)
-                        good_cond_time, ///< Time spent in good mode
-                        penalty_accum;  ///< Penaly reduction accumulator
+    f32                     penalty_time,   ///< Penalty time (in sec)
+                            good_cond_time, ///< Time spent in good mode
+                            penalty_accum;  ///< Penaly reduction accumulator
 
-} connection_t;
+    enum {
+        Disconnected,
+        Disconnecting,
 
-bool net_connection_init( connection_t *c, connection_mode mode, u16 port );
-void net_connection_shutdown( connection_t *c );
+        // client-side connection
+        IDDemandSent,
+        IDReceived,
+        ConnectDemandSent,
 
-void net_connection_listen( connection_t *c );
-void net_connection_connect( connection_t *c, net_addr *addr );
-void net_connection_update( connection_t *c, f32 dt );
+        // server-side connection
+        Listening,
+        IDSent,
+        TryAccepted,
+        
+        // when connection is done :
+        ConnectFail,
+        Connected
+    }                       state;          ///< Connection state
 
-bool net_connection_send( connection_t *c, const u8 *packet, u32 size );
-int  net_connection_receive( connection_t *c, u8 *packet, u32 size );
+    connection_mode         mode;           ///< Connection mode
+} connection;
 
-void net_packet_queue_init( net_packet_queue *q );
 
-/// Inserts a new packet into the queue, in sorted order (more recent first)
-void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p );
-void net_packet_queue_remove( net_packet_queue *q, u32 index );
-bool net_packet_queue_exists( net_packet_queue *q, u32 seq );
-void net_packet_queue_verify( net_packet_queue *q );
-void net_packet_queue_print( net_packet_queue *q );
-bool net_packet_queue_empty( net_packet_queue *q );
-void net_packet_queue_popback( net_packet_queue *q );
+bool Net_connectionInit( connection *c, connection_mode mode );
+void Net_connectionShutdown( connection *c );
+void Net_connectionUpdate( connection *c, f32 dt );
+void Net_connectionWritePacketHeader( connection *c, u8 *packet, u32 msg_type );
 
-void net_packet_queue_update( net_packet_queue *q, f32 dt );
+void Net_connectionSendGuaranteed( connection *c, u32 msg_type );
+void Net_connectionSendUnguaranteed( connection *c, u32 msg_type );
 
+void Net_connectionSendNextPacket( connection *c, net_socket socket );
+
+void Net_connectionPacketSent( connection *c, u32 size );
+void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack_bits, u32 size );
+
+// Server functions
+    void Net_connectionListen( connection *c );
+
+void Net_readPacketHeader( const u8 *packet, u32 *protocolID, u32 *sessionID, u32 *msg_type, u32 *sequence, u32 *ack, u32 *ack_bits );
+
+void Net_packetQueueInit( net_packet_queue *q );
+void Net_packetQueuePush( net_packet_queue *q );
+void Net_packetQueuePop( net_packet_queue *q );
+bool Net_packetQueueIsFull( const net_packet_queue *q );
+void Net_packetQueueGet( net_packet_queue *q, u8 **data_ptr, net_addr *addr );
+void Net_packetQueueSet( net_packet_queue *q, const u8 *data, const net_addr *addr );
+void Net_packetQueueStackInt( net_packet_queue *q, int data );
+
+
+void net_addr_cpy( net_addr *dst, const net_addr *src );
 bool net_addr_equal( const net_addr *a, const net_addr *b );
 void net_addr_fill( net_addr *a, u8 ip1, u8 ip2, u8 ip3, u8 ip4, u16 port );
 void net_addr_fill_int( net_addr *a, u32 ip, u16 port );
 
 
 
-bool net_init();
-void net_shutdown();
+bool Net_init();
+void Net_shutdown();
 
+u32  Net_generateSessionID( int seed );
 
-bool net_open_socket( net_socket *s, u16 port );
-void net_close_socket( net_socket *s );
+bool Net_openSocket( net_socket *s, u16 port );
+void Net_closeSocket( net_socket *s );
 
-bool net_send_packet( net_socket s, const net_addr *dest, const void *packet, u32 packet_size );
-int  net_receive_packet( net_socket s, net_addr *sender, void *packet, u32 packet_size );
+bool Net_sendPacket( net_socket s, const net_addr *dest, const void *packet, u32 packet_size );
+int  Net_receivePacket( net_socket s, net_addr *sender, void *packet, u32 packet_size );
 
 
 #endif // BYTE_NET

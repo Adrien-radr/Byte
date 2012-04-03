@@ -61,14 +61,14 @@ bool Actor_load( Actor *pActor, const char *pFile ) {
             pActor->mSize.y = subitem->valueint;
 
             // get mesh and resize it to the sprite size of the actor
-            str16 mesh_size;
-            snprintf( mesh_size, 16, "%d.%d", (int)pActor->mSize.x, (int)pActor->mSize.y );
+            //str16 mesh_size;
+            //snprintf( mesh_size, 16, "%d.%d", (int)pActor->mSize.x, (int)pActor->mSize.y );
 
             subitem = cJSON_GetObjectItem( item, "mesh" );
             check( subitem, "Error while loading actor '%s', need subentry 'mesh' in entry 'sprite'.\n", pFile );
 
             strcpy( pActor->assets.mesh, subitem->valuestring );
-            strcat( pActor->assets.mesh, mesh_size );
+            //strcat( pActor->assets.mesh, mesh_size );
 
             /*
             pActor->mMesh_id = World_getResource( mesh_str );

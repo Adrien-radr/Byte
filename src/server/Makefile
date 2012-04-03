@@ -14,7 +14,7 @@ LIB = \
 
 all: $(OBJ) $(CO_OBJ)
 	@ $(CC) $(CFLAGS) $(CO_OBJ) $(OBJ) $(LIB) -o ../../bin/sv
-	@echo "Server compiled..."
+	@echo "		-- Server compiled --"
 
 %.o: %.c
 	@ $(CC) $(CFLAGS) -c $< -o $@ 

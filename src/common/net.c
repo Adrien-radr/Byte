@@ -19,10 +19,21 @@
 /// Application Protocol ID. Just the hash of "Byte-Project"
 const u32 protocol_id = 1910167069;
 
-const f32 connection_timeout = 10.f;
+const f32 connectiontimeout = 10.f;
 
 net_ip local_ips[MAX_IPS];
 static int numIP;
+
+str32 PacketTypeStr[PT_ARRAYEND] = {
+    "CONNECT_ASKID",
+    "CONNECT_SESSIONID",
+    "CONNECT_TRY",
+    "CONNECT_ACCEPT",
+    "CONNECT_REFUSE",
+    "CONNECT_CLOSE",
+    "CONNECT_CLOSEOK",
+    "KEEP_ALIVE"
+};
 
 
 
@@ -79,6 +90,11 @@ static void get_local_ips() {
 }
 
 
+void net_addr_cpy( net_addr *dst, const net_addr *src ) {
+    if( src )
+        net_addr_fill( dst, src->ip[0], src->ip[1], src->ip[2], src->ip[3], src->port );
+}
+
 bool net_addr_equal( const net_addr *a, const net_addr *b ) {
     if( !a || !b ) return false;
 
@@ -108,7 +124,7 @@ void net_addr_fill_int( net_addr *a, u32 ip, u16 port ) {
         log_err( "Given address receiver not allocated\n" );
 }
 
-bool net_init() {
+bool Net_init() {
     bool ret = false;
 
 #ifdef BYTE_WIN32
@@ -123,16 +139,80 @@ bool net_init() {
     return ret;
 }
 
-void net_shutdown() {
+void Net_shutdown() {
 #ifdef BYTE_WIN32
     WSACleanup();
 #endif
 }
 
+u32  Net_generateSessionID( int seed ) {
+    srand( seed );
+    u8 random_str[4];
+    u32_to_bytes( rand(), random_str );
+
+    return Byte_GetHash( (char*)random_str );
+}
 
 
 ////////////////////////////////////////////////////////////////////////////
 //                      PACKET QUEUE
+void Net_packetQueueInit( net_packet_queue *q ) {
+    q->start = 0;
+    q->count = 0;
+
+    // Set the stack position to be after the header size
+    for( int i = 0; i < 256; ++i )
+        q->packets[i].stack_pos = PACKET_HEADER_SIZE;
+}
+
+void Net_packetQueuePush( net_packet_queue *q ) {
+    // if buffer full, overwrite last one
+    if( q->count == 256 )
+        q->start = ( q->start + 1 ) % 256;
+    else
+        q->count++;
+}
+
+void Net_packetQueuePop( net_packet_queue *q ) {
+    if( q->count ) {
+        // reposition the stack index
+        q->packets[q->start].stack_pos = PACKET_HEADER_SIZE;
+
+        // Advance in circular buffer
+        q->start = ( q->start + 1 ) % 256;
+        q->count--;
+    }
+}
+
+bool Net_packetQueueIsFull( const net_packet_queue *q ) {
+    return q->count == 256;
+}
+
+void Net_packetQueueGet( net_packet_queue *q, u8 **data_ptr, net_addr *addr ) {
+    if( q ) {
+        if( data_ptr ) *data_ptr = q->packets[q->start].data;
+        if( addr     ) net_addr_cpy( addr, &q->packets[q->start].addr );
+    }
+}
+void Net_packetQueueSet( net_packet_queue *q, const u8 *data, const net_addr *addr ) {
+    if( q ) {
+        memcpy( &q->packets[q->start].data, data, 256 );
+        net_addr_cpy( &q->packets[q->start].addr, addr );
+
+        // get sequence number of packet
+        bytes_to_u32( data + 12, &q->packets[q->start].sequence ); 
+    }
+}
+
+void Net_packetQueueStackInt( net_packet_queue *q, int data ) {
+    int end = ( q->start + q->count ) % 256;
+    u32_to_bytes( data, &q->packets[end].data[q->packets[end].stack_pos] );
+    q->packets[end].stack_pos += 4;
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+//                      PACKET INFO QUEUE
 
 /// Returns true if sequence a is more recent than sequence b
 /// Takes into account the fact that buffers cycle after MAX_SEQUENCE
@@ -141,19 +221,30 @@ static bool sequence_more_recent( u32 a, u32 b ) {
         || ( a < b && ( b - a ) >  MAX_SEQUENCE/2 );
 }
 
-void net_packet_queue_init( net_packet_queue *q ) {
+void net_packet_info_queue_init( net_packet_info_queue *q );
+void net_packet_info_queue_insert( net_packet_info_queue *q, net_packet_info *p );
+void net_packet_info_queue_remove( net_packet_info_queue *q, u32 index );
+bool net_packet_info_queue_exists( net_packet_info_queue *q, u32 seq );
+void net_packet_info_queue_verify( net_packet_info_queue *q );
+void net_packet_info_queue_print( net_packet_info_queue *q );
+bool net_packet_info_queue_empty( net_packet_info_queue *q );
+void net_packet_info_queue_popback( net_packet_info_queue *q );
+
+void net_packet_info_queue_update( net_packet_info_queue *q, f32 dt );
+
+void net_packet_info_queue_init( net_packet_info_queue *q ) {
     if( q ) {
         q->count = 0;
         q->tail = 0;
-        for( int i = 0; i < 256; ++i )
+        for( u32 i = 0; i < 256; ++i )
             q->list[i] = &q->arr[i];
     }
 }
 
-void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p ) {
+void net_packet_info_queue_insert( net_packet_info_queue *q, net_packet_info *p ) {
     if( !q || !p ) return;
 
-    if( net_packet_queue_exists( q, p->seq ) ) return;
+    if( net_packet_info_queue_exists( q, p->seq ) ) return;
 
     if( !q->count ) {
         memcpy( &q->arr[0], p, sizeof(net_packet_info) );
@@ -174,8 +265,7 @@ void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p ) {
             return;
         }
 
-        u16 i;
-        for( i = 0; i < q->count; ++i ) {
+        for( u32 i = 0; i < q->count; ++i ) {
             if( sequence_more_recent( p->seq, q->list[i]->seq ) ) {
                 // we have space, put new one at first available spot and redo linking
                 if( !full ) {
@@ -194,7 +284,7 @@ void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p ) {
                     memcpy( q->list[q->tail], p, sizeof(net_packet_info) );
                     net_packet_info *tmp = q->list[q->tail];
 
-                    for( int j = q->tail; j > i; --j ) 
+                    for( u32 j = q->tail; j > i; --j ) 
                         q->list[j] = q->list[j-1];
 
                     q->list[i] = tmp;
@@ -203,14 +293,14 @@ void net_packet_queue_insert( net_packet_queue *q, net_packet_info *p ) {
             }   
         }
         // error
-        net_packet_queue_print( q );
+        net_packet_info_queue_print( q );
         printf( "new seq=%d\n", p->seq );
         printf( "ARR ERROR\n" );
         exit( 0 );
     }
 }
 
-void net_packet_queue_remove( net_packet_queue *q, u32 index ) {
+void net_packet_info_queue_remove( net_packet_info_queue *q, u32 index ) {
     if( !q || index >= q->count ) return;
 
     if( 1 == q->count ) {
@@ -229,60 +319,72 @@ void net_packet_queue_remove( net_packet_queue *q, u32 index ) {
     }
 }
 
-bool net_packet_queue_exists( net_packet_queue *q, u32 seq ) {
+bool net_packet_info_queue_exists( net_packet_info_queue *q, u32 seq ) {
     if( !q ) return false;
 
-    for( int i = 0; i < q->count; ++i ) 
+    for( u32 i = 0; i < q->count; ++i ) 
         if( q->list[i]->seq == seq )
             return true;
 
     return false;
 }
 
-void net_packet_queue_verify( net_packet_queue *q );
+void net_packet_info_queue_verify( net_packet_info_queue *q );
 
-void net_packet_queue_print( net_packet_queue *q ) {
+void net_packet_info_queue_print( net_packet_info_queue *q ) {
     if( !q ) return;
 
-    for( int i = 0; i < q->count; ++i )
+    for( u32 i = 0; i < q->count; ++i )
         printf( " + %d\n", q->list[i]->seq );
 }
 
-bool net_packet_queue_empty( net_packet_queue *q ) {
+bool net_packet_info_queue_empty( net_packet_info_queue *q ) {
     return q && !q->count;
 }
 
-void net_packet_queue_update( net_packet_queue *q, f32 dt ) {
+void net_packet_info_queue_update( net_packet_info_queue *q, f32 dt ) {
     if( !q ) return;
 
     for( u32 i = 0; i < q->count; ++i )
         q->list[i]->time += dt;
 }
 
+void net_packet_info_queue_popback( net_packet_info_queue *q ) {
+    if( !q ) return;
+
+    if( 1 < q->count )
+        q->tail--;
+
+    q->count--;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 //                      CONNECTION
-
-static void net_connection_clear( connection_t *c ) {
+static void Net_connectionClear( connection *c ) {
     c->state = Disconnected;
     c->timeout_accum = 0.f;
     memset( c->address.ip, 0, 4 );
     c->address.port = 0;
 }
 
-bool net_connection_init( connection_t *c, connection_mode mode, u16 port ) {
+bool Net_connectionInit( connection *c, connection_mode mode ) {
     check( c, "Given connection not allocated\n" );
 
     c->running = false;
-    c->socket = 0;
     c->mode = mode;
+
+    c->session_id = 0;
 
     c->seq_local = 0;
     c->seq_remote = 0;
 
-    net_packet_queue_init( &c->sent_queue );
-    net_packet_queue_init( &c->recv_queue );
-    net_packet_queue_init( &c->pending_acks );
-    net_packet_queue_init( &c->ackd_queue );
+    Net_packetQueueInit( &c->guaranteed );
+    Net_packetQueueInit( &c->unguaranteed );
+
+    net_packet_info_queue_init( &c->sent_queue );
+    net_packet_info_queue_init( &c->recv_queue );
+    net_packet_info_queue_init( &c->pending_acks );
+    net_packet_info_queue_init( &c->ackd_queue );
 
     c->sent_packets = 0;
     c->recv_packets = 0;
@@ -294,96 +396,148 @@ bool net_connection_init( connection_t *c, connection_mode mode, u16 port ) {
     c->rtt= 0.f;
 
     c->flow = Bad;
+    c->flow_speed = 1.f / 10.f;
     c->penalty_time = 4.f;
     c->good_cond_time = 0.f;
     c->penalty_accum = 0.f;
 
-    net_connection_clear( c );
-
-    bool noerr = net_open_socket( &c->socket, port );
-    check( noerr, "Failed to open connection socket\n" );
+    Net_connectionClear( c );
 
     c->running = true;
 
     return true;
 
 error:
-    net_connection_shutdown( c );
+    Net_connectionShutdown( c );
     return false;
 }
 
-void net_connection_shutdown( connection_t *c ) {
+void Net_connectionShutdown( connection *c ) {
     if( c && c->running ) {
-        net_connection_clear( c );
+        Net_connectionClear( c );
         c->running = false;
-
-        if( c->socket )
-            net_close_socket( &c->socket );
     }
 }
 
-void net_connection_listen( connection_t *c ) {
-    if( !c ) return;
-
-
-    if( c->mode == Server )
-        log_info( "Server Listening...\n" );
-    
-    if( c->mode == Client )
-        log_info( "Client getting in Listening mode. WTF?\n" );
+void Net_connectionListen( connection *c ) {
+    if( !c || c->mode == Client ) return;
 
     c->state = Listening;
 }
+/*
+void Net_connectionAskID( connection *c ) {
+    if( !c || c->mode == Server || c->state != Disconnected ) return;
 
-void net_connection_connect( connection_t *c, net_addr *addr ) {
-    if( !c || !addr ) return;
+    net_addr *addr = &c->address;
 
-    log_info( "Connecting to %d.%d.%d.%d:%d\n", 
+    log_info( "Asking ID to %d.%d.%d.%d:%d\n", 
             addr->ip[0], addr->ip[1], addr->ip[2], addr->ip[3], addr->port ); 
 
-    c->state = Connecting;
-    memcpy( &c->address, addr, sizeof(net_addr) );
+    u8 packet[240];
+    u32 msg;
+
+    // no session id yet, send 0
+    c->session_id = 0;
+    u32_to_bytes( c->session_id, packet );
+
+    // send askID msg
+    msg = CONNECT_ASKID;
+    u32_to_bytes( msg, &packet[4] );
+
+    Net_connectionSend( c, packet, 240 );
+
+    c->state = IDDemandSent;
 }
 
-void net_packet_queue_popback( net_packet_queue *q ) {
-    if( !q ) return;
+void Net_connectionReceiveID( connection *c ) {
+    if( !c || c->state != IDDemandSent ) return;
 
-    if( 1 < q->count )
-        q->tail--;
+    u32 bytes_read, msg;
+    u8 packet[240];
 
-    q->count--;
+    bytes_read = Net_connectionReceive( c, packet, 240 );
+
+    if( bytes_read != 8 ) return;
+
+    // check if message is a session ID for us
+    bytes_to_u32( &packet[4], &msg );
+    if( msg != CONNECT_SESSIONID ) return;
+
+    // get our new session id
+    bytes_to_u32( packet, &c->session_id );
+
+    log_info( "Client received session ID %d\n", c->session_id );
+    c->state = IDReceived;
 }
 
-static void nc_update_queues( connection_t *c, f32 dt ) {
+void Net_connectionReceiveResponse( connection *c ) {
+    if( !c || c->state != IDReceived ) return;
+
+    u32 bytes_read, msg, id;
+    u8 packet[240];
+
+    bytes_read = Net_connectionReceive( c, packet, 240 );
+
+    if( bytes_read != 8 ) return;
+
+    // check if msg is for us
+    bytes_to_u32( packet, &id );
+    if( id != c->session_id ) return;
+
+    // get response
+    bytes_to_u32( packet, &msg );
+
+    if( msg == CONNECT_ACCEPT ) {
+        log_info( "Client is now connected to server.\n" );
+        c->state = Connected;
+    } else if( msg == CONNECT_REFUSE ) {
+        log_info( "Server refused connection.\n" );
+        c->state = ConnectFail;
+    } 
+}
+
+void Net_connectionTry( connection *c ) {
+    if( !c || c->state != IDReceived ) return;
+
+    u8 packet[240];
+
+    u32_to_bytes( c->session_id, packet );
+    u32_to_bytes( CONNECT_TRY, &packet[4] );
+
+    Net_connectionSend( c, packet, 240 );
+}
+
+*/
+static void nc_update_queues( connection *c, f32 dt ) {
     // update queues packet time
-    net_packet_queue_update( &c->sent_queue, dt );
-    net_packet_queue_update( &c->recv_queue, dt );
-    net_packet_queue_update( &c->ackd_queue, dt );
-    net_packet_queue_update( &c->pending_acks, dt );
+    net_packet_info_queue_update( &c->sent_queue, dt );
+    net_packet_info_queue_update( &c->recv_queue, dt );
+    net_packet_info_queue_update( &c->ackd_queue, dt );
+    net_packet_info_queue_update( &c->pending_acks, dt );
 
 
     // remove outdated packets from all queues
-    while( !net_packet_queue_empty( &c->sent_queue ) && c->sent_queue.list[c->sent_queue.tail]->time > (MAX_RTT + M_EPS) )
-        net_packet_queue_popback( &c->sent_queue );
+    while( !net_packet_info_queue_empty( &c->sent_queue ) && c->sent_queue.list[c->sent_queue.tail]->time > (MAX_RTT + M_EPS) )
+        net_packet_info_queue_popback( &c->sent_queue );
 
-    if( !net_packet_queue_empty( &c->recv_queue ) ) {
+    if( !net_packet_info_queue_empty( &c->recv_queue ) ) {
         const u32 last_seq = c->recv_queue.list[0]->seq;
         const u32 min_seq = last_seq >= 34 ? (last_seq - 34) : (MAX_SEQUENCE - (34 - last_seq));
 
-        while( !net_packet_queue_empty( &c->recv_queue ) && !sequence_more_recent( c->recv_queue.list[c->recv_queue.tail]->seq, min_seq ) )
-            net_packet_queue_popback( &c->recv_queue );
+        while( !net_packet_info_queue_empty( &c->recv_queue ) && !sequence_more_recent( c->recv_queue.list[c->recv_queue.tail]->seq, min_seq ) )
+            net_packet_info_queue_popback( &c->recv_queue );
     }
 
-    while( !net_packet_queue_empty( &c->ackd_queue ) && c->ackd_queue.list[c->ackd_queue.tail]->time > (MAX_RTT * 2 - M_EPS) )
-        net_packet_queue_popback( &c->ackd_queue );
+    while( !net_packet_info_queue_empty( &c->ackd_queue ) && c->ackd_queue.list[c->ackd_queue.tail]->time > (MAX_RTT * 2 - M_EPS) )
+        net_packet_info_queue_popback( &c->ackd_queue );
 
-    while( !net_packet_queue_empty( &c->pending_acks ) && c->pending_acks.list[c->pending_acks.tail]->time > (MAX_RTT + M_EPS) ) {
-        net_packet_queue_popback( &c->pending_acks );
+    while( !net_packet_info_queue_empty( &c->pending_acks ) && c->pending_acks.list[c->pending_acks.tail]->time > (MAX_RTT + M_EPS) ) {
+        net_packet_info_queue_popback( &c->pending_acks );
         c->lost_packets++;
     }
 }
 
-static void nc_update_flow( connection_t *c, f32 dt ) {
+static void nc_update_flow( connection *c, f32 dt ) {
     const f32 rtt = c->rtt * 1000.f;
 
     if( c->flow == Good ) {
@@ -391,6 +545,7 @@ static void nc_update_flow( connection_t *c, f32 dt ) {
         if( rtt > RTT_THRESHOLD ) {
             log_info( "Connection going to Bad Mode\n" );
             c->flow = Bad;
+            c->flow_speed = 1.f / 10.f;
             
             // Increase penalty time if oscillating between Good & Bad to often
             if( c->good_cond_time < 10.f && c->penalty_time < 60.f ) {
@@ -431,33 +586,18 @@ static void nc_update_flow( connection_t *c, f32 dt ) {
             c->good_cond_time = 0.f;
             c->penalty_accum = 0.f;
             c->flow = Good;
+            c->flow_speed = 1.f / 30.f;
         }
     }
 }
 
-void net_connection_update( connection_t *c, f32 dt ) {
+void Net_connectionUpdate( connection *c, f32 dt ) {
     if( !c || !c->running ) return;
 
     // update reliability system and flow control
     nc_update_queues( c, dt );
     if( c->state == Connected )
         nc_update_flow( c, dt );
-
-    // check connection timeout
-    c->timeout_accum += dt;
-    if( c->timeout_accum > connection_timeout ) {
-        if( c->state == Connecting ) {
-            log_info( "Connecting timed out\n" );
-            net_connection_clear( c );
-            c->state = ConnectFail;
-        } else if( c->state == Connected ) {
-            log_info( "Connection timed out\n" );
-            net_connection_clear( c );
-        }
-        return;
-    }
-
-
 
     // Update connection stats
     int sent_bps = 0;
@@ -475,76 +615,35 @@ void net_connection_update( connection_t *c, f32 dt ) {
     ackd_bps /= MAX_RTT;
     c->sent_bw = sent_bps * ( 8 / 1000.f );
     c->ackd_bw = ackd_bps * ( 8 / 1000.f );
-}
 
-static void nc_packet_sent( connection_t *c, u32 size ) {
-    if( !c ) return;
 
-    if( net_packet_queue_exists( &c->sent_queue, c->seq_local ) ) {
-        log_info( "Local sequence %d exists\n", c->seq_local );
-        net_packet_queue_print( &c->sent_queue );
+    // check connection timeout
+    c->timeout_accum += dt;
+    if( c->timeout_accum > connectiontimeout ) {
+        if( c->state == IDDemandSent || c->state == IDReceived ||
+                c->state == ConnectDemandSent ) {
+            log_info( "Connecting timed out\n" );
+            Net_connectionClear( c );
+            c->state = ConnectFail;
+        } else if( c->state == Connected ) {
+            log_info( "Connection timed out\n" );
+            Net_connectionClear( c );
+            c->state = ConnectFail;
+        }
         return;
     }
-    
-    if( net_packet_queue_exists( &c->pending_acks, c->seq_local ) )
-        return;
-
-    // add a new sent packet info
-    net_packet_info pi;
-    pi.seq = c->seq_local;
-    pi.time = 0.f;
-    pi.size = size;
-
-    net_packet_queue_insert( &c->sent_queue, &pi );
-    net_packet_queue_insert( &c->pending_acks, &pi );
-
-
-    c->sent_packets++;
-    c->seq_local++;
-    if( c->seq_local > MAX_SEQUENCE )
-        c->seq_local = 0;
-
-
 }
 
-static void nc_packet_received( connection_t *c, u32 seq, u32 size ) {
-    if( !c ) return;
 
-    c->recv_packets++;
-
-
-    if( net_packet_queue_exists( &c->recv_queue, seq ) ) 
-        return;
-
-    // add new received packet info
-    net_packet_info pi;
-    pi.seq = seq;
-    pi.time = 0.f;
-    pi.size = size;
-
-    net_packet_queue_insert( &c->recv_queue, &pi );
-
-
-    // update remote sequence if necessary
-    if( sequence_more_recent( seq, c->seq_remote ) )
-        c->seq_remote = seq;
-}
-
-static void nc_write_header( u8 *packet, u32 seq, u32 ack, u32 ack_bits ) {
+void Net_readPacketHeader( const u8 *packet, u32 *protocolID, u32 *sessionID, u32 *msg_type, u32 *sequence, u32 *ack, u32 *ack_bits ) {
     if( !packet ) return;
 
-    u32_to_bytes( protocol_id, packet );
-    u32_to_bytes( seq,         packet + 4 );
-    u32_to_bytes( ack,         packet + 8 );
-    u32_to_bytes( ack_bits,    packet + 12 );
-}
-
-static void nc_read_header( const u8 *packet, u32 *seq, u32 *ack, u32 *ack_bits ) {
-    if( !packet || !seq || !ack ) return;
-
-    bytes_to_u32( packet + 4, seq );
-    bytes_to_u32( packet + 8, ack );
-    bytes_to_u32( packet + 12, ack_bits );
+    if( protocolID ) bytes_to_u32( packet, protocolID );
+    if( sessionID  ) bytes_to_u32( packet + 4, sessionID );
+    if( msg_type   ) bytes_to_u32( packet + 8, msg_type );
+    if( sequence   ) bytes_to_u32( packet + 12, sequence );
+    if( ack        ) bytes_to_u32( packet + 16, ack );
+    if( ack_bits   ) bytes_to_u32( packet + 20, ack_bits );
 }
 
 static int bit_index_for_seq( u32 seq, u32 ack ) {
@@ -554,7 +653,7 @@ static int bit_index_for_seq( u32 seq, u32 ack ) {
         return ack - 1 - seq;
 }
 
-static u32 nc_get_ackbits( connection_t *c ) {
+static u32 Net_getAckbits( connection *c ) {
     if( !c ) return 0;
 
     u32 ack_bits = 0;
@@ -572,9 +671,9 @@ static u32 nc_get_ackbits( connection_t *c ) {
     return ack_bits;
 }
 
-static void nc_process_ackbits( connection_t *c, u32 ack, u32 ack_bits ) {
+static void Net_processAckbits( connection *c, u32 ack, u32 ack_bits ) {
     if( !c ) return; 
-    if( net_packet_queue_empty( &c->pending_acks ) ) return;
+    if( net_packet_info_queue_empty( &c->pending_acks ) ) return;
 
     int i = c->pending_acks.tail;
     while( i >= 0 ) {
@@ -591,115 +690,180 @@ static void nc_process_ackbits( connection_t *c, u32 ack, u32 ack_bits ) {
         if( acked ) {
             c->rtt += ( c->pending_acks.list[i]->time - c->rtt ) * 0.1f;
 
-            net_packet_queue_insert( &c->ackd_queue, c->pending_acks.list[i] );
+            // check the sequence of the first packet in guaranteed queue. If acked, Pop it
+            if( c->guaranteed.packets[c->guaranteed.start].sequence == c->pending_acks.list[i]->seq ) 
+                Net_packetQueuePop( &c->guaranteed );
+
+
+            net_packet_info_queue_insert( &c->ackd_queue, c->pending_acks.list[i] );
             c->ackd_packets++;
-            net_packet_queue_remove( &c->pending_acks, i );
+            net_packet_info_queue_remove( &c->pending_acks, i );
         } 
 
         --i;
     }
 }
 
-bool net_connection_send( connection_t *c, const u8 *packet, u32 size ) {
-    if( !c || !packet ) return false;
+void Net_connectionWritePacketHeader( connection *c, u8 *packet, u32 msg_type ) {
+    if( !c || !packet ) return;
+    if( !c->running ) return;
 
-    // header : protocol id + sequence + ack + ack_bits
-    const int header = 16;
-    u8 msg[size+header];
-
-    check( c->running, "Connection not running\n" );
-    
-
-    u32 address;
-    bytes_to_u32( c->address.ip, &address );
-    if( !address ) return false;
-
-
-    // write packet header
-    nc_write_header( msg, c->seq_local, c->seq_remote, nc_get_ackbits( c ) );
-    
-    // add data 
-    memcpy( &msg[header], packet, size );
-
-    // send the message
-    if( !net_send_packet( c->socket, &c->address, msg, size + header ) )
-        return false;
-
-
-    // update connection
-    nc_packet_sent( c, size );
-
-    return true;
-
-error:
-    return false;
+    u32_to_bytes( protocol_id,          packet );
+    u32_to_bytes( c->session_id,        packet + 4 );
+    u32_to_bytes( msg_type,             packet + 8 );
+    u32_to_bytes( c->seq_local,         packet + 12 );
+    u32_to_bytes( c->seq_remote,        packet + 16 );
+    u32_to_bytes( Net_getAckbits( c ),  packet + 20 );
 }
 
-int  net_connection_receive( connection_t *c, u8 *packet, u32 size ) {
-    if( !c || !packet ) return -1;
+void Net_connectionSendGuaranteed( connection *c, u32 msg_type ) {
+    if( !c ) return;
 
-    // header : protocol id + sequence + ack + ack_bits
-    const int header = 16;
+    u8 packet[256];
+    Net_connectionWritePacketHeader( c, packet, msg_type );
+    Net_packetQueueSet( &c->guaranteed, packet, &c->address );
+    Net_packetQueuePush( &c->guaranteed );
+}
 
-    u8 msg[size+header];
-    net_addr sender;
+void Net_connectionSendUnguaranteed( connection *c, u32 msg_type ) {
+    if( !c ) return;
 
-    check( c->running, "Connection not running\n" );
-    check( size > header, "Receiving buffer too small\n" );
+    u8 packet[256];
+    Net_connectionWritePacketHeader( c, packet, msg_type );
+    Net_packetQueueSet( &c->unguaranteed, packet, &c->address );
+    Net_packetQueuePush( &c->unguaranteed );
+}
 
+void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
+    // send guaranteed and unguaranteed packets equally frequently
+    static bool type = false;
+    static int  cpt  = 0;
+    const int guaranteed_ratio   = 1,
+              unguaranteed_ratio = 1;
 
-    int bytes_read = net_receive_packet( c->socket, &sender, msg, size + header );
-    if( bytes_read <= header )
-        return 0;
+    bool unguaranteed = false;
+    u8 *packet = NULL;
 
-
-    u32 id;
-    bytes_to_u32( msg, &id );
-
-    // bad header protocol
-    if( id != protocol_id )
-        return 0;
-
-    // get header
-    u32 seq, ack, ack_bits;
-    nc_read_header( msg, &seq, &ack, &ack_bits );
-
-    // update connection
-    nc_packet_received( c, seq, bytes_read - header );
-    nc_process_ackbits( c, ack, ack_bits );
-
-    // client connecting to server
-    if( c->mode == Server && c->state != Connected ) {
-        log_info( "Server accepting connection from %d.%d.%d.%d:%d\n",
-                sender.ip[0], sender.ip[1], sender.ip[2], sender.ip[3], sender.port ); 
-        c->state = Connected;
-        memcpy( &c->address, &sender, sizeof(net_addr) );
-    } 
-
-    if( net_addr_equal( &c->address, &sender ) ) {
-        // Client connecting, finalize connection
-        if( c->mode == Client && c->state == Connecting ) {
-            log_info( "Client connected with server\n" );
-            c->state = Connected;
+    if( type ) {
+        // try to pop a guaranteed packet
+        if( c->guaranteed.count ) {
+            Net_packetQueueGet( &c->guaranteed, &packet, NULL );
+            cpt++;
         }
 
-        // timeout reset
-        c->timeout_accum = 0.f;
+        // else, no guaranteed packet available, try to get a unguaranteed one
+        else if( c->unguaranteed.count ) {
+            Net_packetQueueGet( &c->unguaranteed, &packet, NULL );
+            unguaranteed = true;
+        }
 
-        // get packet data
-        memcpy( packet, &msg[header], bytes_read - header );
-        return bytes_read - header;
+
+        if( cpt == guaranteed_ratio ) {
+            cpt = 0;
+            type = !type;
+        }
+
+    } else {
+        // try to pop an unguaranteed packet
+        if( c->unguaranteed.count ) {
+            Net_packetQueueGet( &c->unguaranteed, &packet, NULL );
+            unguaranteed = true;
+            cpt++;
+        }
+
+        // else, no unguaranteed packet available, try to get a guaranteed one
+        else if( c->guaranteed.count ) 
+            Net_packetQueueGet( &c->guaranteed, &packet, NULL );
+
+
+        if( cpt == unguaranteed_ratio ) {
+            cpt = 0;
+            type = !type;
+        }
     }
 
-error:
-    return -1;
+    // if we got something, send it to client
+    if( packet ) {
+        u32 type;
+        bytes_to_u32( packet + 8, &type );
+        log_info( "sending %s\n", PacketTypeStr[type] );
+        Net_sendPacket( socket, &c->address, packet, 256 );
+        Net_connectionPacketSent( c, 256 - PACKET_HEADER_SIZE );
+
+        if( unguaranteed )
+            Net_packetQueuePop( &c->unguaranteed );
+
+    // else, send a keepalive
+    } else if( c->state == Connected ) {
+        u8 keep_alive[256];
+        Net_connectionWritePacketHeader( c, keep_alive, KEEP_ALIVE );
+        Net_sendPacket( socket, &c->address, keep_alive, 256 );
+        Net_connectionPacketSent( c, 256 - PACKET_HEADER_SIZE );
+    }
+}
+
+void Net_connectionPacketSent( connection *c, u32 size ) {
+    if( !c ) return;
+
+    if( net_packet_info_queue_exists( &c->sent_queue, c->seq_local ) ) {
+        log_info( "Local sequence %d exists\n", c->seq_local );
+        net_packet_info_queue_print( &c->sent_queue );
+        return;
+    }
+    
+    if( net_packet_info_queue_exists( &c->pending_acks, c->seq_local ) )
+        return;
+
+    // add a new sent packet info
+    net_packet_info pi;
+    pi.seq = c->seq_local;
+    pi.time = 0.f;
+    pi.size = size;
+
+    net_packet_info_queue_insert( &c->sent_queue, &pi );
+    net_packet_info_queue_insert( &c->pending_acks, &pi );
+
+
+    c->sent_packets++;
+    c->seq_local++;
+    if( c->seq_local > MAX_SEQUENCE )
+        c->seq_local = 0;
+}
+
+void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack_bits, u32 size ) {
+    if( !c || !c->running ) return;
+
+    // update connection
+    c->recv_packets++;
+
+    if( net_packet_info_queue_exists( &c->recv_queue, sequence ) ) 
+        return;
+
+    // add new received packet info
+    net_packet_info pi;
+    pi.seq = sequence;
+    pi.time = 0.f;
+    pi.size = size;
+
+    net_packet_info_queue_insert( &c->recv_queue, &pi );
+
+
+    // update remote sequence if necessary
+    if( sequence_more_recent( sequence, c->seq_remote ) ) 
+        c->seq_remote = sequence;
+
+
+    Net_processAckbits( c, ack, ack_bits );
+
+    // timeout reset
+    c->timeout_accum = 0.f;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////
 //                      SOCKETS
 
-bool net_open_socket( net_socket *s, u16 port ) {
+bool Net_openSocket( net_socket *s, u16 port ) {
     check( !*s, "Socket already opened." );
 
     *s = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
@@ -726,18 +890,18 @@ bool net_open_socket( net_socket *s, u16 port ) {
     return true;
 
 error:
-    net_close_socket( s );
+    Net_closeSocket( s );
     return false;
 }
 
-void net_close_socket( net_socket *s ) {
+void Net_closeSocket( net_socket *s ) {
     if( *s ) {
         close( *s );
         *s = 0;
     }
 }
 
-bool net_send_packet( net_socket s, const net_addr *dest, const void *packet, u32 packet_size ) {
+bool Net_sendPacket( net_socket s, const net_addr *dest, const void *packet, u32 packet_size ) {
     check( s, "Socket not opened\n" );
     check( packet, "Packet to send not allocated\n" );
     check( dest, "Packet destination address not allocated\n" );
@@ -758,7 +922,7 @@ error:
     return false;
 }
 
-int  net_receive_packet( net_socket s, net_addr *sender, void *packet, u32 packet_size ) {
+int  Net_receivePacket( net_socket s, net_addr *sender, void *packet, u32 packet_size ) {
     check( s, "Socket not opened\n" );
     check( packet, "Receiving packet not allocated\n" );
     check( sender, "Sender address not allocated\n" );

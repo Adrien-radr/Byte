@@ -118,7 +118,7 @@ static texture_t *Byte_LoadPNG( const char *filename ) {
     t->texels = byte_alloc( rowbytes * h );
     row_pointers = byte_alloc( sizeof(png_bytep) * h );
 
-    for( int i = 0; i < t->height; ++i )
+    for( u32 i = 0; i < t->height; ++i )
         row_pointers[i] = t->texels + i * rowbytes;
 
     png_read_image( img, row_pointers );

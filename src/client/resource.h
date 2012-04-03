@@ -36,7 +36,7 @@ int  ResourceManager_load( ResourceType pType,  const char *pFile );
 
 /// Returns a resource already loaded, by its file name
 /// @return : the handle to the resource, or -1 if inexistant
-int  ResourceManager_getResource( const char *pFile );
+int  ResourceManager_get( const char *pFile );
 
 /// Load all resources available in resource directories
 /// @return : True if all resources were loaded correctly. false otherwise

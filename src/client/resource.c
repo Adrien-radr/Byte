@@ -21,6 +21,11 @@ typedef struct s_ResourceManager {
 ResourceManager *rm = NULL;
 
 bool ResourceManager_init() {
+    if( rm ) {
+        log_warn( "Tried to reinit the ResourceManager. Dont do this! :(\n" );
+        return false;
+    }
+
     rm = byte_alloc( sizeof( ResourceManager ) );
     check_mem( rm );
 
@@ -264,7 +269,7 @@ int ResourceManager_load( ResourceType pType, const char *pFile ) {
         u32 hash = Byte_GetHash( r_name );
 
         // search if wanted resource already exist
-        for( int i = 0; i < rm->mHashes.cpt; ++i )  {
+        for( u32 i = 0; i < rm->mHashes.cpt; ++i )  {
             // the array is sorted in increasing order so break if superior
             if( rm->mHashes.data[i] > hash )
                 break;
@@ -366,7 +371,7 @@ void ResourceManager_add( const char *pName, u32 pResource ) {
     }
 }
 
-int ResourceManager_getResource( const char *pFile ) {
+int ResourceManager_get( const char *pFile ) {
     int handle = -1;
     if( rm && pFile ) {
         int hash = Byte_GetHash( pFile );

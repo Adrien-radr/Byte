@@ -125,7 +125,7 @@ Font *Font_get( const char *pName, u32 pSize ) {
         strcat( font, size );
 
         // get resource and get the font associated to it from the renderer
-        int font_resource = ResourceManager_getResource( font );
+        int font_resource = ResourceManager_get( font );
         check( font_resource >= 0, "Cant set font \"%s\", it has not been loaded as a resource!\n", pName );
 
 

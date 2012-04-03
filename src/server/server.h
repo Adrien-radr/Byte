@@ -2,34 +2,32 @@
 #define BYTE_SERVER_H
 
 #include "common/net.h"
+#include "common/clock.h"
 
 #define SERVER_PORT 1991
+#define MAX_CLIENTS 8
 
-typedef struct {
-    u16             max_clients;
 
-    connection_t    connection;
+struct {
+    u32                 client_n;                   ///< Number of clients
+    connection          connections[MAX_CLIENTS];
 
-    FILE            *log;
-    f32             up_time;
-} server_t;
+    net_socket          socket;                     ///< Server UDP socket
 
-server_t server;
+    net_packet_queue    recv_packets;           ///< Packets received during frame
 
-#define sv_log( msg, ... ) \
-    do { \
-        if( server.log ) { \
-            char m[512]; \
-            int printed = sprintf( m, "<%.2f> ", server.up_time ); \
-            snprintf( &m[printed], 512-printed-1, msg, ##__VA_ARGS__ ); \
-            fprintf( server.log, m );\
-        } \
-    } while(0)
+    FILE                *log;
+
+    Clock               clock;                      ///< Server clock
+} server;
 
 
 bool Server_init();
 void Server_shutdown();
 void Server_run();
+
+void Server_sendGuaranteed( u32 client_id, u32 type );
+void Server_sendUnguaranteed( u32 client_id, u32 type );
 
 
 #endif // BYTE_SERVER
