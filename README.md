@@ -8,24 +8,15 @@ Author(s) : Adrian 'Revk' Dubouchet \<greunne@gmail.com\>, Matthias 'Beulard' Du
 
 
 
-This is a 2D Game with GPU based rendering (OpenGL3/GLSL). Windows and Linux support.
-
-Things I expect :
-
-* Large number of units on screen
-* Zoomable map
-* Dynamic lighting (with faked shadow casting)
-* 2.5D with fake height
+This is a 2D isometric Game with GPU based rendering (OpenGL3/GLSL). Windows and Linux support.
 
 
-----------
 Used tech
 ----------
     - C Programming Language
-    - Lua Scripting Language
     - OpenGL 3.2 API
-    - GLSL 3.30 
+    - GLSL 1.50 
     - GLFW windowing library
-    - SOIL Image library
+    - libpng
     - JSON data format (with cJSON)
     - Freetype 2 Font Library
