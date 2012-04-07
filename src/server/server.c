@@ -82,11 +82,11 @@ void ClientConnect( const net_addr *addr ) {
     } else {
         log_warn( "Max clients limit reached!\n" );
         // direcly send to him
-        u8 packet[32];
+        u8 packet[256];
         u32_to_bytes( protocol_id, packet );
         u32_to_bytes( 0, packet + 4 );
         u32_to_bytes( CONNECT_REFUSE, packet + 8 );
-        while( !Net_sendPacket( server.socket, addr, packet, 32 ) );
+        while( !Net_sendPacket( server.socket, addr, packet, 256 ) );
     }
 
     // debug

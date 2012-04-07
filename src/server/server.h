@@ -5,7 +5,7 @@
 #include "common/clock.h"
 
 #define SERVER_PORT 1991
-#define MAX_CLIENTS 8
+#define MAX_CLIENTS 4
 
 
 struct {

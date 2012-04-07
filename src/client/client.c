@@ -122,6 +122,9 @@ void ConnectStep() {
                 client.c_info.state = IDReceived;
                 log_info( "Received Session ID from server : %u\n", id );
                 return;
+            } else if( type == CONNECT_REFUSE ) {
+                log_warn( "Server is full.\n" );
+                client.c_info.state = ConnectFail;
             } else 
                 log_warn( "Received packet with type=%s, client does not have any session_id yet!\n", PacketTypeStr[type] );
         }

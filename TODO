@@ -20,10 +20,11 @@ Byte-Project : TODO File
     ------------
     + Client part
     + Msg struct for msg transmission
-    - Dedicated server & server+client & client-only
+    + Dedicated server & client-only
+    - server/client (for solo)
 
-    - Add free port finding (several connection from single machine )
-    - Handle server refusing because not enough slot
+    + Add free port finding (several connection from single machine )
+    + Handle server refusing because not enough slot
 
     Map System
     ----------
