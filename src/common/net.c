@@ -308,11 +308,13 @@ void net_packet_info_queue_remove( net_packet_info_queue *q, u32 index ) {
         q->list[0]->seq = 0;
         q->count--;
     } else {
+        net_packet_info *tmp = q->list[index];
+
         for( u32 i = index; i < q->tail; ++i ) {
             q->list[i] = q->list[i+1];
         }
 
-        q->list[q->tail] = &q->arr[index];
+        q->list[q->tail] = tmp;
         q->list[q->tail]->seq = 0;
         q->count--;
         q->tail--;
@@ -784,9 +786,10 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
 
     // if we got something, send it to client
     if( packet ) {
-        u32 type;
-        bytes_to_u32( packet + 8, &type );
-        log_info( "sending %s\n", PacketTypeStr[type] );
+        //u32 type, seq;
+        //bytes_to_u32( packet + 8, &type );
+        //bytes_to_u32( packet + 12, &seq );
+        //log_info( "sending %s(seq=%d)\n", PacketTypeStr[type], seq );
         Net_sendPacket( socket, &c->address, packet, 256 );
         Net_connectionPacketSent( c, 256 - PACKET_HEADER_SIZE );
 
@@ -795,6 +798,7 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
 
     // else, send a keepalive
     } else if( c->state == Connected ) {
+        //log_info( "sending KEEP_ALIVE\n" );
         u8 keep_alive[256];
         Net_connectionWritePacketHeader( c, keep_alive, KEEP_ALIVE );
         Net_sendPacket( socket, &c->address, keep_alive, 256 );

@@ -82,7 +82,7 @@ bool ReceivePacket() {
     return true;
 }
 
-void Connect() {
+void ConnectStep() {
     u8 *packet = NULL;
 
     switch( client.c_info.state ) {
@@ -97,11 +97,7 @@ void Connect() {
                     client.c_info.address.port ); 
 
             Client_sendGuaranteed( CONNECT_ASKID );
-
-            // send packet
-            Net_packetQueueGet( &client.c_info.guaranteed, &packet, NULL );
-            while( !Net_sendPacket( client.socket, &client.c_info.address, packet, 256 ) );
-            Net_connectionPacketSent( &client.c_info, 256 - PACKET_HEADER_SIZE );
+            Net_connectionSendNextPacket( &client.c_info, client.socket );
 
             client.c_info.state = IDDemandSent;
         }
@@ -110,35 +106,31 @@ void Connect() {
         {
         // receive demand response
         u32 id, type, sequence, ack, ack_bits;
-        while( true ) {
-            ReceivePacket();
-            while( client.recv_packets.count ) {
-                Net_packetQueueGet( &client.recv_packets, &packet, NULL );
 
-                Net_readPacketHeader( packet, NULL, &id, &type, &sequence, &ack, &ack_bits );
-                Net_packetQueuePop( &client.recv_packets );
+        ReceivePacket();
 
-                Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
+        while( client.recv_packets.count ) {
+            Net_packetQueueGet( &client.recv_packets, &packet, NULL );
 
-                if( type == CONNECT_SESSIONID ) {
-                    client.c_info.session_id = id;
-                    client.c_info.state = IDReceived;
-                    log_info( "Received Session ID from server : %u\n", id );
-                    return;
-                } else 
-                    log_warn( "Received packet with type=%s, client does not have any session_id yet!\n", PacketTypeStr[type] );
-            }
+            Net_readPacketHeader( packet, NULL, &id, &type, &sequence, &ack, &ack_bits );
+            Net_packetQueuePop( &client.recv_packets );
+
+            Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
+
+            if( type == CONNECT_SESSIONID ) {
+                client.c_info.session_id = id;
+                client.c_info.state = IDReceived;
+                log_info( "Received Session ID from server : %u\n", id );
+                return;
+            } else 
+                log_warn( "Received packet with type=%s, client does not have any session_id yet!\n", PacketTypeStr[type] );
         }
         }
         break;
     case IDReceived :
         // if we already got an ID, try a connection
         Client_sendGuaranteed( CONNECT_TRY );
-
-        // send packet
-        Net_packetQueueGet( &client.c_info.guaranteed, &packet, NULL );
-        while( !Net_sendPacket( client.socket, &client.c_info.address, packet, 256 ) );
-        Net_connectionPacketSent( &client.c_info, 256 - PACKET_HEADER_SIZE );
+        Net_connectionSendNextPacket( &client.c_info, client.socket );
 
         client.c_info.state = ConnectDemandSent;
         log_info( "Sent a connection demand to server...\n" );
@@ -147,32 +139,47 @@ void Connect() {
         {
         // we sent a demand, wait for response
         u32 id, type, sequence, ack, ack_bits;
-        while( true ) {
-            ReceivePacket();
-            while( client.recv_packets.count ) {
-                Net_packetQueueGet( &client.recv_packets, &packet, NULL );
 
-                Net_readPacketHeader( packet, NULL, &id, &type, &sequence, &ack, &ack_bits );
-                Net_packetQueuePop( &client.recv_packets );
+        ReceivePacket();
+        while( client.recv_packets.count ) {
+            Net_packetQueueGet( &client.recv_packets, &packet, NULL );
 
-                Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
+            Net_readPacketHeader( packet, NULL, &id, &type, &sequence, &ack, &ack_bits );
+            Net_packetQueuePop( &client.recv_packets );
 
-                if( type == CONNECT_ACCEPT ) {
-                    client.c_info.state = Connected;
-                    log_info( "Client is now connected to server.\n" );
-                    return;
-                } else if( type == CONNECT_REFUSE ) {
-                    log_info( "Server refused client connection.\n" );
-                    client.c_info.state = ConnectFail;
-                    return;
-                } 
-            }
+            Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
+
+            if( type == CONNECT_ACCEPT ) {
+                client.c_info.state = Connected;
+                log_info( "Client is now connected to server.\n" );
+                Net_packetQueueInit( &client.c_info.guaranteed );
+                return;
+            } else if( type == CONNECT_REFUSE ) {
+                log_info( "Server refused client connection.\n" );
+                client.c_info.state = ConnectFail;
+                return;
+            } 
         }
+
         }
         break;
     default :
         return;
     }
+}
+
+bool Connect() {
+    f32 start_t;
+
+    while( client.c_info.state != Connected && client.c_info.state != ConnectFail ) {
+        start_t = Clock_getElapsedTime( &client.clock );
+
+        ConnectStep();
+        Net_connectionUpdate( &client.c_info, Clock_getElapsedTime( &client.clock ) - start_t );
+        Clock_sleep( 0.2f );
+    }
+
+    return client.c_info.state == Connected;
 }
 
 void Disconnect() {
@@ -249,12 +256,7 @@ void Client_run() {
     bool received_smthg;
 
     // Connection to server
-    while( client.c_info.state != Connected &&
-            client.c_info.state != ConnectFail )
-        Connect();
-
-    if( client.c_info.state != Connected ) return;
-
+    if( !Connect() ) return;
 
     while( true ) {
         // sample frame start time
@@ -263,9 +265,6 @@ void Client_run() {
 
         // SEND GAME PACKETS TO SERVER
         while( send_accum > client.c_info.flow_speed ) {
-            // Connection if not yet connected
-            //if( client.c_info.state != Connected )
-            //    Connect();
 
             Net_connectionSendNextPacket( &client.c_info, client.socket );
             send_accum -= client.c_info.flow_speed;
