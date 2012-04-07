@@ -96,7 +96,7 @@ bool frame_callback( f32 frame_time ) {
 int main() {
     Clock_sleep( 0.5f );
 
-    net_addr sv_addr = { { 127,0,0,1 }, 1991 };
+    net_addr sv_addr = { { 192,168,1,3 }, 1991 };
 
     if( !Client_init( &sv_addr ) ) 
         return 1;

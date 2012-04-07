@@ -13,7 +13,7 @@ LIB = \
 
 
 all: $(OBJ) $(CO_OBJ)
-	@ $(CC) $(CFLAGS) $(CO_OBJ) $(OBJ) $(LIB) -o ../../bin/sv
+	@ $(CC) $(CO_OBJ) $(OBJ) $(LIB) $(CFLAGS) -o ../../bin/sv
 	@echo "		-- Server compiled --"
 
 %.o: %.c

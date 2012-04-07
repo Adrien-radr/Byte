@@ -196,11 +196,12 @@ void Net_packetQueueGet( net_packet_queue *q, u8 **data_ptr, net_addr *addr ) {
 }
 void Net_packetQueueSet( net_packet_queue *q, const u8 *data, const net_addr *addr ) {
     if( q ) {
-        memcpy( &q->packets[q->start].data, data, 256 );
-        net_addr_cpy( &q->packets[q->start].addr, addr );
+        int end = ( q->start + q->count ) % 256;
+        memcpy( &q->packets[end].data, data, 256 );
+        net_addr_cpy( &q->packets[end].addr, addr );
 
         // get sequence number of packet
-        bytes_to_u32( data + 12, &q->packets[q->start].sequence ); 
+        bytes_to_u32( data + 12, &q->packets[end].sequence ); 
     }
 }
 
@@ -786,10 +787,10 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
 
     // if we got something, send it to client
     if( packet ) {
-        //u32 type, seq;
-        //bytes_to_u32( packet + 8, &type );
-        //bytes_to_u32( packet + 12, &seq );
-        //log_info( "sending %s(seq=%d)\n", PacketTypeStr[type], seq );
+        u32 type, seq;
+        bytes_to_u32( packet + 8, &type );
+        bytes_to_u32( packet + 12, &seq );
+        log_info( "sending %s(seq=%d)\n", PacketTypeStr[type], seq );
         Net_sendPacket( socket, &c->address, packet, 256 );
         Net_connectionPacketSent( c, 256 - PACKET_HEADER_SIZE );
 
@@ -798,7 +799,7 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
 
     // else, send a keepalive
     } else if( c->state == Connected ) {
-        //log_info( "sending KEEP_ALIVE\n" );
+        log_info( "sending KEEP_ALIVE\n" );
         u8 keep_alive[256];
         Net_connectionWritePacketHeader( c, keep_alive, KEEP_ALIVE );
         Net_sendPacket( socket, &c->address, keep_alive, 256 );

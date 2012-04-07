@@ -96,6 +96,8 @@ void ConnectStep() {
                     client.c_info.address.ip[3], 
                     client.c_info.address.port ); 
 
+
+            Net_packetQueueStackInt( &client.c_info.guaranteed, 5 );
             Client_sendGuaranteed( CONNECT_ASKID );
             Net_connectionSendNextPacket( &client.c_info, client.socket );
 
@@ -178,8 +180,8 @@ bool Connect() {
         start_t = Clock_getElapsedTime( &client.clock );
 
         ConnectStep();
+        Clock_sleep( 0.1f );
         Net_connectionUpdate( &client.c_info, Clock_getElapsedTime( &client.clock ) - start_t );
-        Clock_sleep( 0.2f );
     }
 
     return client.c_info.state == Connected;
@@ -242,10 +244,12 @@ void HandleReceivedPackets() {
             Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
             switch( msg_type ) {
                 case KEEP_ALIVE :
+                    //log_info( "received KEEP_ALIVE \n" );
                     break;
 
 
                 default:
+                    log_info( "received unknown %s \n", PacketTypeStr[msg_type] );
                     break;
             }
         }
@@ -293,6 +297,8 @@ void Client_run() {
 
         if( client.c_info.state == ConnectFail ) 
             break;
+
+        Clock_sleep( Clock_getElapsedTime( &client.clock ) - start_t );
 
 
         // sample frame end time

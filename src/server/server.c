@@ -246,6 +246,8 @@ void Server_run() {
             }
 
 
+        Clock_sleep( Clock_getElapsedTime( &client.clock ) - start_t );
+
         // sample frame end time
         end_t = Clock_getElapsedTime( &server.clock );
 

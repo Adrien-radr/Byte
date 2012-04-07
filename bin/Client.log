@@ -1,41 +1,632 @@
 Byte-Project Log v0.1.5
-Sat 07 Apr 2012 - 13:49:35
+Sat 07 Apr 2012 - 15:51:21
 ==========================
 <0.00> [INFO] (net.c:70) IP : 127.0.0.1 (lo)
 <0.00> [INFO] (net.c:70) IP : 192.168.1.2 (wlan0)
 <0.00> [INFO] (client.c:31) Socket opened on port 1992
-<0.34> [INFO] (context.c:116) GLFW Window successfully initialized!
-<0.43> [INFO] (renderer.c:76) GLEW v1.7.0 successfully initialized!
-<0.43> [INFO] (renderer.c:83) OpenGL 3.2
-<0.43> [INFO] (renderer.c:84) GLSL 4.20
-<0.43> [INFO] (renderer.c:85) Hardware : ATI Technologies Inc. - ATI Mobility Radeon HD 5800 Series 
-<0.43> [INFO] (renderer.c:106) Renderer successfully initialized!
-<0.43> [INFO] (event.c:75) Event manager successfully initialized!
-<0.43> [INFO] (device.c:132) Device successfully initialized!
-<0.59> [INFO] (resource.c:319) Resource "map_shader.json" loaded.
-<0.61> [INFO] (resource.c:319) Resource "sprite_shader.json" loaded.
-<0.62> [INFO] (resource.c:319) Resource "text_shader.json" loaded.
-<0.62> [INFO] (resource.c:338) Resource "map.json" loaded.
-<0.62> [INFO] (resource.c:338) Resource "quadmesh.json" loaded.
-<0.62> [INFO] (resource.c:302) Resource "hextile.png" loaded.
-<0.62> [INFO] (resource.c:302) Resource "img_test.png" loaded.
-<0.62> [INFO] (resource.c:302) Resource "man-template.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "man-v5.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "man.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "mans.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "mansh.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "mansh2.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "map.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "tile-up-west.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "tile.png" loaded.
-<0.63> [INFO] (resource.c:302) Resource "unknown.png" loaded.
-<0.68> [INFO] (resource.c:352) Resource "DejaVuSans.ttf" loaded.
-<0.72> [INFO] (resource.c:352) Resource "visitor2.ttf" loaded.
-<0.72> [INFO] (game.c:45) Game successfully initialized!
-<0.72> [INFO] (client.c:97) Asking Session ID to 127.0.0.1:1991
-<0.92> [INFO] (client.c:123) Received Session ID from server : 561517530
-<1.12> [INFO] (client.c:139) Sent a connection demand to server...
-<1.72> [INFO] (client.c:157) Client is now connected to server.
-<5.93> [INFO] (net.c:587) Connection going to Good Mode
-<15.93> [INFO] (net.c:575) Penalty time decreased to 2.000000
-<20.65> [INFO] (client.c:192) Disconnecting...
+<0.31> [INFO] (context.c:116) GLFW Window successfully initialized!
+<0.34> [INFO] (renderer.c:76) GLEW v1.7.0 successfully initialized!
+<0.35> [INFO] (renderer.c:83) OpenGL 4.2
+<0.35> [INFO] (renderer.c:84) GLSL 4.20
+<0.35> [INFO] (renderer.c:85) Hardware : ATI Technologies Inc. - ATI Mobility Radeon HD 5800 Series 
+<0.35> [INFO] (renderer.c:106) Renderer successfully initialized!
+<0.35> [INFO] (event.c:75) Event manager successfully initialized!
+<0.35> [INFO] (device.c:132) Device successfully initialized!
+<0.43> [INFO] (resource.c:319) Resource "map_shader.json" loaded.
+<0.45> [INFO] (resource.c:319) Resource "sprite_shader.json" loaded.
+<0.46> [INFO] (resource.c:319) Resource "text_shader.json" loaded.
+<0.47> [INFO] (resource.c:338) Resource "map.json" loaded.
+<0.47> [INFO] (resource.c:338) Resource "quadmesh.json" loaded.
+<0.47> [INFO] (resource.c:302) Resource "hextile.png" loaded.
+<0.47> [INFO] (resource.c:302) Resource "img_test.png" loaded.
+<0.47> [INFO] (resource.c:302) Resource "man-template.png" loaded.
+<0.47> [INFO] (resource.c:302) Resource "man-v5.png" loaded.
+<0.47> [INFO] (resource.c:302) Resource "man.png" loaded.
+<0.47> [INFO] (resource.c:302) Resource "mans.png" loaded.
+<0.47> [INFO] (resource.c:302) Resource "mansh.png" loaded.
+<0.47> [INFO] (resource.c:302) Resource "mansh2.png" loaded.
+<0.47> [INFO] (resource.c:302) Resource "map.png" loaded.
+<0.48> [INFO] (resource.c:302) Resource "tile-up-west.png" loaded.
+<0.48> [INFO] (resource.c:302) Resource "tile.png" loaded.
+<0.48> [INFO] (resource.c:302) Resource "unknown.png" loaded.
+<0.53> [INFO] (resource.c:352) Resource "DejaVuSans.ttf" loaded.
+<0.58> [INFO] (resource.c:352) Resource "visitor2.ttf" loaded.
+<0.58> [INFO] (game.c:45) Game successfully initialized!
+<0.58> [INFO] (client.c:97) Asking Session ID to 192.168.1.3:1991
+<0.58> [INFO] (net.c:793) sending CONNECT_ASKID(seq=0)
+<0.68> [INFO] (client.c:125) Received Session ID from server : 2087648046
+<0.78> [INFO] (net.c:793) sending CONNECT_TRY(seq=1)
+<0.78> [INFO] (client.c:141) Sent a connection demand to server...
+<0.98> [INFO] (client.c:159) Client is now connected to server.
+<1.08> [INFO] (client.c:252) received unknown CONNECT_ACCEPT 
+<1.08> [INFO] (client.c:252) received unknown CONNECT_ACCEPT 
+<1.16> [INFO] (client.c:252) received unknown CONNECT_ACCEPT 
+<1.21> [INFO] (net.c:802) sending KEEP_ALIVE
+<1.21> [INFO] (client.c:252) received unknown CONNECT_ACCEPT 
+<1.31> [INFO] (net.c:802) sending KEEP_ALIVE
+<1.31> [INFO] (client.c:247) received KEEP_ALIVE 
+<1.41> [INFO] (net.c:802) sending KEEP_ALIVE
+<1.41> [INFO] (client.c:247) received KEEP_ALIVE 
+<1.51> [INFO] (net.c:802) sending KEEP_ALIVE
+<1.51> [INFO] (client.c:247) received KEEP_ALIVE 
+<1.62> [INFO] (net.c:802) sending KEEP_ALIVE
+<1.62> [INFO] (client.c:247) received KEEP_ALIVE 
+<1.72> [INFO] (net.c:802) sending KEEP_ALIVE
+<1.77> [INFO] (client.c:247) received KEEP_ALIVE 
+<1.82> [INFO] (net.c:802) sending KEEP_ALIVE
+<1.82> [INFO] (client.c:247) received KEEP_ALIVE 
+<1.92> [INFO] (net.c:802) sending KEEP_ALIVE
+<1.92> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.02> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.02> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.12> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.12> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.22> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.22> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.33> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.33> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.43> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.43> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.53> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.53> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.63> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.63> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.73> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.73> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.83> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.83> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.88> [INFO] (net.c:802) sending KEEP_ALIVE
+<2.93> [INFO] (client.c:247) received KEEP_ALIVE 
+<2.99> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.04> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.09> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.14> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.19> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.24> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.29> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.39> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.44> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.49> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.54> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.59> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.65> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.70> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.75> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.80> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.85> [INFO] (client.c:247) received KEEP_ALIVE 
+<3.90> [INFO] (net.c:802) sending KEEP_ALIVE
+<3.95> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.00> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.05> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.10> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.15> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.20> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.25> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.31> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.36> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.41> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.46> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.51> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.56> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.61> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.66> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.71> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.76> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.81> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.86> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.86> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.86> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.86> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.91> [INFO] (net.c:802) sending KEEP_ALIVE
+<4.91> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.96> [INFO] (client.c:247) received KEEP_ALIVE 
+<4.96> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.01> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.01> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.02> [INFO] (net.c:588) Connection going to Good Mode
+<5.07> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.07> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.07> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.07> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.12> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.12> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.12> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.17> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.17> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.17> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.22> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.22> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.22> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.27> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.27> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.27> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.32> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.32> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.32> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.37> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.37> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.37> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.42> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.42> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.42> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.47> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.47> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.47> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.52> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.52> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.52> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.57> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.57> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.57> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.62> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.63> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.63> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.68> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.73> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.73> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.73> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.78> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.78> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.78> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.83> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.83> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.83> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.88> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.88> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.88> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.93> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.93> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.93> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.93> [INFO] (client.c:247) received KEEP_ALIVE 
+<5.98> [INFO] (net.c:802) sending KEEP_ALIVE
+<5.98> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.03> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.03> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.03> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.03> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.08> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.08> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.08> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.13> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.13> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.13> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.18> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.18> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.18> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.23> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.24> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.24> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.29> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.29> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.29> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.34> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.39> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.39> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.39> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.44> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.44> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.44> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.49> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.49> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.49> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.54> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.54> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.54> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.59> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.59> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.59> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.64> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.64> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.64> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.69> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.69> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.69> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.74> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.74> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.74> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.79> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.79> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.79> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.84> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.84> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.84> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.90> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.90> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.90> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.95> [INFO] (net.c:802) sending KEEP_ALIVE
+<6.95> [INFO] (client.c:247) received KEEP_ALIVE 
+<6.95> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.00> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.00> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.00> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.05> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.05> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.05> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.10> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.10> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.10> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.15> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.15> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.15> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.15> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.20> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.20> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.25> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.25> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.25> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.25> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.25> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.30> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.35> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.35> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.35> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.35> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.35> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.40> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.45> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.45> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.45> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.45> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.50> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.50> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.50> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.50> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.55> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.55> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.55> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.55> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.60> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.66> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.66> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.66> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.66> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.66> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.71> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.71> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.76> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.76> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.76> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.81> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.81> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.86> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.86> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.86> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.86> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.91> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.91> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.91> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.96> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.96> [INFO] (net.c:802) sending KEEP_ALIVE
+<7.96> [INFO] (client.c:247) received KEEP_ALIVE 
+<7.96> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.01> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.01> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.06> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.06> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.06> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.11> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.11> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.11> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.16> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.16> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.16> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.21> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.21> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.21> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.26> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.26> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.26> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.26> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.31> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.36> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.36> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.36> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.41> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.41> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.41> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.41> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.47> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.47> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.47> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.47> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.52> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.52> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.52> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.57> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.62> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.62> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.67> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.72> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.72> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.72> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.72> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.72> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.72> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.72> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.72> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.77> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.77> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.77> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.82> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.82> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.87> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.87> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.87> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.87> [INFO] (client.c:247) received KEEP_ALIVE 
+<8.92> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.92> [INFO] (net.c:802) sending KEEP_ALIVE
+<8.97> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.02> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.02> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.02> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.07> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.07> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.07> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.07> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.07> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.07> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.12> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.12> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.12> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.12> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.17> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.17> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.22> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.22> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.28> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.33> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.33> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.38> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.38> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.38> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.38> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.38> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.38> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.38> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.43> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.43> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.43> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.43> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.48> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.48> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.53> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.53> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.53> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.53> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.58> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.63> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.63> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.68> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.73> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.73> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.73> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.73> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.73> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.78> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.78> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.83> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.83> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.83> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.83> [INFO] (client.c:247) received KEEP_ALIVE 
+<9.88> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.88> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.93> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.99> [INFO] (net.c:802) sending KEEP_ALIVE
+<9.99> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.04> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.04> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.04> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.04> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.04> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.04> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.04> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.09> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.09> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.09> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.14> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.14> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.14> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.19> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.19> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.19> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.24> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.29> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.29> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.34> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.39> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.39> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.39> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.44> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.44> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.44> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.49> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.49> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.49> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.54> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.59> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.59> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.65> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.70> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.70> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.70> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.70> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.70> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.70> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.70> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.70> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.75> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.75> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.75> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.80> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.80> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.80> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.80> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.85> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.85> [INFO] (client.c:247) received KEEP_ALIVE 
+<10.90> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.90> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.95> [INFO] (net.c:802) sending KEEP_ALIVE
+<10.95> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.00> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.00> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.00> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.00> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.00> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.00> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.05> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.05> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.05> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.10> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.10> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.10> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.15> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.15> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.15> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.20> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.25> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.26> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.31> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.36> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.36> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.36> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.36> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.36> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.36> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.36> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.36> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.41> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.41> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.41> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.46> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.46> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.46> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.51> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.51> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.51> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.56> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.56> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.61> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.66> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.66> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.66> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.66> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.66> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.66> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.71> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.71> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.71> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.76> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.76> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.76> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.81> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.81> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.81> [INFO] (client.c:247) received KEEP_ALIVE 
+<11.87> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.87> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.92> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.92> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.97> [INFO] (net.c:802) sending KEEP_ALIVE
+<11.97> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.02> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.02> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.02> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.02> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.02> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.02> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.02> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.07> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.07> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.12> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.12> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.12> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.12> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.17> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.17> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.22> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.22> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.27> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.32> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.32> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.32> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.32> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.32> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.32> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.32> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.37> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.37> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.42> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.42> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.42> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.42> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.47> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.47> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.53> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.53> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.58> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.63> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.63> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.68> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.68> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.73> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.73> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.73> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.78> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.78> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.78> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.83> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.83> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.83> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.88> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.88> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.88> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.93> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.93> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.93> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.98> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.98> [INFO] (net.c:802) sending KEEP_ALIVE
+<12.98> [INFO] (client.c:247) received KEEP_ALIVE 
+<12.98> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.03> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.03> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.08> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.08> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.08> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.08> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.13> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.14> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.19> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.19> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.19> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.19> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.24> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.24> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.29> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.29> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.29> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.29> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.34> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.34> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.39> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.39> [INFO] (net.c:802) sending KEEP_ALIVE
+<13.39> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.39> [INFO] (client.c:247) received KEEP_ALIVE 
+<13.39> [INFO] (client.c:194) Disconnecting...
