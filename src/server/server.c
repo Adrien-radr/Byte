@@ -82,11 +82,11 @@ void ClientConnect( const net_addr *addr ) {
     } else {
         log_warn( "Max clients limit reached!\n" );
         // direcly send to him
-        u8 packet[256];
+        u8 packet[PACKET_SIZE];
         u32_to_bytes( protocol_id, packet );
         u32_to_bytes( 0, packet + 4 );
         u32_to_bytes( CONNECT_REFUSE, packet + 8 );
-        while( !Net_sendPacket( server.socket, addr, packet, 256 ) );
+        while( !Net_sendPacket( server.socket, addr, packet, PACKET_SIZE ) );
     }
 
     // debug
@@ -149,7 +149,7 @@ void HandleReceivedInputs() {
                 }
 
             if( found ) {
-                Net_connectionPacketReceived( &server.connections[i], sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
+                Net_connectionPacketReceived( &server.connections[i], sequence, ack, ack_bits );
 
                 // HANDLE INPUTS FOR LOGIC
                 switch( msg_type ) {
@@ -186,11 +186,11 @@ void HandleReceivedInputs() {
 
 bool ReceivePacket() {
     u32 bytes_read;
-    u8 packet[256];
+    u8 packet[PACKET_SIZE];
     net_addr from;
 
     // get packet
-    bytes_read = Net_receivePacket( server.socket, &from, packet, 256 );
+    bytes_read = Net_receivePacket( server.socket, &from, packet, PACKET_SIZE );
     if( !bytes_read ) return false;
     if( bytes_read < PACKET_HEADER_SIZE ) return true;
 

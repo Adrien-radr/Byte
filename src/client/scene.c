@@ -6,6 +6,8 @@
 #include "context.h"
 #include "resource.h"
 
+#include "game.h"
+
 #ifdef USE_GLDL
 #include "GL/gldl.h"
 #else
@@ -20,6 +22,12 @@ typedef struct s_Scene {
     TextArray       *mTexts;            ///< Texts in the scene
 
     Camera          *mCamera;           ///< Camera of the scene
+
+    struct {
+        u32 mesh;
+        u32 texture;
+        u32 shader;
+    }               local_map;
 } Scene;
 
 
@@ -60,6 +68,59 @@ typedef struct s_Scene {
         }
     }
 
+// MAP visual representation creation/rendering
+void initMap( Scene *scene ) {
+    vec2 map_pos[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+    vec2 map_tcs[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+    u32  map_indices[6*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+
+    const int start = LOCAL_MAP_HEIGHT/2 * 50 + 25;
+ 
+    // vertex position offsets
+    int x_offset, y_offset;  
+
+    // arrays indices offsets ( xi and yj for pos and tcs offsets,
+    int xi, yj, ii, ij;      // ii and ij for indices               )
+     
+
+    // create map mesh data
+    for( int j = 0; j < LOCAL_MAP_HEIGHT/2; ++j )
+        for( int i = 0; i < 2*LOCAL_MAP_WIDTH; ++i ) {
+            x_offset = i * 50.f;
+            y_offset = j * 50.f + (i&1) * 25.f;
+            xi = i * 4;
+            yj = j * 2 * LOCAL_MAP_WIDTH * 4;
+            map_pos[yj+xi+0].x = x_offset + 50.f;
+            map_pos[yj+xi+0].y = y_offset + 50.f;
+            map_pos[yj+xi+1].x = x_offset;
+            map_pos[yj+xi+1].y = y_offset + 25.f;
+            map_pos[yj+xi+2].x = x_offset + 50.f;
+            map_pos[yj+xi+2].y = y_offset;
+            map_pos[yj+xi+3].x = x_offset + 100.f;
+            map_pos[yj+xi+3].y = y_offset + 25.f;
+
+            map_tcs[yj+xi+0].x = 0.f;     map_tcs[yj+xi+0].y = 0.f;
+            map_tcs[yj+xi+1].x = 0.f;     map_tcs[yj+xi+1].y = 1.f;
+            map_tcs[yj+xi+2].x = 1.f;     map_tcs[yj+xi+2].y = 1.f;
+            map_tcs[yj+xi+3].x = 1.f;     map_tcs[yj+xi+3].y = 0.f;
+
+            ii = i * 6;
+            ij = j * 2 * LOCAL_MAP_WIDTH * 6;
+            map_indices[ij+ii+0] = yj+xi+0;
+            map_indices[ij+ii+1] = yj+xi+2;
+            map_indices[ij+ii+2] = yj+xi+1;
+            map_indices[ij+ii+3] = yj+xi+0;
+            map_indices[ij+ii+4] = yj+xi+3;
+            map_indices[ij+ii+5] = yj+xi+2;
+        }
+
+    // create mesh
+    scene->local_map.mesh = Renderer_createStaticMesh( GL_TRIANGLES, map_indices, sizeof(map_indices), map_pos, sizeof(map_pos), map_tcs, sizeof(map_tcs) );
+ 
+    // get shader and texture
+    scene->local_map.texture = ResourceManager_get( "map.png" );
+    scene->local_map.shader = ResourceManager_get( "map_shader.json" );
+}
 
 Scene *Scene_new() {
     Scene *s = NULL;
@@ -84,6 +145,9 @@ Scene *Scene_new() {
     check( ts >= 0, "Text shader creation error!\n" );
 
     s->mTextShader = ts;
+
+    // map
+        initMap( s );
 
     // camera
         s->mCamera = Camera_new();
@@ -118,6 +182,20 @@ void Scene_update( Scene *pScene ) {
 
 void Scene_render( Scene *pScene ) {
     if( pScene ) {
+        glDisable( GL_CULL_FACE );
+        // ##################################################
+        //      RENDER MAP
+        Renderer_useShader( pScene->local_map.shader );
+        Color c = { 0.8f, 0.8f, 0.8f, 1.f };
+        Shader_sendColor( "iColor", &c );
+        Shader_sendInt( "Depth", 9 );
+
+        Renderer_useTexture( pScene->local_map.texture, 0 );
+        mat3 m;
+        mat3_identity( &m );
+        Shader_sendMat3( "ModelMatrix", &m );
+        Renderer_renderMesh( pScene->local_map.mesh );
+
         // ##################################################
         //      RENDER SPRITES
         Renderer_useShader( pScene->mSpriteShader );

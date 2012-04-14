@@ -161,11 +161,11 @@ void Renderer_initVao() {
     }
 }
 
-int  Renderer_createStaticMesh( u32 *pIndices, u32 pIndiceSize, vec2 *pPositions, u32 pPositionSize, vec2 *pTexcoords, u32 pTexcoordSize ) {
+int  Renderer_createStaticMesh( GLenum mode, u32 *pIndices, u32 pIndiceSize, vec2 *pPositions, u32 pPositionSize, vec2 *pTexcoords, u32 pTexcoordSize ) {
     Mesh *m = NULL;
     if( renderer ) {
         if( MeshArray_checkSize( &renderer->mMeshes ) ) {
-            m = Mesh_new();
+            m = Mesh_new( mode );
             check_mem( m );
 
             // add Vertex Data
@@ -197,7 +197,7 @@ int  Renderer_createRescaledMesh( u32 pMesh, const vec2 *pScale ) {
     Mesh *m = NULL;
     if( renderer && pMesh < renderer->mMeshes.cpt ) {
         if( MeshArray_checkSize( &renderer->mMeshes ) ) {
-            m = Mesh_new();
+            m = Mesh_new( GL_TRIANGLES );
             check_mem( m );
     
             // copy given mesh and rescale it
@@ -225,7 +225,7 @@ int  Renderer_createDynamicMesh() {
     Mesh *m = NULL;
     if( renderer ) {
         if( MeshArray_checkSize( &renderer->mMeshes ) ) {
-            m = Mesh_new();
+            m = Mesh_new( GL_TRIANGLES );
             check_mem( m );
 
             // storage
@@ -301,9 +301,9 @@ void Renderer_renderMesh( u32 pIndex ) {
         }
 
         if( m->mUseIndices )
-            glDrawElements( GL_TRIANGLES, m->mIndexCount, GL_UNSIGNED_INT, 0 );
+            glDrawElements( m->mode, m->mIndexCount, GL_UNSIGNED_INT, 0 );
         else
-            glDrawArrays( GL_TRIANGLES, 0, m->mVertexCount );
+            glDrawArrays( m->mode, 0, m->mVertexCount );
     }
 }
 

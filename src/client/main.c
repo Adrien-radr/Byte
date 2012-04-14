@@ -12,83 +12,57 @@
 #endif
 
 /*                  TODO
-    - Make this type of loop, with before the while the code needed
-      to connect the client to the server and init game data.
-    - Make multi-client arch.
-    - Introduce guaranteed(connection, ...) vs unguaranteed(fast stuff)
-      pakets.
-    - Implement connection/disconnection
-    - Add Heartbeats when no inputs
     - Try implementing a ingame chat to test arch
 
-//              TYPICAL MULTI LOOP
-
-while ( true )
-{
-    SendPackets( socket );
-
-    while ( true )
-    {
-        int packetSize = 0;
-        unsigned char packet[1024];
-        if ( !socket.RecievePacket( packet, packetSize ) )
-            break;
-        assert( packetSize > 0 );
-        Game::ProcessPacket( packet, packetSize );
-    }
-
-    float frameTime = Timer::getFrameTime();
-    Game::Update( frameTime );
-}
-
 */
-GLuint vbo, shader;
+
+/*
 mat3 m;
 Color c;
+u32 mesh;
+u32 texture;
+u32 shader;
+*/
 
 void init_callback() {
-    Actor man;
-    Actor_load( &man, "data/game/actors/man.json" );
+    int a1_h = World_loadActor( "data/game/actors/man.json" );
+    if( a1_h >= 0 ) {
+        Actor *a1 = World_getActor( a1_h );
 
-    Game_loadActorAssets( &man );
-    World_addActor( &man );
-    Scene_addSpriteFromActor( game->mScene, &man );
+        Game_loadActorAssets( a1 );
+        Scene_addSpriteFromActor( game->mScene, a1 );
+        vec2 pos = { 50, -25 };
+        mat3 m;
+        mat3_translationMatrixfv( &m, &pos );
+        Scene_modifySprite( game->mScene, a1_h, SA_Matrix, &m );
+    }
 
-
-    // tile
-    vec2 pts[] = {
-        { 50,25 },
-        { 0,50 },
-        { 50,75 },
-        { 100,50 },
-        { 50,25 }
-    };
-
-    glGenBuffers( 1, &vbo );
-    glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(pts), pts, GL_STATIC_DRAW );
+/*
+    mesh = ResourceManager_get( "map.json" );
 
     shader = ResourceManager_get( "map_shader.json" );
+    texture = ResourceManager_get( "map.png" );
 
     c.r = c.g = c.b = 0.8f;
     c.a = 1.f;
+    */
 }
  
 bool frame_callback( f32 frame_time ) {
+    /*
     Renderer_useShader( shader );
     Shader_sendColor( "iColor", &c );
     Shader_sendInt( "Depth", 9 );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    glDisableVertexAttribArray( 1 );
-    glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, 0 );
+    Renderer_useTexture( texture, 0 );
+
     mat3_identity( &m );
     Shader_sendMat3( "ModelMatrix", &m );
-    glDrawArrays( GL_LINE_STRIP, 0, 5 );
+    Renderer_renderMesh( mesh );
     mat3_translatef( &m, 50.f, 25.f );
     Shader_sendMat3( "ModelMatrix", &m );
-    glDrawArrays( GL_LINE_STRIP, 0, 5 );
-    glEnableVertexAttribArray( 1 );
+    Renderer_renderMesh( mesh );
+    */
 
     return true;
 }

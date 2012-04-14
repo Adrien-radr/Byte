@@ -21,6 +21,8 @@ typedef enum {
 
 extern str32 PacketTypeStr[PT_ARRAYEND];
 
+// Default packet size (including header
+#define PACKET_SIZE 165
 
 // Packet header size in bytes
 // [protocolID, sessionID, msgType, sequence, ack, ack bits]
@@ -34,6 +36,10 @@ extern str32 PacketTypeStr[PT_ARRAYEND];
 
 // RTT Threshold, after that, pass flow to Bad Mode
 #define RTT_THRESHOLD 250.f
+
+// Connection Flow Bad and Good packets per second
+#define FLOW_BAD   5.f
+#define FLOW_GOOD 10.f
 
 /// Application Protocol ID
 extern const u32 protocol_id;
@@ -64,7 +70,7 @@ typedef struct {
 /// Circular buffer for packets
 typedef struct {
     struct {
-        u8          data[256];
+        u8          data[PACKET_SIZE];
         u32         stack_pos;
 
         net_addr    addr;           
@@ -166,8 +172,8 @@ void Net_connectionSendUnguaranteed( connection *c, u32 msg_type );
 
 void Net_connectionSendNextPacket( connection *c, net_socket socket );
 
-void Net_connectionPacketSent( connection *c, u32 size );
-void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack_bits, u32 size );
+void Net_connectionPacketSent( connection *c );
+void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack_bits );
 
 // Server functions
     void Net_connectionListen( connection *c );

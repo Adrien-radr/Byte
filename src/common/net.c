@@ -197,7 +197,7 @@ void Net_packetQueueGet( net_packet_queue *q, u8 **data_ptr, net_addr *addr ) {
 void Net_packetQueueSet( net_packet_queue *q, const u8 *data, const net_addr *addr ) {
     if( q ) {
         int end = ( q->start + q->count ) % 256;
-        memcpy( &q->packets[end].data, data, 256 );
+        memcpy( &q->packets[end].data, data, PACKET_SIZE );
         net_addr_cpy( &q->packets[end].addr, addr );
 
         // get sequence number of packet
@@ -399,7 +399,7 @@ bool Net_connectionInit( connection *c, connection_mode mode ) {
     c->rtt= 0.f;
 
     c->flow = Bad;
-    c->flow_speed = 1.f / 10.f;
+    c->flow_speed = 1.f / FLOW_BAD;
     c->penalty_time = 4.f;
     c->good_cond_time = 0.f;
     c->penalty_accum = 0.f;
@@ -427,90 +427,7 @@ void Net_connectionListen( connection *c ) {
 
     c->state = Listening;
 }
-/*
-void Net_connectionAskID( connection *c ) {
-    if( !c || c->mode == Server || c->state != Disconnected ) return;
 
-    net_addr *addr = &c->address;
-
-    log_info( "Asking ID to %d.%d.%d.%d:%d\n", 
-            addr->ip[0], addr->ip[1], addr->ip[2], addr->ip[3], addr->port ); 
-
-    u8 packet[240];
-    u32 msg;
-
-    // no session id yet, send 0
-    c->session_id = 0;
-    u32_to_bytes( c->session_id, packet );
-
-    // send askID msg
-    msg = CONNECT_ASKID;
-    u32_to_bytes( msg, &packet[4] );
-
-    Net_connectionSend( c, packet, 240 );
-
-    c->state = IDDemandSent;
-}
-
-void Net_connectionReceiveID( connection *c ) {
-    if( !c || c->state != IDDemandSent ) return;
-
-    u32 bytes_read, msg;
-    u8 packet[240];
-
-    bytes_read = Net_connectionReceive( c, packet, 240 );
-
-    if( bytes_read != 8 ) return;
-
-    // check if message is a session ID for us
-    bytes_to_u32( &packet[4], &msg );
-    if( msg != CONNECT_SESSIONID ) return;
-
-    // get our new session id
-    bytes_to_u32( packet, &c->session_id );
-
-    log_info( "Client received session ID %d\n", c->session_id );
-    c->state = IDReceived;
-}
-
-void Net_connectionReceiveResponse( connection *c ) {
-    if( !c || c->state != IDReceived ) return;
-
-    u32 bytes_read, msg, id;
-    u8 packet[240];
-
-    bytes_read = Net_connectionReceive( c, packet, 240 );
-
-    if( bytes_read != 8 ) return;
-
-    // check if msg is for us
-    bytes_to_u32( packet, &id );
-    if( id != c->session_id ) return;
-
-    // get response
-    bytes_to_u32( packet, &msg );
-
-    if( msg == CONNECT_ACCEPT ) {
-        log_info( "Client is now connected to server.\n" );
-        c->state = Connected;
-    } else if( msg == CONNECT_REFUSE ) {
-        log_info( "Server refused connection.\n" );
-        c->state = ConnectFail;
-    } 
-}
-
-void Net_connectionTry( connection *c ) {
-    if( !c || c->state != IDReceived ) return;
-
-    u8 packet[240];
-
-    u32_to_bytes( c->session_id, packet );
-    u32_to_bytes( CONNECT_TRY, &packet[4] );
-
-    Net_connectionSend( c, packet, 240 );
-}
-
-*/
 static void nc_update_queues( connection *c, f32 dt ) {
     // update queues packet time
     net_packet_info_queue_update( &c->sent_queue, dt );
@@ -548,7 +465,7 @@ static void nc_update_flow( connection *c, f32 dt ) {
         if( rtt > RTT_THRESHOLD ) {
             log_info( "Connection going to Bad Mode\n" );
             c->flow = Bad;
-            c->flow_speed = 1.f / 10.f;
+            c->flow_speed = 1.f / FLOW_BAD;
             
             // Increase penalty time if oscillating between Good & Bad to often
             if( c->good_cond_time < 10.f && c->penalty_time < 60.f ) {
@@ -589,7 +506,7 @@ static void nc_update_flow( connection *c, f32 dt ) {
             c->good_cond_time = 0.f;
             c->penalty_accum = 0.f;
             c->flow = Good;
-            c->flow_speed = 1.f / 30.f;
+            c->flow_speed = 1.f / FLOW_GOOD;
         }
     }
 }
@@ -722,7 +639,7 @@ void Net_connectionWritePacketHeader( connection *c, u8 *packet, u32 msg_type ) 
 void Net_connectionSendGuaranteed( connection *c, u32 msg_type ) {
     if( !c ) return;
 
-    u8 packet[256];
+    u8 packet[PACKET_SIZE];
     Net_connectionWritePacketHeader( c, packet, msg_type );
     Net_packetQueueSet( &c->guaranteed, packet, &c->address );
     Net_packetQueuePush( &c->guaranteed );
@@ -731,7 +648,7 @@ void Net_connectionSendGuaranteed( connection *c, u32 msg_type ) {
 void Net_connectionSendUnguaranteed( connection *c, u32 msg_type ) {
     if( !c ) return;
 
-    u8 packet[256];
+    u8 packet[PACKET_SIZE];
     Net_connectionWritePacketHeader( c, packet, msg_type );
     Net_packetQueueSet( &c->unguaranteed, packet, &c->address );
     Net_packetQueuePush( &c->unguaranteed );
@@ -791,8 +708,8 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
         bytes_to_u32( packet + 8, &type );
         bytes_to_u32( packet + 12, &seq );
         log_info( "sending %s(seq=%d)\n", PacketTypeStr[type], seq );
-        Net_sendPacket( socket, &c->address, packet, 256 );
-        Net_connectionPacketSent( c, 256 - PACKET_HEADER_SIZE );
+        Net_sendPacket( socket, &c->address, packet, PACKET_SIZE );
+        Net_connectionPacketSent( c );
 
         if( unguaranteed )
             Net_packetQueuePop( &c->unguaranteed );
@@ -800,14 +717,14 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
     // else, send a keepalive
     } else if( c->state == Connected ) {
         log_info( "sending KEEP_ALIVE\n" );
-        u8 keep_alive[256];
+        u8 keep_alive[PACKET_SIZE];
         Net_connectionWritePacketHeader( c, keep_alive, KEEP_ALIVE );
-        Net_sendPacket( socket, &c->address, keep_alive, 256 );
-        Net_connectionPacketSent( c, 256 - PACKET_HEADER_SIZE );
+        Net_sendPacket( socket, &c->address, keep_alive, PACKET_SIZE );
+        Net_connectionPacketSent( c );
     }
 }
-
-void Net_connectionPacketSent( connection *c, u32 size ) {
+ 
+void Net_connectionPacketSent( connection *c ) {
     if( !c ) return;
 
     if( net_packet_info_queue_exists( &c->sent_queue, c->seq_local ) ) {
@@ -823,7 +740,7 @@ void Net_connectionPacketSent( connection *c, u32 size ) {
     net_packet_info pi;
     pi.seq = c->seq_local;
     pi.time = 0.f;
-    pi.size = size;
+    pi.size = PACKET_SIZE - PACKET_HEADER_SIZE;
 
     net_packet_info_queue_insert( &c->sent_queue, &pi );
     net_packet_info_queue_insert( &c->pending_acks, &pi );
@@ -835,7 +752,7 @@ void Net_connectionPacketSent( connection *c, u32 size ) {
         c->seq_local = 0;
 }
 
-void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack_bits, u32 size ) {
+void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack_bits ) {
     if( !c || !c->running ) return;
 
     // update connection
@@ -848,7 +765,7 @@ void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack
     net_packet_info pi;
     pi.seq = sequence;
     pi.time = 0.f;
-    pi.size = size;
+    pi.size = PACKET_SIZE - PACKET_HEADER_SIZE;
 
     net_packet_info_queue_insert( &c->recv_queue, &pi );
 

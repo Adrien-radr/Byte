@@ -29,6 +29,31 @@ void World_cpy( World *src ) {
         memcpy( world, src, sizeof(World) );
 }
 
+Actor *World_getActor( u32 actor_handle ) {
+    if( !world ) {
+        log_warn( "World is not initialized\n" );
+        return NULL;
+    }
+
+    return (Actor*)HandleManager_getData( world->mActors, actor_handle );
+}
+
+int World_loadActor( const char *actor_name ) {
+    int handle = -1;
+
+    check( world, "World is not initialized\n" );
+
+    Actor a;
+    bool loaded = Actor_load( &a, actor_name );
+
+
+    if( loaded ) 
+        handle = HandleManager_addData( world->mActors, (void*)&a, true, sizeof(Actor) );
+
+error:
+    return handle;
+}
+
 int World_addActor( Actor *actor ) {
     check( world, "Can't add actor to uninitialized world\n" );
 

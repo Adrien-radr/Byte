@@ -59,11 +59,11 @@ void Client_sendUnguaranteed( u32 msg_type ) {
 
 bool ReceivePacket() {
     u32 bytes_read;
-    u8 packet[256];
+    u8 packet[PACKET_SIZE];
     net_addr from;
 
     // get packet
-    bytes_read = Net_receivePacket( client.socket, &from, packet, 256 );
+    bytes_read = Net_receivePacket( client.socket, &from, packet, PACKET_SIZE );
     if( !bytes_read ) return false;
     if( bytes_read < PACKET_HEADER_SIZE ) return true;
 
@@ -117,7 +117,7 @@ void ConnectStep() {
             Net_readPacketHeader( packet, NULL, &id, &type, &sequence, &ack, &ack_bits );
             Net_packetQueuePop( &client.recv_packets );
 
-            Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
+            Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits );
 
             if( type == CONNECT_SESSIONID ) {
                 client.c_info.session_id = id;
@@ -152,7 +152,7 @@ void ConnectStep() {
             Net_readPacketHeader( packet, NULL, &id, &type, &sequence, &ack, &ack_bits );
             Net_packetQueuePop( &client.recv_packets );
 
-            Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
+            Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits );
 
             if( type == CONNECT_ACCEPT ) {
                 client.c_info.state = Connected;
@@ -196,10 +196,10 @@ void Disconnect() {
     client.c_info.state = Disconnecting;
 
     // send Connection closing demand
-    u8 close_packet[256];
+    u8 close_packet[PACKET_SIZE];
     Net_connectionWritePacketHeader( &client.c_info, close_packet, CONNECT_CLOSE );
-    while( !Net_sendPacket( client.socket, &client.c_info.address, close_packet, 256 ) );
-    Net_connectionPacketSent( &client.c_info, 256 - PACKET_HEADER_SIZE );
+    while( !Net_sendPacket( client.socket, &client.c_info.address, close_packet, PACKET_SIZE ) );
+    Net_connectionPacketSent( &client.c_info );
 
     // We read all incoming packets waiting for a CLOSEOK one, then we send it back to finish disconnection procedure
     while( true ) {
@@ -215,7 +215,7 @@ void Disconnect() {
                 if( msg_type == CONNECT_CLOSEOK ) {
                     // send disconnection procedure ending msg
                     Net_connectionWritePacketHeader( &client.c_info, close_packet, CONNECT_CLOSEOK );
-                    while( !Net_sendPacket( client.socket, &client.c_info.address, close_packet, 256 ) );
+                    while( !Net_sendPacket( client.socket, &client.c_info.address, close_packet, PACKET_SIZE ) );
 
                     // reinit connection
                     Net_connectionInit( &client.c_info, Client );
@@ -241,7 +241,7 @@ void HandleReceivedPackets() {
 
         // If we got an ID, check if it is ours and switch on msg_type
         if( client.c_info.session_id == id ) {
-            Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits, 256 - PACKET_HEADER_SIZE );
+            Net_connectionPacketReceived( &client.c_info, sequence, ack, ack_bits );
             switch( msg_type ) {
                 case KEEP_ALIVE :
                     //log_info( "received KEEP_ALIVE \n" );
@@ -249,6 +249,7 @@ void HandleReceivedPackets() {
 
 
                 default:
+                    // MAKE THE GAME HANDLE THE PACKET
                     log_info( "received unknown %s \n", PacketTypeStr[msg_type] );
                     break;
             }
@@ -297,8 +298,6 @@ void Client_run() {
 
         if( client.c_info.state == ConnectFail ) 
             break;
-
-        Clock_sleep( Clock_getElapsedTime( &client.clock ) - start_t );
 
 
         // sample frame end time

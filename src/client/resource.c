@@ -1,6 +1,7 @@
 #include "resource.h"
 #include "renderer.h"
 #include "json/cJSON.h"
+#include "GL/glew.h"
 
 #include <dirent.h>
 
@@ -194,7 +195,7 @@ int LoadMesh( const char *pFile ) {
     }
 
     // create mesh (vbo) from the renderer
-    handle = Renderer_createStaticMesh( indices_v, indice_n * sizeof( u32 ), positions_v, position_n * sizeof( vec2 ), texcoords_v, position_n * sizeof( vec2 ) );
+    handle = Renderer_createStaticMesh( GL_TRIANGLES, indices_v, indice_n * sizeof( u32 ), positions_v, position_n * sizeof( vec2 ), texcoords_v, position_n * sizeof( vec2 ) );
     check( handle >= 0, "Error while creating mesh!\n" );
 
 error:

@@ -41,7 +41,7 @@ bool Renderer_isInitialized();
     /// @param pTexcoords : Mesh Texture coordinates data
     /// @param p*Size : Size of each array
     /// @return : the handle to the created mesh.
-    int  Renderer_createStaticMesh( u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
+    int  Renderer_createStaticMesh( u32 mode, u32 *pIndices, u32 pIndicesSize, vec2 *pPositions, u32 pPositionsSize, vec2 *pTexcoords, u32 pTexcoordsSize );
 
     /// Create a new static mesh and return its ID
     /// This mesh will be a rescaled copy of the given one

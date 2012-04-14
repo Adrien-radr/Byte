@@ -6,8 +6,11 @@
 #include "GL/glew.h"
 #endif
 
-Mesh* Mesh_new() {
+Mesh* Mesh_new( GLenum mode ) {
     Mesh *mesh = byte_alloc( sizeof( Mesh ) );
+
+    if( mesh )
+        mesh->mode = mode;
 
     return mesh;
 }
@@ -27,6 +30,7 @@ void Mesh_cpy( Mesh *dest, const Mesh *src ) {
         dest->mVbo = dest->mIbo = 0;
         dest->mIndexCount = src->mIndexCount;
         dest->mVertexCount = src->mVertexCount;
+        dest->mode = src->mode;
 
         DEL_PTR( dest->mData );
 

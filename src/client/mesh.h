@@ -18,6 +18,8 @@ typedef struct s_Mesh {
 
     size_t  mTexcoordBegin; ///< Begining position in mData of Texcoord Data
     bool    mUseIndices;    ///< True if we use indices for drawing
+
+    u32     mode;           ///< Drawing mode. Default = GL_TRIANGLES
 } Mesh;
 
 /// Mesh attrib type in VBOs
@@ -27,7 +29,7 @@ typedef enum e_MeshAttrib {
 } MeshAttrib;
 
 /// Initialize a new mesh pointer
-Mesh* Mesh_new();
+Mesh* Mesh_new( u32 mode );
 
 /// Destroy an existing mesh and delete its GL buffers
 void Mesh_destroy( Mesh *pMesh );

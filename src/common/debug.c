@@ -70,14 +70,14 @@ void MemoryManager_destroy() {
         // rapport :
         printf( "Memory Manager Rapport :\n"
                 "============================\n"
-                "Allocated bytes at the end of execution : %ld.\n", mem_manager->allocated_bytes );
+                "Allocated bytes at the end of execution : %zu.\n", mem_manager->allocated_bytes );
         if( mem_manager->allocated_bytes ) {
             printf( "Non-free'd pointers :\n" );
             u32 cpt = mem_manager->alloc_cpt;
             for( u32 i = 0; i < cpt; ++i ) {
                 if( mem_manager->alloc_sizes[i] ) {
                     printf( "\tAddress : %p  (%s:%d)\n"
-                            "\tSize : %ld\n", mem_manager->alloc_stack[i], 
+                            "\tSize : %zu\n", mem_manager->alloc_stack[i], 
                                               mem_manager->alloc_files[i],
                                               mem_manager->alloc_lines[i],
                                               mem_manager->alloc_sizes[i] );
@@ -119,7 +119,7 @@ void MemoryManager_reallocation( void *ptr, void *oldptr, size_t size, const cha
                 found = true;
             }
         if( !found )
-            log_err( "MemoryManager error (%s:%d): Tried to reallocate pointer \"%ld\", but it has never been allocated in the memory manager before!\n", file, line, (size_t)ptr );
+            log_err( "MemoryManager error (%s:%d): Tried to reallocate pointer \"%p\", but it has never been allocated in the memory manager before!\n", file, line, ptr );
     }
 }
 
@@ -133,7 +133,7 @@ void MemoryManager_deallocation( void* ptr, const char *file, int line ) {
                 found = true;
             }
         if( !found )
-            log_err( "MemoryManager error (%s:%d): Tried to deallocate pointer \"%ld\", but it has never been allocated in the memory manager before!\n", file, line, (size_t)ptr );
+            log_err( "MemoryManager error (%s:%d): Tried to deallocate pointer \"%p\", but it has never been allocated in the memory manager before!\n", file, line, ptr );
     }
 }
 
