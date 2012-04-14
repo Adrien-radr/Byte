@@ -13,6 +13,8 @@ typedef struct {
     bool    (*frame_func)(f32);     ///< Game frame callback
 
     u32     fps_text;               ///< FPS text drawn in window
+    u32     mousepos_text;          ///< Mouse Position displayed
+    u32     mousetile_text;         ///< Tile under mouse displayed
 } Game;
 
 /// Game Instance

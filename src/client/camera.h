@@ -16,6 +16,7 @@ typedef void (*CameraUpdate)(Camera *);
 /// Keep track of position and zoom level
 struct s_Camera {
     vec2            mPosition;          ///< Camera world position
+    vec2            global_position;    ///< Position not depending on zoom level
 
     f32             mSpeed;             ///< Camera movement speed
 

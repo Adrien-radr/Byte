@@ -74,8 +74,6 @@ void initMap( Scene *scene ) {
     vec2 map_tcs[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
     u32  map_indices[6*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
 
-    const int start = LOCAL_MAP_HEIGHT/2 * 50 + 25;
- 
     // vertex position offsets
     int x_offset, y_offset;  
 
@@ -120,6 +118,56 @@ void initMap( Scene *scene ) {
     // get shader and texture
     scene->local_map.texture = ResourceManager_get( "map.png" );
     scene->local_map.shader = ResourceManager_get( "map_shader.json" );
+}
+
+vec2 Scene_localToGlobal( Scene *scene, const vec2 *local ) {
+    vec2 ret = {0,0};
+    ret = vec2_add( &ret, local );
+    ret = vec2_mul( &ret, scene->mCamera->mZoom );
+    ret = vec2_add( &ret, &scene->mCamera->global_position );
+
+    return ret;
+}
+
+vec2 Scene_screenToIso( Scene *scene, const vec2 *local ) {
+    static vec2 up =    {  50.f,  0.f };
+    static vec2 down =  {  50.f, 50.f };
+    static vec2 left =  {   0.f, 25.f };
+    static vec2 right = { 100.f, 25.f };
+    static vec2 tilesize = { 100.f, 50.f };
+
+    // get global mouse position (not depending on camera zoom or pan)
+    vec2 global = Scene_localToGlobal( scene, local );
+
+    vec2 ret, offset;
+    ret.x = (int)( global.x / tilesize.x );
+    ret.y = (int)( global.y / tilesize.y ) * 2;
+    offset.x = (int)fmod( global.x, tilesize.x );
+    offset.y = (int)fmod( global.y, tilesize.y );
+
+
+    int upleft = PointOnLine( &offset, &left, &up );
+    if( upleft < 0 ) {
+        ret.x -= 1;
+        ret.y -= 1;
+    } else {
+        int downleft = PointOnLine( &offset, &left, &down );
+        if( downleft > 0 ) {
+            ret.x -= 1;
+            ret.y += 1;
+        } else {
+            int upright = PointOnLine( &offset, &up, &right );
+            if( upright < 0 ) {
+                ret.y -= 1;
+            } else {
+                int downright = PointOnLine( &offset, &down, &right );
+                if( downright > 0 ) 
+                    ret.y += 1;
+            }
+        }
+    }
+
+    return ret;
 }
 
 Scene *Scene_new() {

@@ -716,7 +716,7 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
 
     // else, send a keepalive
     } else if( c->state == Connected ) {
-        log_info( "sending KEEP_ALIVE\n" );
+        //log_info( "sending KEEP_ALIVE\n" );
         u8 keep_alive[PACKET_SIZE];
         Net_connectionWritePacketHeader( c, keep_alive, KEEP_ALIVE );
         Net_sendPacket( socket, &c->address, keep_alive, PACKET_SIZE );

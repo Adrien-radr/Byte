@@ -28,6 +28,12 @@ void Scene_render();
 
 // ##########################################################################3
 //      Map
+    /// Returns the global world coordinates of a vector, not depending of camera
+    /// zoom or pan. (often you want this to translate mousepos from screen to world)
+    vec2 Scene_localToGlobal( Scene *scene, const vec2 *local );
+
+    /// Returns the map tile at a given local screen position
+    vec2 Scene_screenToIso( Scene *scene, const vec2 *local );
     
 
 // ##########################################################################3

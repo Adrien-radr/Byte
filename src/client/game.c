@@ -2,6 +2,20 @@
 #include "resource.h"
 #include "renderer.h"
 
+/// Game mouse listener
+void gameMouseListener( const Event *event, void *data ) {
+    if( event->Type == E_MouseMoved ) {
+        str32 text;
+        snprintf( text, 32, "X : %d, Y : %d", (int)event->v.x, (int)event->v.y );
+        Scene_modifyText( game->mScene, game->mousepos_text, TA_String, text );
+
+        vec2 isomouse = Scene_screenToIso( game->mScene, &event->v );
+
+        snprintf( text, 32, "X : %d, Y : %d", (int)isomouse.x, (int)isomouse.y );
+        Scene_modifyText( game->mScene, game->mousetile_text, TA_String, text );
+    }
+}
+
 /// Game instance declaration
 Game *game = NULL;
 
@@ -35,11 +49,26 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     game->mScene = Scene_new();
     check( game->mScene, "Error while creating Game Scene. Aborting initialization.\n" );
 
+    // register mouse listener
+    EventManager_addListener( LT_MouseListener, gameMouseListener, NULL );
+
     // Load fps text
     Font *f = Font_get( "DejaVuSans.ttf", 12 );
-    Color col = { 0.6f, 0.6f, 0.6f, 1.f };
+    Color col = { 0.9f, 0.9f, 0.9f, 1.f };
     game->fps_text = Scene_addText( game->mScene, f, col );
     Scene_modifyText( game->mScene, game->fps_text, TA_String, "FPS : 0" );
+
+    // Load mousepos text
+    game->mousepos_text = Scene_addText( game->mScene, f, col );
+    vec2 pos = {0,15};
+    Scene_modifyText( game->mScene, game->mousepos_text, TA_Position, &pos );
+    Scene_modifyText( game->mScene, game->mousepos_text, TA_String, "X  : 0, Y : 0" );
+
+    // Load mousetile text
+    game->mousetile_text = Scene_addText( game->mScene, f, col );
+    pos.y = 30.f;
+    Scene_modifyText( game->mScene, game->mousetile_text, TA_Position, &pos );
+    Scene_modifyText( game->mScene, game->mousetile_text, TA_String, "X  : 0, Y : 0" );
 
     printf( "\n" );
     log_info( "Game successfully initialized!\n" );

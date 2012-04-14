@@ -8,7 +8,8 @@ Camera *Camera_new() {
 
     c = byte_alloc( sizeof( Camera ) );
 
-    c->mSpeed = c->mZoom = c->mZoomX = 1.f;
+    c->mSpeed = 2.f;
+    c->mZoom = c->mZoomX = 1.f;
     c->mZoomSpeed = .05f;
     c->mZoomMax = 1.f;
     c->mZoomMin = .75f;
@@ -53,15 +54,17 @@ void Camera_calculateProjectionMatrix( Camera *pCamera ) {
         f32 xoffset = (windowSize.x - pCamera->mZoom * windowSize.x) / 2.f;
         f32 yoffset = (windowSize.y - pCamera->mZoom * windowSize.y) / 2.f;
 
+        pCamera->global_position.x = xoffset + pCamera->mPosition.x;
+        pCamera->global_position.y = yoffset + pCamera->mPosition.y;
 
         f32 width = windowSize.x - xoffset,
             height = windowSize.y - yoffset;
 
 
-        mat3_ortho( &pCamera->mProjectionMatrix, xoffset + pCamera->mPosition.x, 
+        mat3_ortho( &pCamera->mProjectionMatrix, pCamera->global_position.x, 
                                                  width + pCamera->mPosition.x, 
                                                  height + pCamera->mPosition.y, 
-                                                 yoffset + pCamera->mPosition.y );
+                                                 pCamera->global_position.y );
     }
 }
 
@@ -89,8 +92,39 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
         // clamp pZoom (no rapid zoom
         Clamp( &pZoom, -1.f, 1.f );
 
-        f32 x = pCamera->mZoomX;
+        f32 x = pCamera->mZoom;
 
+        if( pZoom < 0.f || pCamera->mZoom > 1.f ) {
+            pCamera->mZoom -= pZoom;
+            f32 change = pCamera->mZoom - x;
+
+
+            // modify cameraposition to zoom on mouse
+            vec2 windowSize = Context_getSize();
+            f32 mx = GetMouseX(),
+                my = GetMouseY();
+
+
+            // here we zoom in the direction from the window center to the mouse position, with a 
+            // magnitude depending on the zoom level (less magnitude if near ground)
+            vec2 dir = { .x = (mx - ( windowSize.x / 2.f ) ), .y = (my - ( windowSize.y / 2.f ) ) };
+            f32 dir_len = vec2_len( &dir );
+            vec2_normalize( &dir );
+
+            f32 pan_magnitude = - dir_len * change;//* .1f * (1.f / pCamera->mZoom); 
+            dir = vec2_mul( &dir, pan_magnitude );
+
+
+            pCamera->mPosition.x += dir.x;
+            pCamera->mPosition.y += dir.y;
+
+            // recalculate projection matrix and warn every shaders using it
+            Camera_calculateProjectionMatrix( pCamera );
+            Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
+        }
+    }
+        
+/*
         pCamera->mZoomX += pCamera->mZoomSpeed * pZoom;
 
         // Clamp X (min and max zoom levels)
@@ -140,4 +174,5 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
         Camera_calculateProjectionMatrix( pCamera );
         Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
     }
+    */
 }

@@ -16,14 +16,6 @@
 
 */
 
-/*
-mat3 m;
-Color c;
-u32 mesh;
-u32 texture;
-u32 shader;
-*/
-
 void init_callback() {
     int a1_h = World_loadActor( "data/game/actors/man.json" );
     if( a1_h >= 0 ) {
@@ -36,34 +28,9 @@ void init_callback() {
         mat3_translationMatrixfv( &m, &pos );
         Scene_modifySprite( game->mScene, a1_h, SA_Matrix, &m );
     }
-
-/*
-    mesh = ResourceManager_get( "map.json" );
-
-    shader = ResourceManager_get( "map_shader.json" );
-    texture = ResourceManager_get( "map.png" );
-
-    c.r = c.g = c.b = 0.8f;
-    c.a = 1.f;
-    */
 }
  
 bool frame_callback( f32 frame_time ) {
-    /*
-    Renderer_useShader( shader );
-    Shader_sendColor( "iColor", &c );
-    Shader_sendInt( "Depth", 9 );
-
-    Renderer_useTexture( texture, 0 );
-
-    mat3_identity( &m );
-    Shader_sendMat3( "ModelMatrix", &m );
-    Renderer_renderMesh( mesh );
-    mat3_translatef( &m, 50.f, 25.f );
-    Shader_sendMat3( "ModelMatrix", &m );
-    Renderer_renderMesh( mesh );
-    */
-
     return true;
 }
 

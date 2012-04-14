@@ -67,8 +67,3 @@ cleaner: clean
 	make -C ext/ ARCH=$(ARCH) clean
 	rm -f bin/sv bin/cl
 
-
-
-
-CFLAGS = -Wall -ggdb3 -Isrc/ -Iext/ -Iext/freetype -lX11 -lXrandr -lGL -lz -lbz2 -lpng -llua -std=c99 -D_DEBUG -lm -lpthread -ldl -lrt $(GL_FLAG) -D_POSIX_C_SOURCE=200112L
-
