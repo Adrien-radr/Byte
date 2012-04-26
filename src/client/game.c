@@ -52,23 +52,12 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     // register mouse listener
     EventManager_addListener( LT_MouseListener, gameMouseListener, NULL );
 
-    // Load fps text
     Font *f = Font_get( "DejaVuSans.ttf", 12 );
     Color col = { 0.9f, 0.9f, 0.9f, 1.f };
-    game->fps_text = Scene_addText( game->mScene, f, col );
-    Scene_modifyText( game->mScene, game->fps_text, TA_String, "FPS : 0" );
+    int text_depth = -10;
+    vec2 pos = {0,0};
 
-    // Load mousepos text
-    game->mousepos_text = Scene_addText( game->mScene, f, col );
-    vec2 pos = {0,15};
-    Scene_modifyText( game->mScene, game->mousepos_text, TA_Position, &pos );
-    Scene_modifyText( game->mScene, game->mousepos_text, TA_String, "X  : 0, Y : 0" );
 
-    // Load mousetile text
-    game->mousetile_text = Scene_addText( game->mScene, f, col );
-    pos.y = 30.f;
-    Scene_modifyText( game->mScene, game->mousetile_text, TA_Position, &pos );
-    Scene_modifyText( game->mScene, game->mousetile_text, TA_String, "X  : 0, Y : 0" );
 
     printf( "\n" );
     log_info( "Game successfully initialized!\n" );
@@ -78,6 +67,32 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     if( init_func )
         init_func();
 
+    // Load fps text
+    game->fps_text = Scene_addText( game->mScene, f, col );
+    Scene_modifyText( game->mScene, game->fps_text, TA_Position, &pos );
+    Scene_modifyText( game->mScene, game->fps_text, TA_String, "FPS : 0" );
+    Scene_modifyText( game->mScene, game->fps_text, TA_Depth, &text_depth );
+
+    // Load mousepos text
+    game->mousepos_text = Scene_addText( game->mScene, f, col );
+    pos.y = 15.f;
+    Scene_modifyText( game->mScene, game->mousepos_text, TA_Position, &pos );
+    Scene_modifyText( game->mScene, game->mousepos_text, TA_String, "X  : 0, Y : 0" );
+    Scene_modifyText( game->mScene, game->mousepos_text, TA_Depth, &text_depth );
+
+    // Load mousetile text
+    game->mousetile_text = Scene_addText( game->mScene, f, col );
+    pos.y = 30.f;
+    Scene_modifyText( game->mScene, game->mousetile_text, TA_Position, &pos );
+    Scene_modifyText( game->mScene, game->mousetile_text, TA_String, "X  : 0, Y : 0" );
+    Scene_modifyText( game->mScene, game->mousetile_text, TA_Depth, &text_depth );
+
+
+    // Update all created shaders about their projection matrices
+    Scene_updateShadersProjMatrix( game->mScene );
+
+
+    // register main.c frame function
     game->frame_func = frame_func;
 
     return true;
@@ -128,7 +143,7 @@ bool Game_update( f32 frame_time ) {
         // EACH 1 SECOND STUFF
         if( one_sec >= 1.f ) {
             str32 fps_str;
-            snprintf( fps_str, 32, "FPS : %4.0f", (1.f/frame_time) );
+            snprintf( fps_str, 32, "9{}|'\"/?.>,<mMFPS : %4.0f", (1.f/frame_time) );
             Scene_modifyText( game->mScene, game->fps_text, TA_String, fps_str );
             one_sec = 0.f;
         }

@@ -44,7 +44,7 @@ void Device_windowResize( const Event *pEvent, void *pData ) {
 
     if( device->mActiveCamera ) {
         Camera_calculateProjectionMatrix( device->mActiveCamera );
-        Renderer_updateProjectionMatrix( &device->mActiveCamera->mProjectionMatrix );
+        Renderer_updateProjectionMatrix( ECamera, &device->mActiveCamera->mProjectionMatrix );
     }
 }
 
@@ -185,7 +185,7 @@ f32 Device_getFrameTime() {
 void Device_setCamera( Camera *pCamera ) {
     if( device && pCamera ) {
         device->mActiveCamera = pCamera;
-        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
+        Renderer_updateProjectionMatrix( ECamera, &pCamera->mProjectionMatrix );
     }
 }
 

@@ -78,6 +78,9 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     //glfwOpenWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     //glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
+    // no resizing
+    glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, GL_TRUE );
+
     // Multisamples
     u32 ms = pMultiSamples;
     if( ms != 2 || ms != 4 || ms != 8 )

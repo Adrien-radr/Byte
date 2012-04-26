@@ -9,9 +9,30 @@
 #include "texture.h"
 #include "text.h"
 #include "sprite.h"
+#include "light.h"
 
-// Forward declaration
-typedef struct s_Scene Scene;
+/// Scene structure. Keep all info about rendering in the current view
+typedef struct {
+    u32             mSpriteShader;      ///< Shader used to render sprites
+    SpriteArray     *mSprites;          ///< Sprites in the scene
+
+    u32             mTextShader;        ///< Shader used to render texts
+    TextArray       *mTexts;            ///< Texts in the scene
+
+    Camera          *mCamera;           ///< Camera of the scene
+
+    mat3            proj_matrix_2d;     ///< 2D projection matrix (GUI & text)
+
+    struct {
+        u32 mesh;
+        u32 texture;
+        u32 shader;
+    }               local_map;
+
+    light           light1;
+
+    Color           ambient_color;
+} Scene;
 
 
 /// Create and returns a new scene instance
@@ -24,7 +45,10 @@ void Scene_destroy( Scene *pScene );
 void Scene_update( Scene *pScene );
 
 /// Render all sprites & texts in the scene
-void Scene_render();
+void Scene_render( Scene *pScene );
+
+/// Update all shaders with the scene projection matrices
+void Scene_updateShadersProjMatrix( Scene *pScene );
 
 // ##########################################################################3
 //      Map

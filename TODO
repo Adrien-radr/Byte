@@ -16,6 +16,9 @@ Byte-Project : TODO File
 + Config file
 + Game 'class' containing : the device, the world, the scene, game states
 
+- Remove DEVICE and put its stuff in GAME
+- move map functions in a client/map.c file
+
     Client-Server
     ------------
     + Client part

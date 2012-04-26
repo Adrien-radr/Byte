@@ -8,6 +8,13 @@
 #include "text.h"
 #include "mesh.h"
 
+/// Types of projection matrix
+typedef enum {
+    ECamera,
+    EGui,
+    ENone
+} ProjMatrixType;
+
 typedef struct s_Renderer Renderer;
 
 /// Initialize a renderer and returns it
@@ -20,11 +27,12 @@ void Renderer_destroy();
 void Renderer_beginFrame();
 
 /// Update the projection matrix used to render in shaders
-void Renderer_updateProjectionMatrix( const mat3 *pm );
+/// @param t  : the function will only change shaders that use this type of mat
+/// @param pm : the new matrix
+void Renderer_updateProjectionMatrix( ProjMatrixType t, const mat3 *pm );
 
 /// Returns whether or not the renderer is initialized
 bool Renderer_isInitialized();
-
 
 // ##########################################################################3
 //      MESH UTILS

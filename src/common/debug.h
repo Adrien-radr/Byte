@@ -123,10 +123,14 @@ inline void CloseLog() {
 
     // Reallocate a pointer
     inline void* byte_realloc_func( void **ptr, size_t size, const char *file, int line ) {
-        if( ptr && *ptr ) {
-            void *oldptr = *ptr;
-            *ptr = realloc( *ptr, size );   
-            MemoryManager_reallocation( *ptr, oldptr, size, file, line );
+        if( ptr ) {
+            if( *ptr ) {    // reallocation
+                void *oldptr = *ptr;
+                *ptr = realloc( *ptr, size );   
+                MemoryManager_reallocation( *ptr, oldptr, size, file, line );
+            } else {        // pointer to realloc is null. alloc it
+                *ptr = byte_alloc_func( size, file, line );
+            }
         }
         return *ptr;
     }

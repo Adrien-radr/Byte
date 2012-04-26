@@ -51,6 +51,7 @@ Font *Font_get( const char *pName, u32 pSize );
         u32             *mMeshes;
         Color           *mColors;
         vec2            *mPositions;
+        int             *mDepths;
 
         char            **mStrings;
 
@@ -62,6 +63,7 @@ Font *Font_get( const char *pName, u32 pSize );
     /// Differents attributes of text that can be modified
     typedef enum {
         TA_Font,
+        TA_Depth,
         TA_Color,
         TA_String,
         TA_Position

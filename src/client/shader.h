@@ -10,7 +10,7 @@
 typedef struct s_Shader {
     u32 mID;
 
-    bool mUseProjectionMatrix;  ///< Flag for the use of the projection matrix in shader
+    bool proj_matrix_type;  ///< Type of projection matrix used (see renderer.h)
 } Shader;
 
 /// Create a new shader

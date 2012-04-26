@@ -80,7 +80,7 @@ void Camera_move( Camera *pCamera, vec2 *pVector ) {
 
         // recalculate projection matrix and warn every shaders using it
         Camera_calculateProjectionMatrix( pCamera );
-        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
+        Renderer_updateProjectionMatrix( ECamera, &pCamera->mProjectionMatrix );
     }
 }
 
@@ -120,7 +120,7 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
 
             // recalculate projection matrix and warn every shaders using it
             Camera_calculateProjectionMatrix( pCamera );
-            Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
+            Renderer_updateProjectionMatrix( ECamera, &pCamera->mProjectionMatrix );
         }
     }
         

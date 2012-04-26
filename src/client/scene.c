@@ -5,7 +5,6 @@
 #include "device.h"
 #include "context.h"
 #include "resource.h"
-#include "light.h"
 
 #include "game.h"
 
@@ -14,28 +13,6 @@
 #else
 #include "GL/glew.h"
 #endif
-
-typedef struct s_Scene {
-    u32             mSpriteShader;      ///< Shader used to render sprites
-    SpriteArray     *mSprites;          ///< Sprites in the scene
-
-    u32             mTextShader;        ///< Shader used to render texts
-    TextArray       *mTexts;            ///< Texts in the scene
-
-    Camera          *mCamera;           ///< Camera of the scene
-
-    struct {
-        u32 mesh;
-        u32 texture;
-        u32 shader;
-    }               local_map;
-
-    light           light1;
-
-    Color           ambient_color;
-} Scene;
-
-
 
 
 // Camera listeners and update function
@@ -211,9 +188,14 @@ Scene *Scene_new() {
 
         Device_setCamera( s->mCamera );
 
+    // 2D proj matrix (just ortho2D camera with no zoom or pan)
+    vec2 winsize = Context_getSize();
+    mat3_ortho( &s->proj_matrix_2d, 0.f, winsize.x, winsize.y, 0.f );
+
     // Event listener
     EventManager_addListener( LT_ResizeListener, sceneWindowResizing, s );
 
+    // Lights
     Color_set( &s->ambient_color, 0.0f, 0.0f, 0.0f, 1.f );
 
     Renderer_useShader( s->local_map.shader );
@@ -221,7 +203,7 @@ Scene *Scene_new() {
 
     vec2 lightpos = { 300.f, 200.f };
     Color diffuse = { 1.f, 1.f, 1.f, 1.f };
-    Light_set( &s->light1, &lightpos, 50.f, &diffuse, 0.382f, 0.02f, 0.f );
+    Light_set( &s->light1, &lightpos, 50.f, &diffuse, 0.382f, 0.01f, 0.f );
         
     return s;
 error:
@@ -242,14 +224,17 @@ void Scene_update( Scene *pScene ) {
     Camera_update( pScene->mCamera );
 }
 
+void Scene_updateShadersProjMatrix( Scene *pScene ) {
+    Renderer_updateProjectionMatrix( ECamera, &pScene->mCamera->mProjectionMatrix );
+    Renderer_updateProjectionMatrix( EGui, &pScene->proj_matrix_2d );
+}
+
 void Scene_render( Scene *pScene ) {
     if( pScene ) {
         glDisable( GL_CULL_FACE );
         // ##################################################
         //      RENDER MAP
         Renderer_useShader( pScene->local_map.shader );
-        Color c = { 0.8f, 0.8f, 0.8f, 1.f };
-        Shader_sendColor( "iColor", &c );
         Shader_sendInt( "Depth", 9 );
         Shader_sendColor( "light_color", &pScene->light1.diffuse );
         Shader_sendVec2( "light_pos", &pScene->light1.position );
@@ -285,6 +270,7 @@ void Scene_render( Scene *pScene ) {
         for( u32 i = 0; i < pScene->mTexts->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->mTexts->mUsed, i ) ) {
                 Renderer_useTexture( pScene->mTexts->mFonts[i]->mTexture, 0 );
+                Shader_sendInt( "Depth", pScene->mTexts->mDepths[i] );
                 Shader_sendColor( "Color", &pScene->mTexts->mColors[i] );
                 Shader_sendVec2( "Position", &pScene->mTexts->mPositions[i] );
                 Renderer_renderMesh( pScene->mTexts->mMeshes[i] );
@@ -390,14 +376,17 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
                     {
                         vec2 new_pos = *((vec2*)pData);
 
-                        vec2 ws = Context_getSize();
-                        f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
+                        //vec2 ws = Context_getSize();
+                        //f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
 
-                        new_pos.x *= sx;
-                        new_pos.y *= -sy;
+                        //new_pos.x *= sx;
+                        //new_pos.y *= -sy;
 
                         pScene->mTexts->mPositions[pHandle] = new_pos;
                     }
+                    break;
+                case TA_Depth :
+                    pScene->mTexts->mDepths[pHandle] = *((int*)pData);
                     break;
                 case TA_String :
                     {
@@ -406,10 +395,8 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
                         // recreate VBO
                         Text_setString( pScene->mTexts->mMeshes[pHandle], pScene->mTexts->mFonts[pHandle], s );
 
-                        // copy string inside textarray to keep track of current string
-                        DEL_PTR(pScene->mTexts->mStrings[pHandle] );
-
-                        pScene->mTexts->mStrings[pHandle] = byte_alloc( strlen( s ) + 1 );
+                        // copy string inside textarray to keep track of current string 
+                        pScene->mTexts->mStrings[pHandle] = byte_realloc( pScene->mTexts->mStrings[pHandle], strlen( s ) + 1 );
                         strcpy( pScene->mTexts->mStrings[pHandle], s );
                     }
                     break;

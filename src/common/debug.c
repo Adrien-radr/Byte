@@ -98,10 +98,9 @@ void MemoryManager_allocation( void* ptr, size_t size, const char *file, int lin
             mem_manager->alloc_stack[cpt] = ptr;
             mem_manager->alloc_sizes[cpt] = size;
             mem_manager->alloc_lines[cpt] = line;
-            //mem_manager->alloc_files[cpt] = file;
             strncpy( mem_manager->alloc_files[cpt], file, 32 );
-        } //else
-            //log_err( "MemoryManager Allocation stack is not big enough!\n" );
+        } else
+            log_err( "MemoryManager Allocation stack is not big enough!\n" );
     }
 }
 
@@ -114,7 +113,6 @@ void MemoryManager_reallocation( void *ptr, void *oldptr, size_t size, const cha
                 mem_manager->alloc_stack[i] = ptr;
                 mem_manager->alloc_sizes[i] = size;
                 mem_manager->alloc_lines[i] = line;
-                //mem_manager->alloc_files[i] = file;
                 strncpy( mem_manager->alloc_files[i], file, 32 );
                 found = true;
             }
@@ -132,8 +130,8 @@ void MemoryManager_deallocation( void* ptr, const char *file, int line ) {
                 mem_manager->alloc_sizes[i] = 0;
                 found = true;
             }
-       // if( !found )
-        //    log_err( "Tried to deallocate pointer \"%p\"(%s:%d), but it has never been allocated in the memory manager before!\n", ptr , file, line );
+        if( !found )
+            log_err( "Tried to deallocate pointer \"%p\"(%s:%d), but it has never been allocated in the memory manager before!\n", ptr , file, line );
     }
 }
 

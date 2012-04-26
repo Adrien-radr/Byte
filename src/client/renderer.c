@@ -127,15 +127,15 @@ void Renderer_beginFrame() {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
-void Renderer_updateProjectionMatrix( const mat3 *pm ) {
+void Renderer_updateProjectionMatrix( ProjMatrixType t, const mat3 *pm ) {
     if( renderer ) {
         u32 currShader = renderer->mCurrentShader;
 
         // update every shader using projection matrix
         for( u32 i = 0; renderer && (i < renderer->mShaders.cpt); ++i ) 
-            if( renderer->mShaders.data[i]->mUseProjectionMatrix ) {
+            if( renderer->mShaders.data[i]->proj_matrix_type == t ) {
                 Renderer_useShader( i );
-                Shader_sendMat3( "ProjectionMatrix", pm );
+                Shader_sendMat3( "ProjectionMatrix", pm ); 
             }
 
         // returns to shader used before update
@@ -248,12 +248,10 @@ bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIDat
 
         // Change vertex data if given
         if( pVData && pVSize > 0 ) {
-            // delete previous data if it exists
-            if( m->mData )
-                DEL_PTR( m->mData );
+            // realloc buffer
+            m->mData = byte_realloc( m->mData, pVSize );
 
-            // allocate new space for data, and copy array content
-            m->mData = byte_alloc( pVSize );
+            // copy array content
             memcpy( m->mData, pVData, pVSize );
 
             m->mTexcoordBegin = pVSize / 2;
@@ -263,12 +261,10 @@ bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIDat
 
         // Change index data if given
         if( pIData && pISize > 0 ) {
-            // delete previous data if it exists
-            if( m->mIndices )
-                DEL_PTR( m->mIndices );
+            // realloc buffer
+            m->mIndices = byte_realloc( m->mIndices, pISize );
 
-            // allocate new space for data, and copy array content
-            m->mIndices = byte_alloc( pISize );
+            // copy array content
             memcpy( m->mIndices, pIData, pISize );
 
             m->mIndexCount = pISize / sizeof( u32 );
@@ -463,20 +459,6 @@ void CheckGLError_func( const char *pFile, u32 pLine ) {
                 break;
             }
 
-            /*case GL_STACK_OVERFLOW :
-            {
-                strncpy( errorStr, "GL_STACK_OVERFLOW", 64 );
-                strncpy( description, "This command would cause a stack overflow.", 256 );
-                break;
-            }
-            case GL_STACK_UNDERFLOW :
-            {
-                strncpy( errorStr, "GL_STACK_UNDERFLOW", 64 );
-                strncpy( description, "This command would cause a stack underflow.", 256 );
-                break;
-            }
-
-            */
             case GL_OUT_OF_MEMORY :
             {
                 strncpy( errorStr, "GL_OUT_OF_MEMORY", 64 );
