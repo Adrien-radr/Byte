@@ -98,7 +98,7 @@ bool Renderer_init() {
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-    glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
+    glClearColor( 0.1f, 0.1f, 0.1f, 1.f );
 
     // clear init gl errors
     CheckGLError();

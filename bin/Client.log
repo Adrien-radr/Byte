@@ -1,47 +1,49 @@
 Byte-Project Log v0.1.5
-Sat 14 Apr 2012 - 18:55:25
+Wed 25 Apr 2012 - 18:30:14
 ==========================
 <0.00> [INFO] (net.c:70) IP : 127.0.0.1 (lo)
-<0.00> [INFO] (net.c:70) IP : 192.168.1.2 (wlan0)
+<0.00> [INFO] (net.c:70) IP : 192.168.1.3 (wlan0)
 <0.00> [INFO] (client.c:31) Socket opened on port 1992
-<0.23> [INFO] (context.c:116) GLFW Window successfully initialized!
-<0.27> [INFO] (renderer.c:76) GLEW v1.7.0 successfully initialized!
-<0.27> [INFO] (renderer.c:83) OpenGL 4.2
-<0.27> [INFO] (renderer.c:84) GLSL 4.20
-<0.27> [INFO] (renderer.c:85) Hardware : ATI Technologies Inc. - ATI Mobility Radeon HD 5800 Series 
-<0.27> [INFO] (renderer.c:106) Renderer successfully initialized!
-<0.27> [INFO] (event.c:75) Event manager successfully initialized!
-<0.27> [INFO] (device.c:132) Device successfully initialized!
-<0.37> [INFO] (resource.c:320) Resource "map_shader.json" loaded.
-<0.37> [INFO] (resource.c:320) Resource "sprite_shader.json" loaded.
-<0.38> [INFO] (resource.c:320) Resource "text_shader.json" loaded.
-<0.39> [INFO] (resource.c:339) Resource "map.json" loaded.
-<0.39> [INFO] (resource.c:339) Resource "quadmesh.json" loaded.
-<0.39> [INFO] (resource.c:303) Resource "hextile.png" loaded.
-<0.39> [INFO] (resource.c:303) Resource "img_test.png" loaded.
-<0.39> [INFO] (resource.c:303) Resource "man-template.png" loaded.
-<0.39> [INFO] (resource.c:303) Resource "man-v5.png" loaded.
-<0.39> [INFO] (resource.c:303) Resource "man.png" loaded.
-<0.39> [INFO] (resource.c:303) Resource "mans.png" loaded.
-<0.39> [INFO] (resource.c:303) Resource "mansh.png" loaded.
-<0.39> [INFO] (resource.c:303) Resource "mansh2.png" loaded.
-<0.39> [INFO] (resource.c:303) Resource "map.png" loaded.
-<0.40> [INFO] (resource.c:303) Resource "tile-up-west.png" loaded.
-<0.40> [INFO] (resource.c:303) Resource "tile.png" loaded.
-<0.40> [INFO] (resource.c:303) Resource "unknown.png" loaded.
-<0.43> [INFO] (resource.c:353) Resource "DejaVuSans.ttf" loaded.
-<0.45> [INFO] (resource.c:353) Resource "visitor2.ttf" loaded.
-<0.45> [INFO] (game.c:74) Game successfully initialized!
-<0.45> [INFO] (client.c:97) Asking Session ID to 127.0.0.1:1991
-<0.45> [INFO] (net.c:710) sending CONNECT_ASKID(seq=0)
-<0.55> [INFO] (client.c:125) Received Session ID from server : 2086579849
-<0.65> [INFO] (net.c:710) sending CONNECT_TRY(seq=1)
-<0.65> [INFO] (client.c:141) Sent a connection demand to server...
-<0.75> [INFO] (client.c:159) Client is now connected to server.
-<0.90> [INFO] (client.c:253) received unknown CONNECT_ACCEPT 
-<4.76> [INFO] (net.c:505) Connection going to Good Mode
-<11.61> [INFO] (client.c:194) Disconnecting...
-<11.94> [INFO] (debug.c:73) 
+<0.20> [INFO] (context.c:109) GLFW Window successfully initialized!
+<0.24> [INFO] (renderer.c:76) GLEW v1.7.0 successfully initialized!
+<0.24> [INFO] (renderer.c:83) OpenGL 4.2
+<0.24> [INFO] (renderer.c:84) GLSL 4.20
+<0.24> [INFO] (renderer.c:85) Hardware : ATI Technologies Inc. - ATI Mobility Radeon HD 5800 Series 
+<0.24> [INFO] (renderer.c:106) Renderer successfully initialized!
+<0.24> [INFO] (event.c:75) Event manager successfully initialized!
+<0.24> [INFO] (device.c:132) Device successfully initialized!
+<0.34> [INFO] (resource.c:320) Resource "map_shader.json" loaded.
+<0.35> [INFO] (resource.c:320) Resource "sprite_shader.json" loaded.
+<0.36> [INFO] (resource.c:320) Resource "text_shader.json" loaded.
+<0.36> [INFO] (resource.c:339) Resource "map.json" loaded.
+<0.36> [INFO] (resource.c:339) Resource "quadmesh.json" loaded.
+<0.36> [INFO] (resource.c:303) Resource "hextile.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "img_test.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "man-template.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "man-v5.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "man.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "mans.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "mansh.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "mansh2.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "map.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "tile-up-west.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "tile.png" loaded.
+<0.37> [INFO] (resource.c:303) Resource "unknown.png" loaded.
+<0.42> [INFO] (resource.c:353) Resource "DejaVuSans.ttf" loaded.
+<0.47> [INFO] (resource.c:353) Resource "visitor2.ttf" loaded.
+<0.47> [INFO] (game.c:74) Game successfully initialized!
+<0.47> [INFO] (client.c:97) Asking Session ID to 127.0.0.1:1991
+<0.47> [INFO] (net.c:710) sending CONNECT_ASKID(seq=0)
+<0.57> [INFO] (client.c:125) Received Session ID from server : 2090280734
+<0.67> [INFO] (net.c:710) sending CONNECT_TRY(seq=1)
+<0.67> [INFO] (client.c:141) Sent a connection demand to server...
+<0.77> [INFO] (client.c:159) Client is now connected to server.
+<0.93> [INFO] (client.c:253) received unknown CONNECT_ACCEPT 
+<4.78> [INFO] (net.c:505) Connection going to Good Mode
+<14.78> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<24.79> [INFO] (net.c:493) Penalty time decreased to 1.000000
+<36.79> [INFO] (client.c:194) Disconnecting...
+<37.13> [INFO] (debug.c:73) 
 Memory Manager Rapport :
 ============================
 Allocated bytes at the end of execution : 0.

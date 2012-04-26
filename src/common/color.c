@@ -1,5 +1,20 @@
 #include "color.h"
 
+void Color_cpy( Color *A, const Color *B ) {
+    if( A && B ) {
+        memcpy( A, B, sizeof( Color ) );
+    }
+}
+
+void Color_set( Color *col, f32 r, f32 g, f32 b, f32 a ) {
+    if( col ) {
+        col->r = r;
+        col->g = g;
+        col->b = b;
+        col->a = a;
+    }
+}
+
 void Color_rgb( const Color *pColor, f32 pTab[3] ) {
     pTab[0] = pColor->r;
     pTab[1] = pColor->g;

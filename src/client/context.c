@@ -1,10 +1,3 @@
-//#include "GL/glew.h"
-#ifdef USE_GLDL
-#include "GL/gldl.h"
-#else
-#include "GL/glew.h"
-#endif
-
 #include "GL/glfw.h"
 
 #include "common/vector.h"
@@ -80,8 +73,8 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
     glfwSetWindowTitle( pName );
 
     // OpenGL profile
-    glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 2 );
-    glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 1 );
+    //glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 2 );
+    //glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 1 );
     //glfwOpenWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     //glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 

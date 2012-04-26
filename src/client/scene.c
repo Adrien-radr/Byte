@@ -5,6 +5,7 @@
 #include "device.h"
 #include "context.h"
 #include "resource.h"
+#include "light.h"
 
 #include "game.h"
 
@@ -28,6 +29,10 @@ typedef struct s_Scene {
         u32 texture;
         u32 shader;
     }               local_map;
+
+    light           light1;
+
+    Color           ambient_color;
 } Scene;
 
 
@@ -208,6 +213,15 @@ Scene *Scene_new() {
 
     // Event listener
     EventManager_addListener( LT_ResizeListener, sceneWindowResizing, s );
+
+    Color_set( &s->ambient_color, 0.0f, 0.0f, 0.0f, 1.f );
+
+    Renderer_useShader( s->local_map.shader );
+    Shader_sendColor( "amb_color", &s->ambient_color );
+
+    vec2 lightpos = { 300.f, 200.f };
+    Color diffuse = { 1.f, 1.f, 1.f, 1.f };
+    Light_set( &s->light1, &lightpos, 50.f, &diffuse, 0.382f, 0.02f, 0.f );
         
     return s;
 error:
@@ -237,6 +251,12 @@ void Scene_render( Scene *pScene ) {
         Color c = { 0.8f, 0.8f, 0.8f, 1.f };
         Shader_sendColor( "iColor", &c );
         Shader_sendInt( "Depth", 9 );
+        Shader_sendColor( "light_color", &pScene->light1.diffuse );
+        Shader_sendVec2( "light_pos", &pScene->light1.position );
+        Shader_sendFloat( "light_height", pScene->light1.height );
+        Shader_sendFloat( "light_cstatt", pScene->light1.cst_att );
+        Shader_sendFloat( "light_linatt", pScene->light1.lin_att );
+        Shader_sendFloat( "light_quadatt", pScene->light1.quad_att );
 
         Renderer_useTexture( pScene->local_map.texture, 0 );
         mat3 m;
