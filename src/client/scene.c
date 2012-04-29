@@ -1,57 +1,22 @@
-#include "common/world.h"
 #include "scene.h"
 #include "renderer.h"
 #include "camera.h"
-#include "device.h"
 #include "context.h"
 #include "resource.h"
 
 #include "game.h"
 
-#ifdef USE_GLDL
+#ifdef USEGLDL
 #include "GL/gldl.h"
 #else
 #include "GL/glew.h"
 #endif
 
+// #############################################################################
+//          SCENE MAP
 
-// Camera listeners and update function
-    void cameraMouseListener( const Event *pEvent, void *pCamera ) {
-        Camera *cam = (Camera*)pCamera;
-        // manage zoom event 
-        if( pEvent->Type == E_MouseWheelMoved ) 
-            Camera_zoom( cam, pEvent->i );
-    }
-
-    void cameraUpdate( Camera *pCamera ) {
-        // manage position pan 
-        vec2 move = { .x = 0.f, .y = 0.f };
-        if( IsKeyDown( K_W ) )
-            move.y -= 1.f;
-        if( IsKeyDown( K_A ) )
-            move.x -= 1.f;
-        if( IsKeyDown( K_S ) )
-            move.y += 1.f;
-        if( IsKeyDown( K_D ) )
-            move.x += 1.f;
-
-        if( move.x || move.y )
-            Camera_move( pCamera, &move );
-    }
-
-// Event Listener for window resizing
-    void sceneWindowResizing( const Event *pEvent, void *pData ) {
-        Scene *s = (Scene*)pData;
-
-        // update all texts with new window size
-        for( u32 i = 0; i < s->mTexts->mMaxIndex; ++i ) {
-            if( HandleManager_isUsed( s->mTexts->mUsed, i ) )
-                Text_setString( s->mTexts->mMeshes[i], s->mTexts->mFonts[i], s->mTexts->mStrings[i] );
-        }
-    }
-
-// MAP visual representation creation/rendering
-void initMap( Scene *scene ) {
+/// Local function. Initialize the scene map
+void SceneMap_init( Scene *scene ) {
     vec2 map_pos[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
     vec2 map_tcs[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
     u32  map_indices[6*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
@@ -105,8 +70,8 @@ void initMap( Scene *scene ) {
 vec2 Scene_localToGlobal( Scene *scene, const vec2 *local ) {
     vec2 ret = {0,0};
     ret = vec2_add( &ret, local );
-    ret = vec2_mul( &ret, scene->mCamera->mZoom );
-    ret = vec2_add( &ret, &scene->mCamera->global_position );
+    ret = vec2_mul( &ret, scene->camera->mZoom );
+    ret = vec2_add( &ret, &scene->camera->global_position );
 
     return ret;
 }
@@ -127,30 +92,61 @@ vec2 Scene_screenToIso( Scene *scene, const vec2 *local ) {
     offset.x = (int)fmod( global.x, tilesize.x );
     offset.y = (int)fmod( global.y, tilesize.y );
 
-
-    int upleft = PointOnLine( &offset, &left, &up );
-    if( upleft < 0 ) {
+    if( PointOnLine( &offset, &left, &up ) < 0 ) {
         ret.x -= 1;
         ret.y -= 1;
-    } else {
-        int downleft = PointOnLine( &offset, &left, &down );
-        if( downleft > 0 ) {
-            ret.x -= 1;
-            ret.y += 1;
-        } else {
-            int upright = PointOnLine( &offset, &up, &right );
-            if( upright < 0 ) {
-                ret.y -= 1;
-            } else {
-                int downright = PointOnLine( &offset, &down, &right );
-                if( downright > 0 ) 
-                    ret.y += 1;
-            }
-        }
-    }
+    } 
+    else if( PointOnLine( &offset, &left, &down ) > 0 ) {
+        ret.x -= 1;
+        ret.y += 1;
+    } 
+    else if( PointOnLine( &offset, &up, &right ) < 0 ) 
+        ret.y -= 1;
+    else if( PointOnLine( &offset, &down, &right ) > 0 ) 
+        ret.y += 1;
 
     return ret;
 }
+
+
+// #############################################################################
+//          SCENE
+
+// Camera listeners and update function
+    void cameraMouseListener( const Event *pEvent, void *pCamera ) {
+        Camera *cam = (Camera*)pCamera;
+        // manage zoom event 
+        if( pEvent->Type == EMouseWheelMoved ) 
+            Camera_zoom( cam, pEvent->i );
+    }
+
+    void cameraUpdate( Camera *pCamera ) {
+        // manage position pan 
+        vec2 move = { .x = 0.f, .y = 0.f };
+        if( IsKeyDown( K_W ) )
+            move.y -= 1.f;
+        if( IsKeyDown( K_A ) )
+            move.x -= 1.f;
+        if( IsKeyDown( K_S ) )
+            move.y += 1.f;
+        if( IsKeyDown( K_D ) )
+            move.x += 1.f;
+
+        if( move.x || move.y )
+            Camera_move( pCamera, &move );
+    }
+
+// Event Listener for window resizing
+    void sceneWindowResizing( const Event *pEvent, void *pData ) {
+        Scene *s = (Scene*)pData;
+
+        // update all texts with new window size
+        for( u32 i = 0; i < s->texts->mMaxIndex; ++i ) {
+            if( HandleManager_isUsed( s->texts->mUsed, i ) )
+                Text_setString( s->texts->mMeshes[i], s->texts->mFonts[i], s->texts->mStrings[i] );
+        }
+    }
+
 
 Scene *Scene_new() {
     Scene *s = NULL;
@@ -159,34 +155,33 @@ Scene *Scene_new() {
     check_mem( s );
 
     // create array of entities (initial size = 50)
-    s->mSprites = SpriteArray_init( 50 );
+    s->sprites = SpriteArray_init( 50 );
 
     // init default sprite shader
     int ss = ResourceManager_get( "sprite_shader.json" );
     check( ss >= 0, "Sprite shader creation error!\n" );
 
-    s->mSpriteShader = ss;
+    s->sprite_shader = ss;
 
     // create array of texts (intial size = 50)
-    s->mTexts = TextArray_init( 50 );
+    s->texts = TextArray_init( 50 );
 
     // init default text shader
     int ts = ResourceManager_get( "text_shader.json" );
     check( ts >= 0, "Text shader creation error!\n" );
 
-    s->mTextShader = ts;
+    s->text_shader = ts;
 
     // map
-        initMap( s );
+        SceneMap_init( s );
 
     // camera
-        s->mCamera = Camera_new();
-        check_mem( s->mCamera );
+        s->camera = Camera_new();
+        check_mem( s->camera );
 
-        Camera_registerListener( s->mCamera, cameraMouseListener, LT_MouseListener );
-        Camera_registerUpdateFunction( s->mCamera, cameraUpdate );
+        Camera_registerListener( s->camera, cameraMouseListener, LT_MouseListener );
+        Camera_registerUpdateFunction( s->camera, cameraUpdate );
 
-        Device_setCamera( s->mCamera );
 
     // 2D proj matrix (just ortho2D camera with no zoom or pan)
     vec2 winsize = Context_getSize();
@@ -213,19 +208,19 @@ error:
 
 void Scene_destroy( Scene *pScene ) {
     if( pScene ) {
-        SpriteArray_destroy( pScene->mSprites );
-        TextArray_destroy( pScene->mTexts );
-        Camera_destroy( pScene->mCamera );
+        SpriteArray_destroy( pScene->sprites );
+        TextArray_destroy( pScene->texts );
+        Camera_destroy( pScene->camera );
         DEL_PTR( pScene );
     }   
 }
 
 void Scene_update( Scene *pScene ) {
-    Camera_update( pScene->mCamera );
+    Camera_update( pScene->camera );
 }
 
 void Scene_updateShadersProjMatrix( Scene *pScene ) {
-    Renderer_updateProjectionMatrix( ECamera, &pScene->mCamera->mProjectionMatrix );
+    Renderer_updateProjectionMatrix( ECamera, &pScene->camera->mProjectionMatrix );
     Renderer_updateProjectionMatrix( EGui, &pScene->proj_matrix_2d );
 }
 
@@ -251,29 +246,35 @@ void Scene_render( Scene *pScene ) {
 
         // ##################################################
         //      RENDER SPRITES
-        Renderer_useShader( pScene->mSpriteShader );
+        Renderer_useShader( pScene->sprite_shader );
 
-        for( u32 i = 0; i < pScene->mSprites->mMaxIndex; ++i ) {
-            if( HandleManager_isUsed( pScene->mSprites->mUsed, i ) ) {
-                Renderer_useTexture( pScene->mSprites->mTextures[i], 0 );
-                Shader_sendMat3( "ModelMatrix", &pScene->mSprites->mMatrices[i] );
-                Shader_sendInt( "Depth", pScene->mSprites->mDepths[i] );
-                Renderer_renderMesh( pScene->mSprites->mMeshes[i] );
+        for( u32 i = 0; i < pScene->sprites->mMaxIndex; ++i ) {
+            if( HandleManager_isUsed( pScene->sprites->mUsed, i ) ) {
+                Renderer_useTexture( pScene->sprites->mTextures[i], 0 );
+                Shader_sendMat3( "ModelMatrix", &pScene->sprites->mMatrices[i] );
+                Shader_sendInt( "Depth", pScene->sprites->mDepths[i] );
+                Shader_sendColor( "light_color", &pScene->light1.diffuse );
+                Shader_sendVec2( "light_pos", &pScene->light1.position );
+                Shader_sendFloat( "light_height", pScene->light1.height );
+                Shader_sendFloat( "light_cstatt", pScene->light1.cst_att );
+                Shader_sendFloat( "light_linatt", pScene->light1.lin_att );
+                Shader_sendFloat( "light_quadatt", pScene->light1.quad_att );
+                Renderer_renderMesh( pScene->sprites->mMeshes[i] );
             }
         }
 
 
         // ##################################################
         //      RENDER TEXTS
-        Renderer_useShader( pScene->mTextShader );
+        Renderer_useShader( pScene->text_shader );
 
-        for( u32 i = 0; i < pScene->mTexts->mMaxIndex; ++i ) {
-            if( HandleManager_isUsed( pScene->mTexts->mUsed, i ) ) {
-                Renderer_useTexture( pScene->mTexts->mFonts[i]->mTexture, 0 );
-                Shader_sendInt( "Depth", pScene->mTexts->mDepths[i] );
-                Shader_sendColor( "Color", &pScene->mTexts->mColors[i] );
-                Shader_sendVec2( "Position", &pScene->mTexts->mPositions[i] );
-                Renderer_renderMesh( pScene->mTexts->mMeshes[i] );
+        for( u32 i = 0; i < pScene->texts->mMaxIndex; ++i ) {
+            if( HandleManager_isUsed( pScene->texts->mUsed, i ) ) {
+                Renderer_useTexture( pScene->texts->mFonts[i]->mTexture, 0 );
+                Shader_sendInt( "Depth", pScene->texts->mDepths[i] );
+                Shader_sendColor( "Color", &pScene->texts->mColors[i] );
+                Shader_sendVec2( "Position", &pScene->texts->mPositions[i] );
+                Renderer_renderMesh( pScene->texts->mMeshes[i] );
             }
         }
     }
@@ -285,12 +286,12 @@ int  Scene_addSprite( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
     int handle = -1;
 
     if( pScene ) {
-        handle = SpriteArray_add( pScene->mSprites );
+        handle = SpriteArray_add( pScene->sprites );
 
         if( handle >= 0 ) {
-            pScene->mSprites->mMeshes[handle] = pMesh;
-            pScene->mSprites->mTextures[handle] = pTexture;
-            memcpy( &pScene->mSprites->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
+            pScene->sprites->mMeshes[handle] = pMesh;
+            pScene->sprites->mTextures[handle] = pTexture;
+            memcpy( &pScene->sprites->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
         }
     }
     return handle;
@@ -300,15 +301,15 @@ int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) {
     int handle = -1;
 
     if( pScene && pActor ) {
-        handle = SpriteArray_add( pScene->mSprites );
+        handle = SpriteArray_add( pScene->sprites );
 
         if( handle >= 0 ) {
             pActor->mUsedSprite = handle;
-            pScene->mSprites->mMeshes[handle] = pActor->mMesh_id;
-            pScene->mSprites->mTextures[handle] = pActor->mTexture_id;
+            pScene->sprites->mMeshes[handle] = pActor->mMesh_id;
+            pScene->sprites->mTextures[handle] = pActor->mTexture_id;
             mat3 m;
             mat3_translationMatrixfv( &m, &pActor->mPosition );
-            memcpy( pScene->mSprites->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
+            memcpy( pScene->sprites->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
         }
     }
     return handle;
@@ -316,16 +317,16 @@ int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) {
 
 void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void *pData ) {
     if( pScene ) {
-        if( HandleManager_isUsed( pScene->mSprites->mUsed, pHandle ) ) {
+        if( HandleManager_isUsed( pScene->sprites->mUsed, pHandle ) ) {
             switch( pAttrib ) {
                 case SA_Matrix :
-                    memcpy( &pScene->mSprites->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
+                    memcpy( &pScene->sprites->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
                     break;
                 case SA_Texture :
-                    pScene->mSprites->mTextures[pHandle] = *((u32*)pData);
+                    pScene->sprites->mTextures[pHandle] = *((u32*)pData);
                     break;
                 case SA_Depth :
-                    pScene->mSprites->mDepths[pHandle] = *((u32*)pData);
+                    pScene->sprites->mDepths[pHandle] = *((u32*)pData);
                     break;
             }
         }
@@ -334,20 +335,20 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
 
 void Scene_transformSprite( Scene *pScene, u32 pHandle, mat3 *pTransform ) {
     if( pScene && pTransform ) {
-        if( HandleManager_isUsed( pScene->mSprites->mUsed, pHandle ) ) {
-            mat3_mul( &pScene->mSprites->mMatrices[pHandle], pTransform );
+        if( HandleManager_isUsed( pScene->sprites->mUsed, pHandle ) ) {
+            mat3_mul( &pScene->sprites->mMatrices[pHandle], pTransform );
         }
     }
 }
 
 void Scene_removeSprite( Scene *pScene, u32 pIndex ) {
     if( pScene ) 
-        SpriteArray_remove( pScene->mSprites, pIndex );
+        SpriteArray_remove( pScene->sprites, pIndex );
 }
 
 void Scene_clearSprites( Scene *pScene ) {
     if( pScene ) 
-        SpriteArray_clear( pScene->mSprites );
+        SpriteArray_clear( pScene->sprites );
 }
 
 //  =======================
@@ -356,11 +357,11 @@ int Scene_addText( Scene *pScene, const Font *pFont, Color pColor ) {
     int handle = -1;
 
     if( pScene ) {
-        handle = TextArray_add( pScene->mTexts );
+        handle = TextArray_add( pScene->texts );
 
         if( handle >= 0 ) {
-            pScene->mTexts->mFonts[handle] = pFont;
-            pScene->mTexts->mColors[handle] = pColor;
+            pScene->texts->mFonts[handle] = pFont;
+            pScene->texts->mColors[handle] = pColor;
         }
     }
 
@@ -370,41 +371,34 @@ int Scene_addText( Scene *pScene, const Font *pFont, Color pColor ) {
 void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pData ) {
     if( pScene ) {
         // check if the given handle is a used text
-        if( HandleManager_isUsed( pScene->mTexts->mUsed, pHandle ) ) {
+        if( HandleManager_isUsed( pScene->texts->mUsed, pHandle ) ) {
             switch( pAttrib ) {
                 case TA_Position :
                     {
                         vec2 new_pos = *((vec2*)pData);
-
-                        //vec2 ws = Context_getSize();
-                        //f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
-
-                        //new_pos.x *= sx;
-                        //new_pos.y *= -sy;
-
-                        pScene->mTexts->mPositions[pHandle] = new_pos;
+                        pScene->texts->mPositions[pHandle] = new_pos;
                     }
                     break;
                 case TA_Depth :
-                    pScene->mTexts->mDepths[pHandle] = *((int*)pData);
+                    pScene->texts->mDepths[pHandle] = *((int*)pData);
                     break;
                 case TA_String :
                     {
                         const char *s = (const char*)pData;
 
                         // recreate VBO
-                        Text_setString( pScene->mTexts->mMeshes[pHandle], pScene->mTexts->mFonts[pHandle], s );
+                        Text_setString( pScene->texts->mMeshes[pHandle], pScene->texts->mFonts[pHandle], s );
 
                         // copy string inside textarray to keep track of current string 
-                        pScene->mTexts->mStrings[pHandle] = byte_realloc( pScene->mTexts->mStrings[pHandle], strlen( s ) + 1 );
-                        strcpy( pScene->mTexts->mStrings[pHandle], s );
+                        pScene->texts->mStrings[pHandle] = byte_realloc( pScene->texts->mStrings[pHandle], strlen( s ) + 1 );
+                        strcpy( pScene->texts->mStrings[pHandle], s );
                     }
                     break;
                 case TA_Font :
-                    pScene->mTexts->mFonts[pHandle] = (const Font*)pData;
+                    pScene->texts->mFonts[pHandle] = (const Font*)pData;
                     break;
                 case TA_Color:
-                    pScene->mTexts->mColors[pHandle] = *((Color*)pData);
+                    pScene->texts->mColors[pHandle] = *((Color*)pData);
                     break;
             }
         }
@@ -413,10 +407,10 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
 
 void Scene_removeText( Scene *pScene, u32 pIndex ) {
     if( pScene ) 
-        TextArray_remove( pScene->mTexts, pIndex );
+        TextArray_remove( pScene->texts, pIndex );
 }
 
 void Scene_clearTexts( Scene *pScene ) {
     if( pScene ) 
-        TextArray_clear( pScene->mTexts );
+        TextArray_clear( pScene->texts );
 }

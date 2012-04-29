@@ -100,7 +100,7 @@ bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName,
         glfwSetWindowSizeCallback( WindowResizeCallback );
         glfwSetKeyCallback( KeyPressedCallback );
         glfwSetCharCallback( CharPressedCallback );
-        glfwSetMouseButtonCallback( MousePressedCallback );
+        glfwSetMouseButtonCallback( MouseButtonCallback );
         glfwSetMouseWheelCallback( MouseWheelCallback );
         glfwSetMousePosCallback( MouseMovedCallback );
 

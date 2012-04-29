@@ -1,9 +1,8 @@
 #include "common/world.h"
-#include "text.h"
-#include "texture.h"
 #include "renderer.h"
 #include "context.h"
 #include "resource.h"
+#include "game.h"
 
 #ifdef USE_GLDL
 #include "GL/gldl.h"
@@ -29,7 +28,7 @@ void Font_destroy( Font *pFont ) {
 
 bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
     if( pFont && pFile ) {
-        FT_Library *ft = Device_getFreetype(); 
+        FT_Library *ft = Game_getFreetype(); 
 
         check( !FT_New_Face( *ft, pFile, 0, &pFont->mFace ), "Could not open font file \"%s\"!\n", pFile );
 

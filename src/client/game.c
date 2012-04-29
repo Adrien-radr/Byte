@@ -1,20 +1,104 @@
 #include "game.h"
 #include "resource.h"
 #include "renderer.h"
+#include "context.h"
+
+#ifdef USE_GLDL
+#include "GL/gldl.h"
+#else
+#include "GL/glew.h"
+#endif
+
+#include "json/cJSON.h"
+
+// #############################################################
+//      CONFIG
+const str32 config_file = "config.json";
+
+bool LoadConfigItem( cJSON *root, cJSON **item, const char *param ) {
+    *item = cJSON_GetObjectItem( root, param );
+    check( *item, "Error while getting parameter %s from config file.\n", param );
+    return true;
+error:
+    return false;
+}
+
+// Config loading function
+bool LoadConfig() {
+    if( !game ) return false;
+
+    cJSON *root = NULL, *item = NULL;
+    char *json_file = NULL;
+
+    bool return_val = false;
+
+    Byte_ReadFile( &json_file, config_file );
+    check( json_file, "Error when loading config file!\n" );
+
+    root = cJSON_Parse( json_file );
+    check( root, "JSON Parse error [%s] before :\n%s\n", config_file, cJSON_GetErrorPtr() );
+
+    // get fullscreen state
+    if( !LoadConfigItem( root, &item, "bFullscreen" ) ) 
+        game->config.fullscreen = 0;
+    else 
+        game->config.fullscreen = item->type > 0;
+
+    // get window size
+    if( !LoadConfigItem( root, &item, "iWindowWidth" ) ) 
+        game->config.window_size.x = 800;
+    else 
+        game->config.window_size.x = (f32)item->valueint;
+
+    if( !LoadConfigItem( root, &item, "iWindowHeight" ) ) 
+        game->config.window_size.y = 600;
+    else
+        game->config.window_size.y = (f32)item->valueint;
+
+    // get multisamples
+    if( !LoadConfigItem( root, &item, "iMultiSamples" ) ) 
+        game->config.multisamples = 0;
+    else 
+        game->config.multisamples = item->valueint;
+
+    return_val = true;
+
+error:
+    DEL_PTR( json_file );
+    if( root ) cJSON_Delete( root );
+    return return_val;
+}
+
+
+// #############################################################
+//      GAME
 
 /// Game mouse listener
-void gameMouseListener( const Event *event, void *data ) {
-    if( event->Type == E_MouseMoved ) {
+void Game_mouseListener( const Event *event, void *data ) {
+    if( event->Type == EMouseMoved ) {
         str32 text;
         snprintf( text, 32, "X : %d, Y : %d", (int)event->v.x, (int)event->v.y );
-        Scene_modifyText( game->mScene, game->mousepos_text, TA_String, text );
+        Scene_modifyText( game->scene, game->mousepos_text, TA_String, text );
 
-        vec2 isomouse = Scene_screenToIso( game->mScene, &event->v );
+        vec2 isomouse = Scene_screenToIso( game->scene, &event->v );
 
         snprintf( text, 32, "X : %d, Y : %d", (int)isomouse.x, (int)isomouse.y );
-        Scene_modifyText( game->mScene, game->mousetile_text, TA_String, text );
+        Scene_modifyText( game->scene, game->mousetile_text, TA_String, text );
     }
 }
+
+/// Game window resize function
+void Game_windowResize( const Event *event, void *data ) {
+    Context_setSize( event->v );
+
+    glViewport( 0, 0, (GLsizei)event->v.x, (GLsizei)event->v.y );
+
+    if( game->scene ) {
+        Camera_calculateProjectionMatrix( game->scene->camera );
+        Renderer_updateProjectionMatrix( ECamera, &game->scene->camera->mProjectionMatrix );
+    }
+}
+
 
 /// Game instance declaration
 Game *game = NULL;
@@ -32,8 +116,30 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     game = byte_alloc( sizeof( Game ) );
     check_mem( game );
 
-    // Init Game Device (Window, Context, Config file)
-    check( Device_init(), "Error while creating Game Device. Aborting initialization.\n" );
+    // Load config file
+    LoadConfig();
+
+
+    // Initialize Context
+    str32 title;
+    MSG( title, 32, "Byte-Project v%d.%d.%d", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
+
+    check( Context_init( game->config.window_size.x,
+                         game->config.window_size.y,
+                         game->config.fullscreen,
+                         title,
+                         game->config.multisamples ), "Error while creating Context!\n" );
+
+    // Initialize Renderer
+    check( Renderer_init(), "Error while creating Renderer!\n" );
+
+    // Initialize Event Manager
+    check( EventManager_init(), "Error while creating Event Manager!\n" );
+
+    // Initialize Freetype
+    check( !FT_Init_FreeType( &game->freetype_lib ), "Could not initialize Freetype library!\n" );
+
+
 
     // Load all resources game
     check( ResourceManager_init(), "Error while initializing resource manager. Aborting initialization.\n" );
@@ -46,11 +152,12 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
 
     // Initialize Game current Scene
-    game->mScene = Scene_new();
-    check( game->mScene, "Error while creating Game Scene. Aborting initialization.\n" );
+    game->scene = Scene_new();
+    check( game->scene, "Error while creating Game Scene. Aborting initialization.\n" );
 
-    // register mouse listener
-    EventManager_addListener( LT_MouseListener, gameMouseListener, NULL );
+    // Register Game listeners
+    EventManager_addListener( LT_ResizeListener, Game_windowResize, NULL );
+    EventManager_addListener( LT_MouseListener, Game_mouseListener, NULL );
 
     Font *f = Font_get( "DejaVuSans.ttf", 12 );
     Color col = { 0.9f, 0.9f, 0.9f, 1.f };
@@ -68,28 +175,28 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
         init_func();
 
     // Load fps text
-    game->fps_text = Scene_addText( game->mScene, f, col );
-    Scene_modifyText( game->mScene, game->fps_text, TA_Position, &pos );
-    Scene_modifyText( game->mScene, game->fps_text, TA_String, "FPS : 0" );
-    Scene_modifyText( game->mScene, game->fps_text, TA_Depth, &text_depth );
+    game->fps_text = Scene_addText( game->scene, f, col );
+    Scene_modifyText( game->scene, game->fps_text, TA_Position, &pos );
+    Scene_modifyText( game->scene, game->fps_text, TA_String, "FPS : 0" );
+    Scene_modifyText( game->scene, game->fps_text, TA_Depth, &text_depth );
 
     // Load mousepos text
-    game->mousepos_text = Scene_addText( game->mScene, f, col );
+    game->mousepos_text = Scene_addText( game->scene, f, col );
     pos.y = 15.f;
-    Scene_modifyText( game->mScene, game->mousepos_text, TA_Position, &pos );
-    Scene_modifyText( game->mScene, game->mousepos_text, TA_String, "X  : 0, Y : 0" );
-    Scene_modifyText( game->mScene, game->mousepos_text, TA_Depth, &text_depth );
+    Scene_modifyText( game->scene, game->mousepos_text, TA_Position, &pos );
+    Scene_modifyText( game->scene, game->mousepos_text, TA_String, "X  : 0, Y : 0" );
+    Scene_modifyText( game->scene, game->mousepos_text, TA_Depth, &text_depth );
 
     // Load mousetile text
-    game->mousetile_text = Scene_addText( game->mScene, f, col );
+    game->mousetile_text = Scene_addText( game->scene, f, col );
     pos.y = 30.f;
-    Scene_modifyText( game->mScene, game->mousetile_text, TA_Position, &pos );
-    Scene_modifyText( game->mScene, game->mousetile_text, TA_String, "X  : 0, Y : 0" );
-    Scene_modifyText( game->mScene, game->mousetile_text, TA_Depth, &text_depth );
+    Scene_modifyText( game->scene, game->mousetile_text, TA_Position, &pos );
+    Scene_modifyText( game->scene, game->mousetile_text, TA_String, "X  : 0, Y : 0" );
+    Scene_modifyText( game->scene, game->mousetile_text, TA_Depth, &text_depth );
 
 
     // Update all created shaders about their projection matrices
-    Scene_updateShadersProjMatrix( game->mScene );
+    Scene_updateShadersProjMatrix( game->scene );
 
 
     // register main.c frame function
@@ -103,11 +210,14 @@ error:
 
 void Game_destroy() {
     if( game ) {
-        Scene_destroy( game->mScene );
+        Scene_destroy( game->scene );
 
         World_destroy();
         ResourceManager_destroy();
-        Device_destroy();
+
+        Renderer_destroy();
+        Context_destroy();
+        EventManager_destroy();
 
         DEL_PTR( game );
     }
@@ -125,8 +235,9 @@ bool Game_update( f32 frame_time ) {
     if( IsKeyUp( K_Escape ) || !Context_isWindowOpen() )
         return false;
 
-    // game frame
-    Device_beginFrame();
+    EventManager_update();
+
+    // GAMEPLAY
         phy_update += frame_time;
         one_sec += frame_time;
 
@@ -136,21 +247,22 @@ bool Game_update( f32 frame_time ) {
 
         // AI GAMEPLAY LOOP (fixed at 1/phy_dt FPS)
         while( phy_update >= phy_dt ) {
-            Scene_update( game->mScene );
+            Scene_update( game->scene );
             phy_update -= phy_dt;
         }
 
         // EACH 1 SECOND STUFF
         if( one_sec >= 1.f ) {
             str32 fps_str;
-            snprintf( fps_str, 32, "9{}|'\"/?.>,<mMFPS : %4.0f", (1.f/frame_time) );
-            Scene_modifyText( game->mScene, game->fps_text, TA_String, fps_str );
+            snprintf( fps_str, 32, "FPS : %4.0f", (1.f/frame_time) );
+            Scene_modifyText( game->scene, game->fps_text, TA_String, fps_str );
             one_sec = 0.f;
         }
 
-        // render scene
-        Scene_render( game->mScene );
-    Device_endFrame();
+    // RENDERING
+        Renderer_beginFrame();
+        Scene_render( game->scene );
+        Context_swap();
 
     return true;
 }
@@ -190,4 +302,10 @@ bool Game_loadActorAssets( Actor *actor ) {
 
 error:
     return false;
+}
+
+FT_Library *Game_getFreetype() {
+    if( game )
+        return &game->freetype_lib;
+    return NULL;
 }

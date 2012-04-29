@@ -4,8 +4,9 @@
 #include "common/color.h"
 #include "common/vector.h"
 #include "common/handlemanager.h"
-#include "device.h"
 
+#include "ft2build.h"
+#include FT_FREETYPE_H
 
 /// A Glyph is a single character in a font
 typedef struct {

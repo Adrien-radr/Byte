@@ -15,9 +15,10 @@ Byte-Project : TODO File
 + Fix font rendering when resizing window!
 + Config file
 + Game 'class' containing : the device, the world, the scene, game states
++ Remove DEVICE and put its stuff in GAME
 
-- Remove DEVICE and put its stuff in GAME
-- move map functions in a client/map.c file
+- make camera zoom following fixed step zoom levels
+- text cant have a size superior to ???, why ?
 
     Client-Server
     ------------
@@ -31,14 +32,18 @@ Byte-Project : TODO File
 
     Map System
     ----------
-    - Squared tiles map (3d?)
-    - Mouse picking support
+    + Squared tiles map (3d?)
+    + Mouse picking support
     - Quad-Tree 
     - Procedurally created map (world-map and scene-map)
 
     Lighting
     --------
-    - Point-lights (phong shader)
+    o Point-lights 
+        + Map isometric fragment lighting
+        + Sprites fragment lighting
+        - Sprites lighting with sprite height support
+    - Directional (sun) lights
     - 2D Normal maps of sprites ?
     - Dynamic shadows
 

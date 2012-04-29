@@ -2,19 +2,37 @@
 #define BYTE_GAME_HPP
 
 #include "common/world.h"
-#include "device.h"
 #include "scene.h"
+
+#include "ft2build.h"
+#include FT_FREETYPE_H
+
+
+/// Stores the different parameters of the engine/game
+typedef struct {
+    vec2    window_size;
+    u32     multisamples;
+    bool    fullscreen;
+} Config;
+
+/// Filename of the config file
+extern const str32 config_file;
+
 
 /// Game structure
 ///     It possesses the game current scene where visible entities are drawn
 typedef struct {
-    Scene   *mScene;                ///< Game current scene
+    Scene   *scene;                ///< Game current scene
 
     bool    (*frame_func)(f32);     ///< Game frame callback
 
     u32     fps_text;               ///< FPS text drawn in window
     u32     mousepos_text;          ///< Mouse Position displayed
     u32     mousetile_text;         ///< Tile under mouse displayed
+
+
+    Config      config;            ///< Device/Game configuration parameters
+    FT_Library  freetype_lib;      ///< Instance of the Freetype library.
 } Game;
 
 /// Game Instance
@@ -32,5 +50,8 @@ bool Game_loadActorAssets( Actor *actor );
 /// Run a game frame (called from client)
 /// @return : false if game must be stopped
 bool Game_update( f32 frame_time );
+
+/// Returns a pointer to freetype lib
+FT_Library *Game_getFreetype();
 
 #endif // BYTE_GAME

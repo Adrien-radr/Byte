@@ -10,27 +10,30 @@
 #include "text.h"
 #include "sprite.h"
 #include "light.h"
+#include "camera.h"
+
+/// Visual representation of the map in game
+typedef struct {
+    u32     mesh;
+    u32     texture;
+    u32     shader;
+} SceneMap;
 
 /// Scene structure. Keep all info about rendering in the current view
 typedef struct {
-    u32             mSpriteShader;      ///< Shader used to render sprites
-    SpriteArray     *mSprites;          ///< Sprites in the scene
+    u32             sprite_shader;      ///< Shader used to render sprites
+    SpriteArray     *sprites;           ///< Sprites in the scene
 
-    u32             mTextShader;        ///< Shader used to render texts
-    TextArray       *mTexts;            ///< Texts in the scene
+    u32             text_shader;        ///< Shader used to render texts
+    TextArray       *texts;             ///< Texts in the scene
 
-    Camera          *mCamera;           ///< Camera of the scene
+    Camera          *camera;            ///< Camera of the scene
 
     mat3            proj_matrix_2d;     ///< 2D projection matrix (GUI & text)
 
-    struct {
-        u32 mesh;
-        u32 texture;
-        u32 shader;
-    }               local_map;
+    SceneMap        local_map;
 
-    light           light1;
-
+    Light           light1;
     Color           ambient_color;
 } Scene;
 
@@ -51,7 +54,7 @@ void Scene_render( Scene *pScene );
 void Scene_updateShadersProjMatrix( Scene *pScene );
 
 // ##########################################################################3
-//      Map
+//      Scene Map
     /// Returns the global world coordinates of a vector, not depending of camera
     /// zoom or pan. (often you want this to translate mousepos from screen to world)
     vec2 Scene_localToGlobal( Scene *scene, const vec2 *local );

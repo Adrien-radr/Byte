@@ -13,9 +13,9 @@ typedef struct {
     f32     cst_att,
             lin_att,
             quad_att;
-} light;
+} Light;
 
-void Light_set( light *l, const vec2 *pos, f32 height, const Color *col, f32 cst, f32 lin, f32 quad );
+void Light_set( Light *l, const vec2 *pos, f32 height, const Color *col, f32 cst, f32 lin, f32 quad );
 
 
 #endif // BYTE_LIGHT
