@@ -39,10 +39,10 @@ Byte-Project : TODO File
 
     Lighting
     --------
-    o Point-lights 
+    + Point-lights 
         + Map isometric fragment lighting
         + Sprites fragment lighting
-        - Sprites lighting with sprite height support
+        + Sprites lighting with sprite height support
     - Directional (sun) lights
     - 2D Normal maps of sprites ?
     - Dynamic shadows
@@ -52,4 +52,4 @@ Byte-Project : TODO File
     - Clean the main
     - Lua integration as a scripting language (??)
     - GUI (with Lua or json) (Handled by Beulard)
-    - Fix camera position when resizing window (messy)! (maybe no rescale)
+    - Fix camera position when resizing window (messy)! (maybe no window resizing at all +)

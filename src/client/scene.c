@@ -198,7 +198,7 @@ Scene *Scene_new() {
 
     vec2 lightpos = { 300.f, 200.f };
     Color diffuse = { 1.f, 1.f, 1.f, 1.f };
-    Light_set( &s->light1, &lightpos, 50.f, &diffuse, 0.382f, 0.01f, 0.f );
+    Light_set( &s->light1, &lightpos, 200.f, &diffuse, 0.382f, 0.01f, 0.f );
         
     return s;
 error:
@@ -250,7 +250,9 @@ void Scene_render( Scene *pScene ) {
 
         for( u32 i = 0; i < pScene->sprites->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->sprites->mUsed, i ) ) {
-                Renderer_useTexture( pScene->sprites->mTextures[i], 0 );
+                // use sprites different textures (multi texturing)
+                Renderer_useTexture( pScene->sprites->mTextures0[i], 0 );
+                Renderer_useTexture( pScene->sprites->mTextures1[i], 1 );
                 Shader_sendMat3( "ModelMatrix", &pScene->sprites->mMatrices[i] );
                 Shader_sendInt( "Depth", pScene->sprites->mDepths[i] );
                 Shader_sendColor( "light_color", &pScene->light1.diffuse );
@@ -282,7 +284,7 @@ void Scene_render( Scene *pScene ) {
 
 //  =======================
  
-int  Scene_addSprite( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
+int  Scene_addSprite( Scene *pScene, u32 pMesh, int pTexture[2], mat3 *pMM ) {
     int handle = -1;
 
     if( pScene ) {
@@ -290,7 +292,8 @@ int  Scene_addSprite( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM ) {
 
         if( handle >= 0 ) {
             pScene->sprites->mMeshes[handle] = pMesh;
-            pScene->sprites->mTextures[handle] = pTexture;
+            pScene->sprites->mTextures0[handle] = pTexture[0];
+            pScene->sprites->mTextures1[handle] = pTexture[1];
             memcpy( &pScene->sprites->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
         }
     }
@@ -304,9 +307,10 @@ int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) {
         handle = SpriteArray_add( pScene->sprites );
 
         if( handle >= 0 ) {
-            pActor->mUsedSprite = handle;
-            pScene->sprites->mMeshes[handle] = pActor->mMesh_id;
-            pScene->sprites->mTextures[handle] = pActor->mTexture_id;
+            pActor->used_sprite = handle;
+            pScene->sprites->mMeshes[handle] = pActor->mesh_id;
+            pScene->sprites->mTextures0[handle] = pActor->texture_ids[0];
+            pScene->sprites->mTextures1[handle] = pActor->texture_ids[1];
             mat3 m;
             mat3_translationMatrixfv( &m, &pActor->mPosition );
             memcpy( pScene->sprites->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
@@ -322,8 +326,11 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
                 case SA_Matrix :
                     memcpy( &pScene->sprites->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
                     break;
-                case SA_Texture :
-                    pScene->sprites->mTextures[pHandle] = *((u32*)pData);
+                case SA_Texture0 :
+                    pScene->sprites->mTextures0[pHandle] = *((u32*)pData);
+                    break;
+                case SA_Texture1 :
+                    pScene->sprites->mTextures1[pHandle] = *((int*)pData);
                     break;
                 case SA_Depth :
                     pScene->sprites->mDepths[pHandle] = *((u32*)pData);

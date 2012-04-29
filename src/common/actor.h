@@ -16,14 +16,15 @@ typedef struct {
     // Rendering stuff
     struct {
         str256  mesh;
-        str256  texture;
+        str256  texture[2];             ///< 0 : albedo. 1 : heightmap
+        int     tex_n;
     }                       assets;
 
 
-        int     mUsedSprite;    ///< Sprite used to render the actor (-1 if none)
-        int     mMesh_id,       ///< Mesh Resource ID used by the actor
-                mTexture_id;    ///< Texture resource ID used by the actor
-        vec2    mSize;          ///< Sprite size
+        int     used_sprite;            ///< Sprite used to render the actor (-1 if none)
+        int     mesh_id,                ///< Mesh Resource ID used by the actor
+                texture_ids[2];         ///< Texture resource ID used by the actor
+        vec2    size;                   ///< Sprite size
 } Actor;
 
 /// Loads an actor from a JSON file and extract all components

@@ -273,30 +273,36 @@ bool Game_loadActorAssets( Actor *actor ) {
     // load scaled mesh
     str256 scaled_mesh_str;
     str16 mesh_size;
-    snprintf( mesh_size, 16, "%d.%d", (int)actor->mSize.x, (int)actor->mSize.y );
+    snprintf( mesh_size, 16, "%d.%d", (int)actor->size.x, (int)actor->size.y );
 
     strcpy( scaled_mesh_str, actor->assets.mesh );
     strcat( scaled_mesh_str, mesh_size );
 
-    actor->mMesh_id = ResourceManager_get( scaled_mesh_str );
+    actor->mesh_id = ResourceManager_get( scaled_mesh_str );
     // if correctly sized mesh is not yet loaded, create it
-    if( -1 == actor->mMesh_id ) {
-        actor->mMesh_id = ResourceManager_get( actor->assets.mesh );
-        check( actor->mMesh_id >= 0, "Error while loading actor '%s' mesh. Mesh '%s' is not a loaded resource.\n", actor->mFirstname, actor->assets.mesh );
+    if( -1 == actor->mesh_id ) {
+        actor->mesh_id = ResourceManager_get( actor->assets.mesh );
+        check( actor->mesh_id >= 0, "Error while loading actor '%s' mesh. Mesh '%s' is not a loaded resource.\n", actor->mFirstname, actor->assets.mesh );
 
         // resize
-        int scaled_mesh = Renderer_createRescaledMesh( actor->mMesh_id, &actor->mSize );
+        int scaled_mesh = Renderer_createRescaledMesh( actor->mesh_id, &actor->size );
         check( scaled_mesh >= 0, "Error while creating scaled mesh for actor '%s'. \n", actor->mFirstname );
         
-        actor->mMesh_id = scaled_mesh;
+        actor->mesh_id = scaled_mesh;
 
         // add newly rescaled mesh to resource manager
         ResourceManager_add( scaled_mesh_str, scaled_mesh );
     }   
 
-    // load texture
-    actor->mTexture_id = ResourceManager_get( actor->assets.texture );
-    check( actor->mTexture_id >= 0, "Error while loading actor '%s' texture. Texture '%s' is not a loaded resource.\n", actor->mFirstname, actor->assets.mesh );
+    // load textures
+    for( int i = 0; i < actor->assets.tex_n; ++i ) {
+        if( !actor->assets.texture[i][0] )
+            actor->texture_ids[i] = -1;
+        else {
+            actor->texture_ids[i] = ResourceManager_get( actor->assets.texture[i] );
+            check( actor->assets.texture[i] >= 0, "Error while loading actor '%s' texture. Texture '%s' is not a loaded resource.\n", actor->mFirstname, actor->assets.texture[i] );
+        }
+    }
 
     return true;
 

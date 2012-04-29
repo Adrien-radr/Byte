@@ -67,10 +67,10 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 //      Sprite Array
     /// Add a sprite to be rendered each frame in the scene
     /// @param pMesh : The mesh handle the sprite use
-    /// @param pTexture : The texture handle the sprite use
+    /// @param pTexture : The texture handles for the sprite to use
     /// @param pMM : The ModelMatrix used to orient the sprite
     /// @return : The handle to the given sprite
-    int  Scene_addSprite( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM );
+    int  Scene_addSprite( Scene *pScene, u32 pMesh, int pTexture[2], mat3 *pMM );
 
     /// Add a sprite to be rendered each frame in the scene
     /// @param pActor : the Actor that must be drawn as a sprite

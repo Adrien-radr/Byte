@@ -6,7 +6,8 @@ SpriteArray *SpriteArray_init( u32 pSize ) {
 
     arr->mUsed = HandleManager_init( pSize );
     arr->mMeshes = byte_alloc( pSize * sizeof( u32 ) );
-    arr->mTextures = byte_alloc( pSize * sizeof( u32 ) );
+    arr->mTextures0 = byte_alloc( pSize * sizeof( u32 ) );
+    arr->mTextures1 = byte_alloc( pSize * sizeof( int ) );
     arr->mDepths = byte_alloc( pSize * sizeof( u32 ) );
     arr->mMatrices = byte_alloc( pSize * sizeof( mat3 ) );
 
@@ -26,7 +27,8 @@ int SpriteArray_add( SpriteArray *arr ) {
             if( arr->mUsed->mSize != arr->mSize ) {
                 arr->mSize = arr->mUsed->mSize;
                 arr->mMeshes = byte_realloc( arr->mMeshes, arr->mSize * sizeof( u32 ) );
-                arr->mTextures = byte_realloc( arr->mTextures, arr->mSize * sizeof( u32 ) );
+                arr->mTextures0 = byte_realloc( arr->mTextures0, arr->mSize * sizeof( u32 ) );
+                arr->mTextures1 = byte_realloc( arr->mTextures1, arr->mSize * sizeof( int ) );
                 arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( u32 ) );
                 arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3 ) );
             }
@@ -57,7 +59,8 @@ void SpriteArray_clear( SpriteArray *arr ) {
 void SpriteArray_destroy( SpriteArray *arr ) {
     if( arr ) {
         HandleManager_destroy( arr->mUsed );
-        DEL_PTR( arr->mTextures );
+        DEL_PTR( arr->mTextures0 );
+        DEL_PTR( arr->mTextures1 );
         DEL_PTR( arr->mMeshes );
         DEL_PTR( arr->mDepths );
         DEL_PTR( arr->mMatrices );

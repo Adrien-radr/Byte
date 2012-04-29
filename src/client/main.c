@@ -16,6 +16,7 @@
 
 */
 
+Actor *a1;
 int a1_h;
 
 void mousecb( const Event *e, void *data ) {
@@ -23,6 +24,7 @@ void mousecb( const Event *e, void *data ) {
         vec2 newpos = vec2_add( &game->scene->camera->global_position, &e->v );
         mat3 m;
         mat3_translationMatrixfv( &m, &newpos );
+        m.x[2] = a1->size.y / 2.f;
         Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
     }
 }
@@ -30,13 +32,14 @@ void mousecb( const Event *e, void *data ) {
 void init_callback() {
     a1_h = World_loadActor( "data/game/actors/man.json" );
     if( a1_h >= 0 ) {
-        Actor *a1 = World_getActor( a1_h );
+        a1 = World_getActor( a1_h );
 
         Game_loadActorAssets( a1 );
         Scene_addSpriteFromActor( game->scene, a1 );
         vec2 pos = { 200, 100 };
         mat3 m;
         mat3_translationMatrixfv( &m, &pos );
+        m.x[2] = a1->size.y / 2.f;
         Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
     }
 

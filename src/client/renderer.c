@@ -33,7 +33,7 @@ struct s_Renderer {
     // these are state variables. -1 mean nothing is currently used
     int             mCurrentMesh,           ///< The currently bound OpenGL VBO
                     mCurrentShader,         ///< The currently bound OpenGL Shader Program
-                    mCurrentTexture,        ///< The currently bound OpenGL Texture
+                    mCurrentTexture[2],     ///< The currently bound OpenGL Textures on respective target
                     mCurrentTextureTarget;  ///< The current OpenGL Texture targer
 };
 
@@ -54,7 +54,8 @@ bool Renderer_init() {
 
     renderer->mCurrentMesh = -1;
     renderer->mCurrentShader = -1;
-    renderer->mCurrentTexture = -1;
+    renderer->mCurrentTexture[0] = -1;
+    renderer->mCurrentTexture[1] = -1;
     renderer->mCurrentTextureTarget = 0;
 
     renderer->mVao = -1;
@@ -391,14 +392,15 @@ error:
 }
 
 void Renderer_useTexture( int pTexture, u32 pTarget ) {
-    if( renderer && pTexture < renderer->mTextures.cpt && pTexture != renderer->mCurrentTexture ) {
-        renderer->mCurrentTexture = pTexture;
+    if( renderer && pTexture < renderer->mTextures.cpt && pTexture != renderer->mCurrentTexture[pTarget] ) {
+        renderer->mCurrentTexture[pTarget] = pTexture;
 
+        // will send -1 to Texture_bind if no need to change target
         int target = -1;
         if( pTarget != renderer->mCurrentTextureTarget ) 
             renderer->mCurrentTextureTarget = target = pTarget;
 
-        Texture_bind( pTexture < 0 ? 0 : renderer->mTextures.data[pTexture], target );
+        Texture_bind( pTexture < 0 ? NULL : renderer->mTextures.data[pTexture], target );
     }
 }
 
