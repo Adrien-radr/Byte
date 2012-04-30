@@ -20,8 +20,8 @@ struct s_Camera {
 
     f32             mSpeed;             ///< Camera movement speed
 
-    f32             mZoomX,             ///< Variable to compute the zoom as a function of ZoomX
-                    mZoom,              ///< Camera absolute zoom level
+    int             mZoomX;             ///< Variable to compute the zoom as a function of ZoomX
+    f32             mZoom,              ///< Camera absolute zoom level
                     mZoomSpeed,         ///< Zoom speed for each zoom action (constant)
                     mZoomMax,           ///< Max zoom level
                     mZoomMin;           ///< Min zoom level

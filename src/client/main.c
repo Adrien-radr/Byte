@@ -21,7 +21,8 @@ int a1_h;
 
 void mousecb( const Event *e, void *data ) {
     if( e->Type == EMouseReleased ) {
-        vec2 newpos = vec2_add( &game->scene->camera->global_position, &e->v );
+        vec2 newpos = Scene_localToGlobal( game->scene, &e->v );
+
         mat3 m;
         mat3_translationMatrixfv( &m, &newpos );
         m.x[2] = a1->size.y / 2.f;

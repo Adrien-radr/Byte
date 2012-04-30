@@ -16,8 +16,7 @@ Byte-Project : TODO File
 + Config file
 + Game 'class' containing : the device, the world, the scene, game states
 + Remove DEVICE and put its stuff in GAME
-
-- make camera zoom following fixed step zoom levels
++ make camera zoom following fixed step zoom levels
 
     Client-Server
     ------------

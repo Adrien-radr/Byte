@@ -2,6 +2,8 @@
 #include "context.h"
 #include "renderer.h"
 
+static const float zoom_levels[10] = { 1.f, 1.25f, 1.5f, 1.75f, 2.f, 2.5f, 3.f, 4.f, 5.f, 6.f };
+
 Camera *Camera_new() {
     Camera *c = NULL;
     check( Context_isInitialized(), "Can't create a camera if no context has been created!\n" );
@@ -9,7 +11,8 @@ Camera *Camera_new() {
     c = byte_alloc( sizeof( Camera ) );
 
     c->mSpeed = 2.f;
-    c->mZoom = c->mZoomX = 1.f;
+    c->mZoomX = 0;
+    c->mZoom = zoom_levels[c->mZoomX];
     c->mZoomSpeed = .05f;
     c->mZoomMax = 1.f;
     c->mZoomMin = .75f;
@@ -87,19 +90,23 @@ void Camera_move( Camera *pCamera, vec2 *pVector ) {
 
 void Camera_zoom( Camera *pCamera, int pZoom ) {
     if( pCamera ) {
-        static int reached_min = 0, reached_max = 0;
-
-        // clamp pZoom (no rapid zoom
-        Clamp( &pZoom, -1.f, 1.f );
-
-        f32 x = pCamera->mZoom;
-
-        if( pZoom < 0.f || pCamera->mZoom > 1.f ) {
-            pCamera->mZoom -= pZoom;
-            f32 change = pCamera->mZoom - x;
+        // clamp pZoom (no rapid zoom)
+        Clamp( &pZoom, -1, 1 );
 
 
-            // modify cameraposition to zoom on mouse
+        // get new index for zoom_levels array
+        int old_x = pCamera->mZoomX;
+        pCamera->mZoomX -= pZoom;
+        Clamp( &pCamera->mZoomX, 0, 9 );
+
+        // if change occured, change zoom level and update cam
+        if( old_x != pCamera->mZoomX ) {
+            f32 old_zoom = pCamera->mZoom;
+            pCamera->mZoom = zoom_levels[pCamera->mZoomX];
+
+            f32 change = pCamera->mZoom - old_zoom;
+
+
             vec2 windowSize = Context_getSize();
             f32 mx = GetMouseX(),
                 my = GetMouseY();
@@ -111,7 +118,7 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
             f32 dir_len = vec2_len( &dir );
             vec2_normalize( &dir );
 
-            f32 pan_magnitude = - dir_len * change;//* .1f * (1.f / pCamera->mZoom); 
+            f32 pan_magnitude = - dir_len * change;
             dir = vec2_mul( &dir, pan_magnitude );
 
 
@@ -123,8 +130,10 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
             Renderer_updateProjectionMatrix( ECamera, &pCamera->mProjectionMatrix );
         }
     }
-        
-/*
+
+/*              ZOOM LEVEL FROM 1/x*x*x
+        static int reached_min = 0, reached_max = 0;
+
         pCamera->mZoomX += pCamera->mZoomSpeed * pZoom;
 
         // Clamp X (min and max zoom levels)
@@ -159,7 +168,7 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
             f32 dir_len = vec2_len( &dir );
             vec2_normalize( &dir );
 
-            f32 pan_magnitude = - dir_len * change;//* .1f * (1.f / pCamera->mZoom); 
+            f32 pan_magnitude = - dir_len * change;
             dir = vec2_mul( &dir, pan_magnitude );
 
 
