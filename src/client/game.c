@@ -81,8 +81,7 @@ void Game_mouseListener( const Event *event, void *data ) {
         Scene_modifyText( game->scene, game->mousepos_text, TA_String, text );
 
         vec2 isomouse = Scene_screenToIso( game->scene, &event->v );
-
-        snprintf( text, 32, "X : %d, Y : %d", (int)isomouse.x, (int)isomouse.y );
+        snprintf( text, 32, "TileX: %d, TileY : %d", (int)isomouse.x, (int)isomouse.y );
         Scene_modifyText( game->scene, game->mousetile_text, TA_String, text );
     }
 }

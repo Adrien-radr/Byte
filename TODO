@@ -18,7 +18,6 @@ Byte-Project : TODO File
 + Remove DEVICE and put its stuff in GAME
 
 - make camera zoom following fixed step zoom levels
-- text cant have a size superior to ???, why ?
 
     Client-Server
     ------------

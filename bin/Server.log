@@ -1,350 +1,282 @@
 Byte-Project Log v0.1.5
-Sun 29 Apr 2012 - 17:58:08
+Sun 29 Apr 2012 - 19:45:42
 ==========================
 <0.00> [INFO] (net.c:70) IP : 127.0.0.1 (lo)
 <0.00> [INFO] (net.c:70) IP : 192.168.1.3 (wlan0)
 <0.00> [INFO] (server.c:33) Connection slot 0 listening...
-<16.41> [INFO] (server.c:136) received CONNECT_ASKID
-<16.41> [INFO] (server.c:80) Connection slot 1 listening...
-<16.44> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<16.61> [INFO] (server.c:161) received CONNECT_TRY
-<16.64> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<16.84> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<20.62> [INFO] (net.c:505) Connection going to Good Mode
-<22.93> [INFO] (server.c:169) received CONNECT_CLOSE
-<22.96> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=45)
-<23.06> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=45)
-<23.13> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<23.13> [INFO] (server.c:110) Connection slot 0 listening...
-<232.63> [INFO] (server.c:136) received CONNECT_ASKID
-<232.63> [INFO] (server.c:80) Connection slot 1 listening...
-<232.77> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<232.93> [INFO] (server.c:161) received CONNECT_TRY
-<232.97> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<233.17> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<236.94> [INFO] (net.c:505) Connection going to Good Mode
-<238.33> [INFO] (server.c:169) received CONNECT_CLOSE
-<238.39> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=36)
-<238.49> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=36)
-<238.53> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<238.53> [INFO] (server.c:110) Connection slot 0 listening...
-<339.50> [INFO] (server.c:136) received CONNECT_ASKID
-<339.50> [INFO] (server.c:80) Connection slot 1 listening...
-<339.51> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<339.70> [INFO] (server.c:161) received CONNECT_TRY
-<339.71> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<339.91> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<343.72> [INFO] (net.c:505) Connection going to Good Mode
-<353.74> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<360.81> [INFO] (server.c:169) received CONNECT_CLOSE
-<360.87> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=193)
-<360.97> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=193)
-<361.01> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<361.01> [INFO] (server.c:110) Connection slot 0 listening...
-<385.17> [INFO] (server.c:136) received CONNECT_ASKID
-<385.17> [INFO] (server.c:80) Connection slot 1 listening...
-<385.22> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<385.37> [INFO] (server.c:161) received CONNECT_TRY
-<385.42> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<385.63> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<389.38> [INFO] (net.c:505) Connection going to Good Mode
-<399.41> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<409.44> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<420.03> [INFO] (server.c:169) received CONNECT_CLOSE
-<420.12> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=328)
-<420.22> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=328)
-<420.23> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<420.23> [INFO] (server.c:110) Connection slot 0 listening...
-<443.84> [INFO] (server.c:136) received CONNECT_ASKID
-<443.84> [INFO] (server.c:80) Connection slot 1 listening...
-<443.88> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<444.04> [INFO] (server.c:161) received CONNECT_TRY
-<444.08> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<444.28> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<448.05> [INFO] (net.c:505) Connection going to Good Mode
-<458.08> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<468.12> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<476.41> [INFO] (server.c:169) received CONNECT_CLOSE
-<476.48> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=305)
-<476.58> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=305)
-<476.61> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<476.61> [INFO] (server.c:110) Connection slot 0 listening...
-<535.98> [INFO] (server.c:136) received CONNECT_ASKID
-<535.98> [INFO] (server.c:80) Connection slot 1 listening...
-<536.11> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<536.28> [INFO] (server.c:161) received CONNECT_TRY
-<536.31> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<536.51> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<540.29> [INFO] (net.c:505) Connection going to Good Mode
-<550.33> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<558.78> [INFO] (server.c:169) received CONNECT_CLOSE
-<558.78> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=206)
-<558.88> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=206)
-<558.98> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<558.98> [INFO] (server.c:110) Connection slot 0 listening...
-<573.76> [INFO] (server.c:136) received CONNECT_ASKID
-<573.76> [INFO] (server.c:80) Connection slot 1 listening...
-<573.92> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<574.06> [INFO] (server.c:161) received CONNECT_TRY
-<574.12> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<574.32> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<578.07> [INFO] (net.c:505) Connection going to Good Mode
-<588.10> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<598.13> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<621.06> [INFO] (server.c:169) received CONNECT_CLOSE
-<621.15> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=451)
-<621.25> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=451)
-<621.26> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<621.26> [INFO] (server.c:110) Connection slot 0 listening...
-<646.43> [INFO] (server.c:136) received CONNECT_ASKID
-<646.43> [INFO] (server.c:80) Connection slot 1 listening...
-<646.51> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<646.63> [INFO] (server.c:161) received CONNECT_TRY
-<646.71> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<646.91> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<650.65> [INFO] (net.c:505) Connection going to Good Mode
-<660.68> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<670.71> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<693.39> [INFO] (server.c:169) received CONNECT_CLOSE
-<693.45> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=448)
-<693.55> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=448)
-<693.59> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<693.59> [INFO] (server.c:110) Connection slot 0 listening...
-<771.40> [INFO] (server.c:136) received CONNECT_ASKID
-<771.40> [INFO] (server.c:80) Connection slot 1 listening...
-<771.53> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<771.70> [INFO] (server.c:161) received CONNECT_TRY
-<771.73> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<771.93> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<775.71> [INFO] (net.c:505) Connection going to Good Mode
-<785.75> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<795.78> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<796.49> [INFO] (server.c:169) received CONNECT_CLOSE
-<796.50> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=229)
-<796.60> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=229)
-<796.69> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<796.69> [INFO] (server.c:110) Connection slot 0 listening...
-<832.52> [INFO] (server.c:136) received CONNECT_ASKID
-<832.52> [INFO] (server.c:80) Connection slot 1 listening...
-<832.69> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<832.82> [INFO] (server.c:161) received CONNECT_TRY
-<832.89> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<833.09> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<836.83> [INFO] (net.c:505) Connection going to Good Mode
-<846.87> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<856.90> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<989.48> [INFO] (net.c:466) Connection going to Bad Mode
-<996.49> [INFO] (net.c:505) Connection going to Good Mode
-<1028.00> [INFO] (net.c:466) Connection going to Bad Mode
-<1029.20> [INFO] (net.c:505) Connection going to Good Mode
-<1126.84> [INFO] (net.c:466) Connection going to Bad Mode
-<1128.25> [INFO] (net.c:505) Connection going to Good Mode
-<1184.47> [INFO] (net.c:466) Connection going to Bad Mode
-<1363.85> [INFO] (net.c:505) Connection going to Good Mode
-<1364.25> [INFO] (net.c:466) Connection going to Bad Mode
-<1364.25> [INFO] (net.c:475) Penalty time increased to 2.000000
-<1366.46> [INFO] (net.c:505) Connection going to Good Mode
-<1376.48> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<1388.06> [INFO] (net.c:466) Connection going to Bad Mode
-<1398.87> [INFO] (net.c:505) Connection going to Good Mode
-<1417.08> [INFO] (net.c:466) Connection going to Bad Mode
-<1418.28> [INFO] (net.c:505) Connection going to Good Mode
-<1420.28> [INFO] (net.c:466) Connection going to Bad Mode
-<1420.28> [INFO] (net.c:475) Penalty time increased to 2.000000
-<1422.48> [INFO] (net.c:505) Connection going to Good Mode
-<1432.51> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<1436.52> [INFO] (server.c:169) received CONNECT_CLOSE
-<1436.58> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=4978)
-<1436.68> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=4978)
-<1436.72> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<1436.72> [INFO] (server.c:110) Connection slot 0 listening...
-<1486.54> [INFO] (server.c:136) received CONNECT_ASKID
-<1486.54> [INFO] (server.c:80) Connection slot 1 listening...
-<1486.59> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<1486.74> [INFO] (server.c:161) received CONNECT_TRY
-<1486.79> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<1486.99> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<1490.75> [INFO] (net.c:505) Connection going to Good Mode
-<1497.52> [INFO] (server.c:169) received CONNECT_CLOSE
-<1497.52> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=89)
-<1497.62> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=89)
-<1497.72> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<1497.72> [INFO] (server.c:110) Connection slot 0 listening...
-<1615.53> [INFO] (server.c:136) received CONNECT_ASKID
-<1615.53> [INFO] (server.c:80) Connection slot 1 listening...
-<1615.69> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<1615.83> [INFO] (server.c:161) received CONNECT_TRY
-<1615.89> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<1616.09> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<1619.84> [INFO] (net.c:505) Connection going to Good Mode
-<1622.56> [INFO] (server.c:169) received CONNECT_CLOSE
-<1622.61> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=49)
-<1622.71> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=49)
-<1622.76> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<1622.76> [INFO] (server.c:110) Connection slot 0 listening...
-<1669.69> [INFO] (server.c:136) received CONNECT_ASKID
-<1669.69> [INFO] (server.c:80) Connection slot 1 listening...
-<1669.82> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<1669.99> [INFO] (server.c:161) received CONNECT_TRY
-<1670.02> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<1670.22> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<1674.00> [INFO] (net.c:505) Connection going to Good Mode
-<1677.79> [INFO] (server.c:169) received CONNECT_CLOSE
-<1677.85> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=60)
-<1677.95> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=60)
-<1677.99> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<1677.99> [INFO] (server.c:110) Connection slot 0 listening...
-<1689.99> [INFO] (server.c:136) received CONNECT_ASKID
-<1689.99> [INFO] (server.c:80) Connection slot 1 listening...
-<1690.17> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<1690.29> [INFO] (server.c:161) received CONNECT_TRY
-<1690.37> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<1690.57> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<1694.30> [INFO] (net.c:505) Connection going to Good Mode
-<1704.33> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<1714.36> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<1722.23> [INFO] (server.c:169) received CONNECT_CLOSE
-<1722.27> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=300)
-<1722.37> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=300)
-<1722.43> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<1722.43> [INFO] (server.c:110) Connection slot 0 listening...
-<3566.15> [INFO] (server.c:136) received CONNECT_ASKID
-<3566.15> [INFO] (server.c:80) Connection slot 1 listening...
-<3566.32> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<3566.45> [INFO] (server.c:161) received CONNECT_TRY
-<3566.52> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<3566.72> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<3568.83> [INFO] (server.c:169) received CONNECT_CLOSE
-<3568.92> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=13)
-<3569.03> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<3569.03> [INFO] (server.c:110) Connection slot 0 listening...
-<3598.29> [INFO] (server.c:136) received CONNECT_ASKID
-<3598.29> [INFO] (server.c:80) Connection slot 1 listening...
-<3598.39> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<3598.49> [INFO] (server.c:161) received CONNECT_TRY
-<3598.59> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<3598.79> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<3602.51> [INFO] (net.c:505) Connection going to Good Mode
-<3612.54> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<3621.05> [INFO] (server.c:169) received CONNECT_CLOSE
-<3621.06> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=206)
-<3621.16> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=206)
-<3621.25> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<3621.25> [INFO] (server.c:110) Connection slot 0 listening...
-<3856.53> [INFO] (server.c:136) received CONNECT_ASKID
-<3856.53> [INFO] (server.c:80) Connection slot 1 listening...
-<3856.69> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<3856.83> [INFO] (server.c:161) received CONNECT_TRY
-<3856.89> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<3857.09> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<3860.84> [INFO] (net.c:505) Connection going to Good Mode
-<3870.87> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<3880.90> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<3899.02> [INFO] (server.c:169) received CONNECT_CLOSE
-<3899.11> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=403)
-<3899.21> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=403)
-<3899.22> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<3899.22> [INFO] (server.c:110) Connection slot 0 listening...
-<3915.59> [INFO] (server.c:136) received CONNECT_ASKID
-<3915.59> [INFO] (server.c:80) Connection slot 1 listening...
-<3915.65> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<3915.79> [INFO] (server.c:161) received CONNECT_TRY
-<3915.85> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<3916.05> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<3919.81> [INFO] (net.c:505) Connection going to Good Mode
-<3929.83> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<3932.57> [INFO] (server.c:169) received CONNECT_CLOSE
-<3932.60> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=149)
-<3932.70> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=149)
-<3932.77> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<3932.77> [INFO] (server.c:110) Connection slot 0 listening...
-<4077.35> [INFO] (server.c:136) received CONNECT_ASKID
-<4077.35> [INFO] (server.c:80) Connection slot 1 listening...
-<4077.41> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<4077.55> [INFO] (server.c:161) received CONNECT_TRY
-<4077.61> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4077.81> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4081.57> [INFO] (net.c:505) Connection going to Good Mode
-<4082.97> [INFO] (server.c:169) received CONNECT_CLOSE
-<4083.03> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=36)
-<4083.13> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=36)
-<4083.17> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<4083.17> [INFO] (server.c:110) Connection slot 0 listening...
-<4478.26> [INFO] (server.c:136) received CONNECT_ASKID
-<4478.26> [INFO] (server.c:80) Connection slot 1 listening...
-<4478.44> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<4478.56> [INFO] (server.c:161) received CONNECT_TRY
-<4478.64> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4478.84> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4482.57> [INFO] (net.c:505) Connection going to Good Mode
-<4492.60> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<4502.64> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<4521.84> [INFO] (server.c:169) received CONNECT_CLOSE
-<4521.88> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=413)
-<4521.98> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=413)
-<4522.04> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<4522.04> [INFO] (server.c:110) Connection slot 0 listening...
-<4558.59> [INFO] (server.c:136) received CONNECT_ASKID
-<4558.59> [INFO] (server.c:80) Connection slot 1 listening...
-<4558.67> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<4558.79> [INFO] (server.c:161) received CONNECT_TRY
-<4558.87> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4559.07> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4562.80> [INFO] (net.c:505) Connection going to Good Mode
-<4564.12> [INFO] (server.c:169) received CONNECT_CLOSE
-<4564.19> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=35)
-<4564.29> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=35)
-<4564.32> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<4564.32> [INFO] (server.c:110) Connection slot 0 listening...
-<4572.51> [INFO] (server.c:136) received CONNECT_ASKID
-<4572.51> [INFO] (server.c:80) Connection slot 1 listening...
-<4572.71> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<4572.81> [INFO] (server.c:161) received CONNECT_TRY
-<4572.91> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4573.11> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4576.83> [INFO] (net.c:505) Connection going to Good Mode
-<4584.06> [INFO] (server.c:169) received CONNECT_CLOSE
-<4584.15> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=94)
-<4584.25> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=94)
-<4584.26> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<4584.26> [INFO] (server.c:110) Connection slot 0 listening...
-<4674.06> [INFO] (server.c:136) received CONNECT_ASKID
-<4674.06> [INFO] (server.c:80) Connection slot 1 listening...
-<4674.25> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<4674.36> [INFO] (server.c:161) received CONNECT_TRY
-<4674.45> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4674.65> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4678.37> [INFO] (net.c:505) Connection going to Good Mode
-<4688.41> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<4698.44> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<4848.45> [INFO] (server.c:169) received CONNECT_CLOSE
-<4848.47> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=1717)
-<4848.57> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=1717)
-<4848.65> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<4848.65> [INFO] (server.c:110) Connection slot 0 listening...
-<4911.54> [INFO] (server.c:136) received CONNECT_ASKID
-<4911.54> [INFO] (server.c:80) Connection slot 1 listening...
-<4911.72> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<4911.84> [INFO] (server.c:161) received CONNECT_TRY
-<4911.92> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4912.12> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<4915.85> [INFO] (net.c:505) Connection going to Good Mode
-<4925.88> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<4935.91> [INFO] (net.c:493) Penalty time decreased to 1.000000
-<5052.53> [INFO] (server.c:169) received CONNECT_CLOSE
-<5052.62> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=1385)
-<5052.72> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=1385)
-<5052.73> [INFO] (server.c:174) received CONNECT_CLOSEOK
-<5052.73> [INFO] (server.c:110) Connection slot 0 listening...
-<5076.09> [INFO] (server.c:136) received CONNECT_ASKID
-<5076.09> [INFO] (server.c:80) Connection slot 1 listening...
-<5076.17> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
-<5076.29> [INFO] (server.c:161) received CONNECT_TRY
-<5076.37> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<5076.57> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
-<5080.31> [INFO] (net.c:505) Connection going to Good Mode
-<5090.34> [INFO] (net.c:493) Penalty time decreased to 2.000000
-<5091.05> [INFO] (server.c:169) received CONNECT_CLOSE
-<5091.12> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=129)
-<5091.22> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=129)
-<5091.25> [INFO] (serve
+<7.85> [INFO] (server.c:136) received CONNECT_ASKID
+<7.85> [INFO] (server.c:80) Connection slot 1 listening...
+<8.02> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<8.16> [INFO] (server.c:161) received CONNECT_TRY
+<8.22> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<8.42> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<12.17> [INFO] (net.c:505) Connection going to Good Mode
+<22.19> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<31.18> [INFO] (server.c:169) received CONNECT_CLOSE
+<31.18> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=211)
+<31.28> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=211)
+<31.38> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<31.38> [INFO] (server.c:110) Connection slot 0 listening...
+<447.02> [INFO] (server.c:136) received CONNECT_ASKID
+<447.02> [INFO] (server.c:80) Connection slot 1 listening...
+<447.05> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<447.22> [INFO] (server.c:161) received CONNECT_TRY
+<447.25> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<447.45> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<451.23> [INFO] (net.c:505) Connection going to Good Mode
+<460.80> [INFO] (server.c:169) received CONNECT_CLOSE
+<460.89> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=118)
+<460.99> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=118)
+<461.00> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<461.00> [INFO] (server.c:110) Connection slot 0 listening...
+<539.87> [INFO] (server.c:136) received CONNECT_ASKID
+<539.87> [INFO] (server.c:80) Connection slot 1 listening...
+<539.96> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<540.07> [INFO] (server.c:161) received CONNECT_TRY
+<540.16> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<540.36> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<541.68> [INFO] (server.c:169) received CONNECT_CLOSE
+<541.77> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=9)
+<541.88> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<541.88> [INFO] (server.c:110) Connection slot 0 listening...
+<554.71> [INFO] (server.c:136) received CONNECT_ASKID
+<554.71> [INFO] (server.c:80) Connection slot 1 listening...
+<554.79> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<554.91> [INFO] (server.c:161) received CONNECT_TRY
+<554.99> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<555.19> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<558.92> [INFO] (net.c:505) Connection going to Good Mode
+<568.95> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<572.75> [INFO] (server.c:169) received CONNECT_CLOSE
+<572.85> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=160)
+<572.95> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=160)
+<572.95> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<572.95> [INFO] (server.c:110) Connection slot 0 listening...
+<623.50> [INFO] (server.c:136) received CONNECT_ASKID
+<623.50> [INFO] (server.c:80) Connection slot 1 listening...
+<623.66> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<623.80> [INFO] (server.c:161) received CONNECT_TRY
+<623.87> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<624.07> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<627.81> [INFO] (net.c:505) Connection going to Good Mode
+<635.30> [INFO] (server.c:169) received CONNECT_CLOSE
+<635.30> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=96)
+<635.40> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=96)
+<635.50> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<635.50> [INFO] (server.c:110) Connection slot 0 listening...
+<691.77> [INFO] (server.c:136) received CONNECT_ASKID
+<691.77> [INFO] (server.c:80) Connection slot 1 listening...
+<691.92> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<692.07> [INFO] (server.c:161) received CONNECT_TRY
+<692.12> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<692.32> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<695.25> [INFO] (server.c:169) received CONNECT_CLOSE
+<695.33> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=17)
+<695.45> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<695.45> [INFO] (server.c:110) Connection slot 0 listening...
+<703.98> [INFO] (server.c:136) received CONNECT_ASKID
+<703.98> [INFO] (server.c:80) Connection slot 1 listening...
+<704.15> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<704.28> [INFO] (server.c:161) received CONNECT_TRY
+<704.35> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<704.55> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<706.26> [INFO] (server.c:169) received CONNECT_CLOSE
+<706.36> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=11)
+<706.46> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<706.46> [INFO] (server.c:110) Connection slot 0 listening...
+<714.96> [INFO] (server.c:136) received CONNECT_ASKID
+<714.96> [INFO] (server.c:80) Connection slot 1 listening...
+<714.98> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<715.16> [INFO] (server.c:161) received CONNECT_TRY
+<715.18> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<715.38> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<719.17> [INFO] (net.c:505) Connection going to Good Mode
+<723.03> [INFO] (server.c:169) received CONNECT_CLOSE
+<723.10> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=61)
+<723.20> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=61)
+<723.23> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<723.23> [INFO] (server.c:110) Connection slot 0 listening...
+<734.00> [INFO] (server.c:136) received CONNECT_ASKID
+<734.00> [INFO] (server.c:80) Connection slot 1 listening...
+<734.02> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<734.20> [INFO] (server.c:161) received CONNECT_TRY
+<734.22> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<734.42> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<737.89> [INFO] (server.c:169) received CONNECT_CLOSE
+<738.03> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=20)
+<738.09> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<738.09> [INFO] (server.c:110) Connection slot 0 listening...
+<764.21> [INFO] (server.c:136) received CONNECT_ASKID
+<764.21> [INFO] (server.c:80) Connection slot 1 listening...
+<764.29> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<764.42> [INFO] (server.c:161) received CONNECT_TRY
+<764.49> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<764.69> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<768.43> [INFO] (net.c:505) Connection going to Good Mode
+<778.45> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<788.48> [INFO] (net.c:493) Penalty time decreased to 1.000000
+<795.20> [INFO] (server.c:169) received CONNECT_CLOSE
+<795.27> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=289)
+<795.37> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=289)
+<795.40> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<795.40> [INFO] (server.c:110) Connection slot 0 listening...
+<822.08> [INFO] (server.c:136) received CONNECT_ASKID
+<822.08> [INFO] (server.c:80) Connection slot 1 listening...
+<822.23> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<822.38> [INFO] (server.c:161) received CONNECT_TRY
+<822.43> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<822.63> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<826.40> [INFO] (net.c:505) Connection going to Good Mode
+<836.42> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<846.46> [INFO] (net.c:493) Penalty time decreased to 1.000000
+<911.09> [INFO] (server.c:169) received CONNECT_CLOSE
+<911.10> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=866)
+<911.20> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=866)
+<911.29> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<911.29> [INFO] (server.c:110) Connection slot 0 listening...
+<1763.41> [INFO] (server.c:136) received CONNECT_ASKID
+<1763.41> [INFO] (server.c:80) Connection slot 1 listening...
+<1763.52> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<1763.71> [INFO] (server.c:161) received CONNECT_TRY
+<1763.72> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<1763.92> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<1767.73> [INFO] (net.c:505) Connection going to Good Mode
+<1777.76> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<1787.79> [INFO] (net.c:493) Penalty time decreased to 1.000000
+<1862.49> [INFO] (server.c:169) received CONNECT_CLOSE
+<1862.55> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=967)
+<1862.65> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=967)
+<1862.69> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<1862.69> [INFO] (server.c:110) Connection slot 0 listening...
+<2212.94> [INFO] (server.c:136) received CONNECT_ASKID
+<2212.94> [INFO] (server.c:80) Connection slot 1 listening...
+<2213.05> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2213.24> [INFO] (server.c:161) received CONNECT_TRY
+<2213.25> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2213.45> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2215.29> [INFO] (server.c:169) received CONNECT_CLOSE
+<2215.46> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=12)
+<2215.49> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2215.49> [INFO] (server.c:110) Connection slot 0 listening...
+<2290.89> [INFO] (server.c:136) received CONNECT_ASKID
+<2290.89> [INFO] (server.c:80) Connection slot 1 listening...
+<2291.03> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2291.19> [INFO] (server.c:161) received CONNECT_TRY
+<2291.23> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2291.43> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2295.20> [INFO] (net.c:505) Connection going to Good Mode
+<2305.23> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<2309.35> [INFO] (server.c:169) received CONNECT_CLOSE
+<2309.38> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=163)
+<2309.48> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=163)
+<2309.55> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2309.55> [INFO] (server.c:110) Connection slot 0 listening...
+<2331.27> [INFO] (server.c:136) received CONNECT_ASKID
+<2331.27> [INFO] (server.c:80) Connection slot 1 listening...
+<2331.33> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2331.47> [INFO] (server.c:161) received CONNECT_TRY
+<2331.53> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2331.73> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2335.48> [INFO] (net.c:505) Connection going to Good Mode
+<2345.52> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<2355.55> [INFO] (net.c:493) Penalty time decreased to 1.000000
+<2383.26> [INFO] (server.c:169) received CONNECT_CLOSE
+<2383.30> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=498)
+<2383.40> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=498)
+<2383.46> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2383.46> [INFO] (server.c:110) Connection slot 0 listening...
+<2490.24> [INFO] (server.c:136) received CONNECT_ASKID
+<2490.24> [INFO] (server.c:80) Connection slot 1 listening...
+<2490.24> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2490.44> [INFO] (server.c:161) received CONNECT_TRY
+<2490.44> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2490.64> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2494.45> [INFO] (net.c:505) Connection going to Good Mode
+<2504.48> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<2505.91> [INFO] (server.c:169) received CONNECT_CLOSE
+<2505.99> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=137)
+<2506.09> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=137)
+<2506.11> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2506.11> [INFO] (server.c:110) Connection slot 0 listening...
+<2536.26> [INFO] (server.c:136) received CONNECT_ASKID
+<2536.26> [INFO] (server.c:80) Connection slot 1 listening...
+<2536.36> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2536.46> [INFO] (server.c:161) received CONNECT_TRY
+<2536.56> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2536.76> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2540.46> [INFO] (net.c:505) Connection going to Good Mode
+<2547.29> [INFO] (server.c:169) received CONNECT_CLOSE
+<2547.39> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=90)
+<2547.49> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=90)
+<2547.49> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2547.49> [INFO] (server.c:110) Connection slot 0 listening...
+<2703.87> [INFO] (server.c:136) received CONNECT_ASKID
+<2703.87> [INFO] (server.c:80) Connection slot 1 listening...
+<2704.03> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2704.17> [INFO] (server.c:161) received CONNECT_TRY
+<2704.23> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2704.43> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2708.18> [INFO] (net.c:505) Connection going to Good Mode
+<2718.21> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<2728.25> [INFO] (net.c:493) Penalty time decreased to 1.000000
+<2812.34> [INFO] (server.c:169) received CONNECT_CLOSE
+<2812.41> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=1061)
+<2812.51> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=1061)
+<2812.54> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2812.54> [INFO] (server.c:110) Connection slot 0 listening...
+<2830.13> [INFO] (server.c:136) received CONNECT_ASKID
+<2830.13> [INFO] (server.c:80) Connection slot 1 listening...
+<2830.15> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2830.33> [INFO] (server.c:161) received CONNECT_TRY
+<2830.35> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2830.55> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2834.34> [INFO] (net.c:505) Connection going to Good Mode
+<2836.11> [INFO] (server.c:169) received CONNECT_CLOSE
+<2836.17> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=40)
+<2836.27> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=40)
+<2836.31> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2836.31> [INFO] (server.c:110) Connection slot 0 listening...
+<2910.02> [INFO] (server.c:136) received CONNECT_ASKID
+<2910.02> [INFO] (server.c:80) Connection slot 1 listening...
+<2910.02> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2910.22> [INFO] (server.c:161) received CONNECT_TRY
+<2910.22> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2910.42> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2914.23> [INFO] (net.c:505) Connection going to Good Mode
+<2918.69> [INFO] (server.c:169) received CONNECT_CLOSE
+<2918.75> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=67)
+<2918.85> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=67)
+<2918.89> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2918.89> [INFO] (server.c:110) Connection slot 0 listening...
+<2932.10> [INFO] (server.c:136) received CONNECT_ASKID
+<2932.10> [INFO] (server.c:80) Connection slot 1 listening...
+<2932.27> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<2932.40> [INFO] (server.c:161) received CONNECT_TRY
+<2932.47> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2932.68> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<2935.02> [INFO] (server.c:169) received CONNECT_CLOSE
+<2935.08> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=14)
+<2935.22> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<2935.22> [INFO] (server.c:110) Connection slot 0 listening...
+<3012.39> [INFO] (server.c:136) received CONNECT_ASKID
+<3012.39> [INFO] (server.c:80) Connection slot 1 listening...
+<3012.45> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<3012.59> [INFO] (server.c:161) received CONNECT_TRY
+<3012.65> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<3012.85> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<3016.60> [INFO] (net.c:505) Connection going to Good Mode
+<3026.63> [INFO] (net.c:493) Penalty time decreased to 2.000000
+<3036.66> [INFO] (net.c:493) Penalty time decreased to 1.000000
+<3039.37> [INFO] (server.c:169) received CONNECT_CLOSE
+<3039.44> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=249)
+<3039.54> [INFO] (net.c:710) sending CONNECT_CLOSEOK(seq=249)
+<3039.57> [INFO] (server.c:174) received CONNECT_CLOSEOK
+<3039.57> [INFO] (server.c:110) Connection slot 0 listening...
+<3082.46> [INFO] (server.c:136) received CONNECT_ASKID
+<3082.46> [INFO] (server.c:80) Connection slot 1 listening...
+<3082.64> [INFO] (net.c:710) sending CONNECT_SESSIONID(seq=0)
+<3082.76> [INFO] (server.c:161) received CONNECT_TRY
+<3082.84> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<3083.04> [INFO] (net.c:710) sending CONNECT_ACCEPT(seq=1)
+<3086.77> [INFO] (net.c:505) Connection going to Good Mode
+<3089.41> [INFO] (server.c:169) r

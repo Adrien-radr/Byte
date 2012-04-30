@@ -198,7 +198,7 @@ Scene *Scene_new() {
 
     vec2 lightpos = { 300.f, 200.f };
     Color diffuse = { 1.f, 1.f, 1.f, 1.f };
-    Light_set( &s->light1, &lightpos, 200.f, &diffuse, 0.382f, 0.01f, 0.f );
+    Light_set( &s->light1, &lightpos, 150.f, &diffuse, 0.382f, 0.01f, 0.f );
         
     return s;
 error:

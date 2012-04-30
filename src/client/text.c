@@ -145,6 +145,7 @@ void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr ) {
     const size_t c_size = 6 * 4;
     const size_t text_data_size = c_size * str_len;
     f32 data[text_data_size];
+    memset( data, 0.f, sizeof(data) );
 
     int n_pos = 0, n_tex = text_data_size/2;
     int fw = pFont->mTextureSize.x, fh = pFont->mTextureSize.y;
@@ -157,12 +158,22 @@ void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr ) {
 
     for( const char *p = pStr; *p; ++p ) {
         int i = (int)*p;
+
+        // if char is a carriage return, advance y to the next line, and x to the
+        // line begining. Increase n_pos and n_tex as if a char was rendered.
         if( '\n' == *p ) {
             y += (fh + 4);
             x = x_left;
+            n_pos += 12;
+            n_tex += 12;
             continue;
+
+        // if char is a space, advance x by a reasonable amount depending on font
+        // size and advance n_pos and n_tex like with \n
         } else if ( 32 == *p ) {
             x += (fh/3);
+            n_pos += 12;
+            n_tex += 12;
             continue;
         }
 
