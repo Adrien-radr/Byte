@@ -11,11 +11,14 @@ typedef struct {
     u32 mMesh;
     u32 mTexture;
     mat3* mMM;
+    vec2 mBounds;
 }   WidgetSpriteAttributes;
 
 typedef struct {
     const Font* mFont;
     Color mColor;
+    vec2 mPosition;
+    vec2 mBounds;
 }   WidgetTextAttributes;
 
 typedef struct {
@@ -24,25 +27,28 @@ typedef struct {
     mat3* mMM;
     const Font* mFont;
     Color mColor;
+    vec2 mBounds;
 }   WidgetButtonAttributes;
 
 
 typedef enum {
+    WT_Master,  //  Master of all widgets.
     WT_Text,    //  A floating text.
     WT_Sprite,  //  A floating sprite.
     WT_Button  //  Element containing a text and an entity.
 }   WidgetType;
 
-///< The widget structure is basically the mix between an Entity and a Text. It has bounds
-///< so we can track mouse interaction.
+///< The widget structure is basically the mix between an Entity and a Text.
+///< It has bounds so we can track mouse interaction.
 typedef struct {
+    HandleManager *mUsed;
     HandleManager *mEntityUsed;
     HandleManager *mTextUsed;
 
     u32             *mTextureMeshes;       // Mesh for the texture.
     u32             *mTextMeshes;           //  Mesh for the text.
     u32             *mTextures;
-    u32             mDepth;      //  There is one depth for every widget.
+    int             *mDepths;
     mat3           **mMatrices;   //  For each widget there is a pointer to a matrix.
     vec2            *mBounds;      //  Width and Height of each widget, defines their bounding box.
 
@@ -52,6 +58,8 @@ typedef struct {
 
     char            **mStrings;
 
+    void            **mCallbacks;
+    HandleManager **mChildren;   //  This will track the handle of each widget's children
 
     WidgetType *mWidgetTypes;
 
@@ -65,15 +73,19 @@ typedef enum {
     WA_Texture,
     WA_Matrix,
     WA_Bounds,
+    WA_Depth,
     WA_Font,
     WA_Color,
     WA_TextPosition,
-    WA_String
+    WA_String,
+    WA_Callback
 } WidgetAttrib;
 
 WidgetArray* WidgetArray_init(u32 pSize);
 
-int WidgetArray_add(WidgetArray* pWA, WidgetType pWT);
+int WidgetArray_add(WidgetArray* pWA, WidgetType pWT, int pMother);
+
+void WidgetArray_addChild( WidgetArray* pWA, u32 pMother, u32 pChild );
 
 void WidgetArray_remove(WidgetArray* pWA, u32 pIndex);
 

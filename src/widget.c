@@ -5,18 +5,24 @@ WidgetArray* WidgetArray_init( u32 pSize ){
     WidgetArray *arr = byte_alloc( sizeof( WidgetArray ) );
     check_mem( arr );
 
+
+    arr->mUsed = HandleManager_init( pSize );
     arr->mEntityUsed = HandleManager_init( pSize );
     arr->mTextUsed = HandleManager_init( pSize );
     arr->mTextureMeshes = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextMeshes = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextures = byte_alloc( pSize * sizeof( u32* ) );
-    arr->mDepth = -2;
+    arr->mDepths = byte_alloc( pSize * sizeof( int ) );
     arr->mMatrices = byte_alloc( pSize * sizeof( mat3 ) );
     arr->mBounds = byte_alloc( pSize * sizeof( vec2 ) );
     arr->mFonts = byte_alloc( pSize * sizeof( Font* ) );
     arr->mColors = byte_alloc( pSize * sizeof( Color ) );
     arr->mTextPositions = byte_alloc( pSize * sizeof( vec2 ) );
     arr->mStrings = byte_alloc( pSize * sizeof( char* ) );
+    arr->mChildren = byte_alloc( pSize * sizeof( HandleManager ) );
+    for( u32 i = 0; i < pSize - 1; i++ )
+        arr->mChildren[i] = HandleManager_init( 1 );   // We set a default value of 1 child per widget, but there can be more or less.
+
     arr->mWidgetTypes = byte_alloc( pSize * sizeof( WidgetType ) );
 
 
@@ -26,21 +32,43 @@ error:
     return arr;
 }
 
-int WidgetArray_add( WidgetArray* arr, WidgetType pWT ) {
+int WidgetArray_add( WidgetArray* arr, WidgetType pWT, int pMother ) {
   int handle = -1;
     if( arr ) {
         switch( pWT ) {
-            case WT_Text :
+            case WT_Master :
                 {
-                    handle = HandleManager_addHandle( arr->mTextUsed, 1 );
+                    handle = HandleManager_addHandle( arr->mUsed, 1 );
+                    HandleManager_addHandle( arr->mEntityUsed, 0 ); //  We won't use an entity, so we set its handle to 0
+                    HandleManager_addHandle( arr->mTextUsed, 0 );   //  Same for the text
 
                     if( handle >= 0 ) {
                         // resize our entity array if the handle manager had to be resized
-                        if( arr->mTextUsed->mSize != arr->mSize ) {
-                                arr->mTextUsed = HandleManager_init( arr->mSize );
+                        if( arr->mUsed->mSize != arr->mSize ) {
+                                arr->mSize = arr->mUsed->mSize;
+                                arr->mWidgetTypes = byte_realloc( arr->mWidgetTypes, arr->mSize * sizeof( WidgetType ) );
+                                arr->mChildren = byte_realloc( arr->mChildren, arr->mSize * sizeof( u32 ) );
+                        }
 
+                        ++arr->mMaxIndex;
+                        ++arr->mCount;
+                    }
+
+                    return handle;
+                }
+                break;
+            case WT_Text :
+                {
+                    handle = HandleManager_addHandle( arr->mUsed, 1 );
+                    HandleManager_addHandle( arr->mEntityUsed, 0 ); //  We won't use an entity
+                    HandleManager_addHandle( arr->mTextUsed, 1 );   //  We will use a text
+
+                    if( handle >= 0 ) {
+                        // resize our entity array if the handle manager had to be resized
+                        if( arr->mUsed->mSize != arr->mSize ) {
+                                arr->mSize = arr->mUsed->mSize;
                                 arr->mTextMeshes = byte_realloc( arr->mTextMeshes, arr->mSize * sizeof( u32 ) );
-                                arr->mDepth = -1;
+                                arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( int ) );
                                 arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
                                 arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2 ) );
                                 arr->mFonts = byte_realloc( arr->mFonts, arr->mSize * sizeof( Font* ) );
@@ -63,15 +91,17 @@ int WidgetArray_add( WidgetArray* arr, WidgetType pWT ) {
                 break;
             case WT_Sprite :
                 {
-                    handle = HandleManager_addHandle( arr->mEntityUsed, 1 );
+                    handle = HandleManager_addHandle( arr->mUsed, 1 );
+                    HandleManager_addHandle( arr->mEntityUsed, 1 ); //  We will use an entity
+                    HandleManager_addHandle( arr->mTextUsed, 0 );   //  We won't use a text
 
                     if( handle >= 0 ) {
                         // resize our entity array if the handle manager had to be resized
-                        if( arr->mEntityUsed->mSize != arr->mSize ) {
-                                arr->mEntityUsed = HandleManager_init( arr->mSize );
+                        if( arr->mUsed->mSize != arr->mSize ) {
+                                arr->mSize = arr->mUsed->mSize;
                                 arr->mTextures = byte_realloc( arr->mTextures, arr->mSize * sizeof( u32 ) );
                                 arr->mTextureMeshes = byte_realloc( arr->mTextureMeshes, arr->mSize * sizeof( u32 ) );
-                                arr->mDepth = -1;
+                                arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( int ) );
                                 arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
                                 arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2 ) );
                                 arr->mWidgetTypes = byte_realloc( arr->mWidgetTypes, arr->mSize * sizeof( WidgetType ) );
@@ -87,19 +117,17 @@ int WidgetArray_add( WidgetArray* arr, WidgetType pWT ) {
                 break;
             case WT_Button :
                 {
-                    handle = HandleManager_addHandle( arr->mEntityUsed, 1 );
-                    if( handle < 0 )
-                        return -1;  //  If the handlemanager could not create the handle for the entity, we can't continue.
-                    handle = HandleManager_addHandle( arr->mTextUsed, 1 );
+                    handle = HandleManager_addHandle( arr->mUsed, 1 );
+                    HandleManager_addHandle( arr->mEntityUsed, 1 ); //  We will use both an entity and a text
+                    HandleManager_addHandle( arr->mTextUsed, 1 );
 
                     if( handle >= 0 ) {
                         // resize our entity array if the handle manager had to be resized
-                        if( arr->mTextUsed->mSize != arr->mSize ) {
-                                arr->mTextUsed = HandleManager_init( arr->mSize );
-                                arr->mEntityUsed = HandleManager_init( arr->mSize );
+                        if( arr->mTextUsed->mSize != arr->mSize || arr->mEntityUsed->mSize != arr->mSize ) {
+                                arr->mSize = arr->mEntityUsed->mSize;
                                 arr->mTextureMeshes = byte_realloc( arr->mTextureMeshes, arr->mSize * sizeof( u32 ) );
                                 arr->mTextMeshes = byte_realloc( arr->mTextMeshes, arr->mSize * sizeof( u32 ) );
-                                arr->mDepth = -1;
+                                arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( int ) );
                                 arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
                                 arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2 ) );
                                 arr->mFonts = byte_realloc( arr->mFonts, arr->mSize * sizeof( Font* ) );
@@ -132,6 +160,20 @@ error:
     return -1;
 }
 
+void WidgetArray_addChild( WidgetArray* pWA, u32 pMother, u32 pChild ) {
+    if( HandleManager_isUsed( pWA->mUsed, pMother ) && HandleManager_isUsed( pWA->mUsed, pChild ) ) {
+        HandleManager_addHandle( pWA->mChildren[pMother], pChild );
+    }
+}
+
+void WidgetArray_removeChild( WidgetArray* pWA, u32 pMother, u32 pChild ) {
+    if( HandleManager_isUsed( pWA->mUsed, pMother ) && HandleManager_isUsed( pWA->mUsed, pChild ) ) {
+        if( HandleManager_isUsed( pWA->mChildren[pMother], pChild ) ) {
+           HandleManager_remove( pWA->mChildren[pMother], pChild );
+        }
+    }
+}
+
 void WidgetArray_remove( WidgetArray *arr, u32 pIndex ) {
     if( arr && pIndex < arr->mEntityUsed->mMaxIndex )  {
         if( HandleManager_isUsed( arr->mEntityUsed, pIndex ))
@@ -146,6 +188,7 @@ void WidgetArray_remove( WidgetArray *arr, u32 pIndex ) {
 void WidgetArray_clear( WidgetArray *arr ) {
     if( arr ) {
         arr->mMaxIndex = 0;
+        arr->mCount = 0;
         HandleManager_clear( arr->mEntityUsed );
         HandleManager_clear( arr->mTextUsed );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {

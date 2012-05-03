@@ -49,6 +49,7 @@ void EntityArray_remove( EntityArray *arr, u32 pIndex ) {
 void EntityArray_clear( EntityArray *arr ) {
     if( arr ) {
         arr->mMaxIndex = 0;
+        arr->mCount = 0;
         HandleManager_clear( arr->mUsed );
     }
 }

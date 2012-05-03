@@ -1,5 +1,5 @@
 Byte-Project Log v0.0.14
-Wed 28 Mar 2012 - 03:14:43
+Wed 02 May 2012 - 23:57:46
 ==========================
 [INFO] GLFW Window successfully initialized!
 [INFO] GLEW v1.6.0 successfully initialized!
@@ -13,6 +13,7 @@ Wed 28 Mar 2012 - 03:14:43
 [INFO] Resource "textShader.json" loaded.
 [INFO] Resource "quadmesh.json" loaded.
 [INFO] Resource "widgetmesh.json" loaded.
+[INFO] Resource "widgetmesh2.json" loaded.
 [INFO] Resource "crate.jpg" loaded.
 [INFO] Resource "img_test.png" loaded.
 [INFO] Resource "widgettexture.jpg" loaded.

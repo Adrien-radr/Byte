@@ -24,6 +24,9 @@ void Scene_destroy( Scene *pScene );
 /// Update the scene (camera, etc)
 void Scene_update( Scene *pScene );
 
+/// Update widgets : check if user interacted with one of them.
+void Scene_updateWidgets( Scene *pScene, vec2 pMouse );
+
 /// Render all entities in the scene
 void Scene_render();
 
@@ -74,7 +77,7 @@ void Scene_render();
     /// Add a widget to be rendered
     /// @param pWT : the type of the widget (see widget.h).
     /// @param pData : the corresponding data structure to set the widget (see widget.h).
-    int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct );
+    int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct, int pMother );
 
     void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void *pData );
 

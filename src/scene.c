@@ -13,6 +13,7 @@ typedef struct s_Scene {
     TextArray       *mTexts;            ///< Texts in the scene
 
     WidgetArray  *mWidgets;         ///< Widgets in the scene. They use the same shader as the entities.
+    u32 mMasterWidget;
 
     Camera          *mCamera;           ///< Camera of the scene
 } Scene;
@@ -81,6 +82,8 @@ Scene *Scene_new() {
 
     s->mWidgets = WidgetArray_init(50);
 
+    //mMasterWidget = Scene_addWidget(
+
     // init default text shader
     int ts = World_getResource( "textShader.json" );
     check( ts >= 0, "Text shader creation error!\n" );
@@ -126,6 +129,32 @@ void Scene_update( Scene *pScene ) {
     Camera_update( pScene->mCamera );
 }
 
+void Scene_updateWidgets( Scene* pScene, vec2 pMouse ) {
+    if( IsMouseUp( MB_Left ) ) {
+        for( u32 i = 0; i < pScene->mWidgets->mMaxIndex; ++i ) {
+            vec2 widgetPos;
+            vec2 widgetExtents;
+            if( HandleManager_getHandle( pScene->mWidgets->mTextUsed, i ) != 0 ) {
+                widgetPos = pScene->mWidgets->mTextPositions[i];
+                widgetExtents = vec2_add( &widgetPos, &pScene->mWidgets->mBounds[i] );
+            }
+
+            //  If the widget has an entity, we take its coordinates rather than the text's
+            if( HandleManager_getHandle( pScene->mWidgets->mEntityUsed, i ) != 0 ) {
+                widgetPos.x = pScene->mWidgets->mMatrices[i]->x[6];
+                widgetPos.y = pScene->mWidgets->mMatrices[i]->x[7];
+                widgetExtents = vec2_add( &widgetPos, &pScene->mWidgets->mBounds[i] );
+            }
+
+            if( !(pMouse.x < widgetPos.x || pMouse.y < widgetPos.y || pMouse.x > widgetExtents.x || pMouse.y > widgetExtents.y) ) {
+                if( pScene->mWidgets->mCallbacks[i] )
+                    pScene->mWidgets->mCallbacks[i];
+            }
+        }
+    }
+}
+
+
 void Scene_render( Scene *pScene ) {
     if( pScene ) {
         // ##################################################
@@ -165,42 +194,28 @@ void Scene_render( Scene *pScene ) {
         Shader_sendMat3( "ProjectionMatrix", &projMat );
 
         for( u32 i = 0; i < pScene->mWidgets->mMaxIndex; ++i ){
-            if( HandleManager_isUsed( pScene->mWidgets->mEntityUsed, i ) ) {
-                //  Rendering of the texture
-                Renderer_useTexture( pScene->mWidgets->mTextures[i], 0 );
-                Shader_sendMat3( "ModelMatrix", pScene->mWidgets->mMatrices[i] );
-                Shader_sendInt( "Depth", pScene->mWidgets->mDepth );
-                Renderer_renderMesh( pScene->mWidgets->mTextureMeshes[i] );
+            if( HandleManager_isUsed( pScene->mWidgets->mUsed, i ) ) {
+                if( HandleManager_getHandle( pScene->mWidgets->mEntityUsed, i ) != 0) {
+                    //  Rendering of the texture
+                    Renderer_useTexture( pScene->mWidgets->mTextures[i], 0 );
+                    Shader_sendMat3( "ModelMatrix", pScene->mWidgets->mMatrices[i] );
+                    Shader_sendInt( "Depth", pScene->mWidgets->mDepths[i] );
+                    Renderer_renderMesh( pScene->mWidgets->mTextureMeshes[i] );
 
 
+                }
             }
         }
 
         Renderer_useShader( pScene->mTextShader );
         for( u32 i = 0; i < pScene->mWidgets->mMaxIndex; ++i ) {
-            if( HandleManager_isUsed( pScene->mWidgets->mTextUsed, i ) ) {
-                Renderer_useTexture( pScene->mWidgets->mFonts[i]->mTexture, 0 );
-                Shader_sendColor( "Color", &pScene->mWidgets->mColors[i] );
-
-                /*if( pScene->mWidgets->mHasMoved[i] ) {
-                    //  Replace the text on the entity so that a button will look like a button. ( //TODO: center the text )
-                    if( pScene->mWidgets->mWidgetTypes[i] == WT_Button ) {
-                        pScene->mWidgets->mTextPositions[i].x = pScene->mWidgets->mMatrices[i]->x[6];
-                        pScene->mWidgets->mTextPositions[i].y = pScene->mWidgets->mMatrices[i]->x[7];
-                    }
-                    new_pos = pScene->mWidgets->mTextPositions[i];
-
-
-                    vec2 ws = Context_getSize();
-                    f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
-
-                    new_pos.x *= sx;
-                    new_pos.y *= -sy;
-                    pScene->mWidgets->mHasMoved[i] = false;
-                }*/
-                Shader_sendVec2( "Position", &pScene->mWidgets->mTextPositions[i] );
-
-                Renderer_renderMesh( pScene->mWidgets->mTextMeshes[i] );
+            if( HandleManager_isUsed( pScene->mWidgets->mUsed, i ) ) {
+                if( HandleManager_getHandle( pScene->mWidgets->mTextUsed, i ) != 0) {
+                    Renderer_useTexture( pScene->mWidgets->mFonts[i]->mTexture, 0 );
+                    Shader_sendColor( "Color", &pScene->mWidgets->mColors[i] );
+                    Shader_sendVec2( "Position", &pScene->mWidgets->mTextPositions[i] );
+                    Renderer_renderMesh( pScene->mWidgets->mTextMeshes[i] );
+                }
             }
         }
     }
@@ -339,20 +354,34 @@ void Scene_clearTexts( Scene *pScene ) {
 
 //////////////////////////////
 
-int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct ) {
+int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct, int pMother ) {
     int handle = -1;
 
     if( pScene ){
-        handle = WidgetArray_add( pScene->mWidgets, pWT );
+        handle = WidgetArray_add( pScene->mWidgets, pWT, pMother );
         switch( pWT ) {
+            case WT_Master :
+                if( handle >= 0 ) {
+                    pScene->mWidgets->mBounds[handle] = Context_getSize();
+                }
+                break;
             case WT_Text :
                 {
                     if( handle >= 0 ) {
                         WidgetTextAttributes wta = *(WidgetTextAttributes*)pDataStruct;
+                        pScene->mWidgets->mBounds[handle] = wta.mBounds;
+                        vec2 ws = Context_getSize();
+                        f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
+
+                        wta.mPosition.x *= sx;
+                        wta.mPosition.y *= -sy;
+
+                        pScene->mWidgets->mTextPositions[handle] = wta.mPosition;
                         pScene->mWidgets->mFonts[handle] = wta.mFont;
                         pScene->mWidgets->mColors[handle] = wta.mColor;
                     }
                 }
+                break;
             case WT_Sprite :
                 {
                     if( handle >= 0 ) {
@@ -360,11 +389,13 @@ int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct ) {
                         pScene->mWidgets->mTextureMeshes[handle] = wsa.mMesh;
                         pScene->mWidgets->mTextures[handle] = wsa.mTexture;
                         pScene->mWidgets->mMatrices[handle] = wsa.mMM;
+                        pScene->mWidgets->mBounds[handle] = wsa.mBounds;
+
                     }
                 }
+                break;
             case WT_Button :
                 {
-                    printf("dederer");
                     if( handle >= 0 ) {
                         WidgetButtonAttributes wba = *(WidgetButtonAttributes*)pDataStruct;
                         pScene->mWidgets->mFonts[handle] = wba.mFont;
@@ -372,9 +403,11 @@ int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct ) {
                         pScene->mWidgets->mTextureMeshes[handle] = wba.mMesh;
                         pScene->mWidgets->mTextures[handle] = wba.mTexture;
                         pScene->mWidgets->mMatrices[handle] = wba.mMM;
+                        pScene->mWidgets->mBounds[handle] = wba.mBounds;
 
                     }
                 }
+                break;
         }
     }
     pScene->mWidgets->mWidgetTypes[handle] = pWT;
@@ -383,74 +416,79 @@ int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct ) {
 
 void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void *pData ) {
     if( pScene ) {
-        if( HandleManager_isUsed( pScene->mWidgets->mEntityUsed, pHandle ) ) {
-            switch( pAttrib ) {
-                case WA_Texture :
-                    {
-                        u32 new_texture = *((u32*)pData);
-                        pScene->mWidgets->mTextures[pHandle] = new_texture;
-                    }
-                    break;
-                case WA_Matrix :
-                    pScene->mWidgets->mMatrices[pHandle] = (mat3*)pData;
-                    break;
-                case WA_Bounds :
-                    {
-                        vec2 new_bounds = *((vec2*)pData);
-                        pScene->mWidgets->mBounds[pHandle] = new_bounds;
-                    }
-                    break;
-            }
-        }
-        if( HandleManager_isUsed( pScene->mWidgets->mTextUsed, pHandle ) ) {
-            switch( pAttrib ) {
-                case WA_Bounds :
-                    {
-                        vec2 new_bounds = *((vec2*)pData);
-                        pScene->mWidgets->mBounds[pHandle] = new_bounds;
-                    }
-                    break;
-                case WA_Font :
-                    {
-                        const Font* new_font = ((const Font*)pData);
-                        pScene->mWidgets->mFonts[pHandle] = new_font;
-                    }
-                    break;
-                case WA_Color :
-                    pScene->mWidgets->mColors[pHandle] = *((Color*)pData);
-                    break;
-                case WA_TextPosition :
-                    {
-                        vec2 new_pos = *((vec2*)pData);
-
-                        //  Replace the text on the entity so that a button will look like a button. ( //TODO: center the text )
-                        if( pScene->mWidgets->mWidgetTypes[pHandle] == WT_Button ) {
-                            new_pos.x = pScene->mWidgets->mMatrices[pHandle]->x[6];
-                            new_pos.y = pScene->mWidgets->mMatrices[pHandle]->x[7];
+        if( HandleManager_isUsed( pScene->mWidgets->mUsed, pHandle ) ) {
+            if( HandleManager_getHandle( pScene->mWidgets->mEntityUsed, pHandle ) != 0) {
+                switch( pAttrib ) {
+                    case WA_Texture :
+                        {
+                            u32 new_texture = *((u32*)pData);
+                            pScene->mWidgets->mTextures[pHandle] = new_texture;
                         }
+                        break;
+                    case WA_Matrix :
+                        pScene->mWidgets->mMatrices[pHandle] = (mat3*)pData;
+                        break;
+                    case WA_Bounds :
+                        {
+                            vec2 new_bounds = *((vec2*)pData);
+                            pScene->mWidgets->mBounds[pHandle] = new_bounds;
+                        }
+                        break;
+                    case WA_Depth :
+                        pScene->mEntities->mDepths[pHandle] = *((u32*)pData);
+                        break;
+                }
+            }
+            if( HandleManager_getHandle( pScene->mWidgets->mTextUsed, pHandle ) != 0) {
+                switch( pAttrib ) {
+                    case WA_Bounds :
+                        {
+                            vec2 new_bounds = *((vec2*)pData);
+                            pScene->mWidgets->mBounds[pHandle] = new_bounds;
+                        }
+                        break;
+                    case WA_Font :
+                        {
+                            const Font* new_font = ((const Font*)pData);
+                            pScene->mWidgets->mFonts[pHandle] = new_font;
+                        }
+                        break;
+                    case WA_Color :
+                        pScene->mWidgets->mColors[pHandle] = *((Color*)pData);
+                        break;
+                    case WA_TextPosition :
+                        {
+                            vec2 new_pos = *((vec2*)pData);
 
-                        vec2 ws = Context_getSize();
-                        f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
+                            //  Re-place the text on the entity so that a button will look like a button. ( //TODO: center the text )
+                            if( pScene->mWidgets->mWidgetTypes[pHandle] == WT_Button ) {
+                                new_pos.x = pScene->mWidgets->mMatrices[pHandle]->x[6];
+                                new_pos.y = pScene->mWidgets->mMatrices[pHandle]->x[7];
+                            }
 
-                        new_pos.x *= sx;
-                        new_pos.y *= -sy;
-                        pScene->mWidgets->mTextPositions[pHandle] = new_pos;
-                    }
-                    break;
-                case WA_String :
-                    {
-                        const char *s = (const char*)pData;
+                            vec2 ws = Context_getSize();
+                            f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
 
-                        // recreate VBO
-                        Text_setString( pScene->mWidgets->mTextMeshes[pHandle], pScene->mWidgets->mFonts[pHandle], s );
+                            new_pos.x *= sx;
+                            new_pos.y *= -sy;
+                            pScene->mWidgets->mTextPositions[pHandle] = new_pos;
+                        }
+                        break;
+                    case WA_String :
+                        {
+                            const char *s = (const char*)pData;
 
-                        // copy string inside textarray to keep track of current string
-                        DEL_PTR(pScene->mWidgets->mStrings[pHandle] );
+                            // recreate VBO
+                            Text_setString( pScene->mWidgets->mTextMeshes[pHandle], pScene->mWidgets->mFonts[pHandle], s );
 
-                        pScene->mWidgets->mStrings[pHandle] = byte_alloc( strlen( s ) + 1 );
-                        strcpy( pScene->mWidgets->mStrings[pHandle], s );
-                    }
-                    break;
+                            // copy string inside textarray to keep track of current string
+                            DEL_PTR(pScene->mWidgets->mStrings[pHandle] );
+
+                            pScene->mWidgets->mStrings[pHandle] = byte_alloc( strlen( s ) + 1 );
+                            strcpy( pScene->mWidgets->mStrings[pHandle], s );
+                        }
+                        break;
+                }
             }
         }
     }
