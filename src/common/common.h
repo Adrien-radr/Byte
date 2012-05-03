@@ -193,6 +193,9 @@
 #   define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 #endif
 
+    // forward decl
+    typedef struct s_vec2 vec2;
+
     /// Returns the sign of a float
     inline int Sign( const f32 a, const f32 threshold ) {
         if( a > threshold )
@@ -237,6 +240,10 @@
     inline void Clampf( f32 *x, const f32 min, const f32 max ) {
         *x = *x > max ? max : ( *x < min ? min : *x );
     }
+
+    /// Returns whether a point p is on, under or over a segment AB
+    /// @return : 0 if on line, -1 if under, 1 if above.
+    int PointOnLine( const vec2 *p, const vec2 *A, const vec2 *B );
 
 // #############################################################################
 

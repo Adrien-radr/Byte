@@ -10,7 +10,7 @@
 typedef struct s_Shader {
     u32 mID;
 
-    bool mUseProjectionMatrix;  ///< Flag for the use of the projection matrix in shader
+    bool proj_matrix_type;  ///< Type of projection matrix used (see renderer.h)
 } Shader;
 
 /// Create a new shader
@@ -48,6 +48,11 @@ void Shader_sendMat3( const char *pVarName, const mat3 *pMatrix );
 /// @param pVarName : Variable name in shader src
 /// @param pValue : Value to send in that variable
 void Shader_sendInt( const char *pVarName, int pValue );
+
+/// Send a uniform float value to the shader
+/// @param pVarName : Variable name in shader src
+/// @param pValue : Value to send in that variable
+void Shader_sendFloat( const char *pVarName, f32 pValue );
 
 /// Send a uniform color to the shader
 /// @param pVarName : Variable name in shader src

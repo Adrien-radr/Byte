@@ -68,15 +68,15 @@ bool MemoryManager_init() {
 void MemoryManager_destroy() {
     if( mem_manager ) {
         // rapport :
-        printf( "Memory Manager Rapport :\n"
+        log_info( "\nMemory Manager Rapport :\n"
                 "============================\n"
                 "Allocated bytes at the end of execution : %zu.\n", mem_manager->allocated_bytes );
         if( mem_manager->allocated_bytes ) {
-            printf( "Non-free'd pointers :\n" );
+            log_info( "Non-free'd pointers :\n" );
             u32 cpt = mem_manager->alloc_cpt;
             for( u32 i = 0; i < cpt; ++i ) {
                 if( mem_manager->alloc_sizes[i] ) {
-                    printf( "\tAddress : %p  (%s:%d)\n"
+                    log_info( "\n\tAddress : %p  (%s:%d)\n"
                             "\tSize : %zu\n", mem_manager->alloc_stack[i], 
                                               mem_manager->alloc_files[i],
                                               mem_manager->alloc_lines[i],
@@ -98,10 +98,9 @@ void MemoryManager_allocation( void* ptr, size_t size, const char *file, int lin
             mem_manager->alloc_stack[cpt] = ptr;
             mem_manager->alloc_sizes[cpt] = size;
             mem_manager->alloc_lines[cpt] = line;
-            //mem_manager->alloc_files[cpt] = file;
             strncpy( mem_manager->alloc_files[cpt], file, 32 );
         } else
-            printf( "[ERROR] MemoryManager Allocation stack is not big enough!\n" );
+            log_err( "MemoryManager Allocation stack is not big enough!\n" );
     }
 }
 
@@ -114,12 +113,11 @@ void MemoryManager_reallocation( void *ptr, void *oldptr, size_t size, const cha
                 mem_manager->alloc_stack[i] = ptr;
                 mem_manager->alloc_sizes[i] = size;
                 mem_manager->alloc_lines[i] = line;
-                //mem_manager->alloc_files[i] = file;
                 strncpy( mem_manager->alloc_files[i], file, 32 );
                 found = true;
             }
         if( !found )
-            log_err( "MemoryManager error (%s:%d): Tried to reallocate pointer \"%p\", but it has never been allocated in the memory manager before!\n", file, line, ptr );
+            log_err( "Tried to reallocate pointer \"%p\"(%s,%d), but it has never been allocated in the memory manager before!\n", ptr , file, line );
     }
 }
 
@@ -133,7 +131,7 @@ void MemoryManager_deallocation( void* ptr, const char *file, int line ) {
                 found = true;
             }
         if( !found )
-            log_err( "MemoryManager error (%s:%d): Tried to deallocate pointer \"%p\", but it has never been allocated in the memory manager before!\n", file, line, ptr );
+            log_err( "Tried to deallocate pointer \"%p\"(%s:%d), but it has never been allocated in the memory manager before!\n", ptr , file, line );
     }
 }
 

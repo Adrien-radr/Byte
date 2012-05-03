@@ -7,15 +7,15 @@
 
 /// Types of event that can occur
 typedef enum {
-    E_MouseMoved,
-    E_MousePressed,
-    E_MouseReleased,
-    E_MouseWheelMoved,
-    E_KeyPressed,
-    E_KeyReleased,
-    E_CharPressed,
+    EMouseMoved,
+    EMousePressed,
+    EMouseReleased,
+    EMouseWheelMoved,
+    EKeyPressed,
+    EKeyReleased,
+    ECharPressed,
 
-    E_WindowResized
+    EWindowResized
 } EventType;
 
 /// Event object binding a Type of Event to the value
@@ -93,7 +93,7 @@ void EventManager_update();
     void WindowResizeCallback( int pWidth, int pHeight );
     void KeyPressedCallback( int pKey, int pValue );
     void CharPressedCallback( int pKey, int pValue );
-    void MousePressedCallback( int pButton, int pValue );
+    void MouseButtonCallback( int pButton, int pValue );
     void MouseWheelCallback( int pWheel );
     void MouseMovedCallback( int pX, int pY );
 

@@ -8,6 +8,9 @@ typedef struct {
     f32 r, g, b, a;
 } Color;
 
+void Color_cpy( Color *A, const Color *B );
+void Color_set( Color *col, f32 r, f32 g, f32 b, f32 a );
+
 void Color_rgb( const Color *pColor, f32 tab[3] );
 void Color_rgba( const Color *pColor, f32 tab[4] );
 

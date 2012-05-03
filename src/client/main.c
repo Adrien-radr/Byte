@@ -16,54 +16,47 @@
 
 */
 
-/*
-mat3 m;
-Color c;
-u32 mesh;
-u32 texture;
-u32 shader;
-*/
+Actor *a1;
+int a1_h;
+
+void mousecb( const Event *e, void *data ) {
+    if( e->Type == EMouseReleased ) {
+        if( e->button == MB_Right ) {
+            vec2 newpos = Scene_localToGlobal( game->scene, &e->v );
+
+            mat3 m;
+            mat3_translationMatrixfv( &m, &newpos );
+            m.x[2] = a1->size.y / 2.f;
+            Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
+        } else if( e->button == MB_Left ) {
+            int i = (int)game->mouse_tile.x;
+            int j = (int)game->mouse_tile.y;
+            if( !Map_isWalkable( &world->local_map, i, j ) ) {
+                SceneMap_redTile( game->scene, i, j );
+                Map_setWalkable( &world->local_map, i, j, false );
+            }
+        }
+    }
+}
 
 void init_callback() {
-    int a1_h = World_loadActor( "data/game/actors/man.json" );
+    a1_h = World_loadActor( "data/game/actors/man.json" );
     if( a1_h >= 0 ) {
-        Actor *a1 = World_getActor( a1_h );
+        a1 = World_getActor( a1_h );
 
         Game_loadActorAssets( a1 );
-        Scene_addSpriteFromActor( game->mScene, a1 );
-        vec2 pos = { 50, -25 };
+        Scene_addSpriteFromActor( game->scene, a1 );
+        vec2 pos = { 200, 100 };
         mat3 m;
         mat3_translationMatrixfv( &m, &pos );
-        Scene_modifySprite( game->mScene, a1_h, SA_Matrix, &m );
+        m.x[2] = a1->size.y / 2.f;
+        Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
     }
 
-/*
-    mesh = ResourceManager_get( "map.json" );
-
-    shader = ResourceManager_get( "map_shader.json" );
-    texture = ResourceManager_get( "map.png" );
-
-    c.r = c.g = c.b = 0.8f;
-    c.a = 1.f;
-    */
+    EventManager_addListener( LT_MouseListener, mousecb, NULL );
 }
  
 bool frame_callback( f32 frame_time ) {
-    /*
-    Renderer_useShader( shader );
-    Shader_sendColor( "iColor", &c );
-    Shader_sendInt( "Depth", 9 );
-
-    Renderer_useTexture( texture, 0 );
-
-    mat3_identity( &m );
-    Shader_sendMat3( "ModelMatrix", &m );
-    Renderer_renderMesh( mesh );
-    mat3_translatef( &m, 50.f, 25.f );
-    Shader_sendMat3( "ModelMatrix", &m );
-    Renderer_renderMesh( mesh );
-    */
-
     return true;
 }
 

@@ -2,13 +2,17 @@
 #include "context.h"
 #include "renderer.h"
 
+static const float zoom_levels[10] = { 1.f, 1.25f, 1.5f, 1.75f, 2.f, 2.5f, 3.f, 4.f, 5.f, 6.f };
+
 Camera *Camera_new() {
     Camera *c = NULL;
     check( Context_isInitialized(), "Can't create a camera if no context has been created!\n" );
 
     c = byte_alloc( sizeof( Camera ) );
 
-    c->mSpeed = c->mZoom = c->mZoomX = 1.f;
+    c->mSpeed = 2.f;
+    c->mZoomX = 0;
+    c->mZoom = zoom_levels[c->mZoomX];
     c->mZoomSpeed = .05f;
     c->mZoomMax = 1.f;
     c->mZoomMin = .75f;
@@ -53,15 +57,17 @@ void Camera_calculateProjectionMatrix( Camera *pCamera ) {
         f32 xoffset = (windowSize.x - pCamera->mZoom * windowSize.x) / 2.f;
         f32 yoffset = (windowSize.y - pCamera->mZoom * windowSize.y) / 2.f;
 
+        pCamera->global_position.x = xoffset + pCamera->mPosition.x;
+        pCamera->global_position.y = yoffset + pCamera->mPosition.y;
 
         f32 width = windowSize.x - xoffset,
             height = windowSize.y - yoffset;
 
 
-        mat3_ortho( &pCamera->mProjectionMatrix, xoffset + pCamera->mPosition.x, 
+        mat3_ortho( &pCamera->mProjectionMatrix, pCamera->global_position.x, 
                                                  width + pCamera->mPosition.x, 
                                                  height + pCamera->mPosition.y, 
-                                                 yoffset + pCamera->mPosition.y );
+                                                 pCamera->global_position.y );
     }
 }
 
@@ -77,19 +83,56 @@ void Camera_move( Camera *pCamera, vec2 *pVector ) {
 
         // recalculate projection matrix and warn every shaders using it
         Camera_calculateProjectionMatrix( pCamera );
-        Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
+        Renderer_updateProjectionMatrix( ECamera, &pCamera->mProjectionMatrix );
     }
 }
 
 
 void Camera_zoom( Camera *pCamera, int pZoom ) {
     if( pCamera ) {
+        // clamp pZoom (no rapid zoom)
+        Clamp( &pZoom, -1, 1 );
+
+
+        // get new index for zoom_levels array
+        int old_x = pCamera->mZoomX;
+        pCamera->mZoomX -= pZoom;
+        Clamp( &pCamera->mZoomX, 0, 9 );
+
+        // if change occured, change zoom level and update cam
+        if( old_x != pCamera->mZoomX ) {
+            f32 old_zoom = pCamera->mZoom;
+            pCamera->mZoom = zoom_levels[pCamera->mZoomX];
+
+            f32 change = pCamera->mZoom - old_zoom;
+
+
+            vec2 windowSize = Context_getSize();
+            f32 mx = GetMouseX(),
+                my = GetMouseY();
+
+
+            // here we zoom in the direction from the window center to the mouse position, with a 
+            // magnitude depending on the zoom level (less magnitude if near ground)
+            vec2 dir = { .x = (mx - ( windowSize.x / 2.f ) ), .y = (my - ( windowSize.y / 2.f ) ) };
+            f32 dir_len = vec2_len( &dir );
+            vec2_normalize( &dir );
+
+            f32 pan_magnitude = - dir_len * change;
+            dir = vec2_mul( &dir, pan_magnitude );
+
+
+            pCamera->mPosition.x += dir.x;
+            pCamera->mPosition.y += dir.y;
+
+            // recalculate projection matrix and warn every shaders using it
+            Camera_calculateProjectionMatrix( pCamera );
+            Renderer_updateProjectionMatrix( ECamera, &pCamera->mProjectionMatrix );
+        }
+    }
+
+/*              ZOOM LEVEL FROM 1/x*x*x
         static int reached_min = 0, reached_max = 0;
-
-        // clamp pZoom (no rapid zoom
-        Clamp( &pZoom, -1.f, 1.f );
-
-        f32 x = pCamera->mZoomX;
 
         pCamera->mZoomX += pCamera->mZoomSpeed * pZoom;
 
@@ -125,7 +168,7 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
             f32 dir_len = vec2_len( &dir );
             vec2_normalize( &dir );
 
-            f32 pan_magnitude = - dir_len * change;//* .1f * (1.f / pCamera->mZoom); 
+            f32 pan_magnitude = - dir_len * change;
             dir = vec2_mul( &dir, pan_magnitude );
 
 
@@ -140,4 +183,5 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
         Camera_calculateProjectionMatrix( pCamera );
         Renderer_updateProjectionMatrix( &pCamera->mProjectionMatrix );
     }
+    */
 }

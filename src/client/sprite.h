@@ -9,7 +9,8 @@ typedef struct {
     HandleManager   *mUsed;     ///< Handlemanager telling if an index is used
 
     u32             *mMeshes;
-    u32             *mTextures;
+    u32             *mTextures0;    ///< Texture to bind on target 0
+    int             *mTextures1;    ///< Texture to bind on target 1 (-1 = no tex)
     u32             *mDepths;
     mat3            *mMatrices;
 
@@ -20,7 +21,8 @@ typedef struct {
 
 /// Differents attributes of a sprite that can be modified
 typedef enum {
-    SA_Texture,
+    SA_Texture0,
+    SA_Texture1,
     SA_Depth,
     SA_Matrix
 } SpriteAttrib;

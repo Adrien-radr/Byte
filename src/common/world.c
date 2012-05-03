@@ -10,6 +10,9 @@ bool World_init() {
     // init hm
     world->mActors = HandleManager_init( 50 );
 
+    // init local map
+
+
     return true;
 
 error:

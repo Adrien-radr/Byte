@@ -17,6 +17,10 @@ typedef struct {
     map             local_map;
 } World;
 
+/// World instance
+extern World *world;
+
+
 /// Initialize the game world
 bool World_init();
 

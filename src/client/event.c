@@ -211,20 +211,20 @@ bool EventManager_addListener( ListenerType pType, ListenerFunc pFunc, void *pDa
 
 void EventManager_propagateEvent( const Event pEvent ) {
     switch( pEvent.Type ) {
-        case E_KeyPressed:
-        case E_KeyReleased:
-        case E_CharPressed:
+        case EKeyPressed:
+        case EKeyReleased:
+        case ECharPressed:
             if( EventArray_checkSize( &eventManager->mFrameKeyEvents ) ) 
                 eventManager->mFrameKeyEvents.data[eventManager->mFrameKeyEvents.cpt++] = pEvent;
             break;
-        case E_MouseMoved:
-        case E_MousePressed:
-        case E_MouseReleased:
-        case E_MouseWheelMoved:
+        case EMouseMoved:
+        case EMousePressed:
+        case EMouseReleased:
+        case EMouseWheelMoved:
             if( EventArray_checkSize( &eventManager->mFrameMouseEvents ) ) 
                 eventManager->mFrameMouseEvents.data[eventManager->mFrameMouseEvents.cpt++] = pEvent;
             break;
-        case E_WindowResized:
+        case EWindowResized:
             if( EventArray_checkSize( &eventManager->mFrameResizeEvents ) ) 
                 eventManager->mFrameResizeEvents.data[eventManager->mFrameResizeEvents.cpt++] = pEvent;
             break;
@@ -237,24 +237,24 @@ void EventManager_propagateEvent( const Event pEvent ) {
         if( eventManager )
             eventManager->mCurrState.mKeyboard[pKey] = pValue ? true : false;
 
-        Event e = { .Type = ( pValue ? E_KeyPressed : E_KeyReleased ), .key = (Key)pKey, .i = pKey };
+        Event e = { .Type = ( pValue ? EKeyPressed : EKeyReleased ), .key = (Key)pKey, .i = pKey };
 
         EventManager_propagateEvent( e );
     }
 
     void CharPressedCallback( int pChar, int pValue ) {
         if( eventManager ) {
-            Event e = { .Type = E_CharPressed, .i = pChar };
+            Event e = { .Type = ECharPressed, .i = pChar };
 
             EventManager_propagateEvent( e );
         }
     }
 
-    void MousePressedCallback( int pButton, int pValue ) {
+    void MouseButtonCallback( int pButton, int pValue ) {
         if( eventManager ) {
             eventManager->mCurrState.mMouse[pButton] = pValue ? true : false;
 
-            Event e = { .Type = (pValue ? E_MousePressed : E_MouseReleased), .button = (MouseButton)pButton };
+            Event e = { .Type = (pValue ? EMousePressed : EMouseReleased), .button = (MouseButton)pButton, .v = { eventManager->mCurrState.mMousePos.x, eventManager->mCurrState.mMousePos.y } };
 
             EventManager_propagateEvent( e );
         }
@@ -264,7 +264,7 @@ void EventManager_propagateEvent( const Event pEvent ) {
         if( eventManager ) {
             eventManager->mCurrState.mWheel = pWheel;
 
-            Event e = { .Type = E_MouseWheelMoved, .i = (pWheel - eventManager->mPrevState.mWheel) };
+            Event e = { .Type = EMouseWheelMoved, .i = (pWheel - eventManager->mPrevState.mWheel) };
 
             EventManager_propagateEvent( e );
         }
@@ -275,7 +275,7 @@ void EventManager_propagateEvent( const Event pEvent ) {
             eventManager->mCurrState.mMousePos.x = (f32)pX;
             eventManager->mCurrState.mMousePos.y = (f32)pY;
 
-            Event e = { .Type = E_MouseMoved, .v = { .x = pX, .y = pY } };
+            Event e = { .Type = EMouseMoved, .v = { .x = pX, .y = pY } };
 
             EventManager_propagateEvent( e );
         }
@@ -283,7 +283,7 @@ void EventManager_propagateEvent( const Event pEvent ) {
 
     void WindowResizeCallback( int pWidth, int pHeight ) {
         if( eventManager ) {
-            Event e = { .Type = E_WindowResized, .v = { .x = pWidth, .y = pHeight } };
+            Event e = { .Type = EWindowResized, .v = { .x = pWidth, .y = pHeight } };
 
             EventManager_propagateEvent( e );
         }

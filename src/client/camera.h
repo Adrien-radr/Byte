@@ -16,11 +16,12 @@ typedef void (*CameraUpdate)(Camera *);
 /// Keep track of position and zoom level
 struct s_Camera {
     vec2            mPosition;          ///< Camera world position
+    vec2            global_position;    ///< Position not depending on zoom level
 
     f32             mSpeed;             ///< Camera movement speed
 
-    f32             mZoomX,             ///< Variable to compute the zoom as a function of ZoomX
-                    mZoom,              ///< Camera absolute zoom level
+    int             mZoomX;             ///< Variable to compute the zoom as a function of ZoomX
+    f32             mZoom,              ///< Camera absolute zoom level
                     mZoomSpeed,         ///< Zoom speed for each zoom action (constant)
                     mZoomMax,           ///< Max zoom level
                     mZoomMin;           ///< Min zoom level

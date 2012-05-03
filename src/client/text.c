@@ -1,9 +1,8 @@
 #include "common/world.h"
-#include "text.h"
-#include "texture.h"
 #include "renderer.h"
 #include "context.h"
 #include "resource.h"
+#include "game.h"
 
 #ifdef USE_GLDL
 #include "GL/gldl.h"
@@ -29,7 +28,7 @@ void Font_destroy( Font *pFont ) {
 
 bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
     if( pFont && pFile ) {
-        FT_Library *ft = Device_getFreetype(); 
+        FT_Library *ft = Game_getFreetype(); 
 
         check( !FT_New_Face( *ft, pFile, 0, &pFont->mFace ), "Could not open font file \"%s\"!\n", pFile );
 
@@ -146,49 +145,57 @@ void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr ) {
     const size_t c_size = 6 * 4;
     const size_t text_data_size = c_size * str_len;
     f32 data[text_data_size];
+    memset( data, 0.f, sizeof(data) );
 
     int n_pos = 0, n_tex = text_data_size/2;
     int fw = pFont->mTextureSize.x, fh = pFont->mTextureSize.y;
 
-    vec2 ws = Context_getSize();
-    f32 sx = 2.f / ws.x, sy = 2.f / ws.y;
-
-    f32 x_left = -1;
-    f32 x = -1, y = (ws.y/2.f - fh)*sy;
+    f32 x_left = 0;
+    f32 x = 0, y = 0;
 
 
     const Glyph *glyphs = pFont->mGlyphs;
 
     for( const char *p = pStr; *p; ++p ) {
         int i = (int)*p;
+
+        // if char is a carriage return, advance y to the next line, and x to the
+        // line begining. Increase n_pos and n_tex as if a char was rendered.
         if( '\n' == *p ) {
-            y -= (fh + 4) * sy;
+            y += (fh + 4);
             x = x_left;
+            n_pos += 12;
+            n_tex += 12;
             continue;
+
+        // if char is a space, advance x by a reasonable amount depending on font
+        // size and advance n_pos and n_tex like with \n
         } else if ( 32 == *p ) {
-            x += (fh/3) * sx;
+            x += (fh/3);
+            n_pos += 12;
+            n_tex += 12;
             continue;
         }
 
-        f32 x2 = x  + glyphs[i].position.x * sx;
-        f32 y2 = -y - glyphs[i].position.y * sy;
-        f32 w  = glyphs[i].size.x * sx;
-        f32 h  = glyphs[i].size.y * sy;
+        f32 x2 = x + glyphs[i].position.x;
+        f32 y2 = y + ( fh - glyphs[i].position.y );
+        f32 w  = glyphs[i].size.x;
+        f32 h  = glyphs[i].size.y;
 
         if( !w || !h ) continue;
 
-        x += glyphs[i].advance.x * sx;
-        y += glyphs[i].advance.y * sy;
+        x += glyphs[i].advance.x;
+        y += glyphs[i].advance.y;
 
         // positions triangle 1
-        data[n_pos++] = x2;         data[n_pos++] = -y2;
-        data[n_pos++] = x2;         data[n_pos++] = -y2 - h;
-        data[n_pos++] = x2 + w;     data[n_pos++] = -y2 - h;
+        data[n_pos++] = x2;         data[n_pos++] = y2;
+        data[n_pos++] = x2;         data[n_pos++] = y2 + h;
+        data[n_pos++] = x2 + w;     data[n_pos++] = y2 + h;
 
         // positions triangle 2
-        data[n_pos++] = x2;         data[n_pos++] = -y2;
-        data[n_pos++] = x2 + w;     data[n_pos++] = -y2 - h;
-        data[n_pos++] = x2 + w;     data[n_pos++] = -y2;
+        data[n_pos++] = x2;         data[n_pos++] = y2;
+        data[n_pos++] = x2 + w;     data[n_pos++] = y2 + h;
+        data[n_pos++] = x2 + w;     data[n_pos++] = y2;
 
         // texcoords triangle 1
         data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = 0;
@@ -203,7 +210,7 @@ void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr ) {
     }
 
     // update mesh
-    Renderer_setDynamicMeshData( pMeshVbo, data, sizeof( data ), NULL, 0 );
+    Renderer_setDynamicMeshDataBlock( pMeshVbo, data, sizeof( data ), NULL, 0 );
 }
 
 
@@ -220,6 +227,7 @@ TextArray *TextArray_init( u32 pSize ) {
     arr->mColors = byte_alloc( pSize * sizeof( Color ) );
     arr->mStrings = byte_alloc( pSize * sizeof( char* ) );
     arr->mPositions = byte_alloc( pSize * sizeof( vec2 ) );
+    arr->mDepths = byte_alloc( pSize * sizeof( int ) );
 
     arr->mSize = pSize;
 
@@ -241,10 +249,11 @@ int TextArray_add( TextArray *arr ) {
                 arr->mColors = byte_realloc( arr->mColors, arr->mSize * sizeof( Color ) );
                 arr->mStrings = byte_realloc( arr->mStrings, arr->mSize * sizeof( char* ) );
                 arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2 ) );
+                arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( int ) );
             }
 
             // create mesh used by text
-            check( (arr->mMeshes[handle] = Renderer_createDynamicMesh()) >= 0, "Failed to create mesh of Text!\n" );
+            check( (arr->mMeshes[handle] = Renderer_createDynamicMesh( GL_TRIANGLES )) >= 0, "Failed to create mesh of Text!\n" );
 
             ++arr->mMaxIndex;
             ++arr->mCount;
@@ -284,6 +293,7 @@ void TextArray_destroy( TextArray *arr ) {
         DEL_PTR( arr->mMeshes );
         DEL_PTR( arr->mColors );
         DEL_PTR( arr->mPositions );
+        DEL_PTR( arr->mDepths );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
             DEL_PTR( arr->mStrings[i] ); 
         }

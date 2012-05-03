@@ -1,6 +1,7 @@
 #include <stdarg.h>
 
 #include "common.h"
+#include "vector.h"
 
 
 // Definitions of common.h
@@ -15,6 +16,12 @@ extern inline f32 Deg2Rad( const f32 a );
 extern inline f32 Rad2Deg( const f32 a );
 extern inline void Clamp( int *x, const int min, const int max );
 extern inline void Clampf( f32 *x, const f32 min, const f32 max );
+
+inline int PointOnLine( const vec2 *p, const vec2 *A, const vec2 *B ) {
+    f32 calc = (B->x - A->x) * (p->y - A->y) - (B->y - A->y) * (p->x - A->x);
+
+    return calc > 0.f ? 1 : (calc < 0.f ? -1 : 0);
+}
 
 
 u32 Byte_ReadFile( char **pBuffer, const char *pFile ) {

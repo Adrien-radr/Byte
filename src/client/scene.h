@@ -9,13 +9,37 @@
 #include "texture.h"
 #include "text.h"
 #include "sprite.h"
+#include "light.h"
+#include "camera.h"
 
-// Forward declaration
-typedef struct s_Scene Scene;
+/// Visual representation of the map in game
+typedef struct {
+    u32     mesh;
+    u32     texture;
+    u32     shader;
+} SceneMap;
+
+/// Scene structure. Keep all info about rendering in the current view
+typedef struct {
+    u32             sprite_shader;      ///< Shader used to render sprites
+    SpriteArray     *sprites;           ///< Sprites in the scene
+
+    u32             text_shader;        ///< Shader used to render texts
+    TextArray       *texts;             ///< Texts in the scene
+
+    Camera          *camera;            ///< Camera of the scene
+
+    mat3            proj_matrix_2d;     ///< 2D projection matrix (GUI & text)
+
+    SceneMap        local_map;
+
+    Light           light1;
+    Color           ambient_color;
+} Scene;
 
 
 /// Create and returns a new scene instance
-Scene *Scene_new();
+Scene *Scene_init();
 
 /// Destroy and free the given scene
 void Scene_destroy( Scene *pScene );
@@ -24,20 +48,31 @@ void Scene_destroy( Scene *pScene );
 void Scene_update( Scene *pScene );
 
 /// Render all sprites & texts in the scene
-void Scene_render();
+void Scene_render( Scene *pScene );
+
+/// Update all shaders with the scene projection matrices
+void Scene_updateShadersProjMatrix( Scene *pScene );
 
 // ##########################################################################3
-//      Map
+//      Scene Map
+    /// Returns the global world coordinates of a vector, not depending of camera
+    /// zoom or pan. (often you want this to translate mousepos from screen to world)
+    vec2 Scene_localToGlobal( Scene *scene, const vec2 *local );
+
+    /// Returns the map tile at a given local screen position
+    vec2 Scene_screenToIso( Scene *scene, const vec2 *local );
+
+    void SceneMap_redTile( Scene *scene, u32 i, u32 j );
     
 
 // ##########################################################################3
 //      Sprite Array
     /// Add a sprite to be rendered each frame in the scene
     /// @param pMesh : The mesh handle the sprite use
-    /// @param pTexture : The texture handle the sprite use
+    /// @param pTexture : The texture handles for the sprite to use
     /// @param pMM : The ModelMatrix used to orient the sprite
     /// @return : The handle to the given sprite
-    int  Scene_addSprite( Scene *pScene, u32 pMesh, u32 pTexture, mat3 *pMM );
+    int  Scene_addSprite( Scene *pScene, u32 pMesh, int pTexture[2], mat3 *pMM );
 
     /// Add a sprite to be rendered each frame in the scene
     /// @param pActor : the Actor that must be drawn as a sprite

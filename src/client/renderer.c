@@ -33,7 +33,7 @@ struct s_Renderer {
     // these are state variables. -1 mean nothing is currently used
     int             mCurrentMesh,           ///< The currently bound OpenGL VBO
                     mCurrentShader,         ///< The currently bound OpenGL Shader Program
-                    mCurrentTexture,        ///< The currently bound OpenGL Texture
+                    mCurrentTexture[2],     ///< The currently bound OpenGL Textures on respective target
                     mCurrentTextureTarget;  ///< The current OpenGL Texture targer
 };
 
@@ -54,7 +54,8 @@ bool Renderer_init() {
 
     renderer->mCurrentMesh = -1;
     renderer->mCurrentShader = -1;
-    renderer->mCurrentTexture = -1;
+    renderer->mCurrentTexture[0] = -1;
+    renderer->mCurrentTexture[1] = -1;
     renderer->mCurrentTextureTarget = 0;
 
     renderer->mVao = -1;
@@ -98,7 +99,7 @@ bool Renderer_init() {
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-    glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
+    glClearColor( 0.1f, 0.1f, 0.1f, 1.f );
 
     // clear init gl errors
     CheckGLError();
@@ -127,15 +128,15 @@ void Renderer_beginFrame() {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
-void Renderer_updateProjectionMatrix( const mat3 *pm ) {
+void Renderer_updateProjectionMatrix( ProjMatrixType t, const mat3 *pm ) {
     if( renderer ) {
         u32 currShader = renderer->mCurrentShader;
 
         // update every shader using projection matrix
         for( u32 i = 0; renderer && (i < renderer->mShaders.cpt); ++i ) 
-            if( renderer->mShaders.data[i]->mUseProjectionMatrix ) {
+            if( renderer->mShaders.data[i]->proj_matrix_type == t ) {
                 Renderer_useShader( i );
-                Shader_sendMat3( "ProjectionMatrix", pm );
+                Shader_sendMat3( "ProjectionMatrix", pm ); 
             }
 
         // returns to shader used before update
@@ -168,15 +169,19 @@ int  Renderer_createStaticMesh( GLenum mode, u32 *pIndices, u32 pIndiceSize, vec
             m = Mesh_new( mode );
             check_mem( m );
 
+            MeshConstruction method = ERebuildVbo;
+
             // add Vertex Data
-            check( Mesh_addVertexData( m, pPositions, pPositionSize, pTexcoords, pTexcoordSize ), "Error in mesh creation when setting Vertex Data !\n" );
+            check( Mesh_addVertexData( m, (f32*)pPositions, pPositionSize, (f32*)pTexcoords, pTexcoordSize ), "Error in mesh creation when setting Vertex Data !\n" );
 
             // add Index data if given
-            if( pIndices )
+            if( pIndices ) {
                 check( Mesh_addIndexData( m, pIndices, pIndiceSize ), "Error in mesh creation when setting Index Data !\n" );
+                method |= ERebuildIbo;
+            }
 
             // build Mesh VBO
-            Mesh_build( m, false );
+            Mesh_build( m, method, false );
 
 
             // add the Mesh to the renderer array
@@ -205,7 +210,7 @@ int  Renderer_createRescaledMesh( u32 pMesh, const vec2 *pScale ) {
             Mesh_resize( m, pScale );
 
             // build mesh VBO
-            Mesh_build( m, false );
+            Mesh_build( m, ERebuildVbo | (m->use_indices ? ERebuildIbo : 0), false );
 
             // storage
             int index = renderer->mMeshes.cpt++;
@@ -221,11 +226,11 @@ error:
     return -1;
 }
 
-int  Renderer_createDynamicMesh() {
+int  Renderer_createDynamicMesh( u32 mode ) {
     Mesh *m = NULL;
     if( renderer ) {
         if( MeshArray_checkSize( &renderer->mMeshes ) ) {
-            m = Mesh_new( GL_TRIANGLES );
+            m = Mesh_new( mode );
             check_mem( m );
 
             // storage
@@ -241,42 +246,61 @@ error:
     return -1;
 }
 
-bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIData, u32 pISize ) {
+bool Renderer_setDynamicMeshData( u32 pMesh, f32 *positions, u32 positions_size, f32 *texcoords, u32 texcoords_size, u32 *indices, u32 indices_size ) {
     if( renderer ) {
         Mesh *m = renderer->mMeshes.data[pMesh];
         check( m, "Wanted to change Dynamic Mesh Data of an unexisting mesh (handle = %d)\n", pMesh );
 
+        MeshConstruction method = 0;
+
         // Change vertex data if given
-        if( pVData && pVSize > 0 ) {
-            // delete previous data if it exists
-            if( m->mData )
-                DEL_PTR( m->mData );
-
-            // allocate new space for data, and copy array content
-            m->mData = byte_alloc( pVSize );
-            memcpy( m->mData, pVData, pVSize );
-
-            m->mTexcoordBegin = pVSize / 2;
-            // vertex count = 4 floats(px, py, tx, ty) by vertex
-            m->mVertexCount = pVSize / (sizeof( u32 ) * 4);
+        if( positions && positions_size > 0 && texcoords && texcoords_size > 0 ) {
+            bool scaled = Mesh_addVertexData( m, positions, positions_size, texcoords, texcoords_size );
+            method |= (scaled ? ERebuildVbo : EUpdateVbo);
+            if( method & ERebuildVbo )
+                printf( "rebuilding vbo!\n" );
+            else 
+                printf( "updating vbo!\n" );
         }
 
         // Change index data if given
-        if( pIData && pISize > 0 ) {
-            // delete previous data if it exists
-            if( m->mIndices )
-                DEL_PTR( m->mIndices );
-
-            // allocate new space for data, and copy array content
-            m->mIndices = byte_alloc( pISize );
-            memcpy( m->mIndices, pIData, pISize );
-
-            m->mIndexCount = pISize / sizeof( u32 );
+        if( indices && indices_size > 0 ) {
+            bool scaled = Mesh_addIndexData( m, indices, indices_size );
+            method |= (scaled ? ERebuildIbo : EUpdateIbo);
         } 
-
+ 
         // if any change, rebuild mesh
-        if( pVSize > 0 || pISize > 0 )
-            Mesh_build( m, true );
+        if( method ) 
+            Mesh_build( m, method, true );
+
+        return true;
+    }
+error:
+    return false;
+}
+
+bool Renderer_setDynamicMeshDataBlock( u32 pMesh, f32 *data, u32 data_size, u32 *indices, u32 indices_size ) {
+    if( renderer ) {
+        Mesh *m = renderer->mMeshes.data[pMesh];
+        check( m, "Wanted to change Dynamic Mesh Data of an unexisting mesh (handle = %d)\n", pMesh );
+
+        MeshConstruction method = 0;
+
+        // Change vertex data if given
+        if( data && data_size > 0 ) {
+            bool scaled = Mesh_addVertexDataBlock( m, data, data_size );
+            method |= (scaled ? ERebuildVbo : EUpdateVbo);
+        }
+
+        // Change index data if given
+        if( indices && indices_size > 0 ) {
+            bool scaled = Mesh_addIndexData( m, indices, indices_size );
+            method |= (scaled ? ERebuildIbo : EUpdateIbo);
+        } 
+ 
+        // if any change, rebuild mesh
+        if( method ) 
+            Mesh_build( m, method, true );
 
         return true;
     }
@@ -300,10 +324,10 @@ void Renderer_renderMesh( u32 pIndex ) {
             renderer->mCurrentMesh = pIndex;
         }
 
-        if( m->mUseIndices )
-            glDrawElements( m->mode, m->mIndexCount, GL_UNSIGNED_INT, 0 );
+        if( m->use_indices )
+            glDrawElements( m->mode, m->index_count, GL_UNSIGNED_INT, 0 );
         else
-            glDrawArrays( m->mode, 0, m->mVertexCount );
+            glDrawArrays( m->mode, 0, m->vertex_count );
     }
 }
 
@@ -395,14 +419,15 @@ error:
 }
 
 void Renderer_useTexture( int pTexture, u32 pTarget ) {
-    if( renderer && pTexture < renderer->mTextures.cpt && pTexture != renderer->mCurrentTexture ) {
-        renderer->mCurrentTexture = pTexture;
+    if( renderer && pTexture < renderer->mTextures.cpt && pTexture != renderer->mCurrentTexture[pTarget] ) {
+        renderer->mCurrentTexture[pTarget] = pTexture;
 
+        // will send -1 to Texture_bind if no need to change target
         int target = -1;
         if( pTarget != renderer->mCurrentTextureTarget ) 
             renderer->mCurrentTextureTarget = target = pTarget;
 
-        Texture_bind( pTexture < 0 ? 0 : renderer->mTextures.data[pTexture], target );
+        Texture_bind( pTexture < 0 ? NULL : renderer->mTextures.data[pTexture], target );
     }
 }
 
@@ -463,20 +488,6 @@ void CheckGLError_func( const char *pFile, u32 pLine ) {
                 break;
             }
 
-            /*case GL_STACK_OVERFLOW :
-            {
-                strncpy( errorStr, "GL_STACK_OVERFLOW", 64 );
-                strncpy( description, "This command would cause a stack overflow.", 256 );
-                break;
-            }
-            case GL_STACK_UNDERFLOW :
-            {
-                strncpy( errorStr, "GL_STACK_UNDERFLOW", 64 );
-                strncpy( description, "This command would cause a stack underflow.", 256 );
-                break;
-            }
-
-            */
             case GL_OUT_OF_MEMORY :
             {
                 strncpy( errorStr, "GL_OUT_OF_MEMORY", 64 );

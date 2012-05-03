@@ -126,16 +126,20 @@ int LoadShader( const char *pFile ) {
             if( !strcmp( item_name->valuestring, "Albedo" ) ) {
                 if( 0 <= item_value->valueint )
                     Shader_sendInt( "Albedo", item_value->valueint );
-            } else if( !strcmp( item_name->valuestring, "UseProjectionMatrix" ) ) {
-                if( 0 < item_value->valueint )
-                    s->mUseProjectionMatrix = true;
+            } else if( !strcmp( item_name->valuestring, "Heightmap" ) ) {
+                if( 0 <= item_value->valueint )
+                    Shader_sendInt( "Heightmap", item_value->valueint );
+            } else if( !strcmp( item_name->valuestring, "ProjectionMatrixType" ) ) {
+                if( 1 == item_value->valueint )
+                    s->proj_matrix_type = ECamera;
+                else if( 2 == item_value->valueint )
+                    s->proj_matrix_type = EGui;
                 else
-                    s->mUseProjectionMatrix = false;
+                    s->proj_matrix_type = ENone;
             }
         }
     } else {
-        s->mUseProjectionMatrix = false;
-
+        s->proj_matrix_type = ENone;
     }
 
 

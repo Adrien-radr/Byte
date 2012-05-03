@@ -15,6 +15,8 @@ Byte-Project : TODO File
 + Fix font rendering when resizing window!
 + Config file
 + Game 'class' containing : the device, the world, the scene, game states
++ Remove DEVICE and put its stuff in GAME
++ make camera zoom following fixed step zoom levels
 
     Client-Server
     ------------
@@ -28,20 +30,29 @@ Byte-Project : TODO File
 
     Map System
     ----------
-    - Squared tiles map (3d?)
-    - Mouse picking support
+    + Squared tiles map (3d?)
+    + Mouse picking support
     - Quad-Tree 
     - Procedurally created map (world-map and scene-map)
+    - Pathfinding
+        - basic A* pathfinding
+        - wall (between tiles) collision
+        - actors collision (even in-route)
+        - actors movement prediction
 
     Lighting
     --------
-    - Point-lights (phong shader)
+    + Point-lights 
+        + Map isometric fragment lighting
+        + Sprites fragment lighting
+        + Sprites lighting with sprite height support
+    - Directional (sun) lights
     - 2D Normal maps of sprites ?
     - Dynamic shadows
 
     Misc
     ----
-    - Clean the main
+    + Clean the main
     - Lua integration as a scripting language (??)
     - GUI (with Lua or json) (Handled by Beulard)
-    - Fix camera position when resizing window (messy)! (maybe no rescale)
+    - Fix camera position when resizing window (messy)! (maybe no window resizing at all +)

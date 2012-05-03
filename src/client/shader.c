@@ -154,6 +154,11 @@ void Shader_sendInt( const char *pVarName, int pValue ) {
     CheckGLError();
 }
 
+void Shader_sendFloat( const char *pVarName, f32 pValue ) {
+    glUniform1f( glGetUniformLocation( Renderer_currentGLProgram(), pVarName), pValue );
+    CheckGLError();
+}
+
 void Shader_sendColor( const char *pVarName, const Color *pColor ) {
     float color[4];
     Color_rgba( pColor, color );
