@@ -17,8 +17,11 @@
 
 /// Local function. Initialize the scene map
 void SceneMap_init( Scene *scene ) {
+    // buffer positions ( 4 vertices for each map tile )
     vec2 map_pos[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+    // buffer tex coordinates ( 4 for each tile )
     vec2 map_tcs[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+    // drawing indices ( 2 triangles(3verts) for each tile )
     u32  map_indices[6*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
 
     // vertex position offsets
@@ -33,7 +36,11 @@ void SceneMap_init( Scene *scene ) {
         for( int i = 0; i < 2*LOCAL_MAP_WIDTH; ++i ) {
             x_offset = i * 50.f;
             y_offset = j * 50.f + (i&1) * 25.f;
+
+            // i * 4 : 4 vertices for each tile
             xi = i * 4;
+            // j * 2 : each row index is a col of 2 tiles 
+            // LOCAL_MAP_WIDTH * 4 : 4 vertices for a complete row of tiles
             yj = j * 2 * LOCAL_MAP_WIDTH * 4;
             map_pos[yj+xi+0].x = x_offset + 50.f;
             map_pos[yj+xi+0].y = y_offset + 50.f;
@@ -42,12 +49,12 @@ void SceneMap_init( Scene *scene ) {
             map_pos[yj+xi+2].x = x_offset + 50.f;
             map_pos[yj+xi+2].y = y_offset;
             map_pos[yj+xi+3].x = x_offset + 100.f;
-            map_pos[yj+xi+3].y = y_offset + 25.f;
+            map_pos[yj+xi+3].y = y_offset + 25.f; 
 
             map_tcs[yj+xi+0].x = 0.f;     map_tcs[yj+xi+0].y = 0.f;
             map_tcs[yj+xi+1].x = 0.f;     map_tcs[yj+xi+1].y = 1.f;
-            map_tcs[yj+xi+2].x = 1.f;     map_tcs[yj+xi+2].y = 1.f;
-            map_tcs[yj+xi+3].x = 1.f;     map_tcs[yj+xi+3].y = 0.f;
+            map_tcs[yj+xi+2].x = 0.5f;     map_tcs[yj+xi+2].y = 1.f;
+            map_tcs[yj+xi+3].x = 0.5f;     map_tcs[yj+xi+3].y = 0.f;
 
             ii = i * 6;
             ij = j * 2 * LOCAL_MAP_WIDTH * 6;
@@ -60,11 +67,33 @@ void SceneMap_init( Scene *scene ) {
         }
 
     // create mesh
-    scene->local_map.mesh = Renderer_createStaticMesh( GL_TRIANGLES, map_indices, sizeof(map_indices), map_pos, sizeof(map_pos), map_tcs, sizeof(map_tcs) );
+    scene->local_map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
+    Renderer_setDynamicMeshData( scene->local_map.mesh, (f32*)map_pos, sizeof(map_pos), (f32*)map_tcs, sizeof(map_tcs), map_indices, sizeof(map_indices) );
+
  
     // get shader and texture
     scene->local_map.texture = ResourceManager_get( "map.png" );
     scene->local_map.shader = ResourceManager_get( "map_shader.json" );
+}
+
+void SceneMap_redTile( Scene *scene, u32 i, u32 j ) {
+    if( i >= LOCAL_MAP_WIDTH*2 || j >= LOCAL_MAP_HEIGHT/2 ) 
+        return;
+
+    Mesh *m = Renderer_getMesh( scene->local_map.mesh );
+    u32 tcs_offset = m->vertex_count * 2;
+    int i_offset = i * 8,
+        j_offset = j * 2 * LOCAL_MAP_WIDTH * 8;
+ 
+
+    // we change only on even indices, only the X coord, not Y
+    m->data[tcs_offset+i_offset+j_offset+0] = 0.5f;
+    m->data[tcs_offset+i_offset+j_offset+2] = 0.5f;
+    m->data[tcs_offset+i_offset+j_offset+4] = 1.f;
+    m->data[tcs_offset+i_offset+j_offset+6] = 1.f;
+
+    // rebuild map mesh
+    Mesh_build( m, EUpdateVbo, false );
 }
 
 vec2 Scene_localToGlobal( Scene *scene, const vec2 *local ) {
@@ -87,23 +116,22 @@ vec2 Scene_screenToIso( Scene *scene, const vec2 *local ) {
     vec2 global = Scene_localToGlobal( scene, local );
 
     vec2 ret, offset;
-    ret.x = (int)( global.x / tilesize.x );
-    ret.y = (int)( global.y / tilesize.y ) * 2;
+    ret.x = (int)( global.x / tilesize.x ) * 2;
+    ret.y = (int)( global.y / tilesize.y );
     offset.x = (int)fmod( global.x, tilesize.x );
     offset.y = (int)fmod( global.y, tilesize.y );
 
     if( PointOnLine( &offset, &left, &up ) < 0 ) {
+        ret.y -= 1;      
         ret.x -= 1;
-        ret.y -= 1;
     } 
-    else if( PointOnLine( &offset, &left, &down ) > 0 ) {
+    else if( PointOnLine( &offset, &left, &down ) > 0 ) 
         ret.x -= 1;
-        ret.y += 1;
-    } 
-    else if( PointOnLine( &offset, &up, &right ) < 0 ) 
-        ret.y -= 1;
-    else if( PointOnLine( &offset, &down, &right ) > 0 ) 
-        ret.y += 1;
+    else if( PointOnLine( &offset, &up, &right ) < 0 ) {
+        ret.y -= 1;     
+        ret.x += 1;
+    } else if( PointOnLine( &offset, &down, &right ) > 0 ) 
+        ret.x += 1;
 
     return ret;
 }
@@ -148,7 +176,7 @@ vec2 Scene_screenToIso( Scene *scene, const vec2 *local ) {
     }
 
 
-Scene *Scene_new() {
+Scene *Scene_init() {
     Scene *s = NULL;
     
     s = byte_alloc( sizeof( Scene ) );

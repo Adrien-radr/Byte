@@ -22,7 +22,8 @@ extern const str32 config_file;
 /// Game structure
 ///     It possesses the game current scene where visible entities are drawn
 typedef struct {
-    Scene   *scene;                ///< Game current scene
+    Scene   *scene;                 ///< Game current scene
+    Config  config;                 ///< Device/Game configuration parameters
 
     bool    (*frame_func)(f32);     ///< Game frame callback
 
@@ -30,9 +31,10 @@ typedef struct {
     u32     mousepos_text;          ///< Mouse Position displayed
     u32     mousetile_text;         ///< Tile under mouse displayed
 
+    vec2    mouse_tile;             ///< Tile under the mouse
 
-    Config      config;            ///< Device/Game configuration parameters
-    FT_Library  freetype_lib;      ///< Instance of the Freetype library.
+
+    FT_Library  freetype_lib;       ///< Instance of the Freetype library.
 } Game;
 
 /// Game Instance

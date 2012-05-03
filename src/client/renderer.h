@@ -56,13 +56,17 @@ bool Renderer_isInitialized();
     int  Renderer_createRescaledMesh( u32 pMesh, const vec2 *pScale );
 
     /// Make a dynamic mesh (dont build it yet
-    int  Renderer_createDynamicMesh();
+    int  Renderer_createDynamicMesh( u32 mode );
 
-    /// Change the data of given mesh, and rebuild VBO
+    /// Change the data of given mesh, and rebuild VBO/IBO if necessary
+    /// @return : true if everything went well, false otherwise.
+    bool Renderer_setDynamicMeshData( u32 pMesh, f32 *positions, u32 positions_size, f32 *texcoords, u32 texcoords_size, u32 *indices, u32 indices_size );
+
+    /// Change the data of given mesh, and rebuild VBO/IBO if necessary
     /// @param pVData : Vertex data (position + texcoords)
     /// @param pIData : Index data
     /// @return : true if everything went well, false otherwise.
-    bool Renderer_setDynamicMeshData( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIData, u32 pISize );
+    bool Renderer_setDynamicMeshDataBlock( u32 pMesh, f32 *pVData, u32 pVSize, u32 *pIData, u32 pISize );
 
     /// Returns a pointer to the mesh with the given handle
     Mesh *Renderer_getMesh( u32 pMesh );

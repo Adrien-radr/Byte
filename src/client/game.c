@@ -80,8 +80,8 @@ void Game_mouseListener( const Event *event, void *data ) {
         snprintf( text, 32, "X : %d, Y : %d", (int)event->v.x, (int)event->v.y );
         Scene_modifyText( game->scene, game->mousepos_text, TA_String, text );
 
-        vec2 isomouse = Scene_screenToIso( game->scene, &event->v );
-        snprintf( text, 32, "TileX: %d, TileY : %d", (int)isomouse.x, (int)isomouse.y );
+        game->mouse_tile = Scene_screenToIso( game->scene, &event->v );
+        snprintf( text, 32, "TileX: %d, TileY : %d", (int)game->mouse_tile.x, (int)game->mouse_tile.y );
         Scene_modifyText( game->scene, game->mousetile_text, TA_String, text );
     }
 }
@@ -151,7 +151,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
 
     // Initialize Game current Scene
-    game->scene = Scene_new();
+    game->scene = Scene_init();
     check( game->scene, "Error while creating Game Scene. Aborting initialization.\n" );
 
     // Register Game listeners

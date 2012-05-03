@@ -210,7 +210,7 @@ void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr ) {
     }
 
     // update mesh
-    Renderer_setDynamicMeshData( pMeshVbo, data, sizeof( data ), NULL, 0 );
+    Renderer_setDynamicMeshDataBlock( pMeshVbo, data, sizeof( data ), NULL, 0 );
 }
 
 
@@ -253,7 +253,7 @@ int TextArray_add( TextArray *arr ) {
             }
 
             // create mesh used by text
-            check( (arr->mMeshes[handle] = Renderer_createDynamicMesh()) >= 0, "Failed to create mesh of Text!\n" );
+            check( (arr->mMeshes[handle] = Renderer_createDynamicMesh( GL_TRIANGLES )) >= 0, "Failed to create mesh of Text!\n" );
 
             ++arr->mMaxIndex;
             ++arr->mCount;

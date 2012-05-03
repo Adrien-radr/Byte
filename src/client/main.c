@@ -21,12 +21,21 @@ int a1_h;
 
 void mousecb( const Event *e, void *data ) {
     if( e->Type == EMouseReleased ) {
-        vec2 newpos = Scene_localToGlobal( game->scene, &e->v );
+        if( e->button == MB_Right ) {
+            vec2 newpos = Scene_localToGlobal( game->scene, &e->v );
 
-        mat3 m;
-        mat3_translationMatrixfv( &m, &newpos );
-        m.x[2] = a1->size.y / 2.f;
-        Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
+            mat3 m;
+            mat3_translationMatrixfv( &m, &newpos );
+            m.x[2] = a1->size.y / 2.f;
+            Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
+        } else if( e->button == MB_Left ) {
+            int i = (int)game->mouse_tile.x;
+            int j = (int)game->mouse_tile.y;
+            if( !Map_isWalkable( &world->local_map, i, j ) ) {
+                SceneMap_redTile( game->scene, i, j );
+                Map_setWalkable( &world->local_map, i, j, false );
+            }
+        }
     }
 }
 

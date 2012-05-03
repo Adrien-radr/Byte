@@ -39,7 +39,7 @@ typedef struct {
 
 
 /// Create and returns a new scene instance
-Scene *Scene_new();
+Scene *Scene_init();
 
 /// Destroy and free the given scene
 void Scene_destroy( Scene *pScene );
@@ -61,6 +61,8 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 
     /// Returns the map tile at a given local screen position
     vec2 Scene_screenToIso( Scene *scene, const vec2 *local );
+
+    void SceneMap_redTile( Scene *scene, u32 i, u32 j );
     
 
 // ##########################################################################3
