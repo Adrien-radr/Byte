@@ -17,10 +17,16 @@ extern inline f32 Rad2Deg( const f32 a );
 extern inline void Clamp( int *x, const int min, const int max );
 extern inline void Clampf( f32 *x, const f32 min, const f32 max );
 
-inline int PointOnLine( const vec2 *p, const vec2 *A, const vec2 *B ) {
+inline int PointOnLinef( const vec2 *p, const vec2 *A, const vec2 *B ) {
     f32 calc = (B->x - A->x) * (p->y - A->y) - (B->y - A->y) * (p->x - A->x);
 
     return calc > 0.f ? 1 : (calc < 0.f ? -1 : 0);
+}
+
+inline int PointOnLinei( const vec2i *p, const vec2i *A, const vec2i *B ) {
+    int calc = (B->x - A->x) * (p->y - A->y) - (B->y - A->y) * (p->x - A->x);
+
+    return calc > 0 ? 1 : (calc < 0 ? -1 : 0);
 }
 
 

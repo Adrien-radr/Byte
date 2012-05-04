@@ -20,7 +20,7 @@ Actor *a1;
 int a1_h;
 
 void mousecb( const Event *e, void *data ) {
-    if( e->Type == EMouseReleased ) {
+    if( e->type == EMouseReleased ) {
         if( e->button == MB_Right ) {
             vec2 newpos = Scene_localToGlobal( game->scene, &e->v );
 

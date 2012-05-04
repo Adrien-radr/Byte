@@ -193,8 +193,9 @@
 #   define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-    // forward decl
-    typedef struct s_vec2 vec2;
+    // forward decl (definition in vector.h)
+    typedef struct vec2_ vec2;
+    typedef struct vec2i_ vec2i;
 
     /// Returns the sign of a float
     inline int Sign( const f32 a, const f32 threshold ) {
@@ -243,7 +244,8 @@
 
     /// Returns whether a point p is on, under or over a segment AB
     /// @return : 0 if on line, -1 if under, 1 if above.
-    int PointOnLine( const vec2 *p, const vec2 *A, const vec2 *B );
+    int PointOnLinef( const vec2 *p, const vec2 *A, const vec2 *B );
+    int PointOnLinei( const vec2i *p, const vec2i *A, const vec2i *B );
 
 // #############################################################################
 

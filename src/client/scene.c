@@ -96,41 +96,41 @@ void SceneMap_redTile( Scene *scene, u32 i, u32 j ) {
     Mesh_build( m, EUpdateVbo, false );
 }
 
-vec2 Scene_localToGlobal( Scene *scene, const vec2 *local ) {
-    vec2 ret = {0,0};
-    ret = vec2_add( &ret, local );
+vec2 Scene_localToGlobal( Scene *scene, const vec2i *local ) {
+    vec2 ret = { local->x, local->y};
     ret = vec2_mul( &ret, scene->camera->mZoom );
     ret = vec2_add( &ret, &scene->camera->global_position );
 
     return ret;
 }
 
-vec2 Scene_screenToIso( Scene *scene, const vec2 *local ) {
-    static vec2 up =    {  50.f,  0.f };
-    static vec2 down =  {  50.f, 50.f };
-    static vec2 left =  {   0.f, 25.f };
-    static vec2 right = { 100.f, 25.f };
-    static vec2 tilesize = { 100.f, 50.f };
+vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
+    static vec2i up =    {  50,  0 };
+    static vec2i down =  {  50, 50 };
+    static vec2i left =  {   0, 25 };
+    static vec2i right = { 100, 25 };
+    static vec2i tilesize = { 100, 50 };
 
     // get global mouse position (not depending on camera zoom or pan)
     vec2 global = Scene_localToGlobal( scene, local );
 
-    vec2 ret, offset;
-    ret.x = (int)( global.x / tilesize.x ) * 2;
-    ret.y = (int)( global.y / tilesize.y );
-    offset.x = (int)fmod( global.x, tilesize.x );
-    offset.y = (int)fmod( global.y, tilesize.y );
+    vec2i ret, offset;
+    ret.x = 2 * (int)( global.x / tilesize.x);
+    ret.y = global.y / tilesize.y;
+    offset.x = (int)global.x % tilesize.x;
+    offset.y = (int)global.y % tilesize.y;
 
-    if( PointOnLine( &offset, &left, &up ) < 0 ) {
+
+    if( PointOnLinei( &offset, &left, &up ) < 0 ) {
         ret.y -= 1;      
         ret.x -= 1;
     } 
-    else if( PointOnLine( &offset, &left, &down ) > 0 ) 
+    else if( PointOnLinei( &offset, &left, &down ) > 0 ) 
         ret.x -= 1;
-    else if( PointOnLine( &offset, &up, &right ) < 0 ) {
+    else if( PointOnLinei( &offset, &up, &right ) < 0 ) {
         ret.y -= 1;     
         ret.x += 1;
-    } else if( PointOnLine( &offset, &down, &right ) > 0 ) 
+    } else if( PointOnLinei( &offset, &down, &right ) > 0 )  
         ret.x += 1;
 
     return ret;
@@ -141,14 +141,14 @@ vec2 Scene_screenToIso( Scene *scene, const vec2 *local ) {
 //          SCENE
 
 // Camera listeners and update function
-    void cameraMouseListener( const Event *pEvent, void *pCamera ) {
-        Camera *cam = (Camera*)pCamera;
+    void cameraMouseListener( const Event *event, void *camera ) {
+        Camera *cam = (Camera*)camera;
         // manage zoom event 
-        if( pEvent->Type == EMouseWheelMoved ) 
-            Camera_zoom( cam, pEvent->i );
+        if( event->type == EMouseWheelMoved ) 
+            Camera_zoom( cam, event->i );
     }
 
-    void cameraUpdate( Camera *pCamera ) {
+    void cameraUpdate( Camera *camera ) {
         // manage position pan 
         vec2 move = { .x = 0.f, .y = 0.f };
         if( IsKeyDown( K_W ) )
@@ -161,12 +161,12 @@ vec2 Scene_screenToIso( Scene *scene, const vec2 *local ) {
             move.x += 1.f;
 
         if( move.x || move.y )
-            Camera_move( pCamera, &move );
+            Camera_move( camera, &move );
     }
 
 // Event Listener for window resizing
-    void sceneWindowResizing( const Event *pEvent, void *pData ) {
-        Scene *s = (Scene*)pData;
+    void sceneWindowResizing( const Event *event, void *data ) {
+        Scene *s = (Scene*)data;
 
         // update all texts with new window size
         for( u32 i = 0; i < s->texts->mMaxIndex; ++i ) {
@@ -212,7 +212,7 @@ Scene *Scene_init() {
 
 
     // 2D proj matrix (just ortho2D camera with no zoom or pan)
-    vec2 winsize = Context_getSize();
+    vec2i winsize = Context_getSize();
     mat3_ortho( &s->proj_matrix_2d, 0.f, winsize.x, winsize.y, 0.f );
 
     // Event listener

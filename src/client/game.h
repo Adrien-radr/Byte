@@ -10,7 +10,7 @@
 
 /// Stores the different parameters of the engine/game
 typedef struct {
-    vec2    window_size;
+    vec2i    window_size;
     u32     multisamples;
     bool    fullscreen;
 } Config;
@@ -31,7 +31,7 @@ typedef struct {
     u32     mousepos_text;          ///< Mouse Position displayed
     u32     mousetile_text;         ///< Tile under mouse displayed
 
-    vec2    mouse_tile;             ///< Tile under the mouse
+    vec2i    mouse_tile;            ///< Tile under the mouse
 
 
     FT_Library  freetype_lib;       ///< Instance of the Freetype library.

@@ -3,13 +3,13 @@
 
 /// Structure containing the state of all inputs at a given time
 typedef struct {
-    bool mKeyboard[330];        ///< Keyboard keys
-    bool mMouse[5];             ///< Mouse buttons
-    int  mWheel;                ///< Mouse wheel absolute pos
+    bool keyboard[330];         ///< Keyboard keys
+    bool mouse[5];              ///< Mouse buttons
+    int  wheel;                 ///< Mouse wheel absolute pos
 
-    bool mCloseSignal;          ///< Window closing signal
+    bool close_signal;          ///< Window closing signal
 
-    vec2 mMousePos;             ///< Mouse absolute position
+    vec2i mouse_pos;            ///< Mouse absolute position
 } InputState;
 
 
@@ -27,49 +27,49 @@ SimpleArray( Event, Event );
 /// Manage real time events from GLFW callbacks
 /// Distribute these events to registered listeners
 typedef struct {
-    InputState      mCurrState,         ///< Inputs of current frame
-                    mPrevState;         ///< Inputs of previous frame
+    InputState      curr_state,         ///< Inputs of current frame
+                    prev_state;         ///< Inputs of previous frame
             
-    ListenerArray   mKeyListeners,      ///< List of all registered mouse listeners
-                    mMouseListeners,    ///< List of all registered key listeners
-                    mResizeListeners;   ///< List of all registered resize listeners
+    ListenerArray   key_listeners,      ///< List of all registered mouse listeners
+                    mouse_listeners,    ///< List of all registered key listeners
+                    resize_listeners;   ///< List of all registered resize listeners
 
-    EventArray      mFrameKeyEvents,    ///< All key events recorded during the frame
-                    mFrameMouseEvents,  ///< All mouse events recorded during the frame
-                    mFrameResizeEvents; ///< All resize events recorded during the frame
+    EventArray      frame_key_events,    ///< All key events recorded during the frame
+                    frame_mouse_events,  ///< All mouse events recorded during the frame
+                    frame_resize_events; ///< All resize events recorded during the frame
    
 } EventManager;
 
 
 // Unique instance of the event manager
-static EventManager *eventManager = NULL;
+static EventManager *em = NULL;
 
 
 bool EventManager_init() {
-    check( !eventManager, "Event Manager already created!\n" );
+    check( !em, "Event Manager already created!\n" );
 
-    eventManager = byte_alloc( sizeof( EventManager ) );
-    check_mem( eventManager );
+    em = byte_alloc( sizeof( EventManager ) );
+    check_mem( em );
 
     // Init states
-    memset( eventManager->mCurrState.mKeyboard, false, 330 * sizeof( bool ) );
-    memset( eventManager->mCurrState.mMouse, false, 5 * sizeof( bool ) );
-    eventManager->mCurrState.mWheel = 0;
-    eventManager->mCurrState.mCloseSignal = false;
+    memset( em->curr_state.keyboard, false, 330 * sizeof( bool ) );
+    memset( em->curr_state.mouse, false, 5 * sizeof( bool ) );
+    em->curr_state.wheel = 0;
+    em->curr_state.close_signal = false;
 
-    memset( eventManager->mPrevState.mKeyboard, false, 330 * sizeof( bool ) );
-    memset( eventManager->mPrevState.mMouse, false, 5 * sizeof( bool ) );
-    eventManager->mPrevState.mWheel = 0;
-    eventManager->mPrevState.mCloseSignal = false;
+    memset( em->prev_state.keyboard, false, 330 * sizeof( bool ) );
+    memset( em->prev_state.mouse, false, 5 * sizeof( bool ) );
+    em->prev_state.wheel = 0;
+    em->prev_state.close_signal = false;
 
     // Init Listener arrays
-    ListenerArray_init( &eventManager->mKeyListeners, 10 );
-    ListenerArray_init( &eventManager->mMouseListeners, 10 );
-    ListenerArray_init( &eventManager->mResizeListeners, 5 );
+    ListenerArray_init( &em->key_listeners, 10 );
+    ListenerArray_init( &em->mouse_listeners, 10 );
+    ListenerArray_init( &em->resize_listeners, 5 );
 
-    EventArray_init( &eventManager->mFrameKeyEvents, 50 );
-    EventArray_init( &eventManager->mFrameMouseEvents, 50 );
-    EventArray_init( &eventManager->mFrameResizeEvents, 50 );
+    EventArray_init( &em->frame_key_events, 50 );
+    EventArray_init( &em->frame_mouse_events, 50 );
+    EventArray_init( &em->frame_resize_events, 50 );
 
     
     log_info( "Event manager successfully initialized!\n" );
@@ -83,122 +83,122 @@ error:
 
 
 void EventManager_destroy() {
-    if( eventManager ) {
-        ListenerArray_destroy( &eventManager->mKeyListeners );
-        ListenerArray_destroy( &eventManager->mMouseListeners );
-        ListenerArray_destroy( &eventManager->mResizeListeners );
-        EventArray_destroy( &eventManager->mFrameKeyEvents );
-        EventArray_destroy( &eventManager->mFrameMouseEvents );
-        EventArray_destroy( &eventManager->mFrameResizeEvents );
-        DEL_PTR( eventManager );
+    if( em ) {
+        ListenerArray_destroy( &em->key_listeners );
+        ListenerArray_destroy( &em->mouse_listeners );
+        ListenerArray_destroy( &em->resize_listeners );
+        EventArray_destroy( &em->frame_key_events );
+        EventArray_destroy( &em->frame_mouse_events );
+        EventArray_destroy( &em->frame_resize_events );
+        DEL_PTR( em );
     }
 }
 
 void EventManager_update() {
     // if there has been key events during the frame, send them to all keylisteners
-    if( eventManager->mFrameKeyEvents.cpt ) {
-        for( u32 i = 0; i < eventManager->mKeyListeners.cpt; ++i ) {
-            const ListenerStruct *ls = &eventManager->mKeyListeners.data[i];
-            for( u32 j = 0; j < eventManager->mFrameKeyEvents.cpt; ++j )
-                ls->function( &eventManager->mFrameKeyEvents.data[j], ls->data );
+    if( em->frame_key_events.cpt ) {
+        for( u32 i = 0; i < em->key_listeners.cpt; ++i ) {
+            const ListenerStruct *ls = &em->key_listeners.data[i];
+            for( u32 j = 0; j < em->frame_key_events.cpt; ++j )
+                ls->function( &em->frame_key_events.data[j], ls->data );
         }
 
-        EventArray_clear( &eventManager->mFrameKeyEvents );
+        EventArray_clear( &em->frame_key_events );
     }
     // if there has been mouse events during the frame, send them to all mouselisteners
-    if( eventManager->mFrameMouseEvents.cpt ) {
-        for( u32 i = 0; i < eventManager->mMouseListeners.cpt; ++i ) {
-            const ListenerStruct *ls = &eventManager->mMouseListeners.data[i];
-            for( u32 j = 0; j < eventManager->mFrameMouseEvents.cpt; ++j )
-                ls->function( &eventManager->mFrameMouseEvents.data[j], ls->data );
+    if( em->frame_mouse_events.cpt ) {
+        for( u32 i = 0; i < em->mouse_listeners.cpt; ++i ) {
+            const ListenerStruct *ls = &em->mouse_listeners.data[i];
+            for( u32 j = 0; j < em->frame_mouse_events.cpt; ++j )
+                ls->function( &em->frame_mouse_events.data[j], ls->data );
         }
 
-        EventArray_clear( &eventManager->mFrameMouseEvents );
+        EventArray_clear( &em->frame_mouse_events );
     }
     // if there has been resize events during the frame, send them to all resizelisteners
-    if( eventManager->mFrameResizeEvents.cpt ) {
-        for( u32 i = 0; i < eventManager->mResizeListeners.cpt; ++i ) {
-            const ListenerStruct *ls = &eventManager->mResizeListeners.data[i];
-            for( u32 j = 0; j < eventManager->mFrameResizeEvents.cpt; ++j )
-                ls->function( &eventManager->mFrameResizeEvents.data[j], ls->data );
+    if( em->frame_resize_events.cpt ) {
+        for( u32 i = 0; i < em->resize_listeners.cpt; ++i ) {
+            const ListenerStruct *ls = &em->resize_listeners.data[i];
+            for( u32 j = 0; j < em->frame_resize_events.cpt; ++j )
+                ls->function( &em->frame_resize_events.data[j], ls->data );
         }
 
-        EventArray_clear( &eventManager->mFrameResizeEvents );
+        EventArray_clear( &em->frame_resize_events );
     }
 
 
 
     // Set previous state to current state.
-    memcpy( eventManager->mPrevState.mKeyboard, eventManager->mCurrState.mKeyboard, 330 * sizeof( bool ) );
-    memcpy( eventManager->mPrevState.mMouse, eventManager->mCurrState.mMouse, 5 * sizeof( bool ) );
+    memcpy( em->prev_state.keyboard, em->curr_state.keyboard, 330 * sizeof( bool ) );
+    memcpy( em->prev_state.mouse, em->curr_state.mouse, 5 * sizeof( bool ) );
 
-    eventManager->mPrevState.mWheel = eventManager->mCurrState.mWheel;
-    eventManager->mPrevState.mCloseSignal = eventManager->mCurrState.mCloseSignal;
-    eventManager->mPrevState.mMousePos.x = eventManager->mCurrState.mMousePos.x;
-    eventManager->mPrevState.mMousePos.y = eventManager->mCurrState.mMousePos.y;
+    em->prev_state.wheel = em->curr_state.wheel;
+    em->prev_state.close_signal = em->curr_state.close_signal;
+    em->prev_state.mouse_pos.x = em->curr_state.mouse_pos.x;
+    em->prev_state.mouse_pos.y = em->curr_state.mouse_pos.y;
 }
 
 u32  GetMouseX() {
-    return eventManager->mCurrState.mMousePos.x;
+    return em->curr_state.mouse_pos.x;
 }
 
 u32  GetMouseY() {
-    return eventManager->mCurrState.mMousePos.y;
+    return em->curr_state.mouse_pos.y;
 }
 
 
 bool IsKeyDown( Key pK ) {
-    return eventManager->mCurrState.mKeyboard[pK];
+    return em->curr_state.keyboard[pK];
 }
 
 bool IsKeyUp( Key pK ) {
-    return !eventManager->mCurrState.mKeyboard[pK] && eventManager->mPrevState.mKeyboard[pK];
+    return !em->curr_state.keyboard[pK] && em->prev_state.keyboard[pK];
 }
 
 bool IsKeyHit( Key pK ) {
-    return eventManager->mCurrState.mKeyboard[pK] && !eventManager->mPrevState.mKeyboard[pK];
+    return em->curr_state.keyboard[pK] && !em->prev_state.keyboard[pK];
 }
 
 
 bool IsMouseDown( MouseButton pK ) {
-    return eventManager->mCurrState.mMouse[pK];
+    return em->curr_state.mouse[pK];
 }
 
 bool IsMouseUp( MouseButton pK ) {
-    return eventManager->mCurrState.mMouse[pK] && !eventManager->mPrevState.mMouse[pK];
+    return em->curr_state.mouse[pK] && !em->prev_state.mouse[pK];
 }
 
 bool IsMouseHit( MouseButton pK ) {
-    return eventManager->mCurrState.mMouse[pK] && !eventManager->mPrevState.mMouse[pK];
+    return em->curr_state.mouse[pK] && !em->prev_state.mouse[pK];
 }
 
 
 bool IsWheelUp() {
-    return eventManager->mCurrState.mWheel > eventManager->mPrevState.mWheel;
+    return em->curr_state.wheel > em->prev_state.wheel;
 }
 
 bool IsWheelDown() {
-    return eventManager->mCurrState.mWheel < eventManager->mPrevState.mWheel;
+    return em->curr_state.wheel < em->prev_state.wheel;
 }
 
 // Listener funcs
-bool EventManager_addListener( ListenerType pType, ListenerFunc pFunc, void *pData ) {
-    if( eventManager ) {
-        ListenerStruct s = { .function = pFunc, .data = pData };
+bool EventManager_addListener( ListenerType type, ListenerFunc func, void *data ) {
+    if( em ) {
+        ListenerStruct s = { .function = func, .data = data };
         // switch on Listener type
-        if( LT_KeyListener == pType ) {
-            if( ListenerArray_checkSize( &eventManager->mKeyListeners ) ) {
-                eventManager->mKeyListeners.data[eventManager->mKeyListeners.cpt++] = s;
+        if( LT_KeyListener == type ) {
+            if( ListenerArray_checkSize( &em->key_listeners ) ) {
+                em->key_listeners.data[em->key_listeners.cpt++] = s;
             } else
                 return false;
-        } else if( LT_MouseListener == pType ) {
-            if( ListenerArray_checkSize( &eventManager->mMouseListeners ) ) 
-                eventManager->mMouseListeners.data[eventManager->mMouseListeners.cpt++] = s;
+        } else if( LT_MouseListener == type ) {
+            if( ListenerArray_checkSize( &em->mouse_listeners ) ) 
+                em->mouse_listeners.data[em->mouse_listeners.cpt++] = s;
             else
                 return false;
-        } else if( LT_ResizeListener == pType ) {
-            if( ListenerArray_checkSize( &eventManager->mResizeListeners ) ) 
-                eventManager->mResizeListeners.data[eventManager->mResizeListeners.cpt++] = s;
+        } else if( LT_ResizeListener == type ) {
+            if( ListenerArray_checkSize( &em->resize_listeners ) ) 
+                em->resize_listeners.data[em->resize_listeners.cpt++] = s;
             else
                 return false;
         } else
@@ -210,80 +210,80 @@ bool EventManager_addListener( ListenerType pType, ListenerFunc pFunc, void *pDa
 }
 
 void EventManager_propagateEvent( const Event pEvent ) {
-    switch( pEvent.Type ) {
+    switch( pEvent.type ) {
         case EKeyPressed:
         case EKeyReleased:
         case ECharPressed:
-            if( EventArray_checkSize( &eventManager->mFrameKeyEvents ) ) 
-                eventManager->mFrameKeyEvents.data[eventManager->mFrameKeyEvents.cpt++] = pEvent;
+            if( EventArray_checkSize( &em->frame_key_events ) ) 
+                em->frame_key_events.data[em->frame_key_events.cpt++] = pEvent;
             break;
         case EMouseMoved:
         case EMousePressed:
         case EMouseReleased:
         case EMouseWheelMoved:
-            if( EventArray_checkSize( &eventManager->mFrameMouseEvents ) ) 
-                eventManager->mFrameMouseEvents.data[eventManager->mFrameMouseEvents.cpt++] = pEvent;
+            if( EventArray_checkSize( &em->frame_mouse_events ) ) 
+                em->frame_mouse_events.data[em->frame_mouse_events.cpt++] = pEvent;
             break;
         case EWindowResized:
-            if( EventArray_checkSize( &eventManager->mFrameResizeEvents ) ) 
-                eventManager->mFrameResizeEvents.data[eventManager->mFrameResizeEvents.cpt++] = pEvent;
+            if( EventArray_checkSize( &em->frame_resize_events ) ) 
+                em->frame_resize_events.data[em->frame_resize_events.cpt++] = pEvent;
             break;
     }
 }
 
 
 // GLFW Event Callback functions
-    void KeyPressedCallback( int pKey, int pValue ) {
-        if( eventManager )
-            eventManager->mCurrState.mKeyboard[pKey] = pValue ? true : false;
+    void KeyPressedCallback( int key, int value ) {
+        if( em )
+            em->curr_state.keyboard[key] = value ? true : false;
 
-        Event e = { .Type = ( pValue ? EKeyPressed : EKeyReleased ), .key = (Key)pKey, .i = pKey };
+        Event e = { .type = ( value ? EKeyPressed : EKeyReleased ), .key = (Key)key, .i = key };
 
         EventManager_propagateEvent( e );
     }
 
-    void CharPressedCallback( int pChar, int pValue ) {
-        if( eventManager ) {
-            Event e = { .Type = ECharPressed, .i = pChar };
+    void CharPressedCallback( int c, int value ) {
+        if( em ) {
+            Event e = { .type = ECharPressed, .i = c };
 
             EventManager_propagateEvent( e );
         }
     }
 
-    void MouseButtonCallback( int pButton, int pValue ) {
-        if( eventManager ) {
-            eventManager->mCurrState.mMouse[pButton] = pValue ? true : false;
+    void MouseButtonCallback( int button, int value ) {
+        if( em ) {
+            em->curr_state.mouse[button] = value ? true : false;
 
-            Event e = { .Type = (pValue ? EMousePressed : EMouseReleased), .button = (MouseButton)pButton, .v = { eventManager->mCurrState.mMousePos.x, eventManager->mCurrState.mMousePos.y } };
+            Event e = { .type = (value ? EMousePressed : EMouseReleased), .button = (MouseButton)button, .v = { em->curr_state.mouse_pos.x, em->curr_state.mouse_pos.y } };
 
             EventManager_propagateEvent( e );
         }
     }
 
     void MouseWheelCallback( int pWheel ) {
-        if( eventManager ) {
-            eventManager->mCurrState.mWheel = pWheel;
+        if( em ) {
+            em->curr_state.wheel = pWheel;
 
-            Event e = { .Type = EMouseWheelMoved, .i = (pWheel - eventManager->mPrevState.mWheel) };
-
-            EventManager_propagateEvent( e );
-        }
-    }
-
-    void MouseMovedCallback( int pX, int pY ) {
-        if( eventManager ) {
-            eventManager->mCurrState.mMousePos.x = (f32)pX;
-            eventManager->mCurrState.mMousePos.y = (f32)pY;
-
-            Event e = { .Type = EMouseMoved, .v = { .x = pX, .y = pY } };
+            Event e = { .type = EMouseWheelMoved, .i = (pWheel - em->prev_state.wheel) };
 
             EventManager_propagateEvent( e );
         }
     }
 
-    void WindowResizeCallback( int pWidth, int pHeight ) {
-        if( eventManager ) {
-            Event e = { .Type = EWindowResized, .v = { .x = pWidth, .y = pHeight } };
+    void MouseMovedCallback( int x, int y ) {
+        if( em ) {
+            em->curr_state.mouse_pos.x = (f32)x;
+            em->curr_state.mouse_pos.y = (f32)y;
+
+            Event e = { .type = EMouseMoved, .v = { .x = x, .y = y } };
+
+            EventManager_propagateEvent( e );
+        }
+    }
+
+    void WindowResizeCallback( int width, int height ) {
+        if( em ) {
+            Event e = { .type = EWindowResized, .v = { .x = width, .y = height } };
 
             EventManager_propagateEvent( e );
         }

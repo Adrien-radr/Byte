@@ -6,12 +6,12 @@
 
 
 /// Initialize and returns a Context instance
-/// @param pWidth : Window width
-/// @param pHeight : Window height
-/// @param pFullscreen : Boolean for fullscreen mode
-/// @param pName : Window name
-/// @param pMultiSamples : Nb of FSAA Samples
-bool Context_init( u32 pWidth, u32 pHeight, bool pFullscreen, const char *pName, u32 pMultiSamples );
+/// @param width : Window width
+/// @param height : Window height
+/// @param fullscreen : Boolean for fullscreen mode
+/// @param name : Window name
+/// @param multi_samples : Nb of FSAA Samples
+bool Context_init( u32 width, u32 height, bool fullscreen, const char *name, u32 multi_samples );
 
 /// Destroy a context instance
 void Context_destroy();
@@ -26,19 +26,19 @@ void Context_swap();
 bool Context_isWindowOpen();
 
 /// Returns the window size
-vec2 Context_getSize();
+vec2i Context_getSize();
 
 /// Returns whether the window size has changed or not
 //bool Context_sizeChanged();
 
 /// Sets the window size
-void Context_setSize( vec2 pSize );
+void Context_setSize( vec2i size );
 
 /// (de)Activate Vertical synchronisation
-void Context_setVSync( bool pVal );
+void Context_setVSync( bool val );
 
 /// Show or Hide the mouse cursor in the window boundaries
-void Context_showCursor( bool pVal ); 
+void Context_showCursor( bool val ); 
 
 
 

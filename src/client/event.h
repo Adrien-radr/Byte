@@ -23,13 +23,14 @@ typedef enum {
 /// This is used primalarly by the GLFW Callback funcs
 /// to distribute the event recorded to all Listeners
 typedef struct {
-    EventType   Type;               ///< Type of the event
+    EventType   type;           ///< Type of the event
                         
-    vec2        v;
-    int         i;
+    vec2i       v;              ///< Mouse pos
+    int         i;              ///< Mouse wheel relative
+
     union {
-        MouseButton button;
-        Key         key;
+        MouseButton button;     ///< Mouse button used
+        Key         key;        ///< Keyboard key used
     };
 } Event;
 
@@ -49,13 +50,13 @@ void EventManager_update();
 // Input querying functions
     u32  GetMouseX();
     u32  GetMouseY();
-    bool IsKeyDown( Key pK );
-    bool IsKeyUp( Key pK );
-    bool IsKeyHit( Key pK );
+    bool IsKeyDown( Key k );
+    bool IsKeyUp( Key k );
+    bool IsKeyHit( Key k );
 
-    bool IsMouseDown( MouseButton pK );
-    bool IsMouseUp( MouseButton pK );
-    bool IsMouseHit( MouseButton pK );
+    bool IsMouseDown( MouseButton m );
+    bool IsMouseUp( MouseButton m );
+    bool IsMouseHit( MouseButton m );
 
     bool IsWheelUp();
     bool IsWheelDown();
@@ -69,9 +70,9 @@ void EventManager_update();
 //         ((Camera*)pData).mPosition.x = pEvent.MousePos.x;
 //         ((Camera*)pData).mPosition.y = pEvent.MousePos.y;
     /// Listener function type
-    /// @param pEvent : Event recorded that can be processed
-    /// @parma pData : Void pointer on anything that could be usefull in the callback
-    typedef void (*ListenerFunc)( const Event *pEvent, void *pData );
+    /// @param event : Event recorded that can be processed
+    /// @parma data : Void pointer on anything that could be usefull in the callback
+    typedef void (*ListenerFunc)( const Event *event, void *data );
     
     /// Different types of listener
     typedef enum {
@@ -81,20 +82,20 @@ void EventManager_update();
     } ListenerType;
 
     /// Listener registering function
-    /// @param pType : Key or Mouse listener
-    /// @param pFunc : Callback function of the listener (of type ListenerFunc)
-    /// @parma pData : Void pointer on anything that could be usefull in the callback
-    bool EventManager_addListener( ListenerType pType, ListenerFunc pFunc, void *pData );
+    /// @param type : Key or Mouse listener
+    /// @param func : Callback function of the listener (of type ListenerFunc)
+    /// @parma data : Void pointer on anything that could be usefull in the callback
+    bool EventManager_addListener( ListenerType type, ListenerFunc func, void *data );
 
 
 
 
 // GLFW Event Callback functions
-    void WindowResizeCallback( int pWidth, int pHeight );
-    void KeyPressedCallback( int pKey, int pValue );
-    void CharPressedCallback( int pKey, int pValue );
-    void MouseButtonCallback( int pButton, int pValue );
-    void MouseWheelCallback( int pWheel );
-    void MouseMovedCallback( int pX, int pY );
+    void WindowResizeCallback( int width, int height );
+    void KeyPressedCallback( int key, int value );
+    void CharPressedCallback( int key, int value );
+    void MouseButtonCallback( int button, int value );
+    void MouseWheelCallback( int wheel );
+    void MouseMovedCallback( int x, int y );
 
 #endif

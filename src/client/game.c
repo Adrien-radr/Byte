@@ -75,13 +75,13 @@ error:
 
 /// Game mouse listener
 void Game_mouseListener( const Event *event, void *data ) {
-    if( event->Type == EMouseMoved ) {
+    if( event->type == EMouseMoved ) {
         str32 text;
-        snprintf( text, 32, "X : %d, Y : %d", (int)event->v.x, (int)event->v.y );
+        snprintf( text, 32, "X : %d, Y : %d", event->v.x, event->v.y );
         Scene_modifyText( game->scene, game->mousepos_text, TA_String, text );
 
         game->mouse_tile = Scene_screenToIso( game->scene, &event->v );
-        snprintf( text, 32, "TileX: %d, TileY : %d", (int)game->mouse_tile.x, (int)game->mouse_tile.y );
+        snprintf( text, 32, "TileX: %d, TileY : %d", game->mouse_tile.x, game->mouse_tile.y );
         Scene_modifyText( game->scene, game->mousetile_text, TA_String, text );
     }
 }
