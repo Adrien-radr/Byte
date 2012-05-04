@@ -9,7 +9,7 @@ SpriteArray *SpriteArray_init( u32 pSize ) {
     arr->mTextures0 = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextures1 = byte_alloc( pSize * sizeof( int ) );
     arr->mDepths = byte_alloc( pSize * sizeof( u32 ) );
-    arr->mMatrices = byte_alloc( pSize * sizeof( mat3 ) );
+    arr->mMatrices = byte_alloc( pSize * sizeof( mat3* ) );
 
     arr->mSize = pSize;
 
@@ -30,7 +30,7 @@ int SpriteArray_add( SpriteArray *arr ) {
                 arr->mTextures0 = byte_realloc( arr->mTextures0, arr->mSize * sizeof( u32 ) );
                 arr->mTextures1 = byte_realloc( arr->mTextures1, arr->mSize * sizeof( int ) );
                 arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( u32 ) );
-                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3 ) );
+                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
             }
 
             ++arr->mMaxIndex;

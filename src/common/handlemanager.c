@@ -58,7 +58,7 @@ int  HandleManager_addData( HandleManager *pHm, void *pData, bool manage, u32 da
     int handle = -1;
 
     if( pHm ) {
-        if( pHm->mFirstFreeIndex < 0 ) 
+        if( pHm->mFirstFreeIndex < 0 )
             Resize( pHm );
 
         handle = pHm->mFirstFreeIndex;
@@ -76,8 +76,8 @@ int  HandleManager_addData( HandleManager *pHm, void *pData, bool manage, u32 da
 
         ++pHm->mCount;
         ++pHm->mMaxIndex;
-    }     
-    
+    }
+
     return handle;
 }
 
@@ -85,7 +85,7 @@ int  HandleManager_addHandle( HandleManager *pHm, u32 pData ) {
     int handle = -1;
 
     if( pHm ) {
-        if( pHm->mFirstFreeIndex < 0 ) 
+        if( pHm->mFirstFreeIndex < 0 )
             Resize( pHm );
 
         handle = pHm->mFirstFreeIndex;
@@ -96,17 +96,17 @@ int  HandleManager_addHandle( HandleManager *pHm, u32 pData ) {
 
         ++pHm->mCount;
         ++pHm->mMaxIndex;
-    }     
-    
+    }
+
     return handle;
 }
 
 void HandleManager_remove( HandleManager *pHm, u32 pHandle ) {
     if( pHm && pHandle < pHm->mSize && pHm->mHandles[pHandle].used ) {
         u32 next = pHm->mFirstFreeIndex;
-        
+
         // first free index becomes the one at the pos of the removed data
-        // 
+        //
         pHm->mFirstFreeIndex = pHandle;
         pHm->mHandles[pHandle].next_free_index = next;
 

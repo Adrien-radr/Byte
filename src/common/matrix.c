@@ -21,8 +21,6 @@ void mat3_cpy( mat3 *A, const mat3 *B ) {
 void mat3_mul( mat3 *A, const mat3 *B ) {
     if( A && B ) {
         mat3 m;
-        memcpy( m.x, A->x, 9 * sizeof( f32 ) );
-
         m.x[0] = A->x[0] * B->x[0] + A->x[1] * B->x[3] + A->x[2] * B->x[6];
         m.x[1] = A->x[0] * B->x[1] + A->x[1] * B->x[4] + A->x[2] * B->x[7];
 

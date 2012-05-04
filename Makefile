@@ -10,6 +10,7 @@ ARCH = 64
 
 CC = gcc
 
+<<<<<<< HEAD
 USE_GLDL = 0
 
 # Use GLDL lib for debug if wanted, instead of glew
@@ -22,7 +23,6 @@ GL_FLAG =
 endif
 
 .PHONY: all, client, server, common, ext, coclean, clclean, svclean, clean, cleaner
-
 
 all: 
 	@echo "---- Building $(NAME) $(VERSION) ----"

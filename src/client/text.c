@@ -61,11 +61,11 @@ bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-        
+
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, pFont->mTextureSize.x,
                                                 pFont->mTextureSize.y,
                                                 0,
-                                                GL_RED, 
+                                                GL_RED,
                                                 GL_UNSIGNED_BYTE,
                                                 0 );
 
@@ -77,7 +77,7 @@ bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
 
             glTexSubImage2D( GL_TEXTURE_2D, 0, x, 0, g->bitmap.width,
                                                      g->bitmap.rows,
-                                                     GL_RED, 
+                                                     GL_RED,
                                                      GL_UNSIGNED_BYTE,
                                                      g->bitmap.buffer );
 
@@ -206,7 +206,7 @@ void Text_setString( u32 pMeshVbo, const Font *pFont, const char *pStr ) {
         data[n_tex++] = glyphs[i].x_offset;                                         data[n_tex++] = 0;
         data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = (f32)glyphs[i].size.y / (f32)fh;
         data[n_tex++] = glyphs[i].x_offset + (f32)glyphs[i].size.x / (f32)fw;       data[n_tex++] = 0;
-            
+
     }
 
     // update mesh
@@ -281,7 +281,7 @@ void TextArray_clear( TextArray *arr ) {
         arr->mCount = 0;
         HandleManager_clear( arr->mUsed );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
-            DEL_PTR( arr->mStrings[i] ); 
+            DEL_PTR( arr->mStrings[i] );
         }
     }
 }
@@ -295,7 +295,7 @@ void TextArray_destroy( TextArray *arr ) {
         DEL_PTR( arr->mPositions );
         DEL_PTR( arr->mDepths );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
-            DEL_PTR( arr->mStrings[i] ); 
+            DEL_PTR( arr->mStrings[i] );
         }
         DEL_PTR( arr->mStrings );
         DEL_PTR( arr );
