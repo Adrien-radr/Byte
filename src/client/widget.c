@@ -1,6 +1,9 @@
 #include "widget.h"
 #include "renderer.h"
 
+#include "GL/glew.h"
+
+
 WidgetArray* WidgetArray_init( u32 pSize ){
     WidgetArray *arr = byte_alloc( sizeof( WidgetArray ) );
     check_mem( arr );
@@ -13,18 +16,18 @@ WidgetArray* WidgetArray_init( u32 pSize ){
     arr->mTextMeshes = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextures = byte_alloc( pSize * sizeof( u32* ) );
     arr->mDepths = byte_alloc( pSize * sizeof( int ) );
-    arr->mMatrices = byte_alloc( pSize * sizeof( mat3 ) );
-    arr->mBounds = byte_alloc( pSize * sizeof( vec2 ) );
+    arr->mPositions = byte_alloc( pSize * sizeof( vec2i ) );
+    arr->mBounds = byte_alloc( pSize * sizeof( vec2i ) );
     arr->mFonts = byte_alloc( pSize * sizeof( Font* ) );
     arr->mColors = byte_alloc( pSize * sizeof( Color ) );
-    arr->mTextPositions = byte_alloc( pSize * sizeof( vec2 ) );
+    arr->mTextPositions = byte_alloc( pSize * sizeof( vec2i ) );
     arr->mStrings = byte_alloc( pSize * sizeof( char* ) );
     arr->mChildren = byte_alloc( pSize * sizeof( HandleManager ) );
-    for( u32 i = 0; i < pSize - 1; i++ )
+
+    for( u32 i = 0; i < pSize; ++i )
         arr->mChildren[i] = HandleManager_init( 1 );   // We set a default value of 1 child per widget, but there can be more or less.
 
     arr->mWidgetTypes = byte_alloc( pSize * sizeof( WidgetType ) );
-
 
     arr->mSize = pSize;
 
@@ -69,17 +72,17 @@ int WidgetArray_add( WidgetArray* arr, WidgetType pWT, int pMother ) {
                                 arr->mSize = arr->mUsed->mSize;
                                 arr->mTextMeshes = byte_realloc( arr->mTextMeshes, arr->mSize * sizeof( u32 ) );
                                 arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( int ) );
-                                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
-                                arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2 ) );
+                                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2i ) );
+                                arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2i ) );
                                 arr->mFonts = byte_realloc( arr->mFonts, arr->mSize * sizeof( Font* ) );
                                 arr->mColors = byte_realloc( arr->mColors, arr->mSize * sizeof( Color ) );
-                                arr->mTextPositions = byte_realloc( arr->mTextPositions, arr->mSize * sizeof( vec2 ) );
+                                arr->mTextPositions = byte_realloc( arr->mTextPositions, arr->mSize * sizeof( vec2i ) );
                                 arr->mStrings = byte_realloc( arr->mStrings, arr->mSize * sizeof( char* ) );
                                 arr->mWidgetTypes = byte_realloc( arr->mWidgetTypes, arr->mSize * sizeof( WidgetType ) );
                         }
 
                         // create mesh used by widget
-                        check( (arr->mTextMeshes[handle] = Renderer_createDynamicMesh()) >= 0, "Failed to create mesh of Widget!\n" );
+                        check( (arr->mTextMeshes[handle] = Renderer_createDynamicMesh( GL_TRIANGLES )) >= 0, "Failed to create mesh of Widget!\n" );
 
 
                         ++arr->mMaxIndex;
@@ -102,8 +105,8 @@ int WidgetArray_add( WidgetArray* arr, WidgetType pWT, int pMother ) {
                                 arr->mTextures = byte_realloc( arr->mTextures, arr->mSize * sizeof( u32 ) );
                                 arr->mTextureMeshes = byte_realloc( arr->mTextureMeshes, arr->mSize * sizeof( u32 ) );
                                 arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( int ) );
-                                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
-                                arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2 ) );
+                                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2i ) );
+                                arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2i ) );
                                 arr->mWidgetTypes = byte_realloc( arr->mWidgetTypes, arr->mSize * sizeof( WidgetType ) );
 
                         }
@@ -128,18 +131,18 @@ int WidgetArray_add( WidgetArray* arr, WidgetType pWT, int pMother ) {
                                 arr->mTextureMeshes = byte_realloc( arr->mTextureMeshes, arr->mSize * sizeof( u32 ) );
                                 arr->mTextMeshes = byte_realloc( arr->mTextMeshes, arr->mSize * sizeof( u32 ) );
                                 arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( int ) );
-                                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
-                                arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2 ) );
+                                arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2i ) );
+                                arr->mBounds = byte_realloc( arr->mBounds, arr->mSize * sizeof( vec2i ) );
                                 arr->mFonts = byte_realloc( arr->mFonts, arr->mSize * sizeof( Font* ) );
                                 arr->mColors = byte_realloc( arr->mColors, arr->mSize * sizeof( Color ) );
-                                arr->mTextPositions = byte_realloc( arr->mTextPositions, arr->mSize * sizeof( vec2 ) );
+                                arr->mTextPositions = byte_realloc( arr->mTextPositions, arr->mSize * sizeof( vec2i ) );
                                 arr->mStrings = byte_realloc( arr->mStrings, arr->mSize * sizeof( char* ) );
                                 arr->mWidgetTypes = byte_realloc( arr->mWidgetTypes, arr->mSize * sizeof( WidgetType ) );
 
                         }
 
                         // create mesh used by widget
-                        check( (arr->mTextMeshes[handle] = Renderer_createDynamicMesh()) >= 0, "Failed to create mesh of Widget!\n" );
+                        check( (arr->mTextMeshes[handle] = Renderer_createDynamicMesh( GL_TRIANGLES )) >= 0, "Failed to create mesh of Widget!\n" );
 
 
                         ++arr->mMaxIndex;
@@ -156,6 +159,7 @@ error:
     if( handle >= 0 ) {
         HandleManager_remove( arr->mEntityUsed, handle );
         HandleManager_remove( arr->mTextUsed, handle );
+        HandleManager_remove( arr->mUsed, handle );
     }
     return -1;
 }
@@ -180,6 +184,8 @@ void WidgetArray_remove( WidgetArray *arr, u32 pIndex ) {
             HandleManager_remove( arr->mEntityUsed, pIndex );
         if( HandleManager_isUsed( arr->mTextUsed, pIndex ))
             HandleManager_remove( arr->mTextUsed, pIndex );
+
+        HandleManager_remove( arr->mUsed, pIndex );
         DEL_PTR( arr->mStrings[pIndex] );
         --arr->mCount;
     }
@@ -191,6 +197,7 @@ void WidgetArray_clear( WidgetArray *arr ) {
         arr->mCount = 0;
         HandleManager_clear( arr->mEntityUsed );
         HandleManager_clear( arr->mTextUsed );
+        HandleManager_clear( arr->mUsed );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
             DEL_PTR( arr->mStrings[i] );
         }
@@ -201,10 +208,11 @@ void WidgetArray_destroy( WidgetArray *arr ) {
     if( arr ) {
         HandleManager_destroy( arr->mEntityUsed );
         HandleManager_destroy( arr->mTextUsed );
+        HandleManager_destroy( arr->mUsed );
         DEL_PTR( arr->mTextureMeshes );
         DEL_PTR( arr->mTextMeshes);
         DEL_PTR( arr->mTextures );
-        DEL_PTR( arr->mMatrices );
+        DEL_PTR( arr->mPositions );
         DEL_PTR( arr->mBounds );
         DEL_PTR( arr->mFonts );
         DEL_PTR( arr->mColors );
@@ -214,6 +222,10 @@ void WidgetArray_destroy( WidgetArray *arr ) {
         }
         DEL_PTR( arr->mStrings );
         DEL_PTR( arr->mWidgetTypes );
+        for( u32 i = 0; i < arr->mSize; ++i )
+            HandleManager_destroy( arr->mChildren[i] );
+        DEL_PTR( arr->mChildren );
+        DEL_PTR( arr->mDepths );
         DEL_PTR( arr );
     }
 }

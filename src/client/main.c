@@ -19,6 +19,8 @@
 Actor *a1;
 int a1_h;
 
+int master, button1;
+
 void mousecb( const Event *e, void *data ) {
     if( e->type == EMouseReleased ) {
         if( e->button == MB_Right ) {
@@ -53,6 +55,35 @@ void init_callback() {
         Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
     }
 
+    // GUI
+    master = Scene_addWidget( game->scene, WT_Master, NULL, -1 );
+
+    int mesh = ResourceManager_get("widgetmesh.json");
+    int tex = ResourceManager_get("widgettexture.png");
+
+
+    vec2i pos = { 500, 500 };
+     Color col = { 0.6f, 0.6f, 0.6f, 1.f };
+    vec2 textPos;
+    textPos.x = 10;
+    textPos.y = 10;
+     Font *f = Font_get( "DejaVuSans.ttf", 12 );
+    WidgetButtonAttributes wba;
+    wba.mMesh = mesh;
+    wba.mTexture = tex;
+    wba.mPosition = pos;
+    wba.mFont = f;
+    wba.mColor = col;
+    wba.mBounds.x = 70.f;
+    wba.mBounds.y = 20.f;
+
+    int depth = 0;
+
+    button1 = Scene_addWidget( game->scene, WT_Button, &wba, master );
+    Scene_modifyWidget( game->scene, button1, WA_String, "Button" );
+    Scene_modifyWidget( game->scene, button1, WA_TextPosition, &textPos );
+    Scene_modifyWidget( game->scene, button1, WA_Depth, &depth );
+    
     EventManager_addListener( LT_MouseListener, mousecb, NULL );
 }
  

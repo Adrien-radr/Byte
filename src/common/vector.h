@@ -11,6 +11,9 @@ typedef struct vec2i_ {
     int x, y;
 } vec2i;
 
+/// Cast between vec2i and vec2
+vec2 vec2_vec2i( const vec2i *B );
+
 /// Copy a given vector in another (B->A)
 void vec2_cpy( vec2 *A, const vec2 *B );
 void vec2i_cpy( vec2i *A, const vec2i *B );

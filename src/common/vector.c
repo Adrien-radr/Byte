@@ -1,5 +1,10 @@
 #include "vector.h"
 
+inline vec2 vec2_vec2i( const vec2i *B ) {
+    vec2 v = { (f32)B->x, (f32)B->y };
+    return v;
+}
+
 inline void vec2_cpy( vec2 *A, const vec2 *B ) {
     memcpy( &A->x, &B->x, 2 * sizeof( f32 ) );
 }

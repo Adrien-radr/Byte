@@ -1,5 +1,5 @@
-#ifndef BYTE_SCENE_HPP
-#define BYTE_SCENE_HPP
+#ifndef BYTE_SCENE_H
+#define BYTE_SCENE_H
 
 #include "common/common.h"
 #include "common/handlemanager.h"
@@ -9,6 +9,7 @@
 #include "texture.h"
 #include "text.h"
 #include "sprite.h"
+#include "widget.h"
 #include "light.h"
 #include "camera.h"
 
@@ -26,6 +27,9 @@ typedef struct {
 
     u32             text_shader;        ///< Shader used to render texts
     TextArray       *texts;             ///< Texts in the scene
+
+    u32             ui_shader;          ///< Shader used to render ui elements
+    WidgetArray     *widgets;           ///< Widgets in the scene. 
 
     Camera          *camera;            ///< Camera of the scene
 
@@ -109,6 +113,21 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 
     /// Clears the whole text array, to set a new scene
     void Scene_clearTexts( Scene *pScene );
+
+// ##########################################################################3
+//      Widgets Array
+    /// Add a widget to be rendered
+    /// @param pWT : the type of the widget (see widget.h).
+    /// @param pData : the corresponding data structure to set the widget (see widget.h).
+    int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct, int pMother );
+
+    void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void *pData );
+
+    /// Remove a widget from the scene (by its handle).
+    void Scene_removeWidget( Scene *pScene, u32 pWidget );
+
+    /// Clears the whole widget array, to set a new scene
+    void Scene_clearWidgets( Scene *pScene );
 
 
 

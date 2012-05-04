@@ -1,33 +1,32 @@
 #ifndef BYTE_WIDGET_H
 #define BYTE_WIDGET_H
 
-#include "handlemanager.h"
-#include "vector.h"
-#include "matrix.h"
+#include "common/handlemanager.h"
+#include "common/matrix.h"
 #include "text.h"
 
 //  Those structs are what we have to use as parameters in the creation of a new widget.
 typedef struct {
     u32 mMesh;
     u32 mTexture;
-    mat3* mMM;
-    vec2 mBounds;
+    vec2i mPosition;
+    vec2i mBounds;
 }   WidgetSpriteAttributes;
 
 typedef struct {
     const Font* mFont;
     Color mColor;
-    vec2 mPosition;
-    vec2 mBounds;
+    vec2i mPosition;
+    vec2i mBounds;
 }   WidgetTextAttributes;
 
 typedef struct {
     u32 mMesh;
     u32 mTexture;
-    mat3* mMM;
+    vec2i mPosition;
     const Font* mFont;
     Color mColor;
-    vec2 mBounds;
+    vec2i mBounds;
 }   WidgetButtonAttributes;
 
 
@@ -49,12 +48,12 @@ typedef struct {
     u32             *mTextMeshes;           //  Mesh for the text.
     u32             *mTextures;
     int             *mDepths;
-    mat3           **mMatrices;   //  For each widget there is a pointer to a matrix.
-    vec2            *mBounds;      //  Width and Height of each widget, defines their bounding box.
+    vec2i           *mPositions;   ///< Widget position (screen coords)
+    vec2i           *mBounds;      //  Width and Height of each widget, defines their bounding box.
 
     const Font      **mFonts;   //  For each widget there is a pointer to a Font.
     Color           *mColors;
-    vec2            *mTextPositions;
+    vec2i           *mTextPositions;
 
     char            **mStrings;
 
@@ -71,7 +70,7 @@ typedef struct {
 
 typedef enum {
     WA_Texture,
-    WA_Matrix,
+    WA_Position,
     WA_Bounds,
     WA_Depth,
     WA_Font,
