@@ -2,7 +2,12 @@
 #define BYTE_NET_H
 
 #include "common.h"
-#include <arpa/inet.h>
+
+#ifdef BYTE_WIN32
+    #include <winsock2.h>
+#else
+    #include <netinet/in.h>
+#endif
 
 /// GAME NET PACKAGES TYPES
 typedef enum {
@@ -83,9 +88,13 @@ typedef struct {
 
 typedef struct {
     str16                       ifname;
-    sa_family_t                 family;
+    u16                         family;
+#ifdef BYTE_WIN32
+    struct in_addr              addr;
+#else
     struct sockaddr_storage     addr;
     struct sockaddr_storage     mask;
+#endif
 } net_ip;
 
 #define MAX_IPS 8

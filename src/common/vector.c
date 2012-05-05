@@ -1,5 +1,15 @@
 #include "vector.h"
 
+inline vec2  vec2_c( f32 x, f32 y ) {
+    vec2 v = { x, y };
+    return v;
+}
+
+inline vec2i vec2i_c( int x, int y ) {
+    vec2i v = { x, y };
+    return v;
+}
+
 inline vec2 vec2_vec2i( const vec2i *B ) {
     vec2 v = { (f32)B->x, (f32)B->y };
     return v;

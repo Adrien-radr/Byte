@@ -1,16 +1,15 @@
 #include "net.h"
 
 #ifdef BYTE_WIN32
-    #include <winsock2.h>
+    #include <ws2tcpip.h>
     #pragma comment( lib, "wsock32.lib" )
 
     #define close closesocket
-
+ 
     typedef int socklen_t;
 #else
     #include <sys/socket.h>
     #include <netdb.h>
-    #include <netinet/in.h>
     #include <net/if.h>
     #include <fcntl.h>
     #include <ifaddrs.h>
@@ -39,9 +38,10 @@ str32 PacketTypeStr[PT_ARRAYEND] = {
 
   
 
+#ifndef BYTE_WIN32
 static void add_local_ip( char *ifname, struct sockaddr *addr, struct sockaddr *mask ) {
     int addrlen;
-    sa_family_t family;
+    u16 family;
 
     if( !ifname || !addr || !mask )
         return;
@@ -59,20 +59,42 @@ static void add_local_ip( char *ifname, struct sockaddr *addr, struct sockaddr *
         numIP++;
     }
 }
+#endif
 
 static void show_ip() {
     char buf[48];
 
     for( int i = 0; i < numIP; ++i ) {
+#ifdef BYTE_WIN32
+        log_info( "IP : %s\n", inet_ntoa( local_ips[i].addr ) );
+#else
         if( getnameinfo((struct sockaddr*)&local_ips[i].addr, sizeof(struct sockaddr_in), buf, 48, NULL, 0, NI_NUMERICHOST ) )
             buf[0] = 0;
 
         log_info( "IP : %s (%s)\n", buf, local_ips[i].ifname );
+#endif
     }
 }
 
 
 static void get_local_ips() {
+#ifdef BYTE_WIN32
+    char ac[80];
+    if( gethostname( ac, sizeof(ac) ) == SOCKET_ERROR ) {
+        log_err( "Unable to get list of net interfaces(gethostname)\n" );
+        return;
+    }
+
+    struct hostent *phe = gethostbyname(ac);
+    if( phe == NULL ) {
+        log_err( "Unable to get host list of net interfaces(gethostbyname)\n" );
+        return;
+    }
+
+    for ( int i = 0; phe->h_addr_list[i] != 0; ++i ) 
+        memcpy( &local_ips[i].addr, phe->h_addr_list[i], sizeof(struct in_addr) );
+
+#else
     struct ifaddrs *ifap, *search;
 
     if( getifaddrs( &ifap ) ) 
@@ -86,6 +108,7 @@ static void get_local_ips() {
         freeifaddrs( ifap );
     }
 
+#endif
     show_ip();
 }
 
@@ -128,8 +151,8 @@ bool Net_init() {
     bool ret = false;
 
 #ifdef BYTE_WIN32
-    WSAData wsa_data;
-    ret = WSAStartup( MAKEWORD( 2,2 ), &wsa_data ) != NO_ERROR;
+    WSADATA wsa_data;
+    ret = ( WSAStartup( MAKEWORD( 2,2 ), &wsa_data ) == 0 );
 #else
     ret = true;
 #endif
@@ -802,7 +825,7 @@ bool Net_openSocket( net_socket *s, u16 port ) {
     // set non-blocking IO
 #ifdef BYTE_WIN32
     DWORD non_block = 1;
-    check( ioctlsocket( *s, FIONBIO, &non_block ),
+    check( !ioctlsocket( *s, FIONBIO, &non_block ),
 #else
     int non_block = 1;
     check( !fcntl( *s, F_SETFL, O_NONBLOCK, non_block ),

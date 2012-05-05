@@ -277,12 +277,12 @@ void TextArray_remove( TextArray *arr, u32 pIndex ) {
 
 void TextArray_clear( TextArray *arr ) {
     if( arr ) {
-        arr->mMaxIndex = 0;
-        arr->mCount = 0;
         HandleManager_clear( arr->mUsed );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
             DEL_PTR( arr->mStrings[i] );
         }
+        arr->mMaxIndex = 0;
+        arr->mCount = 0;
     }
 }
 

@@ -50,9 +50,9 @@ void SpriteArray_remove( SpriteArray *arr, u32 pIndex ) {
 
 void SpriteArray_clear( SpriteArray *arr ) {
     if( arr ) {
+        HandleManager_clear( arr->mUsed );
         arr->mMaxIndex = 0;
         arr->mCount = 0;
-        HandleManager_clear( arr->mUsed );
     }
 }
 

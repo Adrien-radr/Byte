@@ -1,5 +1,5 @@
-#ifndef BYTE_SPRITE_HPP
-#define BYTE_SPRITE_HPP
+#ifndef BYTE_SPRITE_H
+#define BYTE_SPRITE_H
 
 #include "common/handlemanager.h"
 #include "common/matrix.h"
@@ -33,7 +33,7 @@ SpriteArray *SpriteArray_init( u32 pSize );
 /// Add a new sprite to the sprite array and returns its handle (or -1 if any error)
 int SpriteArray_add( SpriteArray *pSA );
 
-/// Remove a text from the given sprite array, by its index
+/// Remove a sprite from the given sprite array, by its index
 void SpriteArray_remove( SpriteArray *pSA, u32 pIndex );
 
 /// Clears the whole given sprite array

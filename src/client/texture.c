@@ -62,7 +62,7 @@ static texture_t *Byte_LoadPNG( const char *filename ) {
 
     // get png file signature
     fread( sig, 1, 8, f );
-    check( png_check_sig( sig, 8 ), "\"%s\" is not a valid PNG image!\n", filename );
+    check( png_sig_cmp( sig, 0, 8 ) == 0, "\"%s\" is not a valid PNG image!\n", filename );
 
     
     img = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
