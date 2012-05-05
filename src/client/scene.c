@@ -308,6 +308,20 @@ void Scene_render( Scene *pScene ) {
 
 
         // ##################################################
+        //      RENDER WIDGETS
+        Renderer_useShader( pScene->ui_shader );
+
+        for( u32 i = 0; i < pScene->widgets->max_index; ++i ){
+            if( HandleManager_isUsed( pScene->widgets->used, i ) ) {
+                Renderer_useTexture( pScene->widgets->textures[i], 0 );
+                Shader_sendVec2( "Position", &pScene->widgets->positions[i] );
+                Shader_sendInt( "Depth", pScene->widgets->depths[i] );
+                Renderer_renderMesh( pScene->widgets->meshes[i] );
+            }
+        }
+
+
+        // ##################################################
         //      RENDER TEXTS
         Renderer_useShader( pScene->text_shader );
 
@@ -318,19 +332,6 @@ void Scene_render( Scene *pScene ) {
                 Shader_sendColor( "Color", &pScene->texts->mColors[i] );
                 Shader_sendVec2( "Position", &pScene->texts->mPositions[i] );
                 Renderer_renderMesh( pScene->texts->mMeshes[i] );
-            }
-        }
-
-        // ##################################################
-        //      RENDER WIDGETS
-        Renderer_useShader( pScene->ui_shader );
-
-        for( u32 i = 0; i < pScene->widgets->max_index; ++i ){
-            if( HandleManager_isUsed( pScene->widgets->used, i ) ) {
-                Renderer_useTexture( pScene->widgets->textures[i], 0 );
-                Shader_sendVec2( "Position", &pScene->widgets->positions[i] );
-                Shader_sendInt( "Depth", pScene->widgets->depths[i] );
-                Renderer_renderMesh( pScene->widgets->meshes[i] );
             }
         }
     }

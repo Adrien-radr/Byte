@@ -158,11 +158,6 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     EventManager_addListener( LT_ResizeListener, Game_windowResize, NULL );
     EventManager_addListener( LT_MouseListener, Game_mouseListener, NULL );
 
-    Font *f = Font_get( "DejaVuSans.ttf", 12 );
-    Color col = { 0.9f, 0.9f, 0.9f, 1.f };
-    int text_depth = -10;
-    vec2 pos = {0,0};
-
 
 
     printf( "\n" );
@@ -173,6 +168,12 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     if( init_func )
         init_func();
 
+
+    Font *f = Font_get( "DejaVuSans.ttf", 12 );
+    Color col = { 0.9f, 0.9f, 0.9f, 1.f };
+    int text_depth = -10;
+    vec2 pos = { 6, 4 };
+
     // Load fps text
     game->fps_text = Scene_addText( game->scene, f, col );
     Scene_modifyText( game->scene, game->fps_text, TA_Position, &pos );
@@ -181,14 +182,14 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
     // Load mousepos text
     game->mousepos_text = Scene_addText( game->scene, f, col );
-    pos.y = 15.f;
+    pos.y += 15.f;
     Scene_modifyText( game->scene, game->mousepos_text, TA_Position, &pos );
     Scene_modifyText( game->scene, game->mousepos_text, TA_String, "X  : 0, Y : 0" );
     Scene_modifyText( game->scene, game->mousepos_text, TA_Depth, &text_depth );
 
     // Load mousetile text
     game->mousetile_text = Scene_addText( game->scene, f, col );
-    pos.y = 30.f;
+    pos.y += 15.f;
     Scene_modifyText( game->scene, game->mousetile_text, TA_Position, &pos );
     Scene_modifyText( game->scene, game->mousetile_text, TA_String, "X  : 0, Y : 0" );
     Scene_modifyText( game->scene, game->mousetile_text, TA_Depth, &text_depth );

@@ -58,10 +58,10 @@ void init_callback() {
 
     // GUI
     Widget button;
-    button.position = vec2i_c( 200, 100 );
-    button.size = vec2i_c( 50, 20 );
-    button.depth = -9;
-    Widget_init( &button, "quadmesh.json", "widgettexture.png" );
+    button.position = vec2i_c( 3, 3 );
+    button.size = vec2i_c( 120, 50 );
+    button.depth = -5;
+    Widget_init( &button, "widgetmesh.json", "widgettexture.png" );
 
     button1 = Scene_addWidget( game->scene, &button );
 
