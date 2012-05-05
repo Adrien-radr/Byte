@@ -62,10 +62,13 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 //      Scene Map
     /// Returns the global world coordinates of a vector, not depending of camera
     /// zoom or pan. (often you want this to translate mousepos from screen to world)
-    vec2 Scene_localToGlobal( Scene *scene, const vec2i *local );
+    vec2  Scene_localToGlobal( Scene *scene, const vec2i *local );
 
     /// Returns the map tile at a given local screen position
     vec2i Scene_screenToIso( Scene *scene, const vec2i *local );
+
+    /// Returns the center position of a given tile, in global coordinates
+    vec2  Scene_isoToGlobal( Scene *scene, const vec2i *tile );
 
     void SceneMap_redTile( Scene *scene, u32 i, u32 j );
     

@@ -24,12 +24,9 @@ int master, button1;
 void mousecb( const Event *e, void *data ) {
     if( e->type == EMouseReleased ) {
         if( e->button == MB_Right ) {
-            vec2 newpos = Scene_localToGlobal( game->scene, &e->v );
+            vec2i tile = Scene_screenToIso( game->scene, &e->v );
+            Game_setActorPosition( a1, &tile );
 
-            mat3 m;
-            mat3_translationMatrixfv( &m, &newpos );
-            m.x[2] = a1->size.y / 2.f;
-            Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
         } else if( e->button == MB_Left ) {
             int i = (int)game->mouse_tile.x;
             int j = (int)game->mouse_tile.y;
@@ -49,11 +46,6 @@ void init_callback() {
 
         Game_loadActorAssets( a1 );
         Scene_addSpriteFromActor( game->scene, a1 );
-        vec2 pos = { 200, 100 };
-        mat3 m;
-        mat3_translationMatrixfv( &m, &pos );
-        m.x[2] = a1->size.y / 2.f;
-        Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
     }
 
     // GUI

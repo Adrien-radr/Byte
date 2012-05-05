@@ -136,6 +136,15 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
     return ret;
 }
 
+vec2  Scene_isoToGlobal( Scene *scene, const vec2i *tile ) {
+    static const vec2 tilesize = { 100.f, 50.f };
+    static const vec2 halfsize = { 50.f,  25.f };
+
+    vec2 ret = { (tile->x+1) * halfsize.x, 
+                 tile->y * tilesize.y + (1+(tile->x&1)) * halfsize.y };
+    return ret;
+}
+
 
 // #############################################################################
 //          SCENE
@@ -363,12 +372,11 @@ int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) {
 
         if( handle >= 0 ) {
             pActor->used_sprite = handle;
-            pScene->sprites->mMeshes[handle] = pActor->mesh_id;
-            pScene->sprites->mTextures0[handle] = pActor->texture_ids[0];
-            pScene->sprites->mTextures1[handle] = pActor->texture_ids[1];
-            mat3 m;
-            mat3_translationMatrixfv( &m, &pActor->mPosition );
-            memcpy( pScene->sprites->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
+            pScene->sprites->mMeshes[handle] = pActor->assets.mesh_id;
+            pScene->sprites->mTextures0[handle] = pActor->assets.texture_id[0];
+            pScene->sprites->mTextures1[handle] = pActor->assets.texture_id[1];
+            // set sprite global position from actor tile position
+            Game_setActorPosition( pActor, &pActor->position );
         }
     }
     return handle;

@@ -11,6 +11,7 @@ bool World_init() {
     world->mActors = HandleManager_init( 50 );
 
     // init local map
+    Map_init( &world->local_map );
 
 
     return true;

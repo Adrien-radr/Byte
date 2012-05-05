@@ -56,4 +56,9 @@ bool Game_update( f32 frame_time );
 /// Returns a pointer to freetype lib
 FT_Library *Game_getFreetype();
 
+
+/// Sets an actor position, in its abstract representation(actor.h) and
+/// in its scene sprite representation (sprite.h), it it has one
+void Game_setActorPosition( Actor *actor, const vec2i *pos );
+
 #endif // BYTE_GAME

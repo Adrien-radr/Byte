@@ -14,7 +14,7 @@ typedef struct {
     HandleManager   *mActors;
 
     // World local map
-    map             local_map;
+    Map             local_map;
 } World;
 
 /// World instance

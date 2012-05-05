@@ -267,28 +267,34 @@ bool Game_update( f32 frame_time ) {
     return true;
 }
 
+FT_Library *Game_getFreetype() {
+    if( game )
+        return &game->freetype_lib;
+    return NULL;
+}
+
 bool Game_loadActorAssets( Actor *actor ) {
     check( game, "Tried to load actor assets on an ininitialized game instance\n" );
 
     // load scaled mesh
     str256 scaled_mesh_str;
     str16 mesh_size;
-    snprintf( mesh_size, 16, "%d.%d", (int)actor->size.x, (int)actor->size.y );
+    snprintf( mesh_size, 16, "%d.%d", (int)actor->assets.mesh_size.x, (int)actor->assets.mesh_size.y );
 
     strcpy( scaled_mesh_str, actor->assets.mesh );
     strcat( scaled_mesh_str, mesh_size );
 
-    actor->mesh_id = ResourceManager_get( scaled_mesh_str );
+    actor->assets.mesh_id = ResourceManager_get( scaled_mesh_str );
     // if correctly sized mesh is not yet loaded, create it
-    if( -1 == actor->mesh_id ) {
-        actor->mesh_id = ResourceManager_get( actor->assets.mesh );
-        check( actor->mesh_id >= 0, "Error while loading actor '%s' mesh. Mesh '%s' is not a loaded resource.\n", actor->mFirstname, actor->assets.mesh );
+    if( -1 == actor->assets.mesh_id ) {
+        actor->assets.mesh_id = ResourceManager_get( actor->assets.mesh );
+        check( actor->assets.mesh_id >= 0, "Error while loading actor '%s' mesh. Mesh '%s' is not a loaded resource.\n", actor->firstname, actor->assets.mesh );
 
         // resize
-        int scaled_mesh = Renderer_createRescaledMesh( actor->mesh_id, &actor->size );
-        check( scaled_mesh >= 0, "Error while creating scaled mesh for actor '%s'. \n", actor->mFirstname );
+        int scaled_mesh = Renderer_createRescaledMesh( actor->assets.mesh_id, &actor->assets.mesh_size );
+        check( scaled_mesh >= 0, "Error while creating scaled mesh for actor '%s'. \n", actor->firstname );
         
-        actor->mesh_id = scaled_mesh;
+        actor->assets.mesh_id = scaled_mesh;
 
         // add newly rescaled mesh to resource manager
         ResourceManager_add( scaled_mesh_str, scaled_mesh );
@@ -297,10 +303,10 @@ bool Game_loadActorAssets( Actor *actor ) {
     // load textures
     for( int i = 0; i < actor->assets.tex_n; ++i ) {
         if( !actor->assets.texture[i][0] )
-            actor->texture_ids[i] = -1;
+            actor->assets.texture_id[i] = -1;
         else {
-            actor->texture_ids[i] = ResourceManager_get( actor->assets.texture[i] );
-            check( actor->assets.texture[i] >= 0, "Error while loading actor '%s' texture. Texture '%s' is not a loaded resource.\n", actor->mFirstname, actor->assets.texture[i] );
+            actor->assets.texture_id[i] = ResourceManager_get( actor->assets.texture[i] );
+            check( actor->assets.texture[i] >= 0, "Error while loading actor '%s' texture. Texture '%s' is not a loaded resource.\n", actor->firstname, actor->assets.texture[i] );
         }
     }
 
@@ -310,8 +316,29 @@ error:
     return false;
 }
 
-FT_Library *Game_getFreetype() {
-    if( game )
-        return &game->freetype_lib;
-    return NULL;
+void Game_setActorPosition( Actor *actor, const vec2i *pos ) {
+    if( game && actor && pos ) {
+        // set actor abstract tile location
+        vec2i_cpy( &actor->position, pos );
+
+        // if the actor has a sprite, set its world floating position
+        if( actor->used_sprite >= 0 ) {
+            mat3 m;
+            // get global tile position
+            vec2 glob_tile = Scene_isoToGlobal( game->scene, pos );
+
+            // ajust position with sprite width and height
+            // X -= sprite_width/2 (to center it on tile, horizontally
+            // Y += - sprite_height + 12.5f 
+            glob_tile = vec2_add( &glob_tile, &(vec2){ -actor->assets.mesh_size.x/2.f, -actor->assets.mesh_size.y + 12.5f } );
+
+            // set the matrix to this and update sprite position
+            mat3_translationMatrixfv( &m, &glob_tile );
+                // add the height and half-width of sprite to the matrix to be
+                // used in shader for lighting computations
+                m.x[2] = actor->assets.mesh_size.x/2;
+                m.x[5] = actor->assets.mesh_size.y;
+            Scene_modifySprite( game->scene, actor->used_sprite, SA_Matrix, &m );
+        }
+    }
 }
