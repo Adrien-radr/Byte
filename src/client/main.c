@@ -61,7 +61,7 @@ void init_callback() {
     button.position = vec2i_c( 3, 3 );
     button.size = vec2i_c( 120, 50 );
     button.depth = -5;
-    Widget_init( &button, "widgetmesh.json", "widgettexture.png" );
+    Widget_init( &button, "quadmesh.json", "widgettexture.png" );
 
     button1 = Scene_addWidget( game->scene, &button );
 
