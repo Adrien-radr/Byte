@@ -2,7 +2,6 @@
 
 #ifdef BYTE_WIN32
     #include <ws2tcpip.h>
-    #pragma comment( lib, "wsock32.lib" )
 
     #define close closesocket
  
@@ -14,7 +13,7 @@
     #include <fcntl.h>
     #include <ifaddrs.h>
 #endif
- 
+
 /// Application Protocol ID. Just the hash of "Byte-Project"
 const u32 protocol_id = 1910167069;
 
@@ -36,7 +35,6 @@ str32 PacketTypeStr[PT_ARRAYEND] = {
 
 
 
-  
 
 #ifndef BYTE_WIN32
 static void add_local_ip( char *ifname, struct sockaddr *addr, struct sockaddr *mask ) {
@@ -91,18 +89,18 @@ static void get_local_ips() {
         return;
     }
 
-    for ( int i = 0; phe->h_addr_list[i] != 0; ++i ) 
+    for ( int i = 0; phe->h_addr_list[i] != 0; ++i )
         memcpy( &local_ips[i].addr, phe->h_addr_list[i], sizeof(struct in_addr) );
 
 #else
     struct ifaddrs *ifap, *search;
 
-    if( getifaddrs( &ifap ) ) 
+    if( getifaddrs( &ifap ) )
         printf( "Unable to get list of net interfaces\n" );
     else {
         numIP = 0;
         for( search = ifap; search; search = search->ifa_next ) {
-            if( search->ifa_flags & 0x01 ) 
+            if( search->ifa_flags & 0x01 )
                 add_local_ip( search->ifa_name, search->ifa_addr, search->ifa_netmask );
         }
         freeifaddrs( ifap );
@@ -156,7 +154,7 @@ bool Net_init() {
 #else
     ret = true;
 #endif
- 
+
     get_local_ips();
 
     return ret;
@@ -224,7 +222,7 @@ void Net_packetQueueSet( net_packet_queue *q, const u8 *data, const net_addr *ad
         net_addr_cpy( &q->packets[end].addr, addr );
 
         // get sequence number of packet
-        bytes_to_u32( data + 12, &q->packets[end].sequence ); 
+        bytes_to_u32( data + 12, &q->packets[end].sequence );
     }
 }
 
@@ -297,7 +295,7 @@ void net_packet_info_queue_insert( net_packet_info_queue *q, net_packet_info *p 
                     net_packet_info *tmp = &(*q->list[q->count]);
                     q->list[q->count] = q->list[q->tail];
 
-                    for( int j = q->count-1; j > i; --j ) 
+                    for( int j = q->count-1; j > i; --j )
                         q->list[j] = q->list[j-1];
 
                     q->list[i] = tmp;
@@ -308,13 +306,13 @@ void net_packet_info_queue_insert( net_packet_info_queue *q, net_packet_info *p 
                     memcpy( q->list[q->tail], p, sizeof(net_packet_info) );
                     net_packet_info *tmp = q->list[q->tail];
 
-                    for( u32 j = q->tail; j > i; --j ) 
+                    for( u32 j = q->tail; j > i; --j )
                         q->list[j] = q->list[j-1];
 
                     q->list[i] = tmp;
                 }
                 return;
-            }   
+            }
         }
         // error
         net_packet_info_queue_print( q );
@@ -348,7 +346,7 @@ void net_packet_info_queue_remove( net_packet_info_queue *q, u32 index ) {
 bool net_packet_info_queue_exists( net_packet_info_queue *q, u32 seq ) {
     if( !q ) return false;
 
-    for( u32 i = 0; i < q->count; ++i ) 
+    for( u32 i = 0; i < q->count; ++i )
         if( q->list[i]->seq == seq )
             return true;
 
@@ -489,7 +487,7 @@ static void nc_update_flow( connection *c, f32 dt ) {
             log_info( "Connection going to Bad Mode\n" );
             c->flow = Bad;
             c->flow_speed = 1.f / FLOW_BAD;
-            
+
             // Increase penalty time if oscillating between Good & Bad to often
             if( c->good_cond_time < 10.f && c->penalty_time < 60.f ) {
                 c->penalty_time *= 2.f;
@@ -502,7 +500,7 @@ static void nc_update_flow( connection *c, f32 dt ) {
             c->penalty_accum = 0.f;
             return;
         }
-        
+
         // else, update flow variables
         c->good_cond_time += dt;
         c->penalty_accum += dt;
@@ -548,7 +546,7 @@ void Net_connectionUpdate( connection *c, f32 dt ) {
         sent_bps += c->sent_queue.list[i]->size;
 
     int ackd_pps = 0, ackd_bps = 0;
-    for( u32 i = 0; i < c->ackd_queue.count; ++i ) 
+    for( u32 i = 0; i < c->ackd_queue.count; ++i )
         if( c->ackd_queue.list[i]->time >= MAX_RTT ) {
             ackd_pps++;
             ackd_bps += c->ackd_queue.list[i]->size;
@@ -615,7 +613,7 @@ static u32 Net_getAckbits( connection *c ) {
 }
 
 static void Net_processAckbits( connection *c, u32 ack, u32 ack_bits ) {
-    if( !c ) return; 
+    if( !c ) return;
     if( net_packet_info_queue_empty( &c->pending_acks ) ) return;
 
     int i = c->pending_acks.tail;
@@ -634,14 +632,14 @@ static void Net_processAckbits( connection *c, u32 ack, u32 ack_bits ) {
             c->rtt += ( c->pending_acks.list[i]->time - c->rtt ) * 0.1f;
 
             // check the sequence of the first packet in guaranteed queue. If acked, Pop it
-            if( c->guaranteed.packets[c->guaranteed.start].sequence == c->pending_acks.list[i]->seq ) 
+            if( c->guaranteed.packets[c->guaranteed.start].sequence == c->pending_acks.list[i]->seq )
                 Net_packetQueuePop( &c->guaranteed );
 
 
             net_packet_info_queue_insert( &c->ackd_queue, c->pending_acks.list[i] );
             c->ackd_packets++;
             net_packet_info_queue_remove( &c->pending_acks, i );
-        } 
+        }
 
         --i;
     }
@@ -715,7 +713,7 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
         }
 
         // else, no unguaranteed packet available, try to get a guaranteed one
-        else if( c->guaranteed.count ) 
+        else if( c->guaranteed.count )
             Net_packetQueueGet( &c->guaranteed, &packet, NULL );
 
 
@@ -746,7 +744,7 @@ void Net_connectionSendNextPacket( connection *c, net_socket socket ) {
         Net_connectionPacketSent( c );
     }
 }
- 
+
 void Net_connectionPacketSent( connection *c ) {
     if( !c ) return;
 
@@ -755,7 +753,7 @@ void Net_connectionPacketSent( connection *c ) {
         net_packet_info_queue_print( &c->sent_queue );
         return;
     }
-    
+
     if( net_packet_info_queue_exists( &c->pending_acks, c->seq_local ) )
         return;
 
@@ -781,7 +779,7 @@ void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack
     // update connection
     c->recv_packets++;
 
-    if( net_packet_info_queue_exists( &c->recv_queue, sequence ) ) 
+    if( net_packet_info_queue_exists( &c->recv_queue, sequence ) )
         return;
 
     // add new received packet info
@@ -794,7 +792,7 @@ void Net_connectionPacketReceived( connection *c, u32 sequence, u32 ack, u32 ack
 
 
     // update remote sequence if necessary
-    if( sequence_more_recent( sequence, c->seq_remote ) ) 
+    if( sequence_more_recent( sequence, c->seq_remote ) )
         c->seq_remote = sequence;
 
 
@@ -886,7 +884,7 @@ int  Net_receivePacket( net_socket s, net_addr *sender, void *packet, u32 packet
 
 
     return received_bytes;
-    
+
 error :
     return 0;
 }

@@ -66,7 +66,7 @@ typedef struct {
 
 /// Fixed-size list for net_packet_info
 typedef struct {
-    net_packet_info             arr[256];   
+    net_packet_info             arr[256];
     net_packet_info             *list[256];
     u32                         tail;
     u32                         count;
@@ -78,7 +78,7 @@ typedef struct {
         u8          data[PACKET_SIZE];
         u32         stack_pos;
 
-        net_addr    addr;           
+        net_addr    addr;
         u32         sequence;
     }                           packets[256];
 
@@ -113,7 +113,7 @@ typedef enum {
 typedef struct {
     bool                    running;
     net_addr                address;        ///< Address of destination
-    u32                     session_id;     ///< Session ID. 
+    u32                     session_id;     ///< Session ID.
 
     net_packet_queue        guaranteed,     ///< Ordered and acknowledged packets to send
                             unguaranteed;   ///< other packets to send
@@ -135,7 +135,7 @@ typedef struct {
 
     f32                     sent_bw,
                             ackd_bw,
-                            rtt;        
+                            rtt;
 
     // Flow Control
     enum {
@@ -161,7 +161,7 @@ typedef struct {
         Listening,
         IDSent,
         TryAccepted,
-        
+
         // when connection is done :
         ConnectFail,
         Connected

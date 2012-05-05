@@ -1,15 +1,5 @@
-//#include "game.h"
-
-//#include "renderer.h"
 #include "server.h"
-//#include "client.h"
 #include "common/clock.h"
-
-#ifdef USE_GLDL
-#include "GL/gldl.h"
-#else
-#include "GL/glew.h"
-#endif
 
 int main() {
     if( !Server_init() )
@@ -18,6 +8,10 @@ int main() {
     Server_run();
 
     Server_shutdown();
+
+#ifdef BYTE_WIN32
+    system("PAUSE");
+#endif
 
     return 0;
 }
