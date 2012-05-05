@@ -4,24 +4,24 @@
 ** Copyright (C) 2002-2008, Marcelo E. Magallon <mmagallo[]debian org>
 ** Copyright (C) 2002, Lev Povalahev
 ** All rights reserved.
-** 
-** Redistribution and use in source and binary forms, with or without 
+**
+** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
-** 
-** * Redistributions of source code must retain the above copyright notice, 
+**
+** * Redistributions of source code must retain the above copyright notice,
 **   this list of conditions and the following disclaimer.
-** * Redistributions in binary form must reproduce the above copyright notice, 
-**   this list of conditions and the following disclaimer in the documentation 
+** * Redistributions in binary form must reproduce the above copyright notice,
+**   this list of conditions and the following disclaimer in the documentation
 **   and/or other materials provided with the distribution.
-** * The name of the author may be used to endorse or promote products 
+** * The name of the author may be used to endorse or promote products
 **   derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
@@ -29,7 +29,7 @@
 ** THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <GL/glew.h>
+#include <GL/glewWIN.h>
 #if defined(_WIN32)
 #  include <GL/wglew.h>
 #elif !defined(__APPLE__) || defined(GLEW_APPLE_GLX)
@@ -100,7 +100,7 @@ void* dlGetProcAddress (const GLubyte* name)
 void* NSGLGetProcAddress (const GLubyte *name)
 {
   static void* image = NULL;
-  if (NULL == image) 
+  if (NULL == image)
   {
     image = dlopen("/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL", RTLD_LAZY);
   }
@@ -8065,7 +8065,7 @@ static GLboolean _glewInit_GL_WIN_swap_hint (GLEW_CONTEXT_ARG_DEF_INIT)
 /* ------------------------------------------------------------------------- */
 
 GLboolean glewGetExtension (const char* name)
-{    
+{
   const GLubyte* start;
   const GLubyte* end;
   start = (const GLubyte*)glGetString(GL_EXTENSIONS);
@@ -8092,7 +8092,7 @@ GLenum glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
   dot = _glewStrCLen(s, '.');
   if (dot == 0)
     return GLEW_ERROR_NO_GL_VERSION;
-  
+
   major = s[dot-1]-'0';
   minor = s[dot+1]-'0';
 
@@ -8100,7 +8100,7 @@ GLenum glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
     minor = 0;
   if (major<0 || major>9)
     return GLEW_ERROR_NO_GL_VERSION;
-  
+
 
   if (major == 1 && minor == 0)
   {
@@ -8114,12 +8114,12 @@ GLenum glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
     CONST_CAST(GLEW_VERSION_3_2)   = GLEW_VERSION_3_3   == GL_TRUE || ( major == 3 && minor >= 2 ) ? GL_TRUE : GL_FALSE;
     CONST_CAST(GLEW_VERSION_3_1)   = GLEW_VERSION_3_2   == GL_TRUE || ( major == 3 && minor >= 1 ) ? GL_TRUE : GL_FALSE;
     CONST_CAST(GLEW_VERSION_3_0)   = GLEW_VERSION_3_1   == GL_TRUE || ( major == 3               ) ? GL_TRUE : GL_FALSE;
-    CONST_CAST(GLEW_VERSION_2_1)   = GLEW_VERSION_3_0   == GL_TRUE || ( major == 2 && minor >= 1 ) ? GL_TRUE : GL_FALSE;    
+    CONST_CAST(GLEW_VERSION_2_1)   = GLEW_VERSION_3_0   == GL_TRUE || ( major == 2 && minor >= 1 ) ? GL_TRUE : GL_FALSE;
     CONST_CAST(GLEW_VERSION_2_0)   = GLEW_VERSION_2_1   == GL_TRUE || ( major == 2               ) ? GL_TRUE : GL_FALSE;
     CONST_CAST(GLEW_VERSION_1_5)   = GLEW_VERSION_2_0   == GL_TRUE || ( major == 1 && minor >= 5 ) ? GL_TRUE : GL_FALSE;
     CONST_CAST(GLEW_VERSION_1_4)   = GLEW_VERSION_1_5   == GL_TRUE || ( major == 1 && minor >= 4 ) ? GL_TRUE : GL_FALSE;
     CONST_CAST(GLEW_VERSION_1_3)   = GLEW_VERSION_1_4   == GL_TRUE || ( major == 1 && minor >= 3 ) ? GL_TRUE : GL_FALSE;
-    CONST_CAST(GLEW_VERSION_1_2_1) = GLEW_VERSION_1_3   == GL_TRUE                                 ? GL_TRUE : GL_FALSE; 
+    CONST_CAST(GLEW_VERSION_1_2_1) = GLEW_VERSION_1_3   == GL_TRUE                                 ? GL_TRUE : GL_FALSE;
     CONST_CAST(GLEW_VERSION_1_2)   = GLEW_VERSION_1_2_1 == GL_TRUE || ( major == 1 && minor >= 2 ) ? GL_TRUE : GL_FALSE;
     CONST_CAST(GLEW_VERSION_1_1)   = GLEW_VERSION_1_2   == GL_TRUE || ( major == 1 && minor >= 1 ) ? GL_TRUE : GL_FALSE;
   }
@@ -10330,7 +10330,7 @@ static PFNWGLGETEXTENSIONSSTRINGARBPROC _wglewGetExtensionsStringARB = NULL;
 static PFNWGLGETEXTENSIONSSTRINGEXTPROC _wglewGetExtensionsStringEXT = NULL;
 
 GLboolean wglewGetExtension (const char* name)
-{    
+{
   const GLubyte* start;
   const GLubyte* end;
   if (_wglewGetExtensionsStringARB == NULL)
@@ -11310,7 +11310,7 @@ static GLboolean _glewInit_GLX_SUN_video_resize (GLXEW_CONTEXT_ARG_DEF_INIT)
 /* ------------------------------------------------------------------------ */
 
 GLboolean glxewGetExtension (const char* name)
-{    
+{
   const GLubyte* start;
   const GLubyte* end;
 

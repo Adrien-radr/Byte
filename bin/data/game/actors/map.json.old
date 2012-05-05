@@ -1,0 +1,16 @@
+{
+    "firstname" : "Adrian",
+    "lastname"  : "Dub",
+    "surname"   : "Revk",
+
+    "init"      : {
+        "position" : [ 50.0, 100.0 ]
+    },
+
+    "sprite"    : {
+        "mesh"    : "quadmesh.json",
+        "texture" : "crate.jpg",
+        "width"   : 1,
+        "height"  : 1
+    }
+}

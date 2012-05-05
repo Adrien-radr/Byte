@@ -1,0 +1,19 @@
+{
+    "firstname" : "test",
+    "lastname"  : "1",
+    "surname"   : "dummy",
+
+    "init"      : {
+        "position" : [ 50.0, 0.0 ]
+    },
+
+    "sprite"    : {
+        "mesh"    : "quadmesh.json",
+        "texture" : [
+            "man-v5.png",
+            "man-heightmap.png"
+        ],
+        "width"   : 64,
+        "height"  : 128
+    }
+}

@@ -10,7 +10,7 @@
 #include <png.h>
 
 typedef struct {
-    u32         width, 
+    u32         width,
                 height;
 
     GLenum      fmt;
@@ -62,9 +62,9 @@ static texture_t *Byte_LoadPNG( const char *filename ) {
 
     // get png file signature
     fread( sig, 1, 8, f );
-    check( png_check_sig( sig, 8 ), "\"%s\" is not a valid PNG image!\n", filename );
+    check( png_sig_cmp( sig, 0, 8 ) == 0, "\"%s\" is not a valid PNG image!\n", filename );
 
-    
+
     img = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
     check( img, "Error while creating PNG read struct.\n" );
 
@@ -73,11 +73,11 @@ static texture_t *Byte_LoadPNG( const char *filename ) {
 
     // our texture handle
     t = byte_alloc( sizeof(texture_t) );
-    
+
     // setjmp for any png loading error
-    if( setjmp( png_jmpbuf( img ) ) ) 
+    if( setjmp( png_jmpbuf( img ) ) )
         goto error;
-    
+
     // Load png image
     png_init_io( img, f );
     png_set_sig_bytes( img, 8 );
@@ -98,7 +98,7 @@ static texture_t *Byte_LoadPNG( const char *filename ) {
         if( png_get_valid( img, img_info, PNG_INFO_tRNS ) )
             png_set_tRNS_to_alpha( img );
 
-        if( 16 == bpp ) 
+        if( 16 == bpp )
             png_set_strip_16( img );
         else if( 8 > bpp )
             png_set_packing( img );
@@ -152,7 +152,7 @@ void Texture_destroy( Texture *pTexture ) {
     }
 }
 
-bool Texture_loadFromFile( Texture *pTexture, const char *pFile, bool pMipmaps ) { 
+bool Texture_loadFromFile( Texture *pTexture, const char *pFile, bool pMipmaps ) {
     texture_t *t = NULL;
 
     if( pTexture && pFile ) {
@@ -170,7 +170,7 @@ bool Texture_loadFromFile( Texture *pTexture, const char *pFile, bool pMipmaps )
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
         glTexImage2D(   GL_TEXTURE_2D, 0,
-                        t->int_fmt, 
+                        t->int_fmt,
                         t->width, t->height, 0,
                         t->fmt, GL_UNSIGNED_BYTE,
                         t->texels );
@@ -181,7 +181,7 @@ bool Texture_loadFromFile( Texture *pTexture, const char *pFile, bool pMipmaps )
         pTexture->mID = t->id;
 
         /*
-        u32 gl_id = SOIL_load_OGL_texture(  pFile, 
+        u32 gl_id = SOIL_load_OGL_texture(  pFile,
                                             SOIL_LOAD_AUTO,
                                             SOIL_CREATE_NEW_ID,
                                             (pMipmaps ? SOIL_FLAG_MIPMAPS : 0) );
@@ -213,7 +213,7 @@ void Texture_bind( Texture *pTexture, int pTarget ) {
     u32 tex = pTexture ? pTexture->mID : 0;
 
     // if pTarget < 0, no target change, else, switch the target :
-    if( pTarget >=0 ) 
+    if( pTarget >=0 )
         glActiveTexture( GL_TEXTURE0 + pTarget );
 
 

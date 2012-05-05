@@ -1,0 +1,9 @@
+{
+    "v_src" : "sprite.vs",
+    "f_src" : "sprite.fs",
+    "params" : [
+        { "name" : "Albedo",               "value" :  0 },
+        { "name" : "Heightmap",            "value" :  1 },
+        { "name" : "ProjectionMatrixType", "value" :  1 }
+    ]
+}

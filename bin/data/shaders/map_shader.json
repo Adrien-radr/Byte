@@ -1,0 +1,8 @@
+{
+    "v_src" : "map.vs",
+    "f_src" : "map.fs",
+    "params" : [
+        { "name" : "Albedo",               "value" :  0 },
+        { "name" : "ProjectionMatrixType", "value" :  1 }
+    ]
+}

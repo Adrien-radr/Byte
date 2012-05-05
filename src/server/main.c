@@ -52,6 +52,8 @@ int main() {
 
     Server_shutdown();
 
+    system("PAUSE");
+
     return 0;
 
     /*
@@ -101,7 +103,7 @@ error:
     int man_sprite = Scene_addSpriteFromActor( game->mScene, &man );
     check( man_sprite >= 0, "man error\n" );
 
-    
+
 
 
     vec2 pts[] = {
@@ -163,7 +165,7 @@ error:
                     ent2_move.x -= 1;
                 if( IsKeyDown( K_Right ) )
                     ent2_move.x += 1;
-            //    if( ent2_move.x != 0 || ent2_move.y != 0 ) 
+            //    if( ent2_move.x != 0 || ent2_move.y != 0 )
              //       Actor_move( &actors[0], &ent2_move );
 
                 Scene_update( game->mScene );
@@ -208,6 +210,6 @@ error :
     Game_destroy();
 
     return return_val;
-  */ 
+  */
 }
 
