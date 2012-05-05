@@ -101,9 +101,10 @@ bool Renderer_init() {
 
     // enable alpha blend
     glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,      // rgb
+                         GL_ZERO,      GL_ONE_MINUS_SRC_ALPHA );    // alpha
 
-    glClearColor( 0.1f, 0.1f, 0.1f, 1.f );
+    glClearColor( 0.f, 0.f, 0.f, 1.f );
 
     // clear init gl errors
     CheckGLError();

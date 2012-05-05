@@ -5,91 +5,40 @@
 #include "common/matrix.h"
 #include "text.h"
 
-//  Those structs are what we have to use as parameters in the creation of a new widget.
+/// Data-oriented array storing widgets existing in the scene
 typedef struct {
-    u32 mMesh;
-    u32 mTexture;
-    vec2i mPosition;
-    vec2i mBounds;
-}   WidgetSpriteAttributes;
+    HandleManager   *used;         ///< HandleManager telling if an index is used
 
-typedef struct {
-    const Font* mFont;
-    Color mColor;
-    vec2i mPosition;
-    vec2i mBounds;
-}   WidgetTextAttributes;
+    u32             *meshes;       
+    u32             *textures;
+    int             *depths;
+    vec2            *positions;     ///< Widget position (screen coords)
 
-typedef struct {
-    u32 mMesh;
-    u32 mTexture;
-    vec2i mPosition;
-    const Font* mFont;
-    Color mColor;
-    vec2i mBounds;
-}   WidgetButtonAttributes;
-
-
-typedef enum {
-    WT_Master,  //  Master of all widgets.
-    WT_Text,    //  A floating text.
-    WT_Sprite,  //  A floating sprite.
-    WT_Button  //  Element containing a text and an entity.
-}   WidgetType;
-
-///< The widget structure is basically the mix between an Entity and a Text.
-///< It has bounds so we can track mouse interaction.
-typedef struct {
-    HandleManager *mUsed;
-    HandleManager *mEntityUsed;
-    HandleManager *mTextUsed;
-
-    u32             *mTextureMeshes;       // Mesh for the texture.
-    u32             *mTextMeshes;           //  Mesh for the text.
-    u32             *mTextures;
-    int             *mDepths;
-    vec2i           *mPositions;   ///< Widget position (screen coords)
-    vec2i           *mBounds;      //  Width and Height of each widget, defines their bounding box.
-
-    const Font      **mFonts;   //  For each widget there is a pointer to a Font.
-    Color           *mColors;
-    vec2i           *mTextPositions;
-
-    char            **mStrings;
-
-    void            **mCallbacks;
-    HandleManager **mChildren;   //  This will track the handle of each widget's children
-
-    WidgetType *mWidgetTypes;
-
-    u32 mCount,
-          mSize,
-          mMaxIndex;
+    u32             count,
+                    size,
+                    max_index;
 } WidgetArray;
 
 
 typedef enum {
     WA_Texture,
     WA_Position,
-    WA_Bounds,
     WA_Depth,
-    WA_Font,
-    WA_Color,
-    WA_TextPosition,
-    WA_String,
-    WA_Callback
 } WidgetAttrib;
 
-WidgetArray* WidgetArray_init(u32 pSize);
+/// Initialize and allocate a new WidgetArray
+WidgetArray* WidgetArray_init( u32 size );
 
-int WidgetArray_add(WidgetArray* pWA, WidgetType pWT, int pMother);
+/// Add a new widget to the widget array and returns its handle (or -1 if any error)
+int WidgetArray_add( WidgetArray* wa );
 
-void WidgetArray_addChild( WidgetArray* pWA, u32 pMother, u32 pChild );
+/// Remove a widget from the given widget array, by its index
+void WidgetArray_remove( WidgetArray* wa, u32 index );
 
-void WidgetArray_remove(WidgetArray* pWA, u32 pIndex);
+/// Clears the whole given widget array
+void WidgetArray_clear( WidgetArray* wa );
 
-void WidgetArray_clear(WidgetArray* pWA);
-
-void WidgetArray_destroy(WidgetArray* pWA);
+/// Destroy and free the given widget array
+void WidgetArray_destroy( WidgetArray* wa );
 
 #endif // BYTE_WIDGET

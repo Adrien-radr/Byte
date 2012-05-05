@@ -173,10 +173,6 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
             if( HandleManager_isUsed( s->texts->mUsed, i ) )
                 Text_setString( s->texts->mMeshes[i], s->texts->mFonts[i], s->texts->mStrings[i] );
         }
-        for( u32 i = 0; i < s->widgets->mMaxIndex; ++i ) {
-            if( HandleManager_isUsed( s->widgets->mTextUsed, i ) )
-                Text_setString( s->widgets->mTextMeshes[i], s->widgets->mFonts[i], s->widgets->mStrings[i] );
-        }
     }
 
 
@@ -312,6 +308,20 @@ void Scene_render( Scene *pScene ) {
 
 
         // ##################################################
+        //      RENDER WIDGETS
+        Renderer_useShader( pScene->ui_shader );
+
+        for( u32 i = 0; i < pScene->widgets->max_index; ++i ){
+            if( HandleManager_isUsed( pScene->widgets->used, i ) ) {
+                Renderer_useTexture( pScene->widgets->textures[i], 0 );
+                Shader_sendVec2( "Position", &pScene->widgets->positions[i] );
+                Shader_sendInt( "Depth", pScene->widgets->depths[i] );
+                Renderer_renderMesh( pScene->widgets->meshes[i] );
+            }
+        }
+
+
+        // ##################################################
         //      RENDER TEXTS
         Renderer_useShader( pScene->text_shader );
 
@@ -322,22 +332,6 @@ void Scene_render( Scene *pScene ) {
                 Shader_sendColor( "Color", &pScene->texts->mColors[i] );
                 Shader_sendVec2( "Position", &pScene->texts->mPositions[i] );
                 Renderer_renderMesh( pScene->texts->mMeshes[i] );
-            }
-        }
-
-        // ##################################################
-        //      RENDER WIDGETS
-        Renderer_useShader( pScene->ui_shader );
-
-        for( u32 i = 0; i < pScene->widgets->mMaxIndex; ++i ){
-            if( HandleManager_isUsed( pScene->widgets->mUsed, i ) ) {
-                if( HandleManager_getHandle( pScene->widgets->mEntityUsed, i ) != 0) {
-                    Renderer_useTexture( pScene->widgets->mTextures[i], 0 );
-                    vec2 v = vec2_vec2i( &pScene->widgets->mPositions[i] );
-                    Shader_sendVec2( "Position", &v );
-                    Shader_sendInt( "Depth", pScene->widgets->mDepths[i] );
-                    Renderer_renderMesh( pScene->widgets->mTextureMeshes[i] );
-                }
             }
         }
     }
@@ -486,134 +480,37 @@ void Scene_clearTexts( Scene *pScene ) {
 
 //  =======================
 
-int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct, int pMother ) {
+int Scene_addWidget( Scene *scene, const Widget *widget ) {
     int handle = -1;
 
-    if( pScene ){
-        handle = WidgetArray_add( pScene->widgets, pWT, pMother );
-        switch( pWT ) {
-            case WT_Master :
-                if( handle >= 0 ) {
-                    pScene->widgets->mBounds[handle] = Context_getSize();
-                }
-                break;
-            case WT_Text :
-                {
-                    if( handle >= 0 ) {
-                        WidgetTextAttributes wta = *(WidgetTextAttributes*)pDataStruct;
-                        pScene->widgets->mBounds[handle] = wta.mBounds;
-                        pScene->widgets->mTextPositions[handle] = wta.mPosition;
-                        pScene->widgets->mFonts[handle] = wta.mFont;
-                        pScene->widgets->mColors[handle] = wta.mColor;
-                    }
-                }
-                break;
-            case WT_Sprite :
-                {
-                    if( handle >= 0 ) {
-                        WidgetSpriteAttributes wsa = *(WidgetSpriteAttributes*)pDataStruct;
-                        pScene->widgets->mTextureMeshes[handle] = wsa.mMesh;
-                        pScene->widgets->mTextures[handle] = wsa.mTexture;
-                        pScene->widgets->mPositions[handle] = wsa.mPosition;
-                        pScene->widgets->mBounds[handle] = wsa.mBounds;
-
-                    }
-                }
-                break;
-            case WT_Button :
-                {
-                    if( handle >= 0 ) {
-                        WidgetButtonAttributes wba = *(WidgetButtonAttributes*)pDataStruct;
-                        pScene->widgets->mFonts[handle] = wba.mFont;
-                        pScene->widgets->mColors[handle] = wba.mColor;
-                        pScene->widgets->mTextureMeshes[handle] = wba.mMesh;
-                        pScene->widgets->mTextures[handle] = wba.mTexture;
-                        pScene->widgets->mPositions[handle] = wba.mPosition;
-                        pScene->widgets->mBounds[handle] = wba.mBounds;
-
-                    }
-                }
-                break;
+    if( scene ){
+        handle = WidgetArray_add( scene->widgets );
+        if( handle >= 0 ) {
+            scene->widgets->meshes[handle] = widget->assets.mesh;
+            scene->widgets->textures[handle] = widget->assets.texture;
+            scene->widgets->depths[handle] = widget->depth;
+            scene->widgets->positions[handle] = vec2_vec2i( &widget->position );
         }
     }
-    pScene->widgets->mWidgetTypes[handle] = pWT;
+
     return handle;
 }
 
-void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void *pData ) {
-    if( pScene ) {
-        if( HandleManager_isUsed( pScene->widgets->mUsed, pHandle ) ) {
-            if( HandleManager_getHandle( pScene->widgets->mEntityUsed, pHandle ) != 0) {
-                switch( pAttrib ) {
-                    case WA_Texture :
-                        {
-                            u32 new_texture = *((u32*)pData);
-                            pScene->widgets->mTextures[pHandle] = new_texture;
-                        }
-                        break;
-                    case WA_Position :
-                        pScene->widgets->mPositions[pHandle] = *((vec2i*)pData);
-                        break;
-                    case WA_Bounds :
-                        {
-                            vec2i new_bounds = *((vec2i*)pData);
-                            pScene->widgets->mBounds[pHandle] = new_bounds;
-                        }
-                        break;
-                    case WA_Depth :
-                        pScene->widgets->mDepths[pHandle] = *((u32*)pData);
-                        break;
-                    default :
-                        break;
-                }
-            }
-            if( HandleManager_getHandle( pScene->widgets->mTextUsed, pHandle ) != 0) {
-                switch( pAttrib ) {
-                    case WA_Bounds :
-                        {
-                            vec2i new_bounds = *((vec2i*)pData);
-                            pScene->widgets->mBounds[pHandle] = new_bounds;
-                        }
-                        break;
-                    case WA_Font :
-                        {
-                            const Font* new_font = ((const Font*)pData);
-                            pScene->widgets->mFonts[pHandle] = new_font;
-                        }
-                        break;
-                    case WA_Color :
-                        pScene->widgets->mColors[pHandle] = *((Color*)pData);
-                        break;
-                    case WA_TextPosition :
-                        {
-                            vec2i new_pos = *((vec2i*)pData);
-
-                            //  Re-place the text on the entity so that a button will look like a button. ( //TODO: center the text )
-                            if( pScene->widgets->mWidgetTypes[pHandle] == WT_Button ) {
-                                new_pos.x = pScene->widgets->mPositions[pHandle].x;
-                                new_pos.y = pScene->widgets->mPositions[pHandle].y;
-                            }
-
-                            pScene->widgets->mTextPositions[pHandle] = new_pos;
-                        }
-                        break;
-                    case WA_String :
-                        {
-                            const char *s = (const char*)pData;
-
-                            // recreate VBO
-                            Text_setString( pScene->widgets->mTextMeshes[pHandle], pScene->widgets->mFonts[pHandle], s );
-
-                            // copy string inside textarray to keep track of current string
-                            DEL_PTR(pScene->widgets->mStrings[pHandle] );
-
-                            pScene->widgets->mStrings[pHandle] = byte_alloc( strlen( s ) + 1 );
-                            strcpy( pScene->widgets->mStrings[pHandle], s );
-                        }
-                        break;
-                    default :
-                        break;
-                }
+void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *data ) {
+    if( scene ) {
+        if( HandleManager_isUsed( scene->widgets->used, handle ) ) {
+            switch( attrib ) {
+                case WA_Texture :
+                    scene->widgets->textures[handle] = *((u32*)data);
+                    break;
+                case WA_Position :
+                    scene->widgets->positions[handle] = vec2_vec2i( (vec2i*)data );
+                    break;
+                case WA_Depth :
+                    scene->widgets->depths[handle] = *((u32*)data);
+                    break;
+                default :
+                    break;
             }
         }
     }
@@ -621,14 +518,12 @@ void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void 
 
 
 
-void Scene_removeWidget( Scene *pScene, u32 pWidget ) {
-    if( pScene ){
-        WidgetArray_remove( pScene->widgets, pWidget );
-    }
+void Scene_removeWidget( Scene *scene, u32 widget ) {
+    if( scene )
+        WidgetArray_remove( scene->widgets, widget );
 }
 
-void Scene_clearWidgets( Scene *pScene) {
-    if( pScene ){
-        WidgetArray_clear( pScene->widgets );
-    }
+void Scene_clearWidgets( Scene *scene) {
+    if( scene )
+        WidgetArray_clear( scene->widgets );
 }

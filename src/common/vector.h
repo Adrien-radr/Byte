@@ -11,6 +11,10 @@ typedef struct vec2i_ {
     int x, y;
 } vec2i;
 
+/// Constructors
+vec2  vec2_c( f32 x, f32 y );
+vec2i vec2i_c( int x, int y );
+
 /// Cast between vec2i and vec2
 vec2 vec2_vec2i( const vec2i *B );
 

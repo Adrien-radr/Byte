@@ -10,6 +10,7 @@
 #include "text.h"
 #include "sprite.h"
 #include "widget.h"
+#include "gui.h"
 #include "light.h"
 #include "camera.h"
 
@@ -116,18 +117,19 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 
 // ##########################################################################3
 //      Widgets Array
-    /// Add a widget to be rendered
-    /// @param pWT : the type of the widget (see widget.h).
-    /// @param pData : the corresponding data structure to set the widget (see widget.h).
-    int Scene_addWidget( Scene *pScene, WidgetType pWT, void* pDataStruct, int pMother );
+    /// Add a widget (and recursively all its children) to be rendered
+    int Scene_addWidget( Scene *scene, const Widget *widget );
 
-    void Scene_modifyWidget( Scene *pScene, u32 pHandle, WidgetAttrib pAttrib, void *pData );
+    /// Modify one attribute of a Widget (given by its handle)
+    /// @param attrib : the attribute type we want to change (see widget.h)
+    /// @param data   : data set as the attrib
+    void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *data );
 
     /// Remove a widget from the scene (by its handle).
-    void Scene_removeWidget( Scene *pScene, u32 pWidget );
+    void Scene_removeWidget( Scene *scene, u32 widget );
 
     /// Clears the whole widget array, to set a new scene
-    void Scene_clearWidgets( Scene *pScene );
+    void Scene_clearWidgets( Scene *scene );
 
 
 
