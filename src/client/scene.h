@@ -70,7 +70,7 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
     /// Returns the center position of a given tile, in global coordinates
     vec2  Scene_isoToGlobal( Scene *scene, const vec2i *tile );
 
-    void SceneMap_redTile( Scene *scene, u32 i, u32 j );
+    void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red );
     
 
 // ##########################################################################3

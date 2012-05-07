@@ -172,7 +172,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     Font *f = Font_get( "DejaVuSans.ttf", 12 );
     Color col = { 0.9f, 0.9f, 0.9f, 1.f };
     int text_depth = -10;
-    vec2 pos = { 6, 4 };
+    vec2i pos = { 6, 4 };
 
     // Load fps text
     game->fps_text = Scene_addText( game->scene, f, col );
@@ -182,14 +182,14 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
     // Load mousepos text
     game->mousepos_text = Scene_addText( game->scene, f, col );
-    pos.y += 15.f;
+    pos.y += 15;
     Scene_modifyText( game->scene, game->mousepos_text, TA_Position, &pos );
     Scene_modifyText( game->scene, game->mousepos_text, TA_String, "X  : 0, Y : 0" );
     Scene_modifyText( game->scene, game->mousepos_text, TA_Depth, &text_depth );
 
     // Load mousetile text
     game->mousetile_text = Scene_addText( game->scene, f, col );
-    pos.y += 15.f;
+    pos.y += 15;
     Scene_modifyText( game->scene, game->mousetile_text, TA_Position, &pos );
     Scene_modifyText( game->scene, game->mousetile_text, TA_String, "X  : 0, Y : 0" );
     Scene_modifyText( game->scene, game->mousetile_text, TA_Depth, &text_depth );
@@ -201,6 +201,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
     // register main.c frame function
     game->frame_func = frame_func;
+
 
     return true;
 

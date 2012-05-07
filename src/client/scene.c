@@ -76,21 +76,21 @@ void SceneMap_init( Scene *scene ) {
     scene->local_map.shader = ResourceManager_get( "map_shader.json" );
 }
 
-void SceneMap_redTile( Scene *scene, u32 i, u32 j ) {
-    if( i >= LOCAL_MAP_WIDTH*2 || j >= LOCAL_MAP_HEIGHT/2 ) 
+void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red ) {
+    if( tile->x >= LOCAL_MAP_WIDTH*2 || tile->y >= LOCAL_MAP_HEIGHT/2 ) 
         return;
 
     Mesh *m = Renderer_getMesh( scene->local_map.mesh );
     u32 tcs_offset = m->vertex_count * 2;
-    int i_offset = i * 8,
-        j_offset = j * 2 * LOCAL_MAP_WIDTH * 8;
+    int i_offset = tile->x * 8,
+        j_offset = tile->y * 2 * LOCAL_MAP_WIDTH * 8;
  
 
     // we change only on even indices, only the X coord, not Y
-    m->data[tcs_offset+i_offset+j_offset+0] = 0.5f;
-    m->data[tcs_offset+i_offset+j_offset+2] = 0.5f;
-    m->data[tcs_offset+i_offset+j_offset+4] = 1.f;
-    m->data[tcs_offset+i_offset+j_offset+6] = 1.f;
+    m->data[tcs_offset+i_offset+j_offset+0] = red ? 0.5f : 0.f;
+    m->data[tcs_offset+i_offset+j_offset+2] = red ? 0.5f : 0.f;
+    m->data[tcs_offset+i_offset+j_offset+4] = red ? 1.f : 0.5f;
+    m->data[tcs_offset+i_offset+j_offset+6] = red ? 1.f : 0.5f;
 
     // rebuild map mesh
     Mesh_build( m, EUpdateVbo, false );
@@ -445,7 +445,7 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
             switch( pAttrib ) {
                 case TA_Position :
                     {
-                        vec2 new_pos = *((vec2*)pData);
+                        vec2 new_pos = vec2_vec2i( (vec2i*)pData );
                         pScene->texts->mPositions[pHandle] = new_pos;
                     }
                     break;

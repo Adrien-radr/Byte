@@ -42,18 +42,18 @@ error:
     return false;
 }
 
-void Client_shutdown() {
+inline void Client_shutdown() {
     Net_connectionShutdown( &client.c_info );
     Net_shutdown();
 
     CloseLog();
 }
 
-void Client_sendGuaranteed( u32 msg_type ) {
+inline void Client_sendGuaranteed( u32 msg_type ) {
     Net_connectionSendGuaranteed( &client.c_info, msg_type );
 }
 
-void Client_sendUnguaranteed( u32 msg_type ) {
+inline void Client_sendUnguaranteed( u32 msg_type ) {
     Net_connectionSendUnguaranteed( &client.c_info, msg_type );
 }
 
@@ -309,33 +309,6 @@ void Client_run() {
 
 
         /*
-
-        while( send_accum > 1.f / send_rate ) {
-            u8 pack[size];
-
-            if( recv_packets >= 20 ) {
-                strcpy( (char*)pack, "close" );
-                run = false;
-            } else
-                strcpy( (char*)pack, "FROM CLIENT" );
-
-            net_connection_send( &client.connection, pack, size ); 
-            send_accum -= 1.f / send_rate;
-        }
-
-        while( true ) {
-            bytes_read = net_connection_receive( &client.connection, packet, size );
-            if( !bytes_read )
-                break;
-            else {
-                recv_packets++;
-            }
-        }
-        
-
-        */
-
-        /*
         stat_accum += dt;
         while( stat_accum >= 0.25f && client.connection.state == Connected ) {
             connection_t *c = &client.connection;
@@ -350,4 +323,8 @@ void Client_run() {
 
 
     }
+}
+
+inline f32  Client_getElapsedTime() {
+    return Clock_getElapsedTime( &client.clock );
 }

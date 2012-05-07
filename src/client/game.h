@@ -31,7 +31,7 @@ typedef struct {
     u32     mousepos_text;          ///< Mouse Position displayed
     u32     mousetile_text;         ///< Tile under mouse displayed
 
-    vec2i    mouse_tile;            ///< Tile under the mouse
+    vec2i   mouse_tile;             ///< Tile under the mouse
 
 
     FT_Library  freetype_lib;       ///< Instance of the Freetype library.

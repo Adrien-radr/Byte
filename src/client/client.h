@@ -19,6 +19,8 @@ bool Client_init( const net_addr *sv_addr );
 void Client_shutdown();
 void Client_run();
 
+f32  Client_getElapsedTime();
+
 void Client_sendGuaranteed( u32 msg_type );
 void Client_sendUnguaranteed( u32 msg_type );
 

@@ -26,7 +26,7 @@ void Map_init( Map *map );
 void Map_setWalkable( Map *map, const vec2i *tile, bool walkable );
 
 /// Returns whether or not the given map tile is walkable
-bool Map_isWalkable( Map *map, const vec2i *tile );
+bool Map_isWalkable( const Map *map, const vec2i *tile );
 
 
 // ##################################################################
@@ -36,23 +36,26 @@ bool Map_isWalkable( Map *map, const vec2i *tile );
 //  indexed array for fast lookups in the open list.
 // ##################################################################
 
-typedef struct asPath_ asPath;
-typedef struct asOpenList_ asOpenList;
+/// Forward decl. Definition in map.c
+typedef struct Path_ Path;
 
-/// Add a new node to the current Open List
-void Map_addNodeToOpenList( asOpenList *ol, const vec2i *node );
+/// Add a new node to the current NeighborList
+//void Map_addNodeToNeighborList( asNeighborList *nl, const vec2i *node, f32 cost );
 
 /// Create a new path from node start to node end.
 /// Uses the map.tiles structures in iso format
-asPath *Map_createPath( const Map *m, const vec2i *start, const vec2i *end );
+Path *Map_createPath( const Map *m, const vec2i *start, const vec2i *end );
 
 /// Destroy and free the given path
-void Map_destroyPath( asPath *path );
+void Map_destroyPath( Path *path );
 
 /// Return the total cost of the given path
-f32  Map_getPathCost( const asPath *path );
+f32  Map_getPathCost( const Path *path );
 
 /// Return the number of nodes in the given path
-u32  Map_getPathCount( const asPath *path );
+u32  Map_getPathCount( const Path *path );
+
+/// Return the node (vec2i) of a path, at a given index
+vec2i *Map_getPathNode( const Path *path, u32 i );
 
 #endif // BYTE_MAP_H

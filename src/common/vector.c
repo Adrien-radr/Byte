@@ -1,18 +1,15 @@
 #include "vector.h"
 
 inline vec2  vec2_c( f32 x, f32 y ) {
-    vec2 v = { x, y };
-    return v;
+    return (vec2){ x, y };
 }
 
 inline vec2i vec2i_c( int x, int y ) {
-    vec2i v = { x, y };
-    return v;
+    return (vec2i){ x, y };
 }
 
 inline vec2 vec2_vec2i( const vec2i *B ) {
-    vec2 v = { (f32)B->x, (f32)B->y };
-    return v;
+    return (vec2){ (f32)B->x, (f32)B->y };
 }
 
 inline void vec2_cpy( vec2 *A, const vec2 *B ) {
@@ -29,58 +26,47 @@ inline vec2 vec2_neg( const vec2 *A ) {
 }
 
 inline vec2i vec2i_neg( const vec2i *A ) {
-    vec2i ret = { .x = -A->x, .y = -A->y };
-    return ret;
+    return (vec2i){ .x = -A->x, .y = -A->y };
 }
 
 inline vec2 vec2_add( const vec2 *A, const vec2 *B ) {
-    vec2 ret = { .x = A->x + B->x, .y = A->y + B->y };
-    return ret;
+    return (vec2){ .x = A->x + B->x, .y = A->y + B->y };
 }
 
 inline vec2i vec2i_add( const vec2i *A, const vec2i *B ) {
-    vec2i ret = { .x = A->x + B->x, .y = A->y + B->y };
-    return ret;
+    return (vec2i){ .x = A->x + B->x, .y = A->y + B->y };
 }
 
 inline vec2 vec2_sub( const vec2 *A, const vec2 *B ) {
-    vec2 ret = { .x = A->x - B->x, .y = A->y - B->y };
-    return ret;
+    return (vec2){ .x = A->x - B->x, .y = A->y - B->y };
 }
 
 inline vec2i vec2i_sub( const vec2i *A, const vec2i *B ) {
-    vec2i ret = { .x = A->x - B->x, .y = A->y - B->y };
-    return ret;
+    return (vec2i){ .x = A->x - B->x, .y = A->y - B->y };
 }
 
 inline vec2 vec2_mulv( const vec2 *A, const vec2 *B ) {
-    vec2 ret = { .x = A->x * B->x, .y = A->y * B->y };
-    return ret;
+    return (vec2){ .x = A->x * B->x, .y = A->y * B->y };
 }
 
 inline vec2i vec2i_mulv( const vec2i *A, const vec2i *B ) {
-    vec2i ret = { .x = A->x * B->x, .y = A->y * B->y };
-    return ret;
+    return (vec2i){ .x = A->x * B->x, .y = A->y * B->y };
 }
 
 inline vec2 vec2_mul( const vec2 *A, f32 pFactor ) {
-    vec2 ret = { .x = A->x * pFactor, .y = A->y * pFactor };;
-    return ret;
+    return (vec2){ .x = A->x * pFactor, .y = A->y * pFactor };
 }
 
 inline vec2i vec2i_mul( const vec2i *A, int pFactor ) {
-    vec2i ret = { .x = A->x * pFactor, .y = A->y * pFactor };;
-    return ret;
+    return (vec2i){ .x = A->x * pFactor, .y = A->y * pFactor };
 }
 
 inline vec2 vec2_div( const vec2 *A, f32 pFactor ) {
-    vec2 ret = { .x = A->x / pFactor, .y = A->y / pFactor };;
-    return ret;
+    return (vec2){ .x = A->x / pFactor, .y = A->y / pFactor };
 }
 
 inline vec2i vec2i_div( const vec2i *A, int pFactor ) {
-    vec2i ret = { .x = A->x / pFactor, .y = A->y / pFactor };;
-    return ret;
+    return (vec2i){ .x = A->x / pFactor, .y = A->y / pFactor };
 }
 
 

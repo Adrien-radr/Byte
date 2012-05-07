@@ -484,7 +484,7 @@ static void nc_update_flow( connection *c, f32 dt ) {
     if( c->flow == Good ) {
         // if bad condition, go to Bad
         if( rtt > RTT_THRESHOLD ) {
-            log_info( "Connection going to Bad Mode\n" );
+            //log_info( "Connection going to Bad Mode\n" );
             c->flow = Bad;
             c->flow_speed = 1.f / FLOW_BAD;
 
@@ -493,7 +493,7 @@ static void nc_update_flow( connection *c, f32 dt ) {
                 c->penalty_time *= 2.f;
                 if( c->penalty_time > 60.f )
                     c->penalty_time = 60.f;
-                log_info( "Penalty time increased to %f\n", c->penalty_time );
+                //log_info( "Penalty time increased to %f\n", c->penalty_time );
             }
 
             c->good_cond_time = 0.f;
@@ -511,7 +511,7 @@ static void nc_update_flow( connection *c, f32 dt ) {
             c->penalty_time *= 0.5f;
             if( c->penalty_time < 1.f )
                 c->penalty_time = 1.f;
-            log_info( "Penalty time decreased to %f\n", c->penalty_time );
+            //log_info( "Penalty time decreased to %f\n", c->penalty_time );
         }
     }
 
@@ -523,7 +523,7 @@ static void nc_update_flow( connection *c, f32 dt ) {
 
         // if good condition for some time, go to Good
         if( c->good_cond_time > c->penalty_time ) {
-            log_info( "Connection going to Good Mode\n" );
+            //log_info( "Connection going to Good Mode\n" );
             c->good_cond_time = 0.f;
             c->penalty_accum = 0.f;
             c->flow = Good;
@@ -532,8 +532,8 @@ static void nc_update_flow( connection *c, f32 dt ) {
     }
 }
 
-void Net_connectionUpdate( connection *c, f32 dt ) {
-    if( !c || !c->running ) return;
+bool Net_connectionUpdate( connection *c, f32 dt ) {
+    if( !c || !c->running ) return true;
 
     // update reliability system and flow control
     nc_update_queues( c, dt );
@@ -566,13 +566,16 @@ void Net_connectionUpdate( connection *c, f32 dt ) {
             log_info( "Connecting timed out\n" );
             Net_connectionClear( c );
             c->state = ConnectFail;
+            return false;
         } else if( c->state == Connected ) {
             log_info( "Connection timed out\n" );
             Net_connectionClear( c );
             c->state = ConnectFail;
+            return false;
         }
-        return;
     }
+
+    return true;
 }
 
 

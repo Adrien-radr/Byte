@@ -173,7 +173,10 @@ typedef struct {
 
 bool Net_connectionInit( connection *c, connection_mode mode );
 void Net_connectionShutdown( connection *c );
-void Net_connectionUpdate( connection *c, f32 dt );
+
+/// Update connection flow and reliability control, and stats.
+/// @return : false if connection timed out. true otherwise
+bool Net_connectionUpdate( connection *c, f32 dt );
 void Net_connectionWritePacketHeader( connection *c, u8 *packet, u32 msg_type );
 
 void Net_connectionSendGuaranteed( connection *c, u32 msg_type );

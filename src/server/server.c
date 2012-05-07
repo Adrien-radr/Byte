@@ -241,8 +241,10 @@ void Server_run() {
                     Net_connectionSendNextPacket( &server.connections[i], server.socket );
                 }
 
-                // update connection info
-                Net_connectionUpdate( &server.connections[i], frame_t );
+                // update connection info. Handle client as disconnected if 
+                // connection timed out
+                if( !Net_connectionUpdate( &server.connections[i], frame_t ) )
+                    ClientDisconnected( i-- ); // i-- to stay on this i next loop
             }
 
 
