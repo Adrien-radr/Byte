@@ -40,10 +40,7 @@ void mousecb( const Event *e, void *data ) {
 
             p = Map_createPath( &world->local_map, &a1->position, &dest );
 
-
             printf( "Path creation time : %f\n", Client_getElapsedTime() - begin );
-
-            //Game_setActorPosition( a1, &dest );
 
         } else if( e->button == MB_Left ) {
             bool walkable = Map_isWalkable( &world->local_map, &game->mouse_tile );
@@ -61,6 +58,7 @@ void init_callback() {
 
         Game_loadActorAssets( a1 );
         Scene_addSpriteFromActor( game->scene, a1 );
+        Game_setActorPosition( a1, &(vec2i){ 11, 4 } );
     }
 
     // GUI
@@ -77,16 +75,15 @@ void init_callback() {
 }
  
 bool frame_callback( f32 frame_time ) {
-    if( p && up_time >= 0.15f ) {
-        // path step
-        vec2i *next = Map_getPathNode( p, path_index++ );
-        Game_setActorPosition( a1, next );
-        up_time = 0.f;
-    }
-
-
     if( p ) {
-        up_time += frame_time;
+        // path step
+        if( up_time >= 0.15f ) {
+            vec2i *next = Map_getPathNode( p, path_index++ );
+            Game_setActorPosition( a1, next );
+            up_time = 0.f;
+        } else
+            up_time += frame_time;
+
 
         if( path_index == Map_getPathCount( p ) ) {
             Map_destroyPath( p );

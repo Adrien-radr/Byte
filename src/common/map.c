@@ -458,6 +458,10 @@ Path *Map_createPath( const Map *map, const vec2i *start, const vec2i *end ) {
     if( !map || !start || !end )
         return NULL;
 
+    // check if destination is off-bounds
+    if( end->x < 0 || end->x >= lmap_width*2 || end->y < 0 || end->y >= lmap_height/2 )
+        return NULL;
+
     NeighborList *nl = NeighborList_init();
     VisitedNodes *vn = VisitedNodes_init();
 

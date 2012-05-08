@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "context.h"
 #include "resource.h"
+#include "client.h"
 
 #include "game.h"
 
@@ -230,14 +231,18 @@ Scene *Scene_init() {
     EventManager_addListener( LT_ResizeListener, sceneWindowResizing, s );
 
     // Lights
-    Color_set( &s->ambient_color, 0.0f, 0.0f, 0.0f, 1.f );
+    s->ambient_color = (Color){ 0.035f, 0.035f, 0.035f, 1.f };
 
     Renderer_useShader( s->local_map.shader );
     Shader_sendColor( "amb_color", &s->ambient_color );
+    Shader_sendFloat( "light_power", 1.f );
+    Renderer_useShader( s->sprite_shader );
+    Shader_sendColor( "amb_color", &s->ambient_color );
+    Shader_sendFloat( "light_power", 1.f );
 
-    vec2 lightpos = { 300.f, 200.f };
+    vec2i lightpos = { 12, 5 };
     Color diffuse = { 1.f, 1.f, 1.f, 1.f };
-    Light_set( &s->light1, &lightpos, 150.f, &diffuse, 0.382f, 0.01f, 0.f );
+    Light_set( &s->light1, &lightpos, 5.5f, 200.f, &diffuse, 0.f, 0.f, 0.001f );
         
     return s;
 error:
@@ -264,8 +269,13 @@ void Scene_updateShadersProjMatrix( Scene *pScene ) {
     Renderer_updateProjectionMatrix( EGui, &pScene->proj_matrix_2d );
 }
 
+static f32 light_powers[5] = { 0.9f, 0.95f, 1.f, 0.88f, 1.f };
+
 void Scene_render( Scene *pScene ) {
+    static f32 change_power = 0.f;
+    static int power_index = 0;
     if( pScene ) {
+        const f32 tmp = Client_getElapsedTime();
         glDisable( GL_CULL_FACE );
         // ##################################################
         //      RENDER MAP
@@ -273,10 +283,14 @@ void Scene_render( Scene *pScene ) {
         Shader_sendInt( "Depth", 9 );
         Shader_sendColor( "light_color", &pScene->light1.diffuse );
         Shader_sendVec2( "light_pos", &pScene->light1.position );
+        Shader_sendFloat( "light_radius", pScene->light1.radius );
         Shader_sendFloat( "light_height", pScene->light1.height );
         Shader_sendFloat( "light_cstatt", pScene->light1.cst_att );
         Shader_sendFloat( "light_linatt", pScene->light1.lin_att );
         Shader_sendFloat( "light_quadatt", pScene->light1.quad_att );
+
+        if( change_power > 0.09f ) 
+            Shader_sendFloat( "light_power", light_powers[power_index] );
 
         Renderer_useTexture( pScene->local_map.texture, 0 );
         mat3 m;
@@ -297,10 +311,16 @@ void Scene_render( Scene *pScene ) {
                 Shader_sendInt( "Depth", pScene->sprites->mDepths[i] );
                 Shader_sendColor( "light_color", &pScene->light1.diffuse );
                 Shader_sendVec2( "light_pos", &pScene->light1.position );
+                Shader_sendFloat( "light_radius", pScene->light1.radius );
                 Shader_sendFloat( "light_height", pScene->light1.height );
                 Shader_sendFloat( "light_cstatt", pScene->light1.cst_att );
                 Shader_sendFloat( "light_linatt", pScene->light1.lin_att );
                 Shader_sendFloat( "light_quadatt", pScene->light1.quad_att );
+                if( change_power > 0.09f ) {
+                    Shader_sendFloat( "light_power", light_powers[power_index] );
+                    change_power = 0.f; 
+                    power_index = (power_index + 1) % 5;
+                }
                 Renderer_renderMesh( pScene->sprites->mMeshes[i] );
             }
         }
@@ -333,6 +353,8 @@ void Scene_render( Scene *pScene ) {
                 Renderer_renderMesh( pScene->texts->mMeshes[i] );
             }
         }
+
+        change_power += Client_getElapsedTime() - tmp;
     }
 }
 
