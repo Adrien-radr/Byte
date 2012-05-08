@@ -4,19 +4,26 @@
 #include "common.h"
 #include "vector.h"
 
+#define WORLD_MAP_SIZE  10
+
 // Width and Height of local and world maps
 // You got a nice quad if height = 2 * width
-#define LOCAL_MAP_WIDTH  12     // Can be any size
-#define LOCAL_MAP_HEIGHT 24     // Must be divisible by 2(int)
-#define LOCAL_MAP_SIZE (LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT)
-#define WORLD_MAP_SIZE  10
+#define lmap_width 12    // Can be any size
+#define lmap_height 24   // Must be divisible by 2(int)
+#define lmap_size (lmap_width*lmap_height)
+
+extern const int tile_w;        ///< Tile width
+extern const int tile_h;        ///< Tile height
+extern const int tile_hw;       ///< Tile half width
+extern const int tile_hh;       ///< Tile half height
+
 
 typedef struct {
     bool    walkable;
 } MapTile;
 
 typedef struct {
-    MapTile    tiles[LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+    MapTile    tiles[lmap_size];
 } Map;
 
 /// Initialize map tiles to all be walkable (what else?)
@@ -28,6 +35,11 @@ void Map_setWalkable( Map *map, const vec2i *tile, bool walkable );
 /// Returns whether or not the given map tile is walkable
 bool Map_isWalkable( const Map *map, const vec2i *tile );
 
+/// Returns the square coordinate equivalent of an isometric coordinate
+vec2i Map_isoToSquare( const vec2i *vec );
+
+/// Returns the global floating position of the center of a tile
+vec2  Map_isoToGlobal( const vec2i *tile );
 
 // ##################################################################
 //      A STAR Pathfinding

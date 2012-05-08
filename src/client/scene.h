@@ -67,9 +67,6 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
     /// Returns the map tile at a given local screen position
     vec2i Scene_screenToIso( Scene *scene, const vec2i *local );
 
-    /// Returns the center position of a given tile, in global coordinates
-    vec2  Scene_isoToGlobal( Scene *scene, const vec2i *tile );
-
     void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red );
     
 

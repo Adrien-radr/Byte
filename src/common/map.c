@@ -1,8 +1,15 @@
 #include "map.h"
 
+//////////////////
+//  Map constants 
+const int tile_w = 100;
+const int tile_h = 50;
+const int tile_hw = 50;
+const int tile_hh = 25;
+
 void Map_init( Map *map ) {
     if( map ) {
-        for( int i = 0; i < LOCAL_MAP_SIZE; ++i ) {
+        for( int i = 0; i < lmap_size; ++i ) {
             map->tiles[i].walkable = true;
             // other ?? IF NOT, memset would be better
         }
@@ -10,15 +17,34 @@ void Map_init( Map *map ) {
 }
 
 inline void Map_setWalkable( Map *map, const vec2i *tile, bool walkable ) {
-    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < LOCAL_MAP_WIDTH*2 && tile->y < LOCAL_MAP_HEIGHT/2 ) 
-        map->tiles[tile->y*2*LOCAL_MAP_WIDTH+tile->x].walkable = walkable;
+    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < lmap_width*2 && tile->y < lmap_height/2 ) 
+        map->tiles[tile->y*2*lmap_width+tile->x].walkable = walkable;
 }
 
 inline bool Map_isWalkable( const Map *map, const vec2i *tile ) {
-    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < LOCAL_MAP_WIDTH*2 && tile->y < LOCAL_MAP_HEIGHT/2 ) 
-        return map->tiles[tile->y*2*LOCAL_MAP_WIDTH+tile->x].walkable;
+    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < lmap_width*2 && tile->y < lmap_height/2 ) 
+        return map->tiles[tile->y*2*lmap_width+tile->x].walkable;
     return false;
 }
+
+inline vec2i Map_isoToSquare( const vec2i *vec ) {
+    // X :  y + (x '+ 1')    ( the +1 is here only if x is ODD )
+    //          ---------    
+    //              2        
+    //                       
+    // Y :  y - (x '- 1')    ( the -1 is here only if x is ODD )
+    //          ---------    
+    //              2        
+    return (vec2i){ vec->y + ( vec->x + (vec->x % 2 ? 0 : 1) ) / 2,
+                    vec->y - ( vec->x - (vec->x % 2 ? 0 : 1) ) / 2  };
+}
+
+inline vec2  Map_isoToGlobal( const vec2i *tile ) {
+    return (vec2){ (tile->x+1) * tile_hw, 
+                    tile->y * tile_h + (1+((tile->x % 2) ? 1 : 0)) * tile_hh };
+}
+
+
 
 
 // ##################################################################
@@ -144,24 +170,13 @@ static void pathNodeNeighbors( NeighborList *nl, const Map *map, const vec2i *no
         NeighborList_add( nl, &v, 1 );
 }
 
-/// Manhattan heuristic between two nodes
+/// Manhattan heuristic between two nodes 
 static inline float pathNodeHeuristic( const vec2i *from, const vec2i *to ) {
-    // get squared-tiles coordinates from iso-coordinates of vector TO and FROM
-    // X :  y + (x '+ 1')    ( the +1 is here only if to->X is ODD )
-    //          ---------    
-    //              2        
-    //                       
-    // Y :  y - (x '- 1')    ( the -1 is here only if to->X is ODD )
-    //          ---------    
-    //              2        
-    vec2i sq_to = { to->y + ( to->x + (to->x&1) ) / 2, 
-                    to->y - ( to->x - (to->x&1) ) / 2  };
-
-    vec2i sq_from = { from->y + ( from->x + (from->x&1) ) / 2, 
-                      from->y - ( from->x - (from->x&1) ) / 2  };
+    vec2 fto = Map_isoToGlobal( to );
+    vec2 ffrom = Map_isoToGlobal( from );
 
     // return Manhattan distance between sq_tile and from
-    return ( fabs( sq_to.x - sq_from.x ) + fabs( sq_to.y - sq_from.y ) );
+    return ( fabs( fto.x - ffrom.x ) + fabs( fto.y - ffrom.y ) );
 }
 
 

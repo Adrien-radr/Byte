@@ -326,7 +326,7 @@ void Game_setActorPosition( Actor *actor, const vec2i *pos ) {
         if( actor->used_sprite >= 0 ) {
             mat3 m;
             // get global tile position
-            vec2 glob_tile = Scene_isoToGlobal( game->scene, pos );
+            vec2 glob_tile = Map_isoToGlobal( pos ); 
 
             // ajust position with sprite width and height
             // X -= sprite_width/2 (to center it on tile, horizontally

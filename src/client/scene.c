@@ -18,11 +18,11 @@
 /// Local function. Initialize the scene map
 void SceneMap_init( Scene *scene ) {
     // buffer positions ( 4 vertices for each map tile )
-    vec2 map_pos[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+    vec2 map_pos[4*lmap_size];
     // buffer tex coordinates ( 4 for each tile )
-    vec2 map_tcs[4*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+    vec2 map_tcs[4*lmap_size];
     // drawing indices ( 2 triangles(3verts) for each tile )
-    u32  map_indices[6*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
+    u32  map_indices[6*lmap_size];
 
     // vertex position offsets
     int x_offset, y_offset;  
@@ -32,8 +32,8 @@ void SceneMap_init( Scene *scene ) {
      
 
     // create map mesh data
-    for( int j = 0; j < LOCAL_MAP_HEIGHT/2; ++j )
-        for( int i = 0; i < 2*LOCAL_MAP_WIDTH; ++i ) {
+    for( int j = 0; j < lmap_height/2; ++j )
+        for( int i = 0; i < 2*lmap_width; ++i ) {
             x_offset = i * 50.f;
             y_offset = j * 50.f + (i&1) * 25.f;
 
@@ -41,7 +41,7 @@ void SceneMap_init( Scene *scene ) {
             xi = i * 4;
             // j * 2 : each row index is a col of 2 tiles 
             // LOCAL_MAP_WIDTH * 4 : 4 vertices for a complete row of tiles
-            yj = j * 2 * LOCAL_MAP_WIDTH * 4;
+            yj = j * 2 * lmap_width * 4;
             map_pos[yj+xi+0].x = x_offset + 50.f;
             map_pos[yj+xi+0].y = y_offset + 50.f;
             map_pos[yj+xi+1].x = x_offset;
@@ -57,7 +57,7 @@ void SceneMap_init( Scene *scene ) {
             map_tcs[yj+xi+3].x = 0.5f;     map_tcs[yj+xi+3].y = 0.f;
 
             ii = i * 6;
-            ij = j * 2 * LOCAL_MAP_WIDTH * 6;
+            ij = j * 2 * lmap_width * 6;
             map_indices[ij+ii+0] = yj+xi+0;
             map_indices[ij+ii+1] = yj+xi+2;
             map_indices[ij+ii+2] = yj+xi+1;
@@ -77,13 +77,13 @@ void SceneMap_init( Scene *scene ) {
 }
 
 void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red ) {
-    if( tile->x >= LOCAL_MAP_WIDTH*2 || tile->y >= LOCAL_MAP_HEIGHT/2 ) 
+    if( tile->x >= lmap_width*2 || tile->y >= lmap_height/2 ) 
         return;
 
     Mesh *m = Renderer_getMesh( scene->local_map.mesh );
     u32 tcs_offset = m->vertex_count * 2;
     int i_offset = tile->x * 8,
-        j_offset = tile->y * 2 * LOCAL_MAP_WIDTH * 8;
+        j_offset = tile->y * 2 * lmap_width * 8;
  
 
     // we change only on even indices, only the X coord, not Y
@@ -109,16 +109,15 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
     static vec2i down =  {  50, 50 };
     static vec2i left =  {   0, 25 };
     static vec2i right = { 100, 25 };
-    static vec2i tilesize = { 100, 50 };
 
     // get global mouse position (not depending on camera zoom or pan)
     vec2 global = Scene_localToGlobal( scene, local );
 
     vec2i ret, offset;
-    ret.x = 2 * (int)( global.x / tilesize.x);
-    ret.y = global.y / tilesize.y;
-    offset.x = (int)global.x % tilesize.x;
-    offset.y = (int)global.y % tilesize.y;
+    ret.x = 2 * (int)( global.x / tile_w);
+    ret.y = global.y / tile_h;
+    offset.x = (int)global.x % tile_w;
+    offset.y = (int)global.y % tile_h;
 
 
     if( PointOnLinei( &offset, &left, &up ) < 0 ) {
@@ -133,15 +132,6 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
     } else if( PointOnLinei( &offset, &down, &right ) > 0 )  
         ret.x += 1;
 
-    return ret;
-}
-
-vec2  Scene_isoToGlobal( Scene *scene, const vec2i *tile ) {
-    static const vec2 tilesize = { 100.f, 50.f };
-    static const vec2 halfsize = { 50.f,  25.f };
-
-    vec2 ret = { (tile->x+1) * halfsize.x, 
-                 tile->y * tilesize.y + (1+(tile->x&1)) * halfsize.y };
     return ret;
 }
 
