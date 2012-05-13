@@ -88,11 +88,7 @@ typedef struct {
 
 typedef struct {
     str16                       ifname;
-<<<<<<< HEAD
     u16                 family;
-=======
-    u16                         family;
->>>>>>> ec45a6111d536ef292fe2be80629ab31c4c48aef
 #ifdef BYTE_WIN32
     struct in_addr              addr;
 #else

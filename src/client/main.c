@@ -4,6 +4,7 @@
 #include "game.h"
 #include "resource.h"
 #include "renderer.h"
+#include "context.h"
 
 #ifdef USE_GLDL
 #include "GL/gldl.h"
@@ -16,12 +17,13 @@
 
 */
 
+
 Actor *a1;
 int a1_h;
 
-int master, button1;
+int root, window1, window1head, window1name, button1, text1;
 
-void mousecb( const Event *e, void *data ) {
+void mousecb( const Event *e, void *data ) {/*
     if( e->type == EMouseReleased ) {
         if( e->button == MB_Right ) {
             vec2 newpos = Scene_localToGlobal( game->scene, &e->v );
@@ -38,6 +40,9 @@ void mousecb( const Event *e, void *data ) {
                 Map_setWalkable( &world->local_map, i, j, false );
             }
         }
+    }*/
+    if( e->type == EMouseReleased ) {
+        Widget_callback( RootWidget, e );
     }
 }
 
@@ -56,19 +61,46 @@ void init_callback() {
         Scene_modifySprite( game->scene, a1_h, SA_Matrix, &m );
     }
 
+    Font* f = Font_get( "DejaVuSans.ttf", 12 );
+    Color c;
+    Color_set( &c, 1.f, 1.f, 1.f, 1.f );
+
+    text1 = Scene_addText( game->scene, f, c );
+    Scene_modifyText( game->scene, text1, TA_String, "Button" );
+
+    window1name = Scene_addText( game->scene, f, c );
+    Scene_modifyText( game->scene, window1name, TA_String, "Window" );
+
+    vec2i contextsize = Context_getSize();
+    RootWidget = Widget_init( WT_Root, &contextsize, NULL, NULL, -1 );
+    RootWidget->position = vec2i_c( 0, 0 );
+
+
+    Widget* window = Widget_init( WT_Window, &(vec2i){ 300, 250 }, "quadmesh.json", "widgettexture.png", -1 );
+    window->position = vec2i_c( 100, 100 );
+    window->size = vec2i_c( 300, 250 );
+    window->depth = -5;
+
+    Widget* windowHead = Widget_createWindowHead( window, window1name );
+
+
     // GUI
-    Widget button;
-    button.position = vec2i_c( 3, 3 );
-    button.size = vec2i_c( 120, 50 );
-    button.depth = -5;
-    Widget_init( &button, "quadmesh.json", "widgettexture.png" );
+    Widget* button = Widget_init( WT_Button, &(vec2i){ 192, 38 }, "quadmesh.json", "widgettexture.png", text1 );
+    button->position = vec2i_c( 400, 400 );
+    button->size = vec2i_c( 192, 38 );
+    button->textOffset = vec2i_c( 72, 11 );
+    button->depth = -5;
 
-    button1 = Scene_addWidget( game->scene, &button );
 
-    
+    Widget_addChild( RootWidget, windowHead );
+    Widget_addChild( RootWidget, button );
+
+    window1head = Scene_addWidget( game->scene, windowHead );
+    button1 = Scene_addWidget( game->scene, button );
+
     EventManager_addListener( LT_MouseListener, mousecb, NULL );
 }
- 
+
 bool frame_callback( f32 frame_time ) {
     return true;
 }
@@ -79,7 +111,7 @@ int main() {
     net_addr sv_addr = { { 127,0,0,1 }, 1991 };
     //net_addr sv_addr = { { 192,168,1,3 }, 1991 };
 
-    if( !Client_init( &sv_addr ) ) 
+    if( !Client_init( &sv_addr ) )
         return 1;
 
     if( !Game_init( init_callback, frame_callback ) ) {

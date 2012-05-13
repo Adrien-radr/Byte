@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="..\..\..\src\common\actor.c" open="0" top="0" tabpos="0">
+		<Cursor position="66" topLine="0" />
+	</File>
+	<File name="..\..\..\src\common\color.c" open="1" top="0" tabpos="10">
+		<Cursor position="315" topLine="0" />
+	</File>
+	<File name="..\..\..\src\common\color.h" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="..\..\..\src\common\matrix.h" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="..\..\..\src\common\net.c" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="..\..\..\src\common\net.h" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="..\..\..\src\common\vector.h" open="1" top="0" tabpos="16">
+		<Cursor position="278" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

@@ -25,11 +25,11 @@ void SceneMap_init( Scene *scene ) {
     u32  map_indices[6*LOCAL_MAP_WIDTH*LOCAL_MAP_HEIGHT];
 
     // vertex position offsets
-    int x_offset, y_offset;  
+    int x_offset, y_offset;
 
     // arrays indices offsets ( xi and yj for pos and tcs offsets,
     int xi, yj, ii, ij;      // ii and ij for indices               )
-     
+
 
     // create map mesh data
     for( int j = 0; j < LOCAL_MAP_HEIGHT/2; ++j )
@@ -39,7 +39,7 @@ void SceneMap_init( Scene *scene ) {
 
             // i * 4 : 4 vertices for each tile
             xi = i * 4;
-            // j * 2 : each row index is a col of 2 tiles 
+            // j * 2 : each row index is a col of 2 tiles
             // LOCAL_MAP_WIDTH * 4 : 4 vertices for a complete row of tiles
             yj = j * 2 * LOCAL_MAP_WIDTH * 4;
             map_pos[yj+xi+0].x = x_offset + 50.f;
@@ -49,7 +49,7 @@ void SceneMap_init( Scene *scene ) {
             map_pos[yj+xi+2].x = x_offset + 50.f;
             map_pos[yj+xi+2].y = y_offset;
             map_pos[yj+xi+3].x = x_offset + 100.f;
-            map_pos[yj+xi+3].y = y_offset + 25.f; 
+            map_pos[yj+xi+3].y = y_offset + 25.f;
 
             map_tcs[yj+xi+0].x = 0.f;     map_tcs[yj+xi+0].y = 0.f;
             map_tcs[yj+xi+1].x = 0.f;     map_tcs[yj+xi+1].y = 1.f;
@@ -70,21 +70,21 @@ void SceneMap_init( Scene *scene ) {
     scene->local_map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
     Renderer_setDynamicMeshData( scene->local_map.mesh, (f32*)map_pos, sizeof(map_pos), (f32*)map_tcs, sizeof(map_tcs), map_indices, sizeof(map_indices) );
 
- 
+
     // get shader and texture
     scene->local_map.texture = ResourceManager_get( "map.png" );
     scene->local_map.shader = ResourceManager_get( "map_shader.json" );
 }
 
 void SceneMap_redTile( Scene *scene, u32 i, u32 j ) {
-    if( i >= LOCAL_MAP_WIDTH*2 || j >= LOCAL_MAP_HEIGHT/2 ) 
+    if( i >= LOCAL_MAP_WIDTH*2 || j >= LOCAL_MAP_HEIGHT/2 )
         return;
 
     Mesh *m = Renderer_getMesh( scene->local_map.mesh );
     u32 tcs_offset = m->vertex_count * 2;
     int i_offset = i * 8,
         j_offset = j * 2 * LOCAL_MAP_WIDTH * 8;
- 
+
 
     // we change only on even indices, only the X coord, not Y
     m->data[tcs_offset+i_offset+j_offset+0] = 0.5f;
@@ -122,15 +122,15 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
 
 
     if( PointOnLinei( &offset, &left, &up ) < 0 ) {
-        ret.y -= 1;      
+        ret.y -= 1;
         ret.x -= 1;
-    } 
-    else if( PointOnLinei( &offset, &left, &down ) > 0 ) 
+    }
+    else if( PointOnLinei( &offset, &left, &down ) > 0 )
         ret.x -= 1;
     else if( PointOnLinei( &offset, &up, &right ) < 0 ) {
-        ret.y -= 1;     
+        ret.y -= 1;
         ret.x += 1;
-    } else if( PointOnLinei( &offset, &down, &right ) > 0 )  
+    } else if( PointOnLinei( &offset, &down, &right ) > 0 )
         ret.x += 1;
 
     return ret;
@@ -143,13 +143,13 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
 // Camera listeners and update function
     void cameraMouseListener( const Event *event, void *camera ) {
         Camera *cam = (Camera*)camera;
-        // manage zoom event 
-        if( event->type == EMouseWheelMoved ) 
+        // manage zoom event
+        if( event->type == EMouseWheelMoved )
             Camera_zoom( cam, event->i );
     }
 
     void cameraUpdate( Camera *camera ) {
-        // manage position pan 
+        // manage position pan
         vec2 move = { .x = 0.f, .y = 0.f };
         if( IsKeyDown( K_W ) )
             move.y -= 1.f;
@@ -178,7 +178,7 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
 
 Scene *Scene_init() {
     Scene *s = NULL;
-    
+
     s = byte_alloc( sizeof( Scene ) );
     check_mem( s );
 
@@ -239,7 +239,7 @@ Scene *Scene_init() {
     vec2 lightpos = { 300.f, 200.f };
     Color diffuse = { 1.f, 1.f, 1.f, 1.f };
     Light_set( &s->light1, &lightpos, 150.f, &diffuse, 0.382f, 0.01f, 0.f );
-        
+
     return s;
 error:
     Scene_destroy( s );
@@ -253,11 +253,12 @@ void Scene_destroy( Scene *pScene ) {
         WidgetArray_destroy( pScene->widgets );
         Camera_destroy( pScene->camera );
         DEL_PTR( pScene );
-    }   
+    }
 }
 
 void Scene_update( Scene *pScene ) {
     Camera_update( pScene->camera );
+    Widget_update( pScene, RootWidget );
 }
 
 void Scene_updateShadersProjMatrix( Scene *pScene ) {
@@ -313,12 +314,15 @@ void Scene_render( Scene *pScene ) {
 
         for( u32 i = 0; i < pScene->widgets->max_index; ++i ){
             if( HandleManager_isUsed( pScene->widgets->used, i ) ) {
-                Renderer_useTexture( pScene->widgets->textures[i], 0 );
-                Shader_sendVec2( "Position", &pScene->widgets->positions[i] );
-                Shader_sendInt( "Depth", pScene->widgets->depths[i] );
-                Renderer_renderMesh( pScene->widgets->meshes[i] );
+                if( pScene->widgets->textures[i] >= 0 ){
+                    Renderer_useTexture( pScene->widgets->textures[i], 0 );
+                    Shader_sendVec2( "Position", &pScene->widgets->positions[i] );
+                    Shader_sendInt( "Depth", pScene->widgets->depths[i] );
+                    Renderer_renderMesh( pScene->widgets->meshes[i] );
+                }
             }
         }
+
 
 
         // ##################################################
@@ -338,7 +342,7 @@ void Scene_render( Scene *pScene ) {
 }
 
 //  =======================
- 
+
 int  Scene_addSprite( Scene *pScene, u32 pMesh, int pTexture[2], mat3 *pMM ) {
     int handle = -1;
 
@@ -349,13 +353,13 @@ int  Scene_addSprite( Scene *pScene, u32 pMesh, int pTexture[2], mat3 *pMM ) {
             pScene->sprites->mMeshes[handle] = pMesh;
             pScene->sprites->mTextures0[handle] = pTexture[0];
             pScene->sprites->mTextures1[handle] = pTexture[1];
-            memcpy( &pScene->sprites->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
+            memcpy( &pScene->sprites->mMatrices[handle], pMM, 9 * sizeof( f32 ) );
         }
     }
     return handle;
 }
 
-int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) { 
+int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) {
     int handle = -1;
 
     if( pScene && pActor ) {
@@ -368,7 +372,7 @@ int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) {
             pScene->sprites->mTextures1[handle] = pActor->texture_ids[1];
             mat3 m;
             mat3_translationMatrixfv( &m, &pActor->mPosition );
-            memcpy( pScene->sprites->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) ); 
+            memcpy( pScene->sprites->mMatrices[handle].x, m.x, 9 * sizeof( f32 ) );
         }
     }
     return handle;
@@ -379,7 +383,7 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
         if( HandleManager_isUsed( pScene->sprites->mUsed, pHandle ) ) {
             switch( pAttrib ) {
                 case SA_Matrix :
-                    memcpy( &pScene->sprites->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
+                    memcpy( &pScene->sprites->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) );
                     break;
                 case SA_Texture0 :
                     pScene->sprites->mTextures0[pHandle] = *((u32*)pData);
@@ -392,7 +396,7 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
                     break;
             }
         }
-    }   
+    }
 }
 
 void Scene_transformSprite( Scene *pScene, u32 pHandle, mat3 *pTransform ) {
@@ -404,12 +408,12 @@ void Scene_transformSprite( Scene *pScene, u32 pHandle, mat3 *pTransform ) {
 }
 
 void Scene_removeSprite( Scene *pScene, u32 pIndex ) {
-    if( pScene ) 
+    if( pScene )
         SpriteArray_remove( pScene->sprites, pIndex );
 }
 
 void Scene_clearSprites( Scene *pScene ) {
-    if( pScene ) 
+    if( pScene )
         SpriteArray_clear( pScene->sprites );
 }
 
@@ -437,7 +441,7 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
             switch( pAttrib ) {
                 case TA_Position :
                     {
-                        vec2 new_pos = *((vec2*)pData);
+                        vec2 new_pos = vec2_vec2i(((vec2i*)pData));
                         pScene->texts->mPositions[pHandle] = new_pos;
                     }
                     break;
@@ -451,7 +455,7 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
                         // recreate VBO
                         Text_setString( pScene->texts->mMeshes[pHandle], pScene->texts->mFonts[pHandle], s );
 
-                        // copy string inside textarray to keep track of current string 
+                        // copy string inside textarray to keep track of current string
                         pScene->texts->mStrings[pHandle] = byte_realloc( pScene->texts->mStrings[pHandle], strlen( s ) + 1 );
                         strcpy( pScene->texts->mStrings[pHandle], s );
                     }
@@ -468,28 +472,43 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
 }
 
 void Scene_removeText( Scene *pScene, u32 pIndex ) {
-    if( pScene ) 
+    if( pScene )
         TextArray_remove( pScene->texts, pIndex );
 }
 
 void Scene_clearTexts( Scene *pScene ) {
-    if( pScene ) 
+    if( pScene )
         TextArray_clear( pScene->texts );
 }
 
 
 //  =======================
 
-int Scene_addWidget( Scene *scene, const Widget *widget ) {
+int Scene_addWidget( Scene *scene, Widget *widget ) {
     int handle = -1;
 
     if( scene ){
         handle = WidgetArray_add( scene->widgets );
         if( handle >= 0 ) {
-            scene->widgets->meshes[handle] = widget->assets.mesh;
-            scene->widgets->textures[handle] = widget->assets.texture;
+            widget->sceneIndex = handle;
+
+            if( widget->assets.mesh >= 0 )
+                scene->widgets->meshes[handle] = widget->assets.mesh;
+            if( widget->assets.texture >= 0 )
+                scene->widgets->textures[handle] = widget->assets.texture;
+            if( widget->assets.text >= 0 ){
+                scene->widgets->texts[handle] = widget->assets.text;
+                vec2i textPos = vec2i_add( &widget->position, &widget->textOffset );
+                Scene_modifyText( scene, widget->assets.text, TA_Position, &textPos );
+                int depth = widget->depth - 1;
+                Scene_modifyText( scene, widget->assets.text, TA_Depth, &depth );
+            }
+
             scene->widgets->depths[handle] = widget->depth;
             scene->widgets->positions[handle] = vec2_vec2i( &widget->position );
+            for( u32 i = 0; i < widget->childrenCount; ++i ) {
+                Scene_addWidget( scene, widget->children[i] );
+            }
         }
     }
 
@@ -505,9 +524,15 @@ void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *da
                     break;
                 case WA_Position :
                     scene->widgets->positions[handle] = vec2_vec2i( (vec2i*)data );
+                    vec2i pos = vec2i_c( (int)scene->widgets->positions[handle].x, (int)scene->widgets->positions[handle].y );
+                    vec2i off = vec2i_c( (int)scene->widgets->textOffsets[handle].x, (int)scene->widgets->textOffsets[handle].y );
+                    vec2i textPos = vec2i_add( &pos, &off );
+                    Scene_modifyText( scene, scene->widgets->texts[handle], TA_Position, &textPos );
                     break;
                 case WA_Depth :
                     scene->widgets->depths[handle] = *((u32*)data);
+                    int depth = scene->widgets->depths[handle] - 1;
+                    Scene_modifyText( scene, scene->widgets->texts[handle], TA_Depth, &depth );
                     break;
                 default :
                     break;
@@ -518,12 +543,32 @@ void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *da
 
 
 
-void Scene_removeWidget( Scene *scene, u32 widget ) {
-    if( scene )
-        WidgetArray_remove( scene->widgets, widget );
+void Scene_removeWidget( Scene *scene, Widget* widget ) {
+    if( scene ) {
+        for( u32 i = 0; i < widget->childrenCount; ++i )
+            Scene_removeWidget( scene, widget->children[i] );
+        WidgetArray_remove( scene->widgets, widget->sceneIndex );
+        if( widget->assets.text >= 0 )
+            TextArray_remove( scene->texts, widget->assets.text );
+        widget->sceneIndex = -1;
+    }
 }
 
 void Scene_clearWidgets( Scene *scene) {
     if( scene )
         WidgetArray_clear( scene->widgets );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

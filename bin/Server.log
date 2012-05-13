@@ -1,114 +1,14 @@
-<<<<<<< HEAD
-Byte-Project Log v0.1.5
-Sat 05 May 2012 - 02:34:31
+Byte-Project Log v0.1.6
+Mon 14 May 2012 - 01:21:45
 ==========================
 <0.02> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:33) Connection slot 0 listening...
-<4108.78> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<4108.80> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<4108.81> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<4108.85> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<4109.03> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<4114.05> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<4126.88> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:516) Penalty time decreased to 2.000000
-<4139.68> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:516) Penalty time decreased to 1.000000
-<4160.68> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:489) Connection going to Bad Mode
-<4162.39> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<4166.28> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:489) Connection going to Bad Mode
-<4166.29> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:498) Penalty time increased to 2.000000
-<4169.46> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<4172.68> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:489) Connection going to Bad Mode
-<4172.69> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:498) Penalty time increased to 4.000000
-<4178.02> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<4182.28> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:489) Connection going to Bad Mode
-<4182.29> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:498) Penalty time increased to 8.000000
-<4192.78> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<4194.88> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:489) Connection going to Bad Mode
-<4194.89> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:498) Penalty time increased to 16.000000
-<4215.66> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<4216.93> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
-<4217.01> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_CLOSEOK(seq=661)
-<4217.02> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
-<4217.03> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...
-<4220.07> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<4220.08> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<4220.22> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<4220.26> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<4220.48> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<4222.12> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
-<4222.32> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_CLOSEOK(seq=8)
-<4222.33> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
-<4222.34> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...
-<4236.34> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<4236.34> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<4236.38> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<4236.42> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<4236.65> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<4241.69> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<4254.52> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:516) Penalty time decreased to 2.000000
-<4267.32> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:516) Penalty time decreased to 1.000000
-<4292.59> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:489) Connection going to Bad Mode
-<4294.38> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<4444.28> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
-<4444.33> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_CLOSEOK(seq=1597)
-<4444.34> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
-<4444.35> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...
-<5200.35> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<5200.36> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<5200.48> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<5200.51> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<5200.73> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<5202.60> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
-<5202.83> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_CLOSEOK(seq=9)
-<5202.85> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
-<5202.87> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...
-<5251.47> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<5251.48> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<5251.65> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<5251.69> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<5251.90> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<5252.71> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
-<5252.93> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_CLOSEOK(seq=5)
-<5252.95> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
-<5252.96> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...
-<5323.51> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<5323.52> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<5323.68> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<5323.72> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<5323.94> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<5328.98> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<5341.84> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:516) Penalty time decreased to 2.000000
-<5354.61> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:516) Penalty time decreased to 1.000000
-<5407.58> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
-<5407.59> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_CLOSEOK(seq=635)
-<5407.61> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
-<5407.63> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...
-<5410.82> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<5410.83> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<5411.02> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<5411.06> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<5411.28> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<5412.06> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
-<5412.07> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_CLOSEOK(seq=4)
-<5412.08> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
-<5412.10> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...
-<5444.07> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<5444.09> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<5444.24> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<5444.28> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<5444.49> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<5449.50> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<5455.96> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
-<5456.00> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_CLOSEOK(seq=71)
-<5456.02> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
-<5456.05> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...
-<5616.80> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
-<5616.81> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
-<5616.83> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_SESSIONID(seq=0)
-<5616.87> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
-<5617.05> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:733) sending CONNECT_ACCEPT(seq=1)
-<5622.13> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:528) Connection going to Good Mode
-<5634.94> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:516) Penalty time decreased to 2.000000
-<5647.76> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:516) Penalty time decreased to 1.000000
-<5682.47> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNE
-=======
->>>>>>> ec45a6111d536ef292fe2be80629ab31c4c48aef
+<6.03> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:136) received CONNECT_ASKID
+<6.05> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:80) Connection slot 1 listening...
+<6.16> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:734) sending CONNECT_SESSIONID(seq=0)
+<6.20> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:161) received CONNECT_TRY
+<6.42> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:734) sending CONNECT_ACCEPT(seq=1)
+<11.42> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:529) Connection going to Good Mode
+<11.70> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:169) received CONNECT_CLOSE
+<11.75> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\common\net.c:734) sending CONNECT_CLOSEOK(seq=23)
+<11.77> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:174) received CONNECT_CLOSEOK
+<11.80> [INFO] (C:\Users\Beul\Desktop\Code\ByteLastVersion\src\server\server.c:110) Connection slot 0 listening...

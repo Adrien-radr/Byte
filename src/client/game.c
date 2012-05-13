@@ -39,26 +39,26 @@ bool LoadConfig() {
     check( root, "JSON Parse error [%s] before :\n%s\n", config_file, cJSON_GetErrorPtr() );
 
     // get fullscreen state
-    if( !LoadConfigItem( root, &item, "bFullscreen" ) ) 
+    if( !LoadConfigItem( root, &item, "bFullscreen" ) )
         game->config.fullscreen = 0;
-    else 
+    else
         game->config.fullscreen = item->type > 0;
 
     // get window size
-    if( !LoadConfigItem( root, &item, "iWindowWidth" ) ) 
+    if( !LoadConfigItem( root, &item, "iWindowWidth" ) )
         game->config.window_size.x = 800;
-    else 
+    else
         game->config.window_size.x = (f32)item->valueint;
 
-    if( !LoadConfigItem( root, &item, "iWindowHeight" ) ) 
+    if( !LoadConfigItem( root, &item, "iWindowHeight" ) )
         game->config.window_size.y = 600;
     else
         game->config.window_size.y = (f32)item->valueint;
 
     // get multisamples
-    if( !LoadConfigItem( root, &item, "iMultiSamples" ) ) 
+    if( !LoadConfigItem( root, &item, "iMultiSamples" ) )
         game->config.multisamples = 0;
-    else 
+    else
         game->config.multisamples = item->valueint;
 
     return_val = true;
@@ -145,7 +145,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     check( ResourceManager_loadAllResources(), "Error while loading Game Resources. Aborting initialization.\n");
 
 
-    // Init Game World 
+    // Init Game World
     check( World_init(), "Error while creating Game World. Aborting initialization.\n" );
 
 
@@ -172,7 +172,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     Font *f = Font_get( "DejaVuSans.ttf", 12 );
     Color col = { 0.9f, 0.9f, 0.9f, 1.f };
     int text_depth = -10;
-    vec2 pos = { 6, 4 };
+    vec2i pos = { 6, 4 };
 
     // Load fps text
     game->fps_text = Scene_addText( game->scene, f, col );
@@ -182,14 +182,14 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
     // Load mousepos text
     game->mousepos_text = Scene_addText( game->scene, f, col );
-    pos.y += 15.f;
+    pos.y += 15;
     Scene_modifyText( game->scene, game->mousepos_text, TA_Position, &pos );
     Scene_modifyText( game->scene, game->mousepos_text, TA_String, "X  : 0, Y : 0" );
     Scene_modifyText( game->scene, game->mousepos_text, TA_Depth, &text_depth );
 
     // Load mousetile text
     game->mousetile_text = Scene_addText( game->scene, f, col );
-    pos.y += 15.f;
+    pos.y += 15;
     Scene_modifyText( game->scene, game->mousetile_text, TA_Position, &pos );
     Scene_modifyText( game->scene, game->mousetile_text, TA_String, "X  : 0, Y : 0" );
     Scene_modifyText( game->scene, game->mousetile_text, TA_Depth, &text_depth );
@@ -211,6 +211,7 @@ error:
 void Game_destroy() {
     if( game ) {
         Scene_destroy( game->scene );
+        Widget_remove( RootWidget );
 
         World_destroy();
         ResourceManager_destroy();
@@ -287,12 +288,12 @@ bool Game_loadActorAssets( Actor *actor ) {
         // resize
         int scaled_mesh = Renderer_createRescaledMesh( actor->mesh_id, &actor->size );
         check( scaled_mesh >= 0, "Error while creating scaled mesh for actor '%s'. \n", actor->mFirstname );
-        
+
         actor->mesh_id = scaled_mesh;
 
         // add newly rescaled mesh to resource manager
         ResourceManager_add( scaled_mesh_str, scaled_mesh );
-    }   
+    }
 
     // load textures
     for( int i = 0; i < actor->assets.tex_n; ++i ) {

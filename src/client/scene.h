@@ -22,7 +22,7 @@ typedef struct {
 } SceneMap;
 
 /// Scene structure. Keep all info about rendering in the current view
-typedef struct {
+typedef struct s_Scene {
     u32             sprite_shader;      ///< Shader used to render sprites
     SpriteArray     *sprites;           ///< Sprites in the scene
 
@@ -30,7 +30,7 @@ typedef struct {
     TextArray       *texts;             ///< Texts in the scene
 
     u32             ui_shader;          ///< Shader used to render ui elements
-    WidgetArray     *widgets;           ///< Widgets in the scene. 
+    WidgetArray     *widgets;           ///< Widgets in the scene.
 
     Camera          *camera;            ///< Camera of the scene
 
@@ -68,7 +68,7 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
     vec2i Scene_screenToIso( Scene *scene, const vec2i *local );
 
     void SceneMap_redTile( Scene *scene, u32 i, u32 j );
-    
+
 
 // ##########################################################################3
 //      Sprite Array
@@ -81,7 +81,7 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 
     /// Add a sprite to be rendered each frame in the scene
     /// @param pActor : the Actor that must be drawn as a sprite
-    /// @return : The handle to the given sprite 
+    /// @return : The handle to the given sprite
     int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor );
 
     /// Modify one attribute of a Sprite (given by its handle)
@@ -118,7 +118,7 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 // ##########################################################################3
 //      Widgets Array
     /// Add a widget (and recursively all its children) to be rendered
-    int Scene_addWidget( Scene *scene, const Widget *widget );
+    int Scene_addWidget( Scene *scene, Widget *widget );
 
     /// Modify one attribute of a Widget (given by its handle)
     /// @param attrib : the attribute type we want to change (see widget.h)
@@ -126,7 +126,7 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
     void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *data );
 
     /// Remove a widget from the scene (by its handle).
-    void Scene_removeWidget( Scene *scene, u32 widget );
+    void Scene_removeWidget( Scene *scene, Widget* widget );
 
     /// Clears the whole widget array, to set a new scene
     void Scene_clearWidgets( Scene *scene );

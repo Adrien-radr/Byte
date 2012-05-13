@@ -9,10 +9,13 @@
 typedef struct {
     HandleManager   *used;         ///< HandleManager telling if an index is used
 
-    u32             *meshes;       
+    u32             *meshes;
     u32             *textures;
-    int             *depths;
+    u32             *texts;
+    int              *depths;
     vec2            *positions;     ///< Widget position (screen coords)
+    vec2            *textOffsets;
+
 
     u32             count,
                     size,

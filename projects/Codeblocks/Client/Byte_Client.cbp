@@ -7,9 +7,9 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\bin\Byte" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="..\..\bin\" />
-				<Option object_output="..\..\obj\" />
+				<Option output="..\..\..\bin\Byte" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\..\bin\" />
+				<Option object_output="..\..\..\obj\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -17,18 +17,20 @@
 					<Add option="-std=c99" />
 					<Add option="-ggdb3" />
 					<Add option="-DGLEW_STATIC" />
-					<Add directory="..\..\ext\freetype" />
-					<Add directory="..\..\ext" />
-					<Add directory="..\..\ext\json" />
+					<Add directory="..\..\..\ext\freetype" />
+					<Add directory="..\..\..\ext" />
+					<Add directory="..\..\..\ext\json" />
+					<Add directory="..\..\..\src\" />
 				</Compiler>
 				<Linker>
 					<Add option="-lglfwWIN" />
-					<Add option="-lsoilWIN" />
 					<Add option="-lfreetypeWIN" />
 					<Add option="-lzWIN" />
+					<Add option="-lpng" />
+					<Add option="-lwsock32" />
 					<Add option="-lopengl32" />
 					<Add option="-static-libgcc" />
-					<Add directory="..\..\ext" />
+					<Add directory="..\..\..\ext" />
 				</Linker>
 				<MakeCommands>
 					<Build command="mingw32-make.exe -f $makefile Byte" />
@@ -55,6 +57,12 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="..\..\..\ext\GL\glewWIN.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\ext\json\cJSON.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="..\..\..\src\client\camera.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -75,6 +83,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="..\..\..\src\client\game.h" />
+		<Unit filename="..\..\..\src\client\gui.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\client\gui.h" />
 		<Unit filename="..\..\..\src\client\keys.h" />
 		<Unit filename="..\..\..\src\client\light.c">
 			<Option compilerVar="CC" />
@@ -119,6 +131,50 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="..\..\..\src\client\widget.h" />
+		<Unit filename="..\..\..\src\common\actor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\actor.h" />
+		<Unit filename="..\..\..\src\common\clock.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\clock.h" />
+		<Unit filename="..\..\..\src\common\color.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\color.h" />
+		<Unit filename="..\..\..\src\common\common.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\common.h" />
+		<Unit filename="..\..\..\src\common\debug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\debug.h" />
+		<Unit filename="..\..\..\src\common\handlemanager.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\handlemanager.h" />
+		<Unit filename="..\..\..\src\common\map.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\map.h" />
+		<Unit filename="..\..\..\src\common\matrix.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\matrix.h" />
+		<Unit filename="..\..\..\src\common\net.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\net.h" />
+		<Unit filename="..\..\..\src\common\vector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\vector.h" />
+		<Unit filename="..\..\..\src\common\world.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\..\src\common\world.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
