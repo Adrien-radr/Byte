@@ -43,6 +43,12 @@ bool Actor_load( Actor *actor, const char *file ) {
         actor->position.x = cJSON_GetArrayItem( subitem, 0 )->valueint;
         actor->position.y = cJSON_GetArrayItem( subitem, 1 )->valueint;
 
+        subitem = cJSON_GetObjectItem( item, "animation" );
+        if( subitem )
+            strncpy( actor->assets.anim_str, subitem->valuestring, 128 );
+        else
+            strcpy( actor->assets.anim_str, "" );
+
 
         // get rendering data
             item = cJSON_GetObjectItem( root, "sprite" );
@@ -62,7 +68,7 @@ bool Actor_load( Actor *actor, const char *file ) {
             subitem = cJSON_GetObjectItem( item, "mesh" );
             check( subitem, "Error while loading actor '%s', need subentry 'mesh' in entry 'sprite'.\n", file );
 
-            strcpy( actor->assets.mesh, subitem->valuestring );
+            strncpy( actor->assets.mesh, subitem->valuestring, 128 );
 
             // actor textures
             subitem = cJSON_GetObjectItem( item, "texture" );
@@ -72,7 +78,7 @@ bool Actor_load( Actor *actor, const char *file ) {
             for( int i = 0; i < actor->assets.tex_n; ++i ) {
                 cJSON *tex = cJSON_GetArrayItem( subitem, i );
                 if( tex ) 
-                    strncpy( actor->assets.texture[i], tex->valuestring, 256 );
+                    strncpy( actor->assets.texture[i], tex->valuestring, 128 );
             }
 
         actor->used_sprite = -1;

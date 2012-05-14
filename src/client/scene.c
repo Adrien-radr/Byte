@@ -231,7 +231,7 @@ Scene *Scene_init() {
     EventManager_addListener( LT_ResizeListener, sceneWindowResizing, s );
 
     // Lights
-    s->ambient_color = (Color){ 0.035f, 0.035f, 0.035f, 1.f };
+    s->ambient_color = (Color){ 0.05f, 0.05f, 0.05f, 1.f };
 
     Renderer_useShader( s->local_map.shader );
     Shader_sendColor( "amb_color", &s->ambient_color );
@@ -242,26 +242,39 @@ Scene *Scene_init() {
 
     vec2i lightpos = { 12, 5 };
     Color diffuse = { 1.f, 1.f, 1.f, 1.f };
-    Light_set( &s->light1, &lightpos, 5.5f, 200.f, &diffuse, 0.f, 0.f, 0.001f );
+    Light_set( &s->light1, &lightpos, 300.f, 200.f, &diffuse );
         
+
+
     return s;
+
 error:
     Scene_destroy( s );
     return NULL;
 }
 
-void Scene_destroy( Scene *pScene ) {
-    if( pScene ) {
-        SpriteArray_destroy( pScene->sprites );
-        TextArray_destroy( pScene->texts );
-        WidgetArray_destroy( pScene->widgets );
-        Camera_destroy( pScene->camera );
-        DEL_PTR( pScene );
+void Scene_destroy( Scene *scene ) {
+    if( scene ) {
+        SpriteArray_destroy( scene->sprites );
+        TextArray_destroy( scene->texts );
+        WidgetArray_destroy( scene->widgets );
+        Camera_destroy( scene->camera );
+
+        DEL_PTR( scene );
     }   
 }
 
-void Scene_update( Scene *pScene ) {
-    Camera_update( pScene->camera );
+void Scene_update( Scene *scene, f32 frame_time ) {
+    Camera_update( scene->camera );
+
+    // update all sprite animations
+    for( u32 i = 0; i < scene->sprites->mMaxIndex; ++i ) 
+        if( HandleManager_isUsed( scene->sprites->mUsed, i ) && scene->sprites->anims[i].frame_n >= 0 ) {
+            if( Anim_update( &scene->sprites->anims[i], frame_time ) ) {
+                scene->sprites->mAttributes[i].x[6] = scene->sprites->anims[i].frames[scene->sprites->anims[i].curr_n].x;
+                scene->sprites->mAttributes[i].x[7] = scene->sprites->anims[i].frames[scene->sprites->anims[i].curr_n].y;
+            }
+        }
 }
 
 void Scene_updateShadersProjMatrix( Scene *pScene ) {
@@ -277,6 +290,7 @@ void Scene_render( Scene *pScene ) {
     if( pScene ) {
         const f32 tmp = Client_getElapsedTime();
         glDisable( GL_CULL_FACE );
+
         // ##################################################
         //      RENDER MAP
         Renderer_useShader( pScene->local_map.shader );
@@ -285,9 +299,6 @@ void Scene_render( Scene *pScene ) {
         Shader_sendVec2( "light_pos", &pScene->light1.position );
         Shader_sendFloat( "light_radius", pScene->light1.radius );
         Shader_sendFloat( "light_height", pScene->light1.height );
-        Shader_sendFloat( "light_cstatt", pScene->light1.cst_att );
-        Shader_sendFloat( "light_linatt", pScene->light1.lin_att );
-        Shader_sendFloat( "light_quadatt", pScene->light1.quad_att );
 
         if( change_power > 0.09f ) 
             Shader_sendFloat( "light_power", light_powers[power_index] );
@@ -307,15 +318,11 @@ void Scene_render( Scene *pScene ) {
                 // use sprites different textures (multi texturing)
                 Renderer_useTexture( pScene->sprites->mTextures0[i], 0 );
                 Renderer_useTexture( pScene->sprites->mTextures1[i], 1 );
-                Shader_sendMat3( "ModelMatrix", &pScene->sprites->mMatrices[i] );
-                Shader_sendInt( "Depth", pScene->sprites->mDepths[i] );
+                Shader_sendMat3( "AttrMatrix", &pScene->sprites->mAttributes[i] );
                 Shader_sendColor( "light_color", &pScene->light1.diffuse );
                 Shader_sendVec2( "light_pos", &pScene->light1.position );
                 Shader_sendFloat( "light_radius", pScene->light1.radius );
                 Shader_sendFloat( "light_height", pScene->light1.height );
-                Shader_sendFloat( "light_cstatt", pScene->light1.cst_att );
-                Shader_sendFloat( "light_linatt", pScene->light1.lin_att );
-                Shader_sendFloat( "light_quadatt", pScene->light1.quad_att );
                 if( change_power > 0.09f ) {
                     Shader_sendFloat( "light_power", light_powers[power_index] );
                     change_power = 0.f; 
@@ -359,23 +366,6 @@ void Scene_render( Scene *pScene ) {
 }
 
 //  =======================
- 
-int  Scene_addSprite( Scene *pScene, u32 pMesh, int pTexture[2], mat3 *pMM ) {
-    int handle = -1;
-
-    if( pScene ) {
-        handle = SpriteArray_add( pScene->sprites );
-
-        if( handle >= 0 ) {
-            pScene->sprites->mMeshes[handle] = pMesh;
-            pScene->sprites->mTextures0[handle] = pTexture[0];
-            pScene->sprites->mTextures1[handle] = pTexture[1];
-            memcpy( &pScene->sprites->mMatrices[handle], pMM, 9 * sizeof( f32 ) ); 
-        }
-    }
-    return handle;
-}
-
 int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) { 
     int handle = -1;
 
@@ -388,7 +378,37 @@ int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) {
             pScene->sprites->mTextures0[handle] = pActor->assets.texture_id[0];
             pScene->sprites->mTextures1[handle] = pActor->assets.texture_id[1];
             // set sprite global position from actor tile position
-            Game_setActorPosition( pActor, &pActor->position );
+            //Game_setActorPosition( pActor, &pActor->position );
+
+            memset( &pScene->sprites->mAttributes[handle], 0, 9 * sizeof(f32) );
+
+            // position components
+            pScene->sprites->mAttributes[handle].x[0] = pActor->position.x;
+            pScene->sprites->mAttributes[handle].x[1] = pActor->position.y;
+
+            // depth component
+            pScene->sprites->mAttributes[handle].x[2] = 0;
+
+            // mesh size components
+            pScene->sprites->mAttributes[handle].x[3] = pActor->assets.mesh_size.x;
+            pScene->sprites->mAttributes[handle].x[4] = pActor->assets.mesh_size.y;
+
+            // texcoords of size of mesh on texture atlas
+            if( pActor->assets.animation ) {
+                pScene->sprites->mAttributes[handle].x[6] = pActor->assets.animation->frames[pActor->assets.animation->curr_n].x;
+                pScene->sprites->mAttributes[handle].x[7] = pActor->assets.animation->frames[pActor->assets.animation->curr_n].y;
+
+                // copy current actor animation
+                memcpy( &pScene->sprites->anims[handle], pActor->assets.animation, sizeof(Anim) );
+                // reset it
+                Anim_restart( &pScene->sprites->anims[handle] );
+            } else {
+                pScene->sprites->mAttributes[handle].x[6] = 0;
+                pScene->sprites->mAttributes[handle].x[7] = 0;
+                // frame_n = -1 to signal there aint no anim
+                pScene->sprites->anims[handle].frame_n = -1;
+            }
+
         }
     }
     return handle;
@@ -398,8 +418,19 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
     if( pScene ) {
         if( HandleManager_isUsed( pScene->sprites->mUsed, pHandle ) ) {
             switch( pAttrib ) {
-                case SA_Matrix :
-                    memcpy( &pScene->sprites->mMatrices[pHandle], (mat3*)pData, 9 * sizeof( f32 ) ); 
+                case SA_Position :
+                    {
+                        const vec2 *pos = (vec2*)pData;
+                        pScene->sprites->mAttributes[pHandle].x[0] = pos->x;
+                        pScene->sprites->mAttributes[pHandle].x[1] = pos->y;
+                    }
+                    break;
+                case SA_Animation :
+                    // copy of anim 
+                    memcpy( &pScene->sprites->anims[pHandle], (Anim*)pData, sizeof(Anim) );
+
+                    // reset it
+                    Anim_restart( &pScene->sprites->anims[pHandle] );
                     break;
                 case SA_Texture0 :
                     pScene->sprites->mTextures0[pHandle] = *((u32*)pData);
@@ -408,19 +439,11 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
                     pScene->sprites->mTextures1[pHandle] = *((int*)pData);
                     break;
                 case SA_Depth :
-                    pScene->sprites->mDepths[pHandle] = *((u32*)pData);
+                    pScene->sprites->mAttributes[pHandle].x[2] = *((u32*)pData);
                     break;
             }
         }
     }   
-}
-
-void Scene_transformSprite( Scene *pScene, u32 pHandle, mat3 *pTransform ) {
-    if( pScene && pTransform ) {
-        if( HandleManager_isUsed( pScene->sprites->mUsed, pHandle ) ) {
-            mat3_mul( &pScene->sprites->mMatrices[pHandle], pTransform );
-        }
-    }
 }
 
 void Scene_removeSprite( Scene *pScene, u32 pIndex ) {

@@ -3,6 +3,7 @@
 
 #include "common/handlemanager.h"
 #include "common/matrix.h"
+#include "common/anim.h"
 
 /// Data-oriented array storing all sprites existing in the scene
 typedef struct {
@@ -11,8 +12,11 @@ typedef struct {
     u32             *mMeshes;
     u32             *mTextures0;    ///< Texture to bind on target 0
     int             *mTextures1;    ///< Texture to bind on target 1 (-1 = no tex)
-    u32             *mDepths;
-    mat3            *mMatrices;
+    mat3            *mAttributes;   ///< Attributes of sprite, grouped in a matrix
+                                    ///<  pos.x      |   pos.y    | depth
+                                    ///<  size.x     |  size.y    |   X  
+                                    ///<  frameoff.x | frameoff.y |   X  
+    Anim            *anims;         ///< current anim of sprite (cpy of one of AnimMgr)
 
     u32             mCount,
                     mSize,
@@ -24,7 +28,8 @@ typedef enum {
     SA_Texture0,
     SA_Texture1,
     SA_Depth,
-    SA_Matrix
+    SA_Position,
+    SA_Animation
 } SpriteAttrib;
 
 /// Initialize and allocate a new SpriteArray

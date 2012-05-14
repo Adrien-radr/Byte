@@ -45,11 +45,16 @@ void Mesh_cpy( Mesh *dest, const Mesh *src ) {
     }
 }
 
-void Mesh_resize( Mesh *mesh, const vec2 *size ) {
-    if( mesh && size ) {
+void Mesh_resize( Mesh *mesh, const vec2 *pos_size, const vec2 *texcoords_size ) {
+    if( mesh && pos_size && texcoords_size ) {
         for( u32 i = 0; i < mesh->vertex_count; ++i ) {
-            mesh->data[2*i] *= size->x;
-            mesh->data[2*i+1] *= size->y;
+            // pos scaling
+            mesh->data[2*i] *= pos_size->x;
+            mesh->data[2*i+1] *= pos_size->y;
+
+            // texcoords scaling
+            mesh->data[2*i+mesh->vertex_count*2] *= texcoords_size->x;
+            mesh->data[2*i+1+mesh->vertex_count*2] *= texcoords_size->y;
         }
     }
 }

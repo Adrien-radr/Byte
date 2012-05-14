@@ -24,6 +24,7 @@ extern const str32 config_file;
 typedef struct {
     Scene   *scene;                 ///< Game current scene
     Config  config;                 ///< Device/Game configuration parameters
+    AnimManager anims;          
 
     bool    (*frame_func)(f32);     ///< Game frame callback
 

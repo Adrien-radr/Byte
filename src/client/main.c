@@ -70,7 +70,6 @@ void init_callback() {
 
     button1 = Scene_addWidget( game->scene, &button );
 
-    
     EventManager_addListener( LT_MouseListener, mousecb, NULL );
 }
  

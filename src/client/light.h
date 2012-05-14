@@ -12,12 +12,9 @@ typedef struct {
     Color   diffuse;
 
     f32     radius;
-    f32     cst_att,
-            lin_att,
-            quad_att;
 } Light;
 
-void Light_set( Light *l, const vec2i *pos, f32 radius, f32 height, const Color *col, f32 cst, f32 lin, f32 quad );
+void Light_set( Light *l, const vec2i *pos, f32 radius, f32 height, const Color *col );
 
 
 #endif // BYTE_LIGHT

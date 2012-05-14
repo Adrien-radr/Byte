@@ -34,8 +34,8 @@ Byte-Project : TODO File
     + Mouse picking support
     - Quad-Tree 
     - Procedurally created map (world-map and scene-map)
-    - Pathfinding
-        - basic A* pathfinding
+    + Pathfinding
+        + basic A* pathfinding
         - wall (between tiles) collision
         - actors collision (even in-route)
         - actors movement prediction

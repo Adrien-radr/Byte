@@ -1,10 +1,11 @@
 #ifndef BYTE_TEXTURE_HPP
 #define BYTE_TEXTURE_HPP
 
-#include "common/common.h"
+#include "common/vector.h"
 
 typedef struct {
-    u32 mID;
+    u32     mID;
+    vec2i   size;
 } Texture;
 
 /// Create and return a new texture

@@ -46,7 +46,7 @@ void Mesh_destroy( Mesh *mesh );
 void Mesh_cpy( Mesh *dest, const Mesh *src );
 
 /// Resize the vertices of a mesh
-void Mesh_resize( Mesh *mesh, const vec2 *size );
+void Mesh_resize( Mesh *mesh, const vec2 *pos_size, const vec2 *texcoords_size );
 
 
 // ###############################################################

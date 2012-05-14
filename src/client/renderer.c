@@ -203,16 +203,16 @@ error:
     return -1;
 }
 
-int  Renderer_createRescaledMesh( u32 pMesh, const vec2 *pScale ) {
+int  Renderer_createRescaledMesh( u32 mesh, const vec2 *pos_scale, const vec2 *texcoords_scale ) {
     Mesh *m = NULL;
-    if( renderer && pMesh < renderer->mMeshes.cpt ) {
+    if( renderer && mesh < renderer->mMeshes.cpt ) {
         if( MeshArray_checkSize( &renderer->mMeshes ) ) {
             m = Mesh_new( GL_TRIANGLES );
             check_mem( m );
     
             // copy given mesh and rescale it
-            Mesh_cpy( m, renderer->mMeshes.data[pMesh] );
-            Mesh_resize( m, pScale );
+            Mesh_cpy( m, renderer->mMeshes.data[mesh] );
+            Mesh_resize( m, pos_scale, texcoords_scale );
 
             // build mesh VBO
             Mesh_build( m, ERebuildVbo | (m->use_indices ? ERebuildIbo : 0), false );
@@ -262,10 +262,6 @@ bool Renderer_setDynamicMeshData( u32 pMesh, f32 *positions, u32 positions_size,
         if( positions && positions_size > 0 && texcoords && texcoords_size > 0 ) {
             bool scaled = Mesh_addVertexData( m, positions, positions_size, texcoords, texcoords_size );
             method |= (scaled ? ERebuildVbo : EUpdateVbo);
-            if( method & ERebuildVbo )
-                printf( "rebuilding vbo!\n" );
-            else 
-                printf( "updating vbo!\n" );
         }
 
         // Change index data if given
@@ -377,7 +373,7 @@ int  Renderer_currentShader() {
     return -1;
 }
 
-u32  Renderer_currentGLProgram() {
+inline u32  Renderer_currentGLProgram() {
     if( renderer )
         return renderer->mShaders.data[renderer->mCurrentShader]->mID;
     return 0;
@@ -423,7 +419,7 @@ error:
     return -1;
 }
 
-void Renderer_useTexture( int pTexture, u32 pTarget ) {
+inline void Renderer_useTexture( int pTexture, u32 pTarget ) {
     if( renderer && pTexture < renderer->mTextures.cpt && pTexture != renderer->mCurrentTexture[pTarget] ) {
         renderer->mCurrentTexture[pTarget] = pTexture;
 
@@ -434,6 +430,12 @@ void Renderer_useTexture( int pTexture, u32 pTarget ) {
 
         Texture_bind( pTexture < 0 ? NULL : renderer->mTextures.data[pTexture], target );
     }
+}
+
+inline Texture *Renderer_getTexture( u32 tex ) {
+    if( renderer && tex < renderer->mTextures.cpt )
+        return renderer->mTextures.data[tex];
+    return NULL;
 }
 
 int  Renderer_createFont( const char *pFile, u32 pSize ) {

@@ -178,21 +178,8 @@ bool Texture_loadFromFile( Texture *pTexture, const char *pFile, bool pMipmaps )
         glPixelStorei( GL_UNPACK_ALIGNMENT, curr_alignment );
 
         pTexture->mID = t->id;
-
-        /*
-        u32 gl_id = SOIL_load_OGL_texture(  pFile,
-                                            SOIL_LOAD_AUTO,
-                                            SOIL_CREATE_NEW_ID,
-                                            (pMipmaps ? SOIL_FLAG_MIPMAPS : 0) );
-
-        check( gl_id, "Error while loading texture \"%s\" : %s\n", pFile, SOIL_last_result() );
-
-        //remove error due to OpenGL3 Core profile not used in SOIL provoking Error
-        glGetError();
-
-
-        pTexture->mID = gl_id;
-       */
+        pTexture->size.x = t->width;
+        pTexture->size.y = t->height;
 
         DEL_PTR( t->texels );
         DEL_PTR( t );

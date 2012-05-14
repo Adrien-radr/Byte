@@ -53,7 +53,7 @@ bool Renderer_isInitialized();
 
     /// Create a new static mesh and return its ID
     /// This mesh will be a rescaled copy of the given one
-    int  Renderer_createRescaledMesh( u32 pMesh, const vec2 *pScale );
+    int  Renderer_createRescaledMesh( u32 mesh, const vec2 *pos_scale, const vec2 *texcoords_scale );
 
     /// Make a dynamic mesh (dont build it yet
     int  Renderer_createDynamicMesh( u32 mode );
@@ -106,6 +106,9 @@ bool Renderer_isInitialized();
 
     /// Sets the renderer to use a given texture in the given unit
     void Renderer_useTexture( int pTexture, u32 pTarget );
+
+    /// Returns a pointer to the texture with the given handle
+    Texture *Renderer_getTexture( u32 tex );
 
 
 // ##########################################################################3

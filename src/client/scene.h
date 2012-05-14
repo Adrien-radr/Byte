@@ -4,6 +4,7 @@
 #include "common/common.h"
 #include "common/handlemanager.h"
 #include "common/actor.h"
+#include "common/anim.h"
 #include "mesh.h"
 #include "shader.h"
 #include "texture.h"
@@ -40,6 +41,7 @@ typedef struct {
 
     Light           light1;
     Color           ambient_color;
+
 } Scene;
 
 
@@ -50,7 +52,7 @@ Scene *Scene_init();
 void Scene_destroy( Scene *pScene );
 
 /// Update the scene (camera, etc)
-void Scene_update( Scene *pScene );
+void Scene_update( Scene *scene, f32 frame_time );
 
 /// Render all sprites & texts in the scene
 void Scene_render( Scene *pScene );
@@ -73,13 +75,6 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 // ##########################################################################3
 //      Sprite Array
     /// Add a sprite to be rendered each frame in the scene
-    /// @param pMesh : The mesh handle the sprite use
-    /// @param pTexture : The texture handles for the sprite to use
-    /// @param pMM : The ModelMatrix used to orient the sprite
-    /// @return : The handle to the given sprite
-    int  Scene_addSprite( Scene *pScene, u32 pMesh, int pTexture[2], mat3 *pMM );
-
-    /// Add a sprite to be rendered each frame in the scene
     /// @param pActor : the Actor that must be drawn as a sprite
     /// @return : The handle to the given sprite 
     int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor );
@@ -88,9 +83,6 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
     /// @param pAttrib : the attribute type we want to change (see sprite.h)
     /// @param pData   : data set as the attrib
     void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void *pData );
-
-    /// Transform a sprite matrix with a given one. (just matrix multiplication)
-    void Scene_transformSprite( Scene *pScene, u32 pHandle, mat3 *pTransform );
 
     /// Remove a sprite from the scene rendered sprites (by its handle)
     void Scene_removeSprite( Scene *pScene, u32 pIndex );

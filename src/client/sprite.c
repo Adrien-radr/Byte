@@ -8,8 +8,8 @@ SpriteArray *SpriteArray_init( u32 pSize ) {
     arr->mMeshes = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextures0 = byte_alloc( pSize * sizeof( u32 ) );
     arr->mTextures1 = byte_alloc( pSize * sizeof( int ) );
-    arr->mDepths = byte_alloc( pSize * sizeof( u32 ) );
-    arr->mMatrices = byte_alloc( pSize * sizeof( mat3* ) );
+    arr->mAttributes = byte_alloc( pSize * sizeof( mat3* ) );
+    arr->anims = byte_alloc( pSize * sizeof( Anim ) );
 
     arr->mSize = pSize;
 
@@ -29,8 +29,8 @@ int SpriteArray_add( SpriteArray *arr ) {
                 arr->mMeshes = byte_realloc( arr->mMeshes, arr->mSize * sizeof( u32 ) );
                 arr->mTextures0 = byte_realloc( arr->mTextures0, arr->mSize * sizeof( u32 ) );
                 arr->mTextures1 = byte_realloc( arr->mTextures1, arr->mSize * sizeof( int ) );
-                arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( u32 ) );
-                arr->mMatrices = byte_realloc( arr->mMatrices, arr->mSize * sizeof( mat3* ) );
+                arr->mAttributes = byte_realloc( arr->mAttributes, arr->mSize * sizeof( mat3* ) );
+                arr->anims = byte_realloc( arr->anims, arr->mSize * sizeof( Anim ) );
             }
 
             ++arr->mMaxIndex;
@@ -62,8 +62,8 @@ void SpriteArray_destroy( SpriteArray *arr ) {
         DEL_PTR( arr->mTextures0 );
         DEL_PTR( arr->mTextures1 );
         DEL_PTR( arr->mMeshes );
-        DEL_PTR( arr->mDepths );
-        DEL_PTR( arr->mMatrices );
+        DEL_PTR( arr->mAttributes );
+        DEL_PTR( arr->anims );
         DEL_PTR( arr );
     }
 }

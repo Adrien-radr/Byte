@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 1
-#define BYTE_PATCH 7
+#define BYTE_PATCH 8
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -42,6 +42,7 @@
     typedef char str16[16];
     typedef char str32[32];
     typedef char str64[64];
+    typedef char str128[128];
     typedef char str256[256];
     typedef char str512[512];
     typedef char str1024[1024];

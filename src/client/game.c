@@ -148,6 +148,8 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     // Init Game World 
     check( World_init(), "Error while creating Game World. Aborting initialization.\n" );
 
+    /// Load all animations
+    AnimManager_loadAll( &game->anims );
 
 
     // Initialize Game current Scene
@@ -213,6 +215,7 @@ void Game_destroy() {
     if( game ) {
         Scene_destroy( game->scene );
 
+        AnimManager_unloadAll( &game->anims );
         World_destroy();
         ResourceManager_destroy();
 
@@ -248,7 +251,7 @@ bool Game_update( f32 frame_time ) {
 
         // AI GAMEPLAY LOOP (fixed at 1/phy_dt FPS)
         while( phy_update >= phy_dt ) {
-            Scene_update( game->scene );
+            Scene_update( game->scene, phy_dt );
             phy_update -= phy_dt;
         }
 
@@ -277,7 +280,25 @@ FT_Library *Game_getFreetype() {
 bool Game_loadActorAssets( Actor *actor ) {
     check( game, "Tried to load actor assets on an ininitialized game instance\n" );
 
-    // load scaled mesh
+    // load textures
+    for( int i = 0; i < actor->assets.tex_n; ++i ) {
+        if( !actor->assets.texture[i][0] )
+            actor->assets.texture_id[i] = -1;
+        else {
+            actor->assets.texture_id[i] = ResourceManager_get( actor->assets.texture[i] );
+            check( actor->assets.texture[i] >= 0, "Error while loading actor '%s' texture. Texture '%s' is not a loaded resource.\n", actor->firstname, actor->assets.texture[i] );
+
+            // compute texcoords sprite size on texture atlas
+            if( 0 == i ) {
+                const vec2i *tex_size = &Renderer_getTexture( actor->assets.texture_id[0] )->size;
+
+                actor->assets.texcoords_size = (vec2){ actor->assets.mesh_size.x / tex_size->x, actor->assets.mesh_size.y / tex_size->y };
+            }
+        }
+    }
+
+
+    // load scaled mesh (scaled to the mesh_size for the positions, and to the texcoords_size for the texcoords)
     str256 scaled_mesh_str;
     str16 mesh_size;
     snprintf( mesh_size, 16, "%d.%d", (int)actor->assets.mesh_size.x, (int)actor->assets.mesh_size.y );
@@ -292,7 +313,7 @@ bool Game_loadActorAssets( Actor *actor ) {
         check( actor->assets.mesh_id >= 0, "Error while loading actor '%s' mesh. Mesh '%s' is not a loaded resource.\n", actor->firstname, actor->assets.mesh );
 
         // resize
-        int scaled_mesh = Renderer_createRescaledMesh( actor->assets.mesh_id, &actor->assets.mesh_size );
+        int scaled_mesh = Renderer_createRescaledMesh( actor->assets.mesh_id, &actor->assets.mesh_size, &actor->assets.texcoords_size );
         check( scaled_mesh >= 0, "Error while creating scaled mesh for actor '%s'. \n", actor->firstname );
         
         actor->assets.mesh_id = scaled_mesh;
@@ -301,15 +322,12 @@ bool Game_loadActorAssets( Actor *actor ) {
         ResourceManager_add( scaled_mesh_str, scaled_mesh );
     }   
 
-    // load textures
-    for( int i = 0; i < actor->assets.tex_n; ++i ) {
-        if( !actor->assets.texture[i][0] )
-            actor->assets.texture_id[i] = -1;
-        else {
-            actor->assets.texture_id[i] = ResourceManager_get( actor->assets.texture[i] );
-            check( actor->assets.texture[i] >= 0, "Error while loading actor '%s' texture. Texture '%s' is not a loaded resource.\n", actor->firstname, actor->assets.texture[i] );
-        }
-    }
+    // load animation
+    u32 anim_str_n = strlen( actor->assets.anim_str );
+    if( anim_str_n )
+        actor->assets.animation = AnimManager_gets( &game->anims, actor->assets.anim_str );
+    else 
+        actor->assets.animation = NULL;
 
     return true;
 
@@ -324,22 +342,8 @@ void Game_setActorPosition( Actor *actor, const vec2i *pos ) {
 
         // if the actor has a sprite, set its world floating position
         if( actor->used_sprite >= 0 ) {
-            mat3 m;
-            // get global tile position
             vec2 glob_tile = Map_isoToGlobal( pos ); 
-
-            // ajust position with sprite width and height
-            // X -= sprite_width/2 (to center it on tile, horizontally
-            // Y += - sprite_height + 12.5f 
-            glob_tile = vec2_add( &glob_tile, &(vec2){ -actor->assets.mesh_size.x/2.f, -actor->assets.mesh_size.y + 12.5f } );
-
-            // set the matrix to this and update sprite position
-            mat3_translationMatrixfv( &m, &glob_tile );
-                // add the height and half-width of sprite to the matrix to be
-                // used in shader for lighting computations
-                m.x[2] = actor->assets.mesh_size.x/2;
-                m.x[5] = actor->assets.mesh_size.y;
-            Scene_modifySprite( game->scene, actor->used_sprite, SA_Matrix, &m );
+            Scene_modifySprite( game->scene, actor->used_sprite, SA_Position, &glob_tile );
         }
     }
 }

@@ -23,7 +23,7 @@ void Widget_init( Widget *widget, const char *mesh, const char *texture ) {
 
             // resize
             vec2 size = vec2_vec2i( &widget->size );
-            int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size );
+            int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size, &(vec2){ 1,1 } );
             check( scaled_mesh >= 0, "Error while creating scaled mesh for widget.\n" );
 
             widget->assets.mesh = scaled_mesh;
