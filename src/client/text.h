@@ -17,7 +17,7 @@ typedef struct {
     f32     x_offset;       ///< X Offset of the glyph in the texture
 } Glyph;
 
-/// This is a font loaded with freetype 
+/// This is a font loaded with freetype
 typedef struct {
     Glyph   mGlyphs[128];   ///< 128 ASCII chars used in fonts
     FT_Face mFace;          ///< Freetype font face
@@ -42,7 +42,7 @@ Font *Font_get( const char *pName, u32 pSize );
 
 
 // ##########################################################################3
-//      Text Array 
+//      Text Array
 // ##########################################################################3
     /// Data-oriented array storing all text existing in the scene
     typedef struct {
@@ -53,6 +53,7 @@ Font *Font_get( const char *pName, u32 pSize );
         Color           *mColors;
         vec2            *mPositions;
         int             *mDepths;
+        bool            *mVisible;
 
         char            **mStrings;
 
@@ -67,7 +68,8 @@ Font *Font_get( const char *pName, u32 pSize );
         TA_Depth,
         TA_Color,
         TA_String,
-        TA_Position
+        TA_Position,
+        TA_Visible
     } TextAttrib;
 
     /// Initialize and allocate a new TextArray

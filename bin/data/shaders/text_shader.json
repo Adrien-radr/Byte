@@ -1,8 +1,0 @@
-{
-    "v_src" : "text.vs",
-    "f_src" : "text.fs",
-    "params" : [
-        { "name" : "Albedo",                 "value" : 0 },
-        { "name" : "ProjectionMatrixType",   "value" : 2 }
-    ]
-}

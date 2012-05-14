@@ -28,7 +28,7 @@ void Font_destroy( Font *pFont ) {
 
 bool Font_createAtlas( Font *pFont, const char *pFile, u32 pSize ) {
     if( pFont && pFile ) {
-        FT_Library *ft = Game_getFreetype(); 
+        FT_Library *ft = Game_getFreetype();
 
         check( !FT_New_Face( *ft, pFile, 0, &pFont->mFace ), "Could not open font file \"%s\"!\n", pFile );
 
@@ -228,6 +228,8 @@ TextArray *TextArray_init( u32 pSize ) {
     arr->mStrings = byte_alloc( pSize * sizeof( char* ) );
     arr->mPositions = byte_alloc( pSize * sizeof( vec2 ) );
     arr->mDepths = byte_alloc( pSize * sizeof( int ) );
+    arr->mVisible = byte_alloc( pSize * sizeof( bool ) );
+
 
     arr->mSize = pSize;
 
@@ -250,6 +252,7 @@ int TextArray_add( TextArray *arr ) {
                 arr->mStrings = byte_realloc( arr->mStrings, arr->mSize * sizeof( char* ) );
                 arr->mPositions = byte_realloc( arr->mPositions, arr->mSize * sizeof( vec2 ) );
                 arr->mDepths = byte_realloc( arr->mDepths, arr->mSize * sizeof( int ) );
+                arr->mVisible = byte_realloc( arr->mVisible, arr->mSize * sizeof( bool ) );
             }
 
             // create mesh used by text
@@ -294,6 +297,7 @@ void TextArray_destroy( TextArray *arr ) {
         DEL_PTR( arr->mColors );
         DEL_PTR( arr->mPositions );
         DEL_PTR( arr->mDepths );
+        DEL_PTR( arr->mVisible );
         for( u32 i = 0; i < arr->mMaxIndex; ++i ) {
             DEL_PTR( arr->mStrings[i] );
         }

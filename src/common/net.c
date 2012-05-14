@@ -19,7 +19,7 @@
 /// Application Protocol ID. Just the hash of "Byte-Project"
 const u32 protocol_id = 1910167069;
 
-const f32 connectiontimeout = 10.f;
+const f32 connectiontimeout =  120.f;
 
 net_ip local_ips[MAX_IPS];
 static int numIP;

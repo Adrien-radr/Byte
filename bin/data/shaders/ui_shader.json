@@ -1,8 +1,0 @@
-{
-    "v_src" : "ui.vs",
-    "f_src" : "ui.fs",
-    "params" : [
-        { "name" : "Albedo",                 "value" : 0 },
-        { "name" : "ProjectionMatrixType",   "value" : 2 }
-    ]
-}

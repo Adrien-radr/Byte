@@ -621,7 +621,7 @@
 1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\texture.h
 	"common/common.h"
 
-1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\text.h
+1337015297 c:\users\beul\desktop\code\bytelastversion\src\client\text.h
 	"common/color.h"
 	"common/vector.h"
 	"common/handlemanager.h"
@@ -736,7 +736,7 @@
 1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\light.c
 	"light.h"
 
-1336873147 source:c:\users\beul\desktop\code\bytelastversion\src\client\main.c
+1336955551 source:c:\users\beul\desktop\code\bytelastversion\src\client\main.c
 	"common/clock.h"
 	"common/vector.h"
 	"client.h"
@@ -765,7 +765,7 @@
 	"GL/glew.h"
 	<dirent.h>
 
-1336951298 source:c:\users\beul\desktop\code\bytelastversion\src\client\scene.c
+1337016707 source:c:\users\beul\desktop\code\bytelastversion\src\client\scene.c
 	"scene.h"
 	"renderer.h"
 	"camera.h"
@@ -784,7 +784,7 @@
 1336184842 source:c:\users\beul\desktop\code\bytelastversion\src\client\sprite.c
 	"sprite.h"
 
-1336184842 source:c:\users\beul\desktop\code\bytelastversion\src\client\text.c
+1337014943 source:c:\users\beul\desktop\code\bytelastversion\src\client\text.c
 	"common/world.h"
 	"renderer.h"
 	"context.h"
@@ -871,7 +871,7 @@
 1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\matrix.c
 	"matrix.h"
 
-1336250614 source:c:\users\beul\desktop\code\bytelastversion\src\common\net.c
+1336955310 source:c:\users\beul\desktop\code\bytelastversion\src\common\net.c
 	"net.h"
 	<winsock2.h>
 	<ws2tcpip.h>
@@ -957,14 +957,16 @@
 1336183187 c:\users\beul\desktop\code\bytelastversion\ext\\zlib.h
 	"zconf.h"
 
-1336935953 c:\users\beul\desktop\code\bytelastversion\src\client\gui.h
+1336956223 c:\users\beul\desktop\code\bytelastversion\src\client\gui.h
 	"common/common.h"
 	"common/vector.h"
 	"client/event.h"
 
-1336166522 c:\users\beul\desktop\code\bytelastversion\ext\gl\glfw.h
+1332509774 c:\users\beul\desktop\code\bytelastversion\ext\gl\glfw.h
+	<OpenGL/gl3.h>
 	<OpenGL/gl.h>
 	<OpenGL/glu.h>
+	<GL3/gl3.h>
 	<GL/gl.h>
 	<GL/glu.h>
 
@@ -1006,7 +1008,7 @@
 	<X11/Xmd.h>
 	"glew.h"
 
-1336951273 source:c:\users\beul\desktop\code\bytelastversion\src\client\gui.c
+1337014600 source:c:\users\beul\desktop\code\bytelastversion\src\client\gui.c
 	"gui.h"
 	"game.h"
 	"resource.h"

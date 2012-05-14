@@ -8,8 +8,17 @@
 typedef struct s_Widget Widget;
 typedef struct s_Scene Scene;
 
+//  Widget tree
+Widget *RootWidget,
+                *windowHead,
+                    *window,
+                *button;
+
 typedef void (*WidgetCallback)(Widget*, const Event*);
 
+//  General function for close buttons on windows.
+void windowCloseButtonCallback( Widget* widget, const Event* e );
+void button1Callback( Widget* widget, const Event* e );
 
 typedef enum {
     WT_Root,
@@ -43,10 +52,6 @@ typedef struct s_Widget {
 } Widget;
 
 
-Widget* RootWidget;
-//  General function for close buttons on windows.
-void windowCloseButton( Widget* widget, const Event* e );
-
 
 /// Initialize the given widget (build the mesh);
 Widget* Widget_init( WidgetType type, vec2i* size, const char *mesh, const char *texture, int text );
@@ -55,7 +60,8 @@ Widget* Widget_createWindowHead( Widget* window, u32 name );
 void Widget_update( Scene* scene, Widget* widget );
 void Widget_callback( Widget* widget, const Event* e );
 void Widget_addChild( Widget *master, Widget* child );
-/// Will be called on RootWidget to remove every widget.
+void Widget_toggleShow( Widget* widget );
+/// Will be called on RootWidget when closing game to remove every widget.
 void Widget_remove( Widget* widget );
 
 #endif /* BYTE_GUI */

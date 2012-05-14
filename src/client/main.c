@@ -71,25 +71,27 @@ void init_callback() {
     window1name = Scene_addText( game->scene, f, c );
     Scene_modifyText( game->scene, window1name, TA_String, "Window" );
 
+    // GUI
     vec2i contextsize = Context_getSize();
     RootWidget = Widget_init( WT_Root, &contextsize, NULL, NULL, -1 );
     RootWidget->position = vec2i_c( 0, 0 );
 
 
-    Widget* window = Widget_init( WT_Window, &(vec2i){ 300, 250 }, "quadmesh.json", "widgettexture.png", -1 );
+    window = Widget_init( WT_Window, &(vec2i){ 300, 250 }, "quadmesh.json", "widgettexture.png", -1 );
     window->position = vec2i_c( 100, 100 );
     window->size = vec2i_c( 300, 250 );
     window->depth = -5;
 
-    Widget* windowHead = Widget_createWindowHead( window, window1name );
+    windowHead = Widget_createWindowHead( window, window1name );
 
 
-    // GUI
-    Widget* button = Widget_init( WT_Button, &(vec2i){ 192, 38 }, "quadmesh.json", "widgettexture.png", text1 );
+
+    button = Widget_init( WT_Button, &(vec2i){ 192, 38 }, "quadmesh.json", "widgettexture.png", text1 );
     button->position = vec2i_c( 400, 400 );
     button->size = vec2i_c( 192, 38 );
     button->textOffset = vec2i_c( 72, 11 );
     button->depth = -5;
+    button->callback = &button1Callback;
 
 
     Widget_addChild( RootWidget, windowHead );

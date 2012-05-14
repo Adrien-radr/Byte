@@ -331,11 +331,13 @@ void Scene_render( Scene *pScene ) {
 
         for( u32 i = 0; i < pScene->texts->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->texts->mUsed, i ) ) {
-                Renderer_useTexture( pScene->texts->mFonts[i]->mTexture, 0 );
-                Shader_sendInt( "Depth", pScene->texts->mDepths[i] );
-                Shader_sendColor( "Color", &pScene->texts->mColors[i] );
-                Shader_sendVec2( "Position", &pScene->texts->mPositions[i] );
-                Renderer_renderMesh( pScene->texts->mMeshes[i] );
+                if( pScene->texts->mVisible[i] ){
+                    Renderer_useTexture( pScene->texts->mFonts[i]->mTexture, 0 );
+                    Shader_sendInt( "Depth", pScene->texts->mDepths[i] );
+                    Shader_sendColor( "Color", &pScene->texts->mColors[i] );
+                    Shader_sendVec2( "Position", &pScene->texts->mPositions[i] );
+                    Renderer_renderMesh( pScene->texts->mMeshes[i] );
+                }
             }
         }
     }
@@ -428,6 +430,7 @@ int Scene_addText( Scene *pScene, const Font *pFont, Color pColor ) {
         if( handle >= 0 ) {
             pScene->texts->mFonts[handle] = pFont;
             pScene->texts->mColors[handle] = pColor;
+            pScene->texts->mVisible[handle] = true;
         }
     }
 
@@ -463,9 +466,11 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
                 case TA_Font :
                     pScene->texts->mFonts[pHandle] = (const Font*)pData;
                     break;
-                case TA_Color:
+                case TA_Color :
                     pScene->texts->mColors[pHandle] = *((Color*)pData);
                     break;
+                case TA_Visible :
+                    pScene->texts->mVisible[pHandle] = *((bool*)pData);
             }
         }
     }
@@ -491,15 +496,17 @@ int Scene_addWidget( Scene *scene, Widget *widget ) {
         handle = WidgetArray_add( scene->widgets );
         if( handle >= 0 ) {
             widget->sceneIndex = handle;
+            widget->visible = true;
 
             if( widget->assets.mesh >= 0 )
                 scene->widgets->meshes[handle] = widget->assets.mesh;
             if( widget->assets.texture >= 0 )
                 scene->widgets->textures[handle] = widget->assets.texture;
-            if( widget->assets.text >= 0 ){
+            if( widget->assets.text >= 0 ) {
                 scene->widgets->texts[handle] = widget->assets.text;
                 vec2i textPos = vec2i_add( &widget->position, &widget->textOffset );
                 Scene_modifyText( scene, widget->assets.text, TA_Position, &textPos );
+                Scene_modifyText( scene, widget->assets.text, TA_Visible, &(bool){true} );
                 int depth = widget->depth - 1;
                 Scene_modifyText( scene, widget->assets.text, TA_Depth, &depth );
             }
@@ -548,8 +555,11 @@ void Scene_removeWidget( Scene *scene, Widget* widget ) {
         for( u32 i = 0; i < widget->childrenCount; ++i )
             Scene_removeWidget( scene, widget->children[i] );
         WidgetArray_remove( scene->widgets, widget->sceneIndex );
-        if( widget->assets.text >= 0 )
-            TextArray_remove( scene->texts, widget->assets.text );
+        if( widget->assets.text >= 0 ) {
+            Scene_modifyText( scene, widget->assets.text, TA_Visible, &(bool){false} );
+        }
+
+        widget->visible = false;
         widget->sceneIndex = -1;
     }
 }
