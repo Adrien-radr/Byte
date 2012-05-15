@@ -1,5 +1,5 @@
 #include "map.h"
-
+ 
 //////////////////
 //  Map constants 
 const int tile_w = 100;
@@ -35,8 +35,8 @@ inline vec2i Map_isoToSquare( const vec2i *vec ) {
     // Y :  y - (x '- 1')    ( the -1 is here only if x is ODD )
     //          ---------    
     //              2        
-    return (vec2i){ vec->y + ( vec->x + (vec->x % 2 ? 0 : 1) ) / 2,
-                    vec->y - ( vec->x - (vec->x % 2 ? 0 : 1) ) / 2  };
+    return (vec2i){ vec->y + ( vec->x + (vec->x % 2 ? 1 : 0) ) / 2,
+                    vec->y - ( vec->x - (vec->x % 2 ? 1 : 0) ) / 2  };
 }
 
 inline vec2  Map_isoToGlobal( const vec2i *tile ) {
@@ -149,34 +149,42 @@ static inline const vec2i *NeighborList_getTile( NeighborList *l, u32 i ) {
 static void pathNodeNeighbors( NeighborList *nl, const Map *map, const vec2i *node ) {
     const int offset = (node->x%2 == 0) ? 1 : 0;
 
-    // check tile to the right
-    vec2i v = { node->x + 1, node->y + (1-offset) };
-    if( Map_isWalkable( map, &v ) ) 
-        NeighborList_add( nl, &v, 1 );
+    // Add a little shifting in the order of added nodes, for the path to seems more 'organic'
+    static int curr_n = 0;       // index in following array
 
-    // check tile to the left
-    v = (vec2i){ node->x - 1, node->y - offset };
-    if( Map_isWalkable( map, &v ) ) 
-        NeighborList_add( nl, &v, 1 );
+    // array of neighbors to check and possibly add.
+    vec2i neighbors[] = {
+        { node->x + 1, node->y + (1-offset) },  // right node
+        { node->x - 1, node->y - offset },      // left node
+        { node->x + 1, node->y - offset },      // above node
+        { node->x - 1, node->y + (1-offset) }   // bellow node
+    }; 
 
-    // check tile above)
-    v = (vec2i){ node->x + 1, node->y - offset };
-    if( Map_isWalkable( map, &v ) )
-        NeighborList_add( nl, &v, 1 ); 
+    if( Map_isWalkable( map, &neighbors[curr_n] ) )  
+        NeighborList_add( nl, &neighbors[curr_n], 1 );
 
-    // check tile below
-    v = (vec2i){ node->x - 1, node->y + (1-offset) };
-    if( Map_isWalkable( map, &v ) ) 
-        NeighborList_add( nl, &v, 1 );
+    curr_n = (curr_n+1) % 4;
+
+    if( Map_isWalkable( map, &neighbors[curr_n] ) )  
+        NeighborList_add( nl, &neighbors[curr_n], 1 );
+
+    curr_n = (curr_n+1) % 4;
+
+    if( Map_isWalkable( map, &neighbors[curr_n] ) )  
+        NeighborList_add( nl, &neighbors[curr_n], 1 );
+
+    curr_n = (curr_n+1) % 4;
+
+    if( Map_isWalkable( map, &neighbors[curr_n] ) )  
+        NeighborList_add( nl, &neighbors[curr_n], 1 );
 }
 
 /// Manhattan heuristic between two nodes 
 static inline float pathNodeHeuristic( const vec2i *from, const vec2i *to ) {
-    vec2 fto = Map_isoToGlobal( to );
-    vec2 ffrom = Map_isoToGlobal( from );
+    vec2i ito = Map_isoToSquare( to );
+    vec2i ifrom = Map_isoToSquare( from );
 
-    // return Manhattan distance between sq_tile and from
-    return ( fabs( fto.x - ffrom.x ) + fabs( fto.y - ffrom.y ) );
+    return abs( ito.x - ifrom.x ) + abs( ito.y - ifrom.y );
 }
 
 
@@ -505,6 +513,7 @@ Path *Map_createPath( const Map *map, const vec2i *start, const vec2i *end ) {
             // If this neighbor does not have a estimated cost (H), do it
             if( !Node_hasEstimatedCost( &neighbor ) )
                 Node_setEstimatedCost( &neighbor, Node_applyHeuristic( &neighbor, &goal ) );
+
 
             // If this neighbor is on openlist and cost to get to it from current
             // is smaller than cost it had, remove from open (better path)

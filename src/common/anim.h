@@ -1,7 +1,7 @@
 #ifndef BYTE_ANIM_H
 #define BYTE_ANIM_H
 
-#include "vector.h"
+#include "common.h"
 
 typedef enum {
     MAN_IDLE,
@@ -37,7 +37,7 @@ void Anim_toggle( Anim *a );
 extern str32 AnimDirectory;
 
 typedef struct {
-    Anim    animations[ANIM_N];    
+    Anim    animations[ANIM_N];
 } AnimManager;
 
 void AnimManager_loadAll( AnimManager *am );

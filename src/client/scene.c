@@ -242,7 +242,7 @@ Scene *Scene_init() {
 
     vec2i lightpos = { 12, 5 };
     Color diffuse = { 1.f, 1.f, 1.f, 1.f };
-    Light_set( &s->light1, &lightpos, 300.f, 200.f, &diffuse );
+    Light_set( &s->light1, &lightpos, 2100.f, 200.f, &diffuse );
         
 
 

@@ -46,6 +46,7 @@ Byte-Project : TODO File
         + Map isometric fragment lighting
         + Sprites fragment lighting
         + Sprites lighting with sprite height support
+    - Multiple scene lights
     - Directional (sun) lights
     - 2D Normal maps of sprites ?
     - Dynamic shadows

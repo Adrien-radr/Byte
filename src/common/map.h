@@ -7,9 +7,9 @@
 #define WORLD_MAP_SIZE  10
 
 // Width and Height of local and world maps
-// You got a nice quad if height = 2 * width
-#define lmap_width 12    // Can be any size
-#define lmap_height 24   // Must be divisible by 2(int)
+// You got a nice quad if height = 4 * width
+#define lmap_width 24    // Can be any size
+#define lmap_height 96   // Must be divisible by 2(int)
 #define lmap_size (lmap_width*lmap_height)
 
 extern const int tile_w;        ///< Tile width

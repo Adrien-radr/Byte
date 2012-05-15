@@ -29,7 +29,7 @@ SimpleArray( Event, Event );
 typedef struct {
     InputState      curr_state,         ///< Inputs of current frame
                     prev_state;         ///< Inputs of previous frame
-            
+
     ListenerArray   key_listeners,      ///< List of all registered mouse listeners
                     mouse_listeners,    ///< List of all registered key listeners
                     resize_listeners;   ///< List of all registered resize listeners
@@ -37,7 +37,7 @@ typedef struct {
     EventArray      frame_key_events,    ///< All key events recorded during the frame
                     frame_mouse_events,  ///< All mouse events recorded during the frame
                     frame_resize_events; ///< All resize events recorded during the frame
-   
+
 } EventManager;
 
 
@@ -71,7 +71,7 @@ bool EventManager_init() {
     EventArray_init( &em->frame_mouse_events, 50 );
     EventArray_init( &em->frame_resize_events, 50 );
 
-    
+
     log_info( "Event manager successfully initialized!\n" );
 
     return true;
@@ -192,12 +192,12 @@ bool EventManager_addListener( ListenerType type, ListenerFunc func, void *data 
             } else
                 return false;
         } else if( LT_MouseListener == type ) {
-            if( ListenerArray_checkSize( &em->mouse_listeners ) ) 
+            if( ListenerArray_checkSize( &em->mouse_listeners ) )
                 em->mouse_listeners.data[em->mouse_listeners.cpt++] = s;
             else
                 return false;
         } else if( LT_ResizeListener == type ) {
-            if( ListenerArray_checkSize( &em->resize_listeners ) ) 
+            if( ListenerArray_checkSize( &em->resize_listeners ) )
                 em->resize_listeners.data[em->resize_listeners.cpt++] = s;
             else
                 return false;
@@ -214,18 +214,18 @@ void EventManager_propagateEvent( const Event pEvent ) {
         case EKeyPressed:
         case EKeyReleased:
         case ECharPressed:
-            if( EventArray_checkSize( &em->frame_key_events ) ) 
+            if( EventArray_checkSize( &em->frame_key_events ) )
                 em->frame_key_events.data[em->frame_key_events.cpt++] = pEvent;
             break;
         case EMouseMoved:
         case EMousePressed:
         case EMouseReleased:
         case EMouseWheelMoved:
-            if( EventArray_checkSize( &em->frame_mouse_events ) ) 
+            if( EventArray_checkSize( &em->frame_mouse_events ) )
                 em->frame_mouse_events.data[em->frame_mouse_events.cpt++] = pEvent;
             break;
         case EWindowResized:
-            if( EventArray_checkSize( &em->frame_resize_events ) ) 
+            if( EventArray_checkSize( &em->frame_resize_events ) )
                 em->frame_resize_events.data[em->frame_resize_events.cpt++] = pEvent;
             break;
     }
@@ -237,7 +237,8 @@ void EventManager_propagateEvent( const Event pEvent ) {
         if( em )
             em->curr_state.keyboard[key] = value ? true : false;
 
-        Event e = { .type = ( value ? EKeyPressed : EKeyReleased ), .key = (Key)key, .i = key };
+        Event e = { .type = ( value ? EKeyPressed : EKeyReleased ), .i = key };
+        e.key = (Key)key;
 
         EventManager_propagateEvent( e );
     }
@@ -254,7 +255,8 @@ void EventManager_propagateEvent( const Event pEvent ) {
         if( em ) {
             em->curr_state.mouse[button] = value ? true : false;
 
-            Event e = { .type = (value ? EMousePressed : EMouseReleased), .button = (MouseButton)button, .v = { em->curr_state.mouse_pos.x, em->curr_state.mouse_pos.y } };
+            Event e = { .type = (value ? EMousePressed : EMouseReleased), .v = { em->curr_state.mouse_pos.x, em->curr_state.mouse_pos.y } };
+            e.button = button;
 
             EventManager_propagateEvent( e );
         }

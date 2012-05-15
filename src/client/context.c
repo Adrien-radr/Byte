@@ -1,10 +1,8 @@
-#include "GL/glfw.h"
-
-#include "common/vector.h"
 #include "context.h"
 #include "event.h"
+#include "GL/glfw.h"
 
-/// GLFW Window/Context 
+/// GLFW Window/Context
 typedef struct {
     vec2i   *video_modes;       ///< Video Modes width/height
     int     video_modes_n;      ///< Video Modes count
@@ -31,7 +29,7 @@ bool Context_init( u32 width, u32 height, bool fullscreen, const char *name, u32
     context = (Context*)byte_alloc( sizeof( Context ) );
     check_mem( context );
 
-    // Initialize GLFW 
+    // Initialize GLFW
     check( glfwInit(), "Could not initialize GLFW\n" );
 
     // Get available videomodes
@@ -45,7 +43,7 @@ bool Context_init( u32 width, u32 height, bool fullscreen, const char *name, u32
         context->video_modes[i].x = vidmodes[i].Width;
         context->video_modes[i].y = vidmodes[i].Height;
 
-        if( !resolution_found && 
+        if( !resolution_found &&
                 context->video_modes[i].x == width && context->video_modes[i].y == height )
             resolution_found = true;
     }
@@ -80,12 +78,12 @@ bool Context_init( u32 width, u32 height, bool fullscreen, const char *name, u32
     u32 ms = multi_samples;
     if( ms != 2 || ms != 4 || ms != 8 )
         ms = 0;
-    
+
     context->multi_samples = ms;
     glfwOpenWindowHint( GLFW_FSAA_SAMPLES, ms );
 
 
-    int init = glfwOpenWindow(  context->size.x, context->size.y, 
+    int init = glfwOpenWindow(  context->size.x, context->size.y,
                                 8, 8, 8, 0,
                                 24, 8, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW );
 
@@ -103,7 +101,7 @@ bool Context_init( u32 width, u32 height, bool fullscreen, const char *name, u32
 
     log_info( "GLFW Window successfully initialized!\n" );
     return true;
-        
+
 error:
     if( context ) Context_destroy( context );
     return false;
@@ -138,7 +136,7 @@ vec2i Context_getSize() {
         size.x = context->size.x;
         size.y = context->size.y;
     }
-        
+
     return size;
 }
 

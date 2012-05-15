@@ -1,7 +1,7 @@
 #ifndef BYTE_TEXTURE_HPP
 #define BYTE_TEXTURE_HPP
 
-#include "common/vector.h"
+#include "common/common.h"
 
 typedef struct {
     u32     mID;

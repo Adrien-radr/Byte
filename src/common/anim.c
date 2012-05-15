@@ -29,9 +29,11 @@ void Anim_loadFromFile( Anim *a, const char *file ) {
 
     for( int i = 0; i < a->frame_n; ++i ) {
         cJSON *frame = cJSON_GetArrayItem( frames, i );
+
+        // frames positions are position on a 2048^2 texture. find their relative pos to it :
         if( frame ) 
-            a->frames[i] = (vec2){ cJSON_GetArrayItem( frame, 0 )->valuedouble,
-                                   cJSON_GetArrayItem( frame, 1 )->valuedouble };
+            a->frames[i] = (vec2){ cJSON_GetArrayItem( frame, 0 )->valuedouble / 2048.f,
+                                   cJSON_GetArrayItem( frame, 1 )->valuedouble / 2048.f };
     }
 
     cJSON *ft = cJSON_GetObjectItem( root, "frame_time" );
