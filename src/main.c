@@ -7,14 +7,16 @@ f32 up_time = 0.f;
 
 int master, button1;
 
+int a0_h;
+Agent *a0;
+
 void mousecb( const Event *e, void *data ) {
     if( e->type == EMouseReleased ) {
         if( e->button == MB_Right ) {
-            /*
             vec2i dest = Scene_screenToIso( game->scene, &e->v );
 
             // create path
-            f32 begin = Client_getElapsedTime();
+            f32 begin = Game_getElapsedTime();
 
             if( p ) {
                 Map_destroyPath( p );
@@ -22,30 +24,27 @@ void mousecb( const Event *e, void *data ) {
                 up_time = 0.f;
             }
 
-            p = Map_createPath( &world->local_map, &a1->position, &dest );
+            p = Map_createPath( &game->world->local_map, &a0->location, &dest );
 
-            printf( "Path creation time : %f\n", Client_getElapsedTime() - begin );
-*/
+            printf( "Path creation time : %f\n", Game_getElapsedTime() - begin );
         } else if( e->button == MB_Left ) {
-            bool walkable = Map_isWalkable( &world->local_map, &game->mouse_tile );
+            bool walkable = Map_isWalkable( &game->world->local_map, &game->mouse_tile );
             SceneMap_redTile( game->scene, &game->mouse_tile, walkable );
-            Map_setWalkable( &world->local_map, &game->mouse_tile, !walkable );
+            Map_setWalkable( &game->world->local_map, &game->mouse_tile, !walkable );
         }
     }
 }
 
 
 void init_callback() {
-    /*
-    a1_h = World_loadActor( "data/game/actors/man.json" );
-    if( a1_h >= 0 ) {
-        a1 = World_getActor( a1_h );
+    a0_h = World_loadAgent( game->world, "data/game/agent0.json" );
+    if( a0_h >= 0 ) {
+        a0 = World_getAgent( game->world, a0_h );
 
-        Game_loadActorAssets( a1 );
-        Scene_addSpriteFromActor( game->scene, a1 );
-        Game_setActorPosition( a1, &(vec2i){ 11, 4 } );
-    }
-    */
+        Scene_addAgentSprite( game->scene, a0 );
+        Agent_setPosition( a0, &(vec2i){ 11,4 } );
+    } else
+        log_info( "Unable to load agent 0!!\n" );
 
     // GUI
     Widget button;
@@ -60,12 +59,11 @@ void init_callback() {
 }
  
 bool frame_callback( f32 frame_time ) {
-    /*
     if( p ) {
         // path step
         if( up_time >= 0.15f ) {
             vec2i *next = Map_getPathNode( p, path_index++ );
-            Game_setActorPosition( a1, next );
+            Agent_setPosition( a0, next );
             up_time = 0.f;
         } else
             up_time += frame_time;
@@ -78,7 +76,6 @@ bool frame_callback( f32 frame_time ) {
             path_index = 1;
         }
     }
-    */
 
     return true;
 }

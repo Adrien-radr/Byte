@@ -3,35 +3,33 @@
 
 #include "common/common.h"
 #include "common/handlemanager.h"
+
+#include "agent.h"
 #include "map.h"
 
-/*
-            WORLD
-    World is the shared world state between server and clients. No game resources here, only world state storage (actors, buildings, etc..)
-*/
+/// World contains info about every agents and static objects of the game. Also contains the world map and the current local map
 typedef struct {
-    //HandleManager   *mActors;
+    HandleManager   *agents;        ///< World agents
 
-    // World local map
-    Map             local_map;
+    Map             local_map;      ///< World local map
 } World;
-
-/// World instance
-extern World *world;
 
 
 /// Initialize the game world
-bool World_init();
+bool World_init( World **w );
 
 /// Destroy the world (pretty scary, heh?)
-void World_destroy();
+void World_destroy( World *w );
 
-/// Load an actor and add it to the world
-/// @return : a handle to the stored actor, or -1 if failed
-//int World_loadActor( const char *actor_name );
+/// Send an event to the world to be processed.
+void World_sendEvent( World *w );
 
-/// Returns the actor data of a given actor handle
-//Actor *World_getActor( u32 actor_handle );
+/// Load an agent and add it to the world
+/// @return : a handle to the stored agent, or -1 if failed
+int World_loadAgent( World *w, const char *file );
+
+/// Returns the agent data of a given handle
+Agent *World_getAgent( World *w, u32 agent_handle );
 
 /// Adds an actor to the world
 /// @return : a handle to the stored actor, or -1 if failed

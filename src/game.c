@@ -154,15 +154,15 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
 
     // Init Game World 
-    check( World_init(), "Error while creating Game World. Aborting initialization.\n" );
+    check( World_init( &game->world ), "Error while creating Game World. Aborting initialization.\n" );
+
+
+    // Initialize Game current Scene
+    check( Scene_init( &game->scene ), "Error while creating Game Scene. Aborting initialization.\n" );
 
     /// Load all animations
     AnimManager_loadAll( &game->anims );
 
-
-    // Initialize Game current Scene
-    game->scene = Scene_init();
-    check( game->scene, "Error while creating Game Scene. Aborting initialization.\n" );
 
     // Register Game listeners
     //EventManager_addListener( LT_ResizeListener, Game_windowResize, NULL );
@@ -222,9 +222,9 @@ error:
 void Game_destroy() {
     if( game ) {
         Scene_destroy( game->scene );
+        World_destroy( game->world );
 
         AnimManager_unloadAll( &game->anims );
-        World_destroy();
         ResourceManager_destroy();
 
         Renderer_destroy();
@@ -304,34 +304,6 @@ FT_Library *Game_getFreetype() {
     return NULL;
 }
 
-/*
-bool Game_loadActorAssets( Actor *actor ) {
-    // load animation
-    u32 anim_str_n = strlen( actor->assets.anim_str );
-    if( anim_str_n )
-        actor->assets.animation = AnimManager_gets( &game->anims, actor->assets.anim_str );
-    else 
-        actor->assets.animation = NULL;
-
-    return true;
-
-error:
-    return false;
-}
-
-void Game_setActorPosition( Actor *actor, const vec2i *pos ) {
-    if( game && actor && pos ) {
-        // set actor abstract tile location
-        vec2i_cpy( &actor->position, pos );
-
-        // if the actor has a sprite, set its world floating position
-        if( actor->used_sprite >= 0 ) {
-            vec2 glob_tile = Map_isoToGlobal( pos ); 
-            Scene_modifySprite( game->scene, actor->used_sprite, SA_Position, &glob_tile );
-        }
-    }
-}
-*/
 
 inline f32 Game_getElapsedTime() {
     return Clock_getElapsedTime( &game->clock );

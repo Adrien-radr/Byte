@@ -170,11 +170,11 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
     }
 
 
-Scene *Scene_init() {
-    Scene *s = NULL;
-    
-    s = byte_alloc( sizeof( Scene ) );
-    check_mem( s );
+bool Scene_init( Scene **sp ) {
+    *sp = byte_alloc( sizeof( Scene ) );
+    check_mem( *sp );
+
+    Scene *s = *sp;
 
     // sprites
     // create array of entities (initial size = 50)
@@ -240,11 +240,11 @@ Scene *Scene_init() {
         
 
 
-    return s;
+    return true;
 
 error:
     Scene_destroy( s );
-    return NULL;
+    return false;
 }
 
 void Scene_destroy( Scene *scene ) {
@@ -360,55 +360,51 @@ void Scene_render( Scene *pScene ) {
 }
 
 //  =======================
-/*
-int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor ) { 
+int  Scene_addAgentSprite( Scene *scene, Agent *agent ) {
     int handle = -1;
 
-    if( pScene && pActor ) {
-        handle = SpriteArray_add( pScene->sprites );
+    if( scene && agent ) {
+        handle = SpriteArray_add( scene->sprites );
 
         if( handle >= 0 ) {
-            pActor->used_sprite = handle;
-            pScene->sprites->mMeshes[handle] = pActor->assets.mesh_id;
-            pScene->sprites->mTextures0[handle] = pActor->assets.texture_id[0];
-            pScene->sprites->mTextures1[handle] = pActor->assets.texture_id[1];
-            // set sprite global position from actor tile position
-            //Game_setActorPosition( pActor, &pActor->position );
+            Sprite *as = &agent->sprite;
 
-            memset( &pScene->sprites->mAttributes[handle], 0, 9 * sizeof(f32) );
+            as->used_sprite = handle;
+            scene->sprites->mMeshes[handle] = as->mesh_id;
+            scene->sprites->mTextures0[handle] = as->tex_id[0];
+            scene->sprites->mTextures1[handle] = as->tex_id[1];
+
+            // reinit attribute matrix
+            memset( &scene->sprites->mAttributes[handle], 0, 9 * sizeof(f32) );
 
             // position components
-            pScene->sprites->mAttributes[handle].x[0] = pActor->position.x;
-            pScene->sprites->mAttributes[handle].x[1] = pActor->position.y;
+            scene->sprites->mAttributes[handle].x[0] = as->position.x;
+            scene->sprites->mAttributes[handle].x[1] = as->position.y;
 
             // depth component
-            pScene->sprites->mAttributes[handle].x[2] = 0;
+            scene->sprites->mAttributes[handle].x[2] = as->depth;
 
             // mesh size components
-            pScene->sprites->mAttributes[handle].x[3] = pActor->assets.mesh_size.x;
-            pScene->sprites->mAttributes[handle].x[4] = pActor->assets.mesh_size.y;
+            scene->sprites->mAttributes[handle].x[3] = as->mesh_size.x;
+            scene->sprites->mAttributes[handle].x[4] = as->mesh_size.y;
 
-            // texcoords of size of mesh on texture atlas
-            if( pActor->assets.animation ) {
-                pScene->sprites->mAttributes[handle].x[6] = pActor->assets.animation->frames[pActor->assets.animation->curr_n].x;
-                pScene->sprites->mAttributes[handle].x[7] = pActor->assets.animation->frames[pActor->assets.animation->curr_n].y;
+            // animation frame
+            if( as->animation ) {
+                scene->sprites->mAttributes[handle].x[6] = as->animation->frames[as->animation->curr_n].x;
+                scene->sprites->mAttributes[handle].x[7] = as->animation->frames[as->animation->curr_n].y;
 
-                // copy current actor animation
-                memcpy( &pScene->sprites->anims[handle], pActor->assets.animation, sizeof(Anim) );
-                // reset it
-                Anim_restart( &pScene->sprites->anims[handle] );
+                // copy and restart sprite animation
+                Anim_cpy( &scene->sprites->anims[handle], as->animation );
             } else {
-                pScene->sprites->mAttributes[handle].x[6] = 0;
-                pScene->sprites->mAttributes[handle].x[7] = 0;
-                // frame_n = -1 to signal there aint no anim
-                pScene->sprites->anims[handle].frame_n = -1;
+                scene->sprites->mAttributes[handle].x[6] = 0;
+                scene->sprites->mAttributes[handle].x[7] = 0;
+                scene->sprites->anims[handle].frame_n = -1;
             }
-
         }
     }
+
     return handle;
 }
-*/
 
 void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void *pData ) {
     if( pScene ) {

@@ -13,6 +13,7 @@
 #include "gui.h"
 #include "light.h"
 #include "camera.h"
+#include "agent.h"
 
 /// Visual representation of the map in game
 typedef struct {
@@ -44,8 +45,8 @@ typedef struct {
 } Scene;
 
 
-/// Create and returns a new scene instance
-Scene *Scene_init();
+/// Initialize the given scene
+bool Scene_init( Scene **s );
 
 /// Destroy and free the given scene
 void Scene_destroy( Scene *pScene );
@@ -76,7 +77,7 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
     /// Add a sprite to be rendered each frame in the scene
     /// @param pActor : the Actor that must be drawn as a sprite
     /// @return : The handle to the given sprite 
-    //int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor );
+    int  Scene_addAgentSprite( Scene *scene, Agent *agent );
 
     /// Modify one attribute of a Sprite (given by its handle)
     /// @param pAttrib : the attribute type we want to change (see sprite.h)

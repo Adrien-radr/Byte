@@ -61,6 +61,13 @@ inline void Anim_destroy( Anim *a ) {
         DEL_PTR( a->frames );
 }
 
+void Anim_cpy( Anim *a, const Anim *b ) {
+    if( a && b ) {
+        memcpy( a, b, sizeof(Anim) );
+        Anim_restart( a );
+    }
+}
+
 inline bool Anim_update( Anim *a, f32 frame_time ) {
     if( a->running ) {
         a->curr_t += frame_time;

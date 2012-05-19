@@ -9,10 +9,11 @@ extern const char ShaderDirectory[];
 extern const char MeshDirectory[];
 extern const char TextureDirectory[];
 extern const char FontDirectory[];
+extern const char SpriteDirectory[];
 
 /// Different types of resource that can be loaded
 typedef enum {
-    RT_Actor,
+    RT_Sprite,
     RT_Shader,
     RT_Texture,
     RT_Mesh,

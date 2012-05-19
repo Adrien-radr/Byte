@@ -182,6 +182,7 @@
 //      MATH
 #include <math.h>
 #include "vector.h"
+#include "matrix.h"
 
 #   define M_EPS  1.0e-4
 #ifndef M_PI
@@ -195,7 +196,6 @@
 #ifndef min
 #   define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 #endif
-
 
 
     /// Returns the sign of a float

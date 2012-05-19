@@ -8,14 +8,15 @@ const char ShaderDirectory[] = "data/shaders/";
 const char MeshDirectory[] = "data/meshes/";
 const char TextureDirectory[] = "data/textures/";
 const char FontDirectory[] = "data/fonts/";
+const char SpriteDirectory[] = "data/sprites/";
 
 // Array of u32 for the Hashes and Handles array of the resourcemanager
 SimpleArray( u32, u32 )
+    
 
 typedef struct s_ResourceManager {
     u32Array    mHashes;
     u32Array    mHandles;
-
 } ResourceManager;
 
 ResourceManager *rm = NULL;
@@ -292,6 +293,22 @@ int ResourceManager_load( ResourceType pType, const char *pFile ) {
 
         // else, load the data
         switch( pType ) {
+            case RT_Sprite :
+                // get complete file path
+                strcat( file_path, SpriteDirectory );
+                strcat( file_path, pFile );
+
+                // load sprite
+                handle = Renderer_createSprite( file_path );
+
+                // if successfully loaded, add its hash and handle to the manager
+                if( handle >= 0 ) {
+                    if( ResourceManager_addEntry( hash, handle ) ) {
+                        log_info( "Resource '%s' loaded.\n", pFile );
+                    } else
+                        log_err( "Failed to load resource '%s'.\n", pFile );
+                }
+                break;
             case RT_Texture:
                 // get complete file path
                 strcat( file_path, TextureDirectory );
@@ -303,9 +320,9 @@ int ResourceManager_load( ResourceType pType, const char *pFile ) {
                 // if successfully loaded, add its hash and handle to the manager
                 if( handle >= 0 ) {
                     if( ResourceManager_addEntry( hash, handle ) ) {
-                        log_info( "Resource \"%s\" loaded.\n", pFile );
+                        log_info( "Resource '%s' loaded.\n", pFile );
                     } else
-                        log_err( "Failed to load resource \"%s\".\n", pFile );
+                        log_err( "Failed to load resource '%s'.\n", pFile );
                 }
                 break;
             case RT_Shader:
@@ -320,9 +337,9 @@ int ResourceManager_load( ResourceType pType, const char *pFile ) {
                     // if successfully loaded, add its hash and handle to the manager
                     if( handle >= 0 ) {
                         if( ResourceManager_addEntry( hash, handle ) ) {
-                            log_info( "Resource \"%s\" loaded.\n", pFile );
+                            log_info( "Resource '%s' loaded.\n", pFile );
                         } else
-                            log_err( "Failed to load resource \"%s\".\n", pFile );
+                            log_err( "Failed to load resource '%s'.\n", pFile );
                     }
                 } else
                     log_err( "ResourceManager needs a .json file to load a shader!\n" );
@@ -339,9 +356,9 @@ int ResourceManager_load( ResourceType pType, const char *pFile ) {
                     // if successfully loaded, add its hash and handle to the manager
                     if( handle >= 0 ) {
                         if( ResourceManager_addEntry( hash, handle ) ) {
-                            log_info( "Resource \"%s\" loaded.\n", pFile );
+                            log_info( "Resource '%s' loaded.\n", pFile );
                         } else
-                            log_err( "Failed to load resource \"%s\".\n", pFile );
+                            log_err( "Failed to load resource '%s'.\n", pFile );
                     }
                 } else
                     log_err( "ResourceManager needs a .json file to load a mesh!\n" );
@@ -353,11 +370,11 @@ int ResourceManager_load( ResourceType pType, const char *pFile ) {
                     handle = LoadFont( pFile );
 
                     if( handle >= 0 ) {
-                        log_info( "Resource \"%s\" loaded.\n", pFile );
+                        log_info( "Resource '%s' loaded.\n", pFile );
                     } else
-                        log_err( "Failed to load resource \"%s\".\n", pFile );
+                        log_err( "Failed to load resource '%s'.\n", pFile );
                 } else
-                    log_err( "ResourceManager can't handle \"%s\" as a font file!\n", pFile );
+                    log_err( "ResourceManager can't handle '%s' as a font file!\n", pFile );
 
                 break;
             default:
@@ -446,6 +463,18 @@ bool ResourceManager_loadAllResources() {
         }
 
         closedir( font_dir );
+
+        // Load Sprites
+        DIR *sprite_dir = opendir( SpriteDirectory );
+
+        while( ( entry = readdir( sprite_dir ) ) ) {
+            const char *sprite_file = entry->d_name;
+
+            if( CheckExtension( sprite_file, "json" ) )
+                ResourceManager_load( RT_Sprite, sprite_file );
+        }
+
+        closedir( sprite_dir );
 
         return true;
     }

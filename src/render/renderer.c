@@ -1,11 +1,7 @@
 #include "renderer.h"
 #include "texture.h"
 
-#ifdef USE_GLDL
-#include "GL/gldl.h"
-#else
 #include "GL/glew.h"
-#endif
 
 // Array MeshArray with Mesh* data type
 HeapArray( Mesh*, Mesh, Mesh_destroy )
@@ -19,6 +15,9 @@ HeapArray( Texture*, Texture, Texture_destroy )
 // Array FontArray with Font* data type
 HeapArray( Font*, Font, Font_destroy )
 
+// Array SpriteDataArray with Sprite data type
+SimpleArray( Sprite, SpriteData )
+
 /// Application Renderer
 struct s_Renderer {
     int             mVao;                   ///< Global VAO used to render everything
@@ -29,6 +28,8 @@ struct s_Renderer {
     ShaderArray     mShaders;               ///< Array of loaded GL shader programs
     TextureArray    mTextures;              ///< Array of GL textures
     FontArray       mFonts;                 ///< Array of Font (loaded with freetype2 to GL Texs)
+
+    SpriteDataArray     sprites;
 
     // these are state variables. -1 mean nothing is currently used
     int             mCurrentMesh,           ///< The currently bound OpenGL VBO
@@ -55,6 +56,7 @@ bool Renderer_init() {
     ShaderArray_init( &renderer->mShaders, 10 );
     TextureArray_init( &renderer->mTextures, 10 );
     FontArray_init( &renderer->mFonts, 10 );
+    SpriteDataArray_init( &renderer->sprites, 50 );
 
     renderer->mCurrentMesh = -1;
     renderer->mCurrentShader = -1;
@@ -125,6 +127,7 @@ void Renderer_destroy() {
         TextureArray_destroy( &renderer->mTextures );
         ShaderArray_destroy( &renderer->mShaders );
         FontArray_destroy( &renderer->mFonts );
+        SpriteDataArray_destroy( &renderer->sprites );
         DEL_PTR( renderer );
     }
 }
@@ -459,8 +462,30 @@ error:
 }
 
 Font *Renderer_getFont( u32 pHandle ) {
-    if( renderer )
+    if( renderer && pHandle < renderer->mFonts.cpt )
         return renderer->mFonts.data[pHandle];
+    return NULL;
+}
+
+int  Renderer_createSprite( const char *file ) {
+    if( renderer && SpriteDataArray_checkSize( &renderer->sprites ) ) {
+        Sprite s;
+        bool loaded = Sprite_load( &s, file );
+
+        if( loaded ) {
+            int index = renderer->sprites.cpt++;
+            Sprite_cpy( &renderer->sprites.data[index], &s );
+
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+Sprite *Renderer_getSprite( u32 handle ) {
+    if( renderer && handle < renderer->sprites.cpt )
+        return &renderer->sprites.data[handle];
     return NULL;
 }
 

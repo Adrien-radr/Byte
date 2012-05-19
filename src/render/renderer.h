@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "text.h"
 #include "mesh.h"
+#include "sprite.h"
 
 /// Types of projection matrix
 typedef enum {
@@ -125,6 +126,15 @@ bool Renderer_isInitialized();
     /// Returns a pointer to an indexed font
     Font *Renderer_getFont( u32 pHandle );
 
+
+// ##########################################################################3
+//      SPRITE UTILS
+// ##########################################################################3
+    /// Create a new sprite from file and returns its ID
+    int  Renderer_createSprite( const char *file );
+
+    /// Returns a pointer to and indexed sprite
+    Sprite *Renderer_getSprite( u32 handle );
 
 // OpenGL Error Handling
     /// Check general Opengl Error and log it

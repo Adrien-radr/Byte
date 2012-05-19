@@ -24,6 +24,7 @@ typedef struct {
 
 void Anim_loadFromFile( Anim *a, const char *file );
 void Anim_destroy( Anim *a );
+void Anim_cpy( Anim *a, const Anim *b );
 bool Anim_update( Anim *a, f32 frame_time );
 
 void Anim_start( Anim *a );

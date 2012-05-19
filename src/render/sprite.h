@@ -15,10 +15,12 @@ typedef struct {
     vec2    texcoords_size;     ///< Size of sprite on texture atlas [0..1]^2
     vec2    mesh_size;          ///< Size of sprite globally
 
-    Anim    animation;          ///< Current animation of Sprite
+    Anim    *animation;         ///< Current animation of Sprite
 
 
     vec2    position;           ///< Global position in pixels
+    int     depth;              ///< Sprite onscreen depth
+
     int     used_sprite;        ///< Sprite ID in scene (-1 if none)
 } Sprite;
 
@@ -27,7 +29,10 @@ typedef struct {
 void Sprite_cpy( Sprite *dst, const Sprite *src );
 
 /// Loads an Sprite from a JSON file and create its assets
-bool Sprite_load( Sprite *ent, const char *file );
+bool Sprite_load( Sprite *s, const char *file );
+
+/// Sets a sprite position from a map tile, and update scene if in it
+void Sprite_setPosition( Sprite *s, const vec2i *loc );
 
 
 

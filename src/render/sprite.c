@@ -1,6 +1,9 @@
 #include "sprite.h"
 #include "resource.h"
 #include "renderer.h"
+#include "map.h"
+#include "scene.h"
+#include "game.h"
 #include "json/cJSON.h"
 
 void Sprite_cpy( Sprite *dst, const Sprite *src ) {
@@ -9,7 +12,8 @@ void Sprite_cpy( Sprite *dst, const Sprite *src ) {
         dst->used_sprite = -1;
         dst->position = (vec2){0,0};
 
-        Anim_stop( &dst->animation );
+        if( dst->animation )
+            Anim_restart( dst->animation );
     }
 }
 
@@ -30,8 +34,9 @@ bool Sprite_load( Sprite *s, const char *file ) {
         // not directly initialized stuff 
         // (set when an Agent use this sprite as its representation)
         s->position = (vec2){0,0};
+        s->depth = 0;
         s->used_sprite = -1;
-        Anim_stop( &s->animation );
+        s->animation = NULL;
 
 
         // Load sprite width and height
@@ -99,6 +104,13 @@ error:
     DEL_PTR( json_file );
     if( root ) cJSON_Delete( root );
     return return_val;
+}
+
+void Sprite_setPosition( Sprite *s, const vec2i *loc ) {
+    s->position = Map_isoToGlobal( loc );
+
+    if( s->used_sprite >= 0 ) 
+        Scene_modifySprite( game->scene, s->used_sprite, SA_Position, &s->position );
 }
 
 

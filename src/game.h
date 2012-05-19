@@ -24,6 +24,8 @@ extern const str32 config_file;
 ///     It possesses the game current scene where visible entities are drawn
 typedef struct {
     Scene           *scene;         ///< Game current scene
+    World           *world;         ///< Game world
+
     Config          config;         ///< Device/Game configuration parameters
     AnimManager     anims;                  
     Clock           clock;          ///< Main game clock
@@ -57,13 +59,5 @@ FT_Library *Game_getFreetype();
 
 /// Get game clock elapsedtime
 f32 Game_getElapsedTime();
-
-
-/// Load all game actor assets (mesh and textures)
-//bool Game_loadActorAssets( Actor *actor );
-
-/// Sets an actor position, in its abstract representation(actor.h) and
-/// in its scene sprite representation (sprite.h), it it has one
-//void Game_setActorPosition( Actor *actor, const vec2i *pos );
 
 #endif // BYTE_GAME
