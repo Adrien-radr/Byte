@@ -10,18 +10,9 @@ ARCH = 64
 
 CC = gcc
 
-USE_GLDL = 0
+GL_LIB = 
 
-# Use GLDL lib for debug if wanted, instead of glew
-ifeq ($(USE_GLDL), 1)
-GL_LIB = ext/GL/gldl.o
-GL_FLAG = -DUSE_GLDL
-else
-GL_LIB = ext/GL/glew$(ARCH).o
-GL_FLAG = 
-endif
-
-.PHONY: all, client, server, common, ext, coclean, clclean, svclean, clean, cleaner
+.PHONY: all, common, ext, clean, cleaner
 
 all: 
 	@echo "---- Building $(NAME) $(VERSION) ----"
@@ -31,38 +22,19 @@ all:
 	@make ext
 	@echo "	-- External libs built --"
 	@echo ""
-	@make common
-	@make server
-	@make client
+	@make game
 	@echo "---- $(NAME) $(VERSION) built ----"
 
 ext:
 	@make -C ext/ ARCH=$(ARCH)
 
-common:
-	@make -C src/common ARCH=$(ARCH)
-
-server:
-	@make -C src/server ARCH=$(ARCH)
-
-client:
-	@make -C src/client GL_FLAG=$(GL_FLAG) GL_LIB=$(GL_LIB) ARCH=$(ARCH)
-
-coclean:
-	@make -C src/common clean
-
-clclean:
-	@make -C src/client clean
-
-svclean:
-	@make -C src/server clean
+game:
+	@make -C src/ ARCH=$(ARCH)
 
 clean:
-	@make -C src/common clean
-	@make -C src/server clean
-	@make -C src/client clean
+	@make -C src/ clean
 
 cleaner: clean
 	make -C ext/ ARCH=$(ARCH) clean
-	rm -f bin/sv bin/cl
+	rm -f bin/byte
 

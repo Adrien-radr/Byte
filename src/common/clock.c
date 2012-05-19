@@ -1,6 +1,5 @@
 #include "clock.h"
 
-
 #ifdef BYTE_WIN32
 #	include <Windows.h>
 #endif

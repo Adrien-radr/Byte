@@ -18,7 +18,7 @@
 #endif
 
 // Function to get time for the log
-// Defaults returns 0. Client and Server define theirs (Client_init & Server_init)
+// Defaults returns 0. Game define its own clock (Game_init)
 float LogClockFunc(); 
 
 #   define WriteLog( M, ... ) do { \

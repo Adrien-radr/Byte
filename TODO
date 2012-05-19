@@ -18,6 +18,8 @@ Byte-Project : TODO File
 + Remove DEVICE and put its stuff in GAME
 + make camera zoom following fixed step zoom levels
 
++ Animation system (sprite frames)
+
     Client-Server
     ------------
     + Client part
@@ -39,6 +41,7 @@ Byte-Project : TODO File
         - wall (between tiles) collision
         - actors collision (even in-route)
         - actors movement prediction
+        - group movement (squad with leader; with flocking?)
 
     Lighting
     --------
