@@ -118,7 +118,7 @@ int LoadShader( const char *pFile ) {
 
     if( params ) {
         int param_n = cJSON_GetArraySize( params );
-        for( u32 i = 0; i < param_n; ++i ) {
+        for( int i = 0; i < param_n; ++i ) {
             cJSON *item = cJSON_GetArrayItem( params, i );
             cJSON *item_name = cJSON_GetObjectItem( item, "name" );
             cJSON *item_value = cJSON_GetObjectItem( item, "value" );
@@ -176,7 +176,7 @@ int LoadMesh( const char *pFile ) {
     positions_v = byte_alloc( position_n * sizeof( vec2 ) );
     texcoords_v = byte_alloc( position_n * sizeof( vec2 ) );
 
-    for( u32 i = 0; i < position_n; ++i ) {
+    for( int i = 0; i < position_n; ++i ) {
         cJSON *pos = cJSON_GetArrayItem( positions, i );
         cJSON *tex = cJSON_GetArrayItem( texcoords, i );
 
@@ -193,7 +193,7 @@ int LoadMesh( const char *pFile ) {
         indice_n = cJSON_GetArraySize( indices );
         indices_v = byte_alloc( indice_n * sizeof( u32 ) );
 
-        for( u32 i = 0; i < indice_n; ++i ) {
+        for( int i = 0; i < indice_n; ++i ) {
             indices_v[i] = cJSON_GetArrayItem( indices, i )->valuedouble;
         }
     }

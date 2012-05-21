@@ -48,7 +48,8 @@
     typedef char str1024[1024];
 
 
-    // Data structures Reallocation ratio (at each realloc, multiply the current size by this)
+    // Data structures Reallocation ratio (at each realloc, multiply the current
+    // size by this)
 #   define REALLOC_RATIO 1.7
 
     // Format for Date and Time
@@ -85,9 +86,11 @@
 
 // #############################################################################
 // Generic array type
-// One must choose if the objects in the array hate to be dynamically destroyed or not :
+// One must choose if the objects in the array hate to be dynamically destroyed
+// or not :
 //  - SimpleArray : no memory managment for individual data in array
-//  - HeapArray : individual data in array are destroyed with DEL_PTR when the array is destroyed
+//  - HeapArray : individual data in array are destroyed with DEL_PTR when the
+//                array is destroyed
 //
 // Use :
 //  SimpleArray( float, Float );
@@ -199,49 +202,28 @@
 
 
     /// Returns the sign of a float
-    inline int Sign( const f32 a, const f32 threshold ) {
-        if( a > threshold )
-            return 1;
-        else if ( a < - threshold )
-            return -1;
-        return 0;
-    }
+    int Sign( const f32 a, const f32 threshold );
 
     /// Return absolute value of float number
-    inline f32 Abs( const f32 a ) {
-        return ( a >= 0.f ) ? a : -a;
-    }
+    f32 Abs( const f32 a );
 
     /// Test equality of two floating pt numbers
-    inline bool Eq( f32 a, f32 b, f32 e ) {
-        return Abs( a - b ) < e;
-    }
+    bool Eq( f32 a, f32 b, f32 e );
 
     /// Returns a random floating pt number between to vals
-    inline f32 RandomValue( f32 a, f32 b ) {
-        f32 range = Abs( a - b );
-        return ( (f32)rand() / RAND_MAX ) * range + ( ( a < b ) ? a : b );
-    }
+    f32 RandomValue( f32 a, f32 b );
 
     /// Return the given radian value in degrees
-    inline f32 Deg2Rad( const f32 a ) {
-        return a * ( M_PI / 180.f );
-    }
+    f32 Deg2Rad( const f32 a );
 
     /// Returns the given degree value in radians
-    inline f32 Rad2Deg( const f32 a ) {
-        return a * ( 180.f / M_PI );
-    }
+    f32 Rad2Deg( const f32 a );
 
     /// Clamp the given int between two other
-    inline void Clamp( int *x, const int min, const int max ) {
-        *x = *x > max ? max : ( *x < min ? min : *x );
-    }
+    void Clamp( int *x, const int min, const int max );
 
     /// Clamp the given float between two other
-    inline void Clampf( f32 *x, const f32 min, const f32 max ) {
-        *x = *x > max ? max : ( *x < min ? min : *x );
-    }
+    void Clampf( f32 *x, const f32 min, const f32 max );
 
     /// Returns whether a point p is on, under or over a segment AB
     /// @return : 0 if on line, -1 if under, 1 if above.

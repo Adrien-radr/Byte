@@ -158,6 +158,8 @@ int SpriteArray_add( SpriteArray *arr ) {
 void SpriteArray_remove( SpriteArray *arr, u32 pIndex ) {
     if( arr && pIndex < arr->mUsed->mMaxIndex )  {
         HandleManager_remove( arr->mUsed, pIndex );
+        if( arr->anims[pIndex].frame_n > 0 ) // check if anim is used
+            Anim_destroy( &arr->anims[pIndex] );
         --arr->mCount;
     }
 }
@@ -177,6 +179,9 @@ void SpriteArray_destroy( SpriteArray *arr ) {
         DEL_PTR( arr->mTextures1 );
         DEL_PTR( arr->mMeshes );
         DEL_PTR( arr->mAttributes );
+        for( int i = 0; i < arr->mCount; ++i )
+            if( arr->anims[i].frame_n > 0 ) // check if anim is used
+                Anim_destroy( &arr->anims[i] );
         DEL_PTR( arr->anims );
         DEL_PTR( arr );
     }

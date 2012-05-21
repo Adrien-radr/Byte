@@ -28,7 +28,7 @@ f64 Byte_GetSystemTime(){
     #else
         struct timespec time;
         clock_gettime( CLOCK_MONOTONIC, &time );
-        return (f64)time.tv_sec + (f64)time.tv_nsec / 1000000000L;// / 1000000.0;
+        return (f64)time.tv_sec + (f64)time.tv_nsec / 1000000000L;
     #endif
 }
 

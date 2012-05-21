@@ -11,8 +11,8 @@ typedef struct {
     int                 depth;
 
     struct {
-        u32 mesh;
-        u32 texture;
+        int mesh;
+        int texture;
     }                   assets;
 } Widget;
 

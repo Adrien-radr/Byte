@@ -37,26 +37,6 @@ bool Agent_load( Agent *a, const char *file ) {
 
 
 
-        // Get init state data
-        // position
-        item = cJSON_GetObjectItem( root, "init" );
-        check( item, "Error while loading agent '%s', need entry 'init'.\n", file );
-
-        subitem = cJSON_GetObjectItem( item, "position" );
-        check( subitem, "Error while loading agent '%s', need subentry 'position' in entry 'init'.\n", file );
-
-        a->location.x = cJSON_GetArrayItem( subitem, 0 )->valueint;
-        a->location.y = cJSON_GetArrayItem( subitem, 1 )->valueint;
-
-        // animation
-        subitem = cJSON_GetObjectItem( item, "animation" );
-        check( subitem, "Error while loading agent '%s', need subentry 'animation' in entry 'init'.\n", file );
-
-        Anim *anim = AnimManager_gets( &game->anims, subitem->valuestring );
-        check( anim, "Error while loading agent '%s', animation '%s' is not a loaded resource.\n", file, subitem->valuestring );
-
-        
-
         // Load used sprite
         item = cJSON_GetObjectItem( root, "sprite" );
         check( item, "Error while loading agent '%s', need entry 'sprite'.\n", file );
@@ -71,8 +51,35 @@ bool Agent_load( Agent *a, const char *file ) {
             // global position from map location
             a->sprite.position = Map_isoToGlobal( &a->location );
 
-            // current animation (restarted)
+            // current animation
+            a->sprite.animation = NULL;
+
+
+
+        // Get init state data
+        // position
+        item = cJSON_GetObjectItem( root, "init" );
+        check( item, "Error while loading agent '%s', need entry 'init'.\n", file );
+
+        subitem = cJSON_GetObjectItem( item, "position" );
+        check( subitem, "Error while loading agent '%s', need subentry 'position' in entry 'init'.\n", file );
+
+        a->location.x = cJSON_GetArrayItem( subitem, 0 )->valueint;
+        a->location.y = cJSON_GetArrayItem( subitem, 1 )->valueint;
+
+        // animation
+        subitem = cJSON_GetObjectItem( item, "animation" );
+        //check( subitem, "Error while loading agent '%s', need subentry 'animation' in entry 'init'.\n", file );
+
+        if( subitem ) {
+            Anim *anim = AnimManager_gets( &game->anims, subitem->valuestring );
+            check( anim, "Error while loading agent '%s', animation '%s' is not a loaded resource.\n", file, subitem->valuestring );
+
             a->sprite.animation = anim;
+        }
+
+        
+
 
 
         ret = true;

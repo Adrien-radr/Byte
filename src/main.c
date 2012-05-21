@@ -2,13 +2,13 @@
 
 
 Path *p = NULL;
-int path_index = 1;
+u32 path_index = 1;
 f32 up_time = 0.f;
 
 int master, button1;
 
-int a0_h;
-Agent *a0;
+int a0_h, a1_h;
+Agent *a0, *a1;
 
 void mousecb( const Event *e, void *data ) {
     if( e->type == EMouseReleased ) {
@@ -45,6 +45,15 @@ void init_callback() {
         Agent_setPosition( a0, &(vec2i){ 11,4 } );
     } else
         log_info( "Unable to load agent 0!!\n" );
+
+    a1_h = World_loadAgent( game->world, "data/game/agent1.json" );
+    if( a1_h >= 0 ) {
+        a1 = World_getAgent( game->world, a1_h );
+
+        Scene_addAgentSprite( game->scene, a1 );
+        Agent_setPosition( a1, &(vec2i){ 12,4 } );
+    } else
+        log_info( "Unable to load agent 1!!\n" );
 
     // GUI
     Widget button;

@@ -12,7 +12,8 @@ const str32 config_file = "config.json";
 
 bool LoadConfigItem( cJSON *root, cJSON **item, const char *param ) {
     *item = cJSON_GetObjectItem( root, param );
-    check( *item, "Error while getting parameter %s from config file.\n", param );
+    check( *item,
+           "Error while getting parameter %s from config file.\n", param );
     return true;
 error:
     return false;

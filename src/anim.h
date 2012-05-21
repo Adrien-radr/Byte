@@ -4,7 +4,8 @@
 #include "common/common.h"
 
 typedef enum {
-    MAN_IDLE,
+    MAN_IDLE_SE,
+    MAN_IDLE_SW,
 
     ANIM_N
 } Animations;
@@ -13,12 +14,12 @@ extern str32 Animations_str[ANIM_N];
 
 typedef struct {
     vec2    *frames;    ///< st coords of top left corner of frame
+    f32     *frame_t;   ///< Duration of each frame
 
     int     frame_n;    ///< Number of frames
     int     curr_n;     ///< Current frame to display
 
     bool    running;
-    f32     frame_t;    ///< Time til frame change
     f32     curr_t;     ///< Current accumulated time
 } Anim;
 
