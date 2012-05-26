@@ -24,8 +24,11 @@ void World_destroy( World *w ) {
     }
 }   
 
-void World_sendEvent( World *w ) {
-
+void World_receiveEvent( World *w, const Event *event ) {
+    switch( event->type ) {
+    default :
+        break;
+    }
 }
 
 
@@ -52,18 +55,3 @@ Agent *World_getAgent( World *w, u32 agent_handle ) {
     return NULL;
 }
 
-/*
-
-int World_addActor( Actor *actor ) {
-    check( world, "Can't add actor to uninitialized world\n" );
-
-    // just copy the given actor in the world handlemanager
-    int handle = HandleManager_addData( world->mActors, (void*)actor, true, sizeof(Actor) );
-    check( handle >= 0, "Failed to add actor to world handlemanager\n" );
-
-    return handle;
-
-error:
-    return -1;
-}
-*/

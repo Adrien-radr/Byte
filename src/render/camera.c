@@ -10,7 +10,7 @@ Camera *Camera_new() {
 
     c = byte_alloc( sizeof( Camera ) );
 
-    c->mSpeed = 2.f;
+    c->mSpeed = 4.f;
     c->mZoomX = 0;
     c->mZoom = zoom_levels[c->mZoomX];
     c->mZoomSpeed = .05f;
@@ -24,29 +24,6 @@ error:
 
 void Camera_destroy( Camera *pCamera ) {
     DEL_PTR( pCamera );
-}
-
-void Camera_registerListener( Camera *pCamera, ListenerFunc pFunc, ListenerType pType ) {
-    if( pCamera ) {
-        switch( pType ) {
-            case LT_KeyListener :
-                pCamera->mKeyListener = pFunc;
-                EventManager_addListener( pType, pCamera->mKeyListener, pCamera );
-                break;
-            case LT_MouseListener :
-                pCamera->mMouseListener = pFunc;
-                EventManager_addListener( pType, pCamera->mMouseListener, pCamera );
-                break;
-            default :
-                break;
-        }
-    }
-}
-
-void Camera_registerUpdateFunction( Camera *pCamera, CameraUpdate pFunc ) {
-    if( pCamera ) {
-        pCamera->mUpdateFunc = pFunc;
-    }
 }
 
 void Camera_calculateProjectionMatrix( Camera *pCamera ) {
@@ -71,13 +48,29 @@ void Camera_calculateProjectionMatrix( Camera *pCamera ) {
     }
 }
 
-void Camera_update( Camera *pCamera ) {
-    if( pCamera ) 
-        pCamera->mUpdateFunc( pCamera );
+inline void Camera_update( Camera *camera ) {
+    if( camera ) {
+        // handle key movement for camera pan
+        vec2 move = { .x = 0.f, .y = 0.f };
+        if( IsKeyDown( K_W ) )
+            move.y -= 1.f;
+        if( IsKeyDown( K_A ) )
+            move.x -= 1.f;
+        if( IsKeyDown( K_S ) )
+            move.y += 1.f;
+        if( IsKeyDown( K_D ) )
+            move.x += 1.f;
+
+        if( move.x || move.y )
+            Camera_move( camera, &move );
+    }
 }
 
-void Camera_move( Camera *pCamera, vec2 *pVector ) {
+inline void Camera_move( Camera *pCamera, vec2 *pVector ) {
     if( pCamera && pVector ) {
+        // normalize vector 
+        vec2_normalize( pVector );
+
         pCamera->mPosition.x += pVector->x * pCamera->mSpeed;
         pCamera->mPosition.y += pVector->y * pCamera->mSpeed;
 
@@ -103,6 +96,9 @@ void Camera_zoom( Camera *pCamera, int pZoom ) {
         if( old_x != pCamera->mZoomX ) {
             f32 old_zoom = pCamera->mZoom;
             pCamera->mZoom = zoom_levels[pCamera->mZoomX];
+
+            // update pan speed to be proportionnal to cam height
+            pCamera->mSpeed = 4.f * zoom_levels[pCamera->mZoomX];
 
             f32 change = pCamera->mZoom - old_zoom;
 

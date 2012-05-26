@@ -5,6 +5,57 @@
 
 #include "json/cJSON.h"
 
+// #############################################################
+//      GAME EVENT HANDLING
+
+void Game_mouseListener( const Event *event, void *data ) {
+    if( event->type == EMouseMoved ) {
+        str32 text;
+        snprintf( text, 32, "X : %d, Y : %d", event->v.x, event->v.y );
+        Scene_modifyText( game->scene, game->mousepos_text, TA_String, text );
+
+        game->mouse_tile = Scene_screenToIso( game->scene, &event->v );
+        snprintf( text, 32, "TileX: %d, TileY : %d", game->mouse_tile.x, game->mouse_tile.y );
+        Scene_modifyText( game->scene, game->mousetile_text, TA_String, text );
+    }
+
+
+    // if in game mode
+    if( game->mode == EGame ) {
+        // TODO : send event to GUI, and if not intercepted, 
+        // send event to World
+        World_receiveEvent( game->world, event );
+        Scene_receiveEvent( game->scene, event ); 
+    }
+}
+
+void Game_keyListener( const Event *event, void *data ) {
+    if( event->type == EKeyPressed && event->key == K_F1 ) {
+        game->mode = game->mode == EEditor ? EGame : EEditor;
+    }
+
+    // if in game mode
+    if( game->mode == EGame ) {
+        // TODO : send event to GUI, and if not intercepted, 
+        // send event to World
+        World_receiveEvent( game->world, event );
+        Scene_receiveEvent( game->scene, event ); 
+    }
+}
+
+/*
+void Game_windowResize( const Event *event, void *data ) {
+    Context_setSize( event->v );
+
+    glViewport( 0, 0, (GLsizei)event->v.x, (GLsizei)event->v.y );
+
+    if( game->scene ) {
+        Camera_calculateProjectionMatrix( game->scene->camera );
+        Renderer_updateProjectionMatrix( ECamera, &game->scene->camera->mProjectionMatrix );
+    }
+}
+*/
+
 
 // #############################################################
 //      CONFIG
@@ -69,33 +120,6 @@ error:
 // #############################################################
 //      GAME
 
-/// Game mouse listener
-void Game_mouseListener( const Event *event, void *data ) {
-    if( event->type == EMouseMoved ) {
-        str32 text;
-        snprintf( text, 32, "X : %d, Y : %d", event->v.x, event->v.y );
-        Scene_modifyText( game->scene, game->mousepos_text, TA_String, text );
-
-        game->mouse_tile = Scene_screenToIso( game->scene, &event->v );
-        snprintf( text, 32, "TileX: %d, TileY : %d", game->mouse_tile.x, game->mouse_tile.y );
-        Scene_modifyText( game->scene, game->mousetile_text, TA_String, text );
-    }
-}
-
-/// Game window resize function
-/*
-void Game_windowResize( const Event *event, void *data ) {
-    Context_setSize( event->v );
-
-    glViewport( 0, 0, (GLsizei)event->v.x, (GLsizei)event->v.y );
-
-    if( game->scene ) {
-        Camera_calculateProjectionMatrix( game->scene->camera );
-        Renderer_updateProjectionMatrix( ECamera, &game->scene->camera->mProjectionMatrix );
-    }
-}
-*/
-
 
 /// Game instance declaration
 Game *game = NULL;
@@ -127,6 +151,8 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     // Load config file
     LoadConfig();
 
+    // Begining game mode : Game
+    game->mode = EGame;
 
     // Initialize Context
     str32 title;
@@ -168,6 +194,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     // Register Game listeners
     //EventManager_addListener( LT_ResizeListener, Game_windowResize, NULL );
     EventManager_addListener( LT_MouseListener, Game_mouseListener, NULL );
+    EventManager_addListener( LT_KeyListener, Game_keyListener, NULL );
 
 
 
@@ -256,7 +283,7 @@ void Game_run() {
 
         // check for game termination
         if( IsKeyUp( K_Escape ) || !Context_isWindowOpen() )
-            break;
+            goto end;
 
 
         EventManager_update();
@@ -267,11 +294,12 @@ void Game_run() {
 
             // callback. return false immediatly if frame_func said it
             if( game->frame_func && !game->frame_func( frame_t ) )
-                break;
+                goto end;
 
             // AI GAMEPLAY LOOP (fixed at 1/phy_dt FPS)
             while( phy_update >= phy_dt ) {
-                Scene_update( game->scene, phy_dt );
+                Scene_update( game->scene, phy_dt, game->mode );
+                // WORLD UPDATE !
                 phy_update -= phy_dt;
             }
 
@@ -295,6 +323,7 @@ void Game_run() {
 
     
 
+end:
     // End game
     Game_destroy();
 }

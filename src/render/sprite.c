@@ -106,12 +106,27 @@ error:
     return return_val;
 }
 
-void Sprite_setPosition( Sprite *s, const vec2i *loc ) {
+inline void Sprite_setPosition( Sprite *s, const vec2i *loc ) {
     s->position = Map_isoToGlobal( loc );
 
     if( s->used_sprite >= 0 ) 
         Scene_modifySprite( game->scene, s->used_sprite, SA_Position, &s->position );
 }
+
+inline void Sprite_setAnimation( Sprite *s, Animation anim ) {
+    s->animation = AnimManager_get( &game->anims, anim );
+
+    // if the sprite is used in scene, update it too
+    if( s->used_sprite >= 0 ) {
+        Scene_modifySprite( game->scene, s->used_sprite, SA_Animation, s->animation );
+    }
+}
+
+
+
+
+
+
 
 
 SpriteArray *SpriteArray_init( u32 pSize ) {

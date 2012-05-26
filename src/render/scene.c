@@ -133,32 +133,8 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
 
 // #############################################################################
 //          SCENE
-
-// Camera listeners and update function
-    void cameraMouseListener( const Event *event, void *camera ) {
-        Camera *cam = (Camera*)camera;
-        // manage zoom event 
-        if( event->type == EMouseWheelMoved ) 
-            Camera_zoom( cam, event->i );
-    }
-
-    void cameraUpdate( Camera *camera ) {
-        // manage position pan 
-        vec2 move = { .x = 0.f, .y = 0.f };
-        if( IsKeyDown( K_W ) )
-            move.y -= 1.f;
-        if( IsKeyDown( K_A ) )
-            move.x -= 1.f;
-        if( IsKeyDown( K_S ) )
-            move.y += 1.f;
-        if( IsKeyDown( K_D ) )
-            move.x += 1.f;
-
-        if( move.x || move.y )
-            Camera_move( camera, &move );
-    }
-
 // Event Listener for window resizing
+/*
     void sceneWindowResizing( const Event *event, void *data ) {
         Scene *s = (Scene*)data;
 
@@ -168,7 +144,7 @@ vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
                 Text_setString( s->texts->mMeshes[i], s->texts->mFonts[i], s->texts->mStrings[i] );
         }
     }
-
+*/
 
 bool Scene_init( Scene **sp ) {
     *sp = byte_alloc( sizeof( Scene ) );
@@ -213,16 +189,10 @@ bool Scene_init( Scene **sp ) {
         s->camera = Camera_new();
         check_mem( s->camera );
 
-        Camera_registerListener( s->camera, cameraMouseListener, LT_MouseListener );
-        Camera_registerUpdateFunction( s->camera, cameraUpdate );
-
 
     // 2D proj matrix (just ortho2D camera with no zoom or pan)
     vec2i winsize = Context_getSize();
     mat3_ortho( &s->proj_matrix_2d, 0.f, winsize.x, winsize.y, 0.f );
-
-    // Event listener
-    EventManager_addListener( LT_ResizeListener, sceneWindowResizing, s );
 
     // Lights
     s->ambient_color = (Color){ 0.05f, 0.05f, 0.05f, 1.f };
@@ -234,10 +204,9 @@ bool Scene_init( Scene **sp ) {
     Shader_sendColor( "amb_color", &s->ambient_color );
     Shader_sendFloat( "light_power", 1.f );
 
-    vec2i lightpos = { 12, 5 };
-    Color diffuse = { 1.f, 1.f, 1.f, 1.f };
-    Light_set( &s->light1, &lightpos, 2100.f, 200.f, &diffuse );
-        
+    // zero the light array
+    memset( s->lights, 0, 8 * sizeof(Light*) );
+    s->used_lights = 0;
 
 
     return true;
@@ -258,10 +227,19 @@ void Scene_destroy( Scene *scene ) {
     }   
 }
 
-void Scene_update( Scene *scene, f32 frame_time ) {
-    Camera_update( scene->camera );
 
-    // update all sprite animations
+inline void Scene_receiveEvent( Scene *scene, const Event *evt ) {
+    switch( evt->type ) {
+        case EMouseWheelMoved :
+            Camera_zoom( scene->camera, evt->i );
+        default:
+            break;
+    }
+}
+
+
+void Scene_updateAnimations( Scene *scene, f32 frame_time );
+inline void Scene_updateAnimations( Scene *scene, f32 frame_time ) {
     for( u32 i = 0; i < scene->sprites->mMaxIndex; ++i ) 
         if( HandleManager_isUsed( scene->sprites->mUsed, i ) && scene->sprites->anims[i].frame_n >= 0 ) {
             if( Anim_update( &scene->sprites->anims[i], frame_time ) ) {
@@ -271,9 +249,23 @@ void Scene_update( Scene *scene, f32 frame_time ) {
         }
 }
 
-void Scene_updateShadersProjMatrix( Scene *pScene ) {
+inline void Scene_updateShadersProjMatrix( Scene *pScene ) {
     Renderer_updateProjectionMatrix( ECamera, &pScene->camera->mProjectionMatrix );
     Renderer_updateProjectionMatrix( EGui, &pScene->proj_matrix_2d );
+}
+
+inline void Scene_update( Scene *scene, f32 frame_time, GameMode mode ) {
+    switch( mode ) {
+        case EGame:
+            Scene_updateAnimations( scene, frame_time );
+            Camera_update( scene->camera );
+            break;
+        case EEditor:
+            Camera_update( scene->camera );
+            break;
+        case EMenu:
+            break;
+    }
 }
 
 static f32 light_powers[5] = { 0.9f, 0.95f, 1.f, 0.88f, 1.f };
@@ -289,10 +281,6 @@ void Scene_render( Scene *pScene ) {
         //      RENDER MAP
         Renderer_useShader( pScene->local_map.shader );
         Shader_sendInt( "Depth", 9 );
-        Shader_sendColor( "light_color", &pScene->light1.diffuse );
-        Shader_sendVec2( "light_pos", &pScene->light1.position );
-        Shader_sendFloat( "light_radius", pScene->light1.radius );
-        Shader_sendFloat( "light_height", pScene->light1.height );
 
         if( change_power > 0.09f ) 
             Shader_sendFloat( "light_power", light_powers[power_index] );
@@ -303,9 +291,16 @@ void Scene_render( Scene *pScene ) {
         Shader_sendMat3( "ModelMatrix", &m );
         Renderer_renderMesh( pScene->local_map.mesh );
 
+
         // ##################################################
         //      RENDER SPRITES
         Renderer_useShader( pScene->sprite_shader );
+
+        if( change_power > 0.09f ) {
+            Shader_sendFloat( "light_power", light_powers[power_index] );
+            change_power = 0.f; 
+            power_index = (power_index + 1) % 5;
+        }
 
         for( u32 i = 0; i < pScene->sprites->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->sprites->mUsed, i ) ) {
@@ -313,15 +308,6 @@ void Scene_render( Scene *pScene ) {
                 Renderer_useTexture( pScene->sprites->mTextures0[i], 0 );
                 Renderer_useTexture( pScene->sprites->mTextures1[i], 1 );
                 Shader_sendMat3( "AttrMatrix", &pScene->sprites->mAttributes[i] );
-                Shader_sendColor( "light_color", &pScene->light1.diffuse );
-                Shader_sendVec2( "light_pos", &pScene->light1.position );
-                Shader_sendFloat( "light_radius", pScene->light1.radius );
-                Shader_sendFloat( "light_height", pScene->light1.height );
-                if( change_power > 0.09f ) {
-                    Shader_sendFloat( "light_power", light_powers[power_index] );
-                    change_power = 0.f; 
-                    power_index = (power_index + 1) % 5;
-                }
                 Renderer_renderMesh( pScene->sprites->mMeshes[i] );
             }
         }
@@ -411,19 +397,23 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
         if( HandleManager_isUsed( pScene->sprites->mUsed, pHandle ) ) {
             switch( pAttrib ) {
                 case SA_Position :
-                    {
-                        const vec2 *pos = (vec2*)pData;
-                        pScene->sprites->mAttributes[pHandle].x[0] = pos->x;
-                        pScene->sprites->mAttributes[pHandle].x[1] = pos->y;
-                    }
-                    break;
+                {
+                    const vec2 *pos = (vec2*)pData;
+                    pScene->sprites->mAttributes[pHandle].x[0] = pos->x;
+                    pScene->sprites->mAttributes[pHandle].x[1] = pos->y;
+                }
+                break;
                 case SA_Animation :
+                {
                     // copy of anim 
-                    memcpy( &pScene->sprites->anims[pHandle], (Anim*)pData, sizeof(Anim) );
+                    Anim_cpy( &pScene->sprites->anims[pHandle], (Anim*)pData );
 
-                    // reset it
-                    Anim_restart( &pScene->sprites->anims[pHandle] );
-                    break;
+                    // change current frame in Attribute matrix
+                    const Anim *a = &pScene->sprites->anims[pHandle];
+                    pScene->sprites->mAttributes[pHandle].x[6] = a->frames[a->curr_n].x;
+                    pScene->sprites->mAttributes[pHandle].x[7] = a->frames[a->curr_n].y;
+                }
+                break;
                 case SA_Texture0 :
                     pScene->sprites->mTextures0[pHandle] = *((u32*)pData);
                     break;
@@ -515,7 +505,7 @@ void Scene_clearTexts( Scene *pScene ) {
 
 //  =======================
 
-int Scene_addWidget( Scene *scene, const Widget *widget ) {
+inline int Scene_addWidget( Scene *scene, const Widget *widget ) {
     int handle = -1;
 
     if( scene ){
@@ -553,12 +543,113 @@ void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *da
 
 
 
-void Scene_removeWidget( Scene *scene, u32 widget ) {
+inline void Scene_removeWidget( Scene *scene, u32 widget ) {
     if( scene )
         WidgetArray_remove( scene->widgets, widget );
 }
 
-void Scene_clearWidgets( Scene *scene) {
+inline void Scene_clearWidgets( Scene *scene) {
     if( scene )
         WidgetArray_clear( scene->widgets );
+}
+
+
+int  Scene_addLight( Scene *scene, Light *l ) {
+    static str32 pname;
+    int handle = -1;
+
+    if( scene && scene->used_lights < 8 ) {
+        handle = scene->used_lights; 
+        scene->lights[scene->used_lights++] = l;
+
+        // update shaders using lights with new light
+        // map shader
+        Renderer_useShader( scene->local_map.shader );
+
+        snprintf( pname, 32, "light_color[%d]", handle );
+        Shader_sendColor( pname, &l->diffuse );
+        snprintf( pname, 32, "light_pos[%d]", handle );
+        Shader_sendVec2( pname, &l->position );
+        snprintf( pname, 32, "light_radius[%d]", handle );
+        Shader_sendFloat( pname, l->radius );
+        snprintf( pname, 32, "light_height[%d]", handle );
+        Shader_sendFloat( pname, l->height );
+
+        Shader_sendInt( "light_N", scene->used_lights );
+
+        // sprite shader
+        Renderer_useShader( scene->sprite_shader );
+
+        snprintf( pname, 32, "light_color[%d]", handle );
+        Shader_sendColor( pname, &l->diffuse );
+        snprintf( pname, 32, "light_pos[%d]", handle );
+        Shader_sendVec2( pname, &l->position );
+        snprintf( pname, 32, "light_radius[%d]", handle );
+        Shader_sendFloat( pname, l->radius );
+        snprintf( pname, 32, "light_height[%d]", handle );
+        Shader_sendFloat( pname, l->height );
+
+        Shader_sendInt( "light_N", scene->used_lights );
+    }
+
+    return handle;
+}
+
+void Scene_removeLight( Scene *scene, u32 index ) {
+    static str32 pname;
+
+    if( scene && index < scene->used_lights ) {
+        // move all lights right to the one removed, one step to the left
+        for( int i = index+1; i < scene->used_lights; ++i ) {
+            scene->lights[i-1] = scene->lights[i];
+        }
+
+        scene->lights[--scene->used_lights] = NULL;
+
+        // update shaders using lights with new arrangement of lights
+        // map
+        Renderer_useShader( scene->local_map.shader );
+        
+        for( int i = index; i < scene->used_lights; ++i ) {
+            snprintf( pname, 32, "light_color[%d]", i );
+            Shader_sendColor( pname, &scene->lights[i]->diffuse );
+            snprintf( pname, 32, "light_pos[%d]", i );
+            Shader_sendVec2( pname, &scene->lights[i]->position );
+            snprintf( pname, 32, "light_radius[%d]", i );
+            Shader_sendFloat( pname, scene->lights[i]->radius );
+            snprintf( pname, 32, "light_height[%d]", i );
+            Shader_sendFloat( pname, scene->lights[i]->height );
+        }
+
+        Shader_sendInt( "light_N", scene->used_lights );
+
+        // sprites
+        Renderer_useShader( scene->sprite_shader );
+        
+        for( int i = index; i < scene->used_lights; ++i ) {
+            snprintf( pname, 32, "light_color[%d]", i );
+            Shader_sendColor( pname, &scene->lights[i]->diffuse );
+            snprintf( pname, 32, "light_pos[%d]", i );
+            Shader_sendVec2( pname, &scene->lights[i]->position );
+            snprintf( pname, 32, "light_radius[%d]", i );
+            Shader_sendFloat( pname, scene->lights[i]->radius );
+            snprintf( pname, 32, "light_height[%d]", i );
+            Shader_sendFloat( pname, scene->lights[i]->height );
+        }
+
+        Shader_sendInt( "light_N", scene->used_lights );
+    }
+}
+
+void Scene_clearLights( Scene *scene ) {
+    if( scene ) {
+        memset( scene->lights, 0, 8 * sizeof(Light*) );
+
+        // update shaders using lights 
+        Renderer_useShader( scene->local_map.shader );
+        Shader_sendInt( "light_N", 0 );
+
+        Renderer_useShader( scene->sprite_shader );
+        Shader_sendInt( "light_N", 0 );
+    }
 }

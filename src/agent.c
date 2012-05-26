@@ -92,7 +92,7 @@ error:
 }
 
 
-void Agent_setPosition( Agent *a, const vec2i *pos ) {
+inline void Agent_setPosition( Agent *a, const vec2i *pos ) {
     if( a && pos )  {
         // set location
         vec2i_cpy( &a->location, pos );
@@ -100,4 +100,9 @@ void Agent_setPosition( Agent *a, const vec2i *pos ) {
         // set sprite position
         Sprite_setPosition( &a->sprite, pos );
     }
+}
+
+inline void Agent_playAnimation( Agent *a, Animation anim ) {
+    if( a )
+        Sprite_setAnimation( &a->sprite, anim );
 }

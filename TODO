@@ -20,16 +20,6 @@ Byte-Project : TODO File
 
 + Animation system (sprite frames)
 
-    Client-Server
-    ------------
-    + Client part
-    + Msg struct for msg transmission
-    + Dedicated server & client-only
-    - server/client (for solo)
-
-    + Add free port finding (several connection from single machine )
-    + Handle server refusing because not enough slot
-
     Map System
     ----------
     + Squared tiles map (3d?)
@@ -54,9 +44,13 @@ Byte-Project : TODO File
     - 2D Normal maps of sprites ?
     - Dynamic shadows
 
+    Gameplay
+    --------
+    - Handling events/inputs (if GUI says so)
+    ...
+
     Misc
     ----
     + Clean the main
     - Lua integration as a scripting language (??)
     - GUI (with Lua or json) (Handled by Beulard)
-    - Fix camera position when resizing window (messy)! (maybe no window resizing at all +)

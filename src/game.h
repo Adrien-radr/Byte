@@ -26,6 +26,8 @@ typedef struct {
     Scene           *scene;         ///< Game current scene
     World           *world;         ///< Game world
 
+    GameMode        mode;           ///< Current game mode
+
     Config          config;         ///< Device/Game configuration parameters
     AnimManager     anims;                  
     Clock           clock;          ///< Main game clock

@@ -8,9 +8,9 @@ typedef enum {
     MAN_IDLE_SW,
 
     ANIM_N
-} Animations;
+} Animation;
 
-extern str32 Animations_str[ANIM_N];
+extern str32 Animation_str[ANIM_N];
 
 typedef struct {
     vec2    *frames;    ///< st coords of top left corner of frame
@@ -43,7 +43,7 @@ typedef struct {
 
 void AnimManager_loadAll( AnimManager *am );
 void AnimManager_unloadAll( AnimManager *am );
-Anim *AnimManager_get( AnimManager *am, Animations a );
+Anim *AnimManager_get( AnimManager *am, Animation a );
 Anim *AnimManager_gets( AnimManager *am, const char *anim_name );
 
 

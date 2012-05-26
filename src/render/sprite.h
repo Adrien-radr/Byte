@@ -34,6 +34,9 @@ bool Sprite_load( Sprite *s, const char *file );
 /// Sets a sprite position from a map tile, and update scene if in it
 void Sprite_setPosition( Sprite *s, const vec2i *loc );
 
+/// Sets a sprite current animation
+void Sprite_setAnimation( Sprite *s, Animation anim );
+
 
 
 

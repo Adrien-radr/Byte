@@ -22,4 +22,7 @@ bool Agent_load( Agent *a, const char *file );
 /// Change the agent's location and its sprite position
 void Agent_setPosition( Agent *a, const vec2i *pos );
 
+/// Sets the currently played animation
+void Agent_playAnimation( Agent *a, Animation anim );
+
 #endif /* BYTE_AGENT */

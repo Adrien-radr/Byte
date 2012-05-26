@@ -95,7 +95,7 @@ bool Renderer_init() {
     //glHint( GL_GENERATE_MIPMAP_HINT, GL_NICEST );
 
     glEnable( GL_DEPTH_TEST );
-    glDepthFunc( GL_LESS );
+    glDepthFunc( GL_LEQUAL );
 
     glEnable( GL_CULL_FACE );
     glCullFace( GL_BACK );
@@ -103,10 +103,9 @@ bool Renderer_init() {
 
     // enable alpha blend
     glEnable( GL_BLEND );
-    glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,      // rgb
-                         GL_ZERO,      GL_ONE_MINUS_SRC_ALPHA );    // alpha
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-    glClearColor( 0.f, 0.f, 0.f, 1.f );
+    glClearColor( 0.f, 0.f, 0.f, 0.f );
 
     // clear init gl errors
     CheckGLError();

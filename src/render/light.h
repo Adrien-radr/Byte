@@ -12,6 +12,8 @@ typedef struct {
     Color   diffuse;
 
     f32     radius;
+
+    bool    active;
 } Light;
 
 void Light_set( Light *l, const vec2i *pos, f32 radius, f32 height, const Color *col );

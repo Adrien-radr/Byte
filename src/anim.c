@@ -5,7 +5,7 @@
 
 str32 AnimDirectory = "data/animations/";
 
-str32 Animations_str[ANIM_N] = {
+str32 Animation_str[ANIM_N] = {
     "man_idle_se",
     "man_idle_sw",
 };
@@ -165,7 +165,7 @@ inline Anim *AnimManager_gets( AnimManager *am, const char *anim_name ) {
     if( am && anim_name ) {
         int i;
         for( i = 0; i < ANIM_N; ++i )
-            if( !strcmp( Animations_str[i], anim_name ) )
+            if( !strcmp( Animation_str[i], anim_name ) )
                 break;
        
         if( i < ANIM_N )
@@ -173,6 +173,14 @@ inline Anim *AnimManager_gets( AnimManager *am, const char *anim_name ) {
         else
             log_err( "Animation '%s' is inexistant\n", anim_name );
     }
+
+    return a;
+}
+
+inline Anim *AnimManager_get( AnimManager *am, Animation anim ) {
+    Anim *a = NULL;
+    if( am ) 
+        a = &am->animations[anim];
 
     return a;
 }

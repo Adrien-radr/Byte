@@ -9,5 +9,6 @@ void Light_set( Light *l, const vec2i *pos, f32 radius, f32 height, const Color 
         l->position = Map_isoToGlobal( &l->tile );
         l->radius = radius;
         l->height = height;
+        l->active = true;
     }
 }

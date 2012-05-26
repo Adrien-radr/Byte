@@ -39,9 +39,9 @@ typedef struct {
 
     SceneMap        local_map;
 
-    Light           light1;
+    Light           *lights[8];
+    u32             used_lights;
     Color           ambient_color;
-
 } Scene;
 
 
@@ -51,8 +51,11 @@ bool Scene_init( Scene **s );
 /// Destroy and free the given scene
 void Scene_destroy( Scene *pScene );
 
+/// Scene receive an event to be processed
+void Scene_receiveEvent( Scene *scene, const Event *evt );
+
 /// Update the scene (camera, etc)
-void Scene_update( Scene *scene, f32 frame_time );
+void Scene_update( Scene *scene, f32 frame_time, GameMode mode );
 
 /// Render all sprites & texts in the scene
 void Scene_render( Scene *pScene );
@@ -123,6 +126,18 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
     /// Clears the whole widget array, to set a new scene
     void Scene_clearWidgets( Scene *scene );
 
+
+// ##########################################################################3
+//      Lights
+    /// Add a light to be used for rendering (and update shaders using them)
+    /// @return : it's index in array, or -1 if failed to add light
+    int  Scene_addLight( Scene *scene, Light *l );
+
+    /// Remove a light by its index (and update shaders using them)
+    void Scene_removeLight( Scene *scene, u32 index );
+
+    /// Remove all lights from scene (and update shaders using them)
+    void Scene_clearLights( Scene *scene );
 
 
 #endif // BYTE_SCENE

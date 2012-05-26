@@ -41,11 +41,6 @@ Camera *Camera_new();
 /// Destroy the given camera
 void Camera_destroy( Camera *pCamera );
 
-/// Register a given ListenerFunction to be one of the camera's one
-void Camera_registerListener( Camera *pCamera, ListenerFunc pFunc, ListenerType pType );
-
-/// Register an update function
-void Camera_registerUpdateFunction( Camera *pCamera, CameraUpdate pFunc );
 
 /// Ask the given camera to recalculate its projection matrix (if the window size has
 /// changed for example).

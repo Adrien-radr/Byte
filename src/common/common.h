@@ -22,6 +22,13 @@
 #include "debug.h"
 
 
+/// Different game modes 
+typedef enum {
+    EGame,      ///< In game. IA, camera, animations activated
+    EMenu,      ///< In game menu. No IA, no camera, no animations
+    EEditor     ///< In editor. Mo IA, no animations
+} GameMode;
+
 
 // #############################################################################
 //      MISC
