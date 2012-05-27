@@ -65,9 +65,9 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 
 // ##########################################################################3
 //      Scene Map
-    /// Returns the global world coordinates of a vector, not depending of camera
-    /// zoom or pan. (often you want this to translate mousepos from screen to world)
-    vec2  Scene_localToGlobal( Scene *scene, const vec2i *local );
+    /// Returns the global coordinates of a screen pos, not depending of camera
+    /// zoom or pan. 
+    vec2  Scene_screenToGlobal( Scene *scene, const vec2i *local );
 
     /// Returns the map tile at a given local screen position
     vec2i Scene_screenToIso( Scene *scene, const vec2i *local );
@@ -130,14 +130,16 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 // ##########################################################################3
 //      Lights
     /// Add a light to be used for rendering (and update shaders using them)
-    /// @return : it's index in array, or -1 if failed to add light
-    int  Scene_addLight( Scene *scene, Light *l );
+    void Scene_addLight( Scene *scene, Light *l );
 
-    /// Remove a light by its index (and update shaders using them)
-    void Scene_removeLight( Scene *scene, u32 index );
+    /// Remove a light (and update shaders using them)
+    void Scene_removeLight( Scene *scene, Light *l );
 
     /// Remove all lights from scene (and update shaders using them)
     void Scene_clearLights( Scene *scene );
+
+    /// Notify a modification to a light present in scene attribute
+    void Scene_modifyLight( Scene *scene, Light *l, LightAttribute la );
 
 
 #endif // BYTE_SCENE

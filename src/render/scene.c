@@ -91,7 +91,7 @@ void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red ) {
     Mesh_build( m, EUpdateVbo, false );
 }
 
-vec2 Scene_localToGlobal( Scene *scene, const vec2i *local ) {
+vec2 Scene_screenToGlobal( Scene *scene, const vec2i *local ) {
     vec2 ret = { local->x, local->y};
     ret = vec2_mul( &ret, scene->camera->mZoom );
     ret = vec2_add( &ret, &scene->camera->global_position );
@@ -100,34 +100,10 @@ vec2 Scene_localToGlobal( Scene *scene, const vec2i *local ) {
 }
 
 vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
-    static vec2i up =    {  50,  0 };
-    static vec2i down =  {  50, 50 };
-    static vec2i left =  {   0, 25 };
-    static vec2i right = { 100, 25 };
-
     // get global mouse position (not depending on camera zoom or pan)
-    vec2 global = Scene_localToGlobal( scene, local );
+    vec2 global = Scene_screenToGlobal( scene, local );
 
-    vec2i ret, offset;
-    ret.x = 2 * (int)( global.x / tile_w);
-    ret.y = global.y / tile_h;
-    offset.x = (int)global.x % tile_w;
-    offset.y = (int)global.y % tile_h;
-
-
-    if( PointOnLinei( &offset, &left, &up ) < 0 ) {
-        ret.y -= 1;      
-        ret.x -= 1;
-    } 
-    else if( PointOnLinei( &offset, &left, &down ) > 0 ) 
-        ret.x -= 1;
-    else if( PointOnLinei( &offset, &up, &right ) < 0 ) {
-        ret.y -= 1;     
-        ret.x += 1;
-    } else if( PointOnLinei( &offset, &down, &right ) > 0 )  
-        ret.x += 1;
-
-    return ret;
+    return Map_globalToIso( &global );
 }
 
 
@@ -554,25 +530,24 @@ inline void Scene_clearWidgets( Scene *scene) {
 }
 
 
-int  Scene_addLight( Scene *scene, Light *l ) {
+void Scene_addLight( Scene *scene, Light *l ) {
     static str32 pname;
-    int handle = -1;
 
     if( scene && scene->used_lights < 8 ) {
-        handle = scene->used_lights; 
+        l->scene_id = scene->used_lights; 
         scene->lights[scene->used_lights++] = l;
 
         // update shaders using lights with new light
         // map shader
         Renderer_useShader( scene->local_map.shader );
 
-        snprintf( pname, 32, "light_color[%d]", handle );
+        snprintf( pname, 32, "light_color[%d]", l->scene_id );
         Shader_sendColor( pname, &l->diffuse );
-        snprintf( pname, 32, "light_pos[%d]", handle );
+        snprintf( pname, 32, "light_pos[%d]", l->scene_id );
         Shader_sendVec2( pname, &l->position );
-        snprintf( pname, 32, "light_radius[%d]", handle );
+        snprintf( pname, 32, "light_radius[%d]", l->scene_id );
         Shader_sendFloat( pname, l->radius );
-        snprintf( pname, 32, "light_height[%d]", handle );
+        snprintf( pname, 32, "light_height[%d]", l->scene_id );
         Shader_sendFloat( pname, l->height );
 
         Shader_sendInt( "light_N", scene->used_lights );
@@ -580,27 +555,25 @@ int  Scene_addLight( Scene *scene, Light *l ) {
         // sprite shader
         Renderer_useShader( scene->sprite_shader );
 
-        snprintf( pname, 32, "light_color[%d]", handle );
+        snprintf( pname, 32, "light_color[%d]", l->scene_id );
         Shader_sendColor( pname, &l->diffuse );
-        snprintf( pname, 32, "light_pos[%d]", handle );
+        snprintf( pname, 32, "light_pos[%d]", l->scene_id );
         Shader_sendVec2( pname, &l->position );
-        snprintf( pname, 32, "light_radius[%d]", handle );
+        snprintf( pname, 32, "light_radius[%d]", l->scene_id );
         Shader_sendFloat( pname, l->radius );
-        snprintf( pname, 32, "light_height[%d]", handle );
+        snprintf( pname, 32, "light_height[%d]", l->scene_id );
         Shader_sendFloat( pname, l->height );
 
         Shader_sendInt( "light_N", scene->used_lights );
     }
-
-    return handle;
 }
 
-void Scene_removeLight( Scene *scene, u32 index ) {
+void Scene_removeLight( Scene *scene, Light *l ) {
     static str32 pname;
 
-    if( scene && index < scene->used_lights ) {
+    if( scene && l->scene_id >= 0 && l->scene_id < scene->used_lights ) {
         // move all lights right to the one removed, one step to the left
-        for( int i = index+1; i < scene->used_lights; ++i ) {
+        for( int i = l->scene_id+1; i < scene->used_lights; ++i ) {
             scene->lights[i-1] = scene->lights[i];
         }
 
@@ -610,7 +583,7 @@ void Scene_removeLight( Scene *scene, u32 index ) {
         // map
         Renderer_useShader( scene->local_map.shader );
         
-        for( int i = index; i < scene->used_lights; ++i ) {
+        for( int i = l->scene_id; i < scene->used_lights; ++i ) {
             snprintf( pname, 32, "light_color[%d]", i );
             Shader_sendColor( pname, &scene->lights[i]->diffuse );
             snprintf( pname, 32, "light_pos[%d]", i );
@@ -626,7 +599,7 @@ void Scene_removeLight( Scene *scene, u32 index ) {
         // sprites
         Renderer_useShader( scene->sprite_shader );
         
-        for( int i = index; i < scene->used_lights; ++i ) {
+        for( int i = l->scene_id; i < scene->used_lights; ++i ) {
             snprintf( pname, 32, "light_color[%d]", i );
             Shader_sendColor( pname, &scene->lights[i]->diffuse );
             snprintf( pname, 32, "light_pos[%d]", i );
@@ -638,10 +611,12 @@ void Scene_removeLight( Scene *scene, u32 index ) {
         }
 
         Shader_sendInt( "light_N", scene->used_lights );
+
+        l->scene_id = -1;
     }
 }
 
-void Scene_clearLights( Scene *scene ) {
+inline void Scene_clearLights( Scene *scene ) {
     if( scene ) {
         memset( scene->lights, 0, 8 * sizeof(Light*) );
 
@@ -651,5 +626,43 @@ void Scene_clearLights( Scene *scene ) {
 
         Renderer_useShader( scene->sprite_shader );
         Shader_sendInt( "light_N", 0 );
+    }
+}
+
+void Scene_modifyLight( Scene *scene, Light *l, LightAttribute la ) {
+    if( l->scene_id >= 0 && l->scene_id < scene->used_lights ) {
+        str32 pname;
+
+        // switch on attribute type and send the new value to shaders
+        switch( la ) {
+            case LA_Position :
+                snprintf( pname, 32, "light_pos[%d]", l->scene_id );
+                Renderer_useShader( scene->local_map.shader );
+                Shader_sendVec2( pname, &l->position );
+                Renderer_useShader( scene->sprite_shader );
+                Shader_sendVec2( pname, &l->position );
+                break;
+            case LA_Color :
+                snprintf( pname, 32, "light_color[%d]", l->scene_id );
+                Renderer_useShader( scene->local_map.shader );
+                Shader_sendColor( pname, &l->diffuse );
+                Renderer_useShader( scene->sprite_shader );
+                Shader_sendColor( pname, &l->diffuse );
+                break;
+            case LA_Radius :
+                snprintf( pname, 32, "light_radius[%d]", l->scene_id );
+                Renderer_useShader( scene->local_map.shader );
+                Shader_sendFloat( pname, l->radius );
+                Renderer_useShader( scene->sprite_shader );
+                Shader_sendFloat( pname, l->radius );
+                break;
+            case LA_Height :
+                snprintf( pname, 32, "light_height[%d]", l->scene_id );
+                Renderer_useShader( scene->local_map.shader );
+                Shader_sendFloat( pname, l->height );
+                Renderer_useShader( scene->sprite_shader );
+                Shader_sendFloat( pname, l->height );
+                break;
+        }
     }
 }

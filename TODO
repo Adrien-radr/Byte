@@ -24,7 +24,6 @@ Byte-Project : TODO File
     ----------
     + Squared tiles map (3d?)
     + Mouse picking support
-    - Quad-Tree 
     - Procedurally created map (world-map and scene-map)
     + Pathfinding
         + basic A* pathfinding
@@ -33,16 +32,21 @@ Byte-Project : TODO File
         - actors movement prediction
         - group movement (squad with leader; with flocking?)
 
+    Scene Managment
+    ---------------
+    - Quad-Tree 
+    - Back-to-front sorting of sprites (use depth instead?)
+
     Lighting
     --------
     + Point-lights 
         + Map isometric fragment lighting
         + Sprites fragment lighting
         + Sprites lighting with sprite height support
-    - Multiple scene lights
+    + Multiple scene lights
     - Directional (sun) lights
     - 2D Normal maps of sprites ?
-    - Dynamic shadows
+    - Dynamic shadows (only walls?)
 
     Gameplay
     --------

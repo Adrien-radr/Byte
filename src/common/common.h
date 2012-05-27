@@ -217,8 +217,12 @@ typedef enum {
     /// Test equality of two floating pt numbers
     bool Eq( f32 a, f32 b, f32 e );
 
-    /// Returns a random floating pt number between to vals
+    /// Returns a random floating pt number between two vals
     f32 RandomValue( f32 a, f32 b );
+
+    /// Returns a random vec2 with x and y between two vals
+    vec2 RandomVec2( f32 a, f32 b );
+    vec2i RandomVec2i( int a, int b );
 
     /// Return the given radian value in degrees
     f32 Deg2Rad( const f32 a );

@@ -33,6 +33,17 @@ inline f32 RandomValue( f32 a, f32 b ) {
     return ( (f32)rand() / RAND_MAX ) * range + ( ( a < b ) ? a : b );
 }
 
+inline vec2 RandomVec2( f32 a, f32 b ) {
+    f32 range = Abs( a - b );
+    return (vec2){ ( (f32)rand() / RAND_MAX) * range + ((a<b)?a:b),
+                   ( (f32)rand() / RAND_MAX) * range + ((a<b)?a:b) };
+}
+
+inline vec2i RandomVec2i( int a, int b ) {
+    int range = Abs( a - b );
+    return (vec2i){ rand() % range + ((a<b)?a:b),
+                    rand() % range + ((a<b)?a:b) };
+}
 
 inline f32 Deg2Rad( const f32 a ) {
     return a * ( M_PI / 180.f );

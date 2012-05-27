@@ -135,6 +135,8 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     MemoryManager_init();
 #   endif
 
+    // Initialize random seed
+    srand( time(NULL) );
 
     // Allocate game instance
     game = byte_alloc( sizeof( Game ) );

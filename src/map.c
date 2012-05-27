@@ -9,21 +9,33 @@ const int tile_hh = 25;
 
 void Map_init( Map *map ) {
     if( map ) {
+        // map init : all tiles are walkable from everywhere
         for( int i = 0; i < lmap_size; ++i ) {
-            map->tiles[i].walkable = true;
-            // other ?? IF NOT, memset would be better
+            map->tiles[i].walkable = (NW|NE|SW|SE);
         }
     }
 }
 
-inline void Map_setWalkable( Map *map, const vec2i *tile, bool walkable ) {
-    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < lmap_width*2 && tile->y < lmap_height/2 ) 
-        map->tiles[tile->y*2*lmap_width+tile->x].walkable = walkable;
+inline void Map_setWalkable( Map *map, const vec2i *tile, MapDirection dir, bool walkable ) {
+    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < lmap_width*2 && tile->y < lmap_height/2 ) {
+
+        // if we want the flags in dir to be walkable (walkable==true),
+        //   we do a bitwise OR between dir and the current walkable flag;
+        // if we want them to not be walbale (walkable==false),
+        //   we do a bitwise AND between NOT dir and the current walkable flag;
+        map->tiles[tile->y*2*lmap_width+tile->x].walkable = 
+            walkable ? dir | map->tiles[tile->y*2*lmap_width+tile->x].walkable :
+                      ~dir & map->tiles[tile->y*2*lmap_width+tile->x].walkable; 
+    } 
 }
 
-inline bool Map_isWalkable( const Map *map, const vec2i *tile ) {
+inline bool Map_isWalkable( const Map *map, const vec2i *tile, MapDirection dir ) {
     if( map && tile->x >= 0 && tile->y >= 0 && tile->x < lmap_width*2 && tile->y < lmap_height/2 ) 
-        return map->tiles[tile->y*2*lmap_width+tile->x].walkable;
+        // the directions defined by dir are walkable if dir AND current flag
+        // result in dir. (all flags in dir are also in current flag)
+        return dir == ( dir & map->tiles[tile->y*2*lmap_width+tile->x].walkable );
+
+    // if out of map : false
     return false;
 }
 
@@ -44,6 +56,33 @@ inline vec2  Map_isoToGlobal( const vec2i *tile ) {
                     tile->y * tile_h + (1+((tile->x % 2) ? 1 : 0)) * tile_hh };
 }
 
+vec2i Map_globalToIso( const vec2 *global ) {
+    static vec2i up =    {  50,  0 };
+    static vec2i down =  {  50, 50 };
+    static vec2i left =  {   0, 25 };
+    static vec2i right = { 100, 25 };
+
+    vec2i ret, offset;
+    ret.x = 2 * (int)( global->x / tile_w);
+    ret.y = global->y / tile_h;
+    offset.x = (int)global->x % tile_w;
+    offset.y = (int)global->y % tile_h;
+
+
+    if( PointOnLinei( &offset, &left, &up ) < 0 ) {
+        ret.y -= 1;      
+        ret.x -= 1;
+    } 
+    else if( PointOnLinei( &offset, &left, &down ) > 0 ) 
+        ret.x -= 1;
+    else if( PointOnLinei( &offset, &up, &right ) < 0 ) {
+        ret.y -= 1;     
+        ret.x += 1;
+    } else if( PointOnLinei( &offset, &down, &right ) > 0 )  
+        ret.x += 1;
+
+    return ret;
+}
 
 
 
@@ -150,32 +189,33 @@ static void pathNodeNeighbors( NeighborList *nl, const Map *map, const vec2i *no
     const int offset = (node->x%2 == 0) ? 1 : 0;
 
     // Add a little shifting in the order of added nodes, for the path to seems more 'organic'
-    static int curr_n = 0;       // index in following array
+    static const MapDirection md[4] = { SE, NW, NE, SW }; 
+    static int curr_n = 0;                      // index in following array
 
     // array of neighbors to check and possibly add.
     vec2i neighbors[] = {
         { node->x + 1, node->y + (1-offset) },  // right node
         { node->x - 1, node->y - offset },      // left node
         { node->x + 1, node->y - offset },      // above node
-        { node->x - 1, node->y + (1-offset) }   // bellow node
+        { node->x - 1, node->y + (1-offset) }   // below node
     }; 
 
-    if( Map_isWalkable( map, &neighbors[curr_n] ) )  
+    if( Map_isWalkable( map, node, md[curr_n] ) )  
         NeighborList_add( nl, &neighbors[curr_n], 1 );
 
     curr_n = (curr_n+1) % 4;
 
-    if( Map_isWalkable( map, &neighbors[curr_n] ) )  
+    if( Map_isWalkable( map, node, md[curr_n] ) )  
         NeighborList_add( nl, &neighbors[curr_n], 1 );
 
     curr_n = (curr_n+1) % 4;
 
-    if( Map_isWalkable( map, &neighbors[curr_n] ) )  
+    if( Map_isWalkable( map, node, md[curr_n] ) )  
         NeighborList_add( nl, &neighbors[curr_n], 1 );
 
     curr_n = (curr_n+1) % 4;
 
-    if( Map_isWalkable( map, &neighbors[curr_n] ) )  
+    if( Map_isWalkable( map, node, md[curr_n] ) )  
         NeighborList_add( nl, &neighbors[curr_n], 1 );
 }
 
@@ -467,7 +507,7 @@ Path *Map_createPath( const Map *map, const vec2i *start, const vec2i *end ) {
         return NULL;
 
     // check if destination is off-bounds
-    if( !Map_isWalkable( map, end ) )
+    if( !Map_isWalkable( map, end, (NW | NE | SW | SE) ) )
         return NULL;
 
     NeighborList *nl = NeighborList_init();
@@ -561,7 +601,6 @@ Path *Map_createPath( const Map *map, const vec2i *start, const vec2i *end ) {
             memcpy( &path->nodes[i-1], Node_getTile( &n ), sizeof(vec2i) );
             n = Node_getParent( &n );
         }
-
     }
 
     NeighborList_destroy( nl );

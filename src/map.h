@@ -17,8 +17,16 @@ extern const int tile_hw;       ///< Tile half width
 extern const int tile_hh;       ///< Tile half height
 
 
+typedef enum {
+    NW = 1,
+    NE = 2,
+    SW = 4,
+    SE = 8
+} MapDirection;
+
 typedef struct {
-    bool    walkable;
+    u32     walkable;           ///< Flag of each edge walkability
+    //bool    walkable[4];        ///< Can walk in dir ? { NW, NE, SW, SE }
 } MapTile;
 
 typedef struct {
@@ -28,17 +36,20 @@ typedef struct {
 /// Initialize map tiles to all be walkable (what else?)
 void Map_init( Map *map );
 
-/// Set a tile of the given map to be walkable or not
-void Map_setWalkable( Map *map, const vec2i *tile, bool walkable );
+/// Set the direction(s) from a tile walkable or not
+void Map_setWalkable( Map *map, const vec2i *tile, MapDirection dir, bool walkable );
 
-/// Returns whether or not the given map tile is walkable
-bool Map_isWalkable( const Map *map, const vec2i *tile );
+/// Returns whether or not the given direction is walkable from the given tile
+bool Map_isWalkable( const Map *map, const vec2i *tile, MapDirection dir );
 
 /// Returns the square coordinate equivalent of an isometric coordinate
 vec2i Map_isoToSquare( const vec2i *vec );
 
 /// Returns the global floating position of the center of a tile
 vec2  Map_isoToGlobal( const vec2i *tile );
+
+/// Returns the iso tile under a global position
+vec2i Map_globalToIso( const vec2 *pos );
 
 // ##################################################################
 //      A STAR Pathfinding
