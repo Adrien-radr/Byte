@@ -1,13 +1,10 @@
 #include "net.h"
 
 #ifdef BYTE_WIN32
-<<<<<<< HEAD
     #include <winsock2.h>
     #include <ws2tcpip.h>
     #include <ws2tcpip.h>
-=======
     #include <ws2tcpip.h>
->>>>>>> da3d2e1b9ccf48c55a305e5c4e4141723efbf8ff
 
     #define close closesocket
 
@@ -96,10 +93,6 @@ static void get_local_ips() {
     }
 
     for ( int i = 0; phe->h_addr_list[i] != 0; ++i )
-<<<<<<< HEAD
-    for ( int i = 0; phe->h_addr_list[i] != 0; ++i )
-=======
->>>>>>> da3d2e1b9ccf48c55a305e5c4e4141723efbf8ff
         memcpy( &local_ips[i].addr, phe->h_addr_list[i], sizeof(struct in_addr) );
 
 #else

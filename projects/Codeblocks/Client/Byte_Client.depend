@@ -646,7 +646,7 @@
 	"common/net.h"
 	"common/clock.h"
 
-1336250391 c:\users\beul\desktop\code\bytelastversion\src\\common\net.h
+1338983142 c:\users\beul\desktop\code\bytelastversion\src\\common\net.h
 	"common.h"
 	<winsock2.h>
 	<netinet/in.h>
@@ -793,7 +793,7 @@
 	"GL/gldl.h"
 	"GL/glew.h"
 
-1336250417 source:c:\users\beul\desktop\code\bytelastversion\src\client\texture.c
+1338983158 source:c:\users\beul\desktop\code\bytelastversion\src\client\texture.c
 	"texture.h"
 	"renderer.h"
 	"GL/gldl.h"
@@ -871,9 +871,10 @@
 1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\matrix.c
 	"matrix.h"
 
-1336955310 source:c:\users\beul\desktop\code\bytelastversion\src\common\net.c
+1338983182 source:c:\users\beul\desktop\code\bytelastversion\src\common\net.c
 	"net.h"
 	<winsock2.h>
+	<ws2tcpip.h>
 	<ws2tcpip.h>
 	<ws2tcpip.h>
 	<sys/socket.h>
@@ -882,7 +883,7 @@
 	<fcntl.h>
 	<ifaddrs.h>
 
-1336250391 c:\users\beul\desktop\code\bytelastversion\src\common\net.h
+1338983142 c:\users\beul\desktop\code\bytelastversion\src\common\net.h
 	"common.h"
 	<winsock2.h>
 	<netinet/in.h>
@@ -1008,7 +1009,7 @@
 	<X11/Xmd.h>
 	"glew.h"
 
-1338933648 source:c:\users\beul\desktop\code\bytelastversion\src\client\gui.c
+1338935445 source:c:\users\beul\desktop\code\bytelastversion\src\client\gui.c
 	"gui.h"
 	"game.h"
 	"resource.h"
