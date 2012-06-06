@@ -14,6 +14,7 @@ WidgetArray* WidgetArray_init( u32 size ){
     arr->textures = byte_alloc( size * sizeof( u32 ) );
     arr->depths = byte_alloc( size * sizeof( int ) );
     arr->positions = byte_alloc( size * sizeof( vec2 ) );
+    arr->scales = byte_alloc( size * sizeof( vec2 ) );
     arr->textOffsets = byte_alloc( size * sizeof( vec2 ) );
 
     arr->size = size;
@@ -35,6 +36,7 @@ int WidgetArray_add( WidgetArray* arr ) {
                 arr->texts = byte_realloc( arr->texts, arr->size * sizeof( u32 ) );
                 arr->depths = byte_realloc( arr->depths, arr->size * sizeof( int ) );
                 arr->positions = byte_realloc( arr->positions, arr->size * sizeof( vec2 ) );
+                arr->scales = byte_realloc( arr->scales, arr->size * sizeof( vec2 ) );
                 arr->textOffsets = byte_realloc( arr->textOffsets, arr->size * sizeof( vec2 ) );
             }
 
@@ -68,6 +70,7 @@ void WidgetArray_destroy( WidgetArray *arr ) {
         DEL_PTR( arr->textures );
         DEL_PTR( arr->texts );
         DEL_PTR( arr->positions );
+        DEL_PTR( arr->scales );
         DEL_PTR( arr->textOffsets );
         DEL_PTR( arr->depths );
         DEL_PTR( arr );

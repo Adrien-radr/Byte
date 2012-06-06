@@ -14,6 +14,7 @@ typedef struct {
     u32             *texts;
     int              *depths;
     vec2            *positions;     ///< Widget position (screen coords)
+    vec2            *scales;
     vec2            *textOffsets;
 
 
@@ -27,6 +28,7 @@ typedef enum {
     WA_Texture,
     WA_Position,
     WA_Depth,
+    WA_Scale
 } WidgetAttrib;
 
 /// Initialize and allocate a new WidgetArray

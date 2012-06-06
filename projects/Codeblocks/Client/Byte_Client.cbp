@@ -17,15 +17,14 @@
 					<Add option="-std=c99" />
 					<Add option="-ggdb3" />
 					<Add option="-DGLEW_STATIC" />
-					<Add directory="..\..\..\ext\freetype" />
 					<Add directory="..\..\..\ext" />
 					<Add directory="..\..\..\ext\json" />
 					<Add directory="..\..\..\src\" />
 				</Compiler>
 				<Linker>
 					<Add option="-lglfwWIN" />
-					<Add option="-lfreetypeWIN" />
-					<Add option="-lzWIN" />
+					<Add option="-lfreetype" />
+					<Add option="-lz" />
 					<Add option="-lpng" />
 					<Add option="-lwsock32" />
 					<Add option="-lopengl32" />

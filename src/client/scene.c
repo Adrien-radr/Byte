@@ -317,6 +317,7 @@ void Scene_render( Scene *pScene ) {
                 if( pScene->widgets->textures[i] >= 0 ){
                     Renderer_useTexture( pScene->widgets->textures[i], 0 );
                     Shader_sendVec2( "Position", &pScene->widgets->positions[i] );
+                    Shader_sendVec2( "Scale", &pScene->widgets->scales[i] );
                     Shader_sendInt( "Depth", pScene->widgets->depths[i] );
                     Renderer_renderMesh( pScene->widgets->meshes[i] );
                 }
@@ -505,12 +506,14 @@ int Scene_addWidget( Scene *scene, Widget *widget ) {
             if( widget->assets.text >= 0 ) {
                 scene->widgets->texts[handle] = widget->assets.text;
                 vec2i textPos = vec2i_add( &widget->position, &widget->textOffset );
+                scene->widgets->textOffsets[handle] = vec2_vec2i(&widget->textOffset);
                 Scene_modifyText( scene, widget->assets.text, TA_Position, &textPos );
                 Scene_modifyText( scene, widget->assets.text, TA_Visible, &(bool){true} );
                 int depth = widget->depth - 1;
                 Scene_modifyText( scene, widget->assets.text, TA_Depth, &depth );
             }
 
+            scene->widgets->scales[handle] = widget->scale;
             scene->widgets->depths[handle] = widget->depth;
             scene->widgets->positions[handle] = vec2_vec2i( &widget->position );
             for( u32 i = 0; i < widget->childrenCount; ++i ) {
@@ -541,6 +544,9 @@ void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *da
                     int depth = scene->widgets->depths[handle] - 1;
                     Scene_modifyText( scene, scene->widgets->texts[handle], TA_Depth, &depth );
                     break;
+                case WA_Scale :
+                    scene->widgets->scales[handle] = *((vec2*)data);
+                    break;
                 default :
                     break;
             }
@@ -552,7 +558,7 @@ void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *da
 
 void Scene_removeWidget( Scene *scene, Widget* widget ) {
     if( scene ) {
-        for( u32 i = 0; i < widget->childrenCount; ++i )
+        for( int i = widget->childrenCount - 1; i >= 0; --i )
             Scene_removeWidget( scene, widget->children[i] );
         WidgetArray_remove( scene->widgets, widget->sceneIndex );
         if( widget->assets.text >= 0 ) {

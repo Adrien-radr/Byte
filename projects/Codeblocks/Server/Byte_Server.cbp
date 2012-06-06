@@ -22,8 +22,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-lglfwWIN" />
-					<Add option="-lfreetypeWIN" />
-					<Add option="-lzWIN" />
+					<Add option="-lfreetype" />
+					<Add option="-lz" />
 					<Add option="-lpng" />
 					<Add option="-lwsock32" />
 					<Add option="-lopengl32" />
