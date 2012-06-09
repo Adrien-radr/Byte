@@ -15,7 +15,7 @@ LIB = \
 ../ext/libglfw$(ARCH).a\
 ../ext/json/cJSON$(ARCH).o\
 ../ext/GL/glew$(ARCH).o \
-/usr/lib/libfreetype.a
+/usr/lib/x86_64-linux-gnu/libfreetype.a
 
 all: $(CO_OBJ) $(RE_OBJ) $(GA_OBJ)
 	@ $(CC) $(CO_OBJ) $(RE_OBJ) $(GA_OBJ) $(LIB) $(CFLAGS) -o ../bin/byte

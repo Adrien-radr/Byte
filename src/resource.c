@@ -9,12 +9,10 @@ const char MeshDirectory[] = "data/meshes/";
 const char TextureDirectory[] = "data/textures/";
 const char FontDirectory[] = "data/fonts/";
 const char SpriteDirectory[] = "data/sprites/";
+const char StaticObjectDirectory[] = "data/statics/";
 
-// Array of u32 for the Hashes and Handles array of the resourcemanager
-SimpleArray( u32, u32 )
-    
 
-typedef struct s_ResourceManager {
+typedef struct {
     u32Array    mHashes;
     u32Array    mHandles;
 } ResourceManager;
@@ -309,6 +307,22 @@ int ResourceManager_load( ResourceType pType, const char *pFile ) {
                         log_err( "Failed to load resource '%s'.\n", pFile );
                 }
                 break;
+            case RT_StaticObject :
+                // get complete file path
+                strcat( file_path, StaticObjectDirectory );
+                strcat( file_path, pFile );
+
+                // load sprite
+                handle = Renderer_createStaticObject( file_path );
+
+                // if successfully loaded, add its hash and handle to the manager
+                if( handle >= 0 ) {
+                    if( ResourceManager_addEntry( hash, handle ) ) {
+                        log_info( "Resource '%s' loaded.\n", pFile );
+                    } else
+                        log_err( "Failed to load resource '%s'.\n", pFile );
+                }
+                break;
             case RT_Texture:
                 // get complete file path
                 strcat( file_path, TextureDirectory );
@@ -475,6 +489,18 @@ bool ResourceManager_loadAllResources() {
         }
 
         closedir( sprite_dir );
+
+        // Load Static objects
+        DIR *so_dir = opendir( StaticObjectDirectory );
+
+        while( ( entry = readdir( so_dir ) ) ) {
+            const char *so_file = entry->d_name;
+
+            if( CheckExtension( so_file, "json" ) )
+                ResourceManager_load( RT_StaticObject, so_file );
+        }
+
+        closedir( so_dir );
 
         return true;
     }

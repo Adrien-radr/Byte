@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "texture.h"
+#include "static.h"
 
 #include "GL/glew.h"
 
@@ -15,8 +16,6 @@ HeapArray( Texture*, Texture, Texture_destroy )
 // Array FontArray with Font* data type
 HeapArray( Font*, Font, Font_destroy )
 
-// Array SpriteDataArray with Sprite data type
-SimpleArray( Sprite, SpriteData )
 
 /// Application Renderer
 struct s_Renderer {
@@ -29,7 +28,8 @@ struct s_Renderer {
     TextureArray    mTextures;              ///< Array of GL textures
     FontArray       mFonts;                 ///< Array of Font (loaded with freetype2 to GL Texs)
 
-    SpriteDataArray     sprites;
+    SpritesArray    sprites;
+    StaticsArray    statics;
 
     // these are state variables. -1 mean nothing is currently used
     int             mCurrentMesh,           ///< The currently bound OpenGL VBO
@@ -56,7 +56,8 @@ bool Renderer_init() {
     ShaderArray_init( &renderer->mShaders, 10 );
     TextureArray_init( &renderer->mTextures, 10 );
     FontArray_init( &renderer->mFonts, 10 );
-    SpriteDataArray_init( &renderer->sprites, 50 );
+    SpritesArray_init( &renderer->sprites, 50 );
+    StaticsArray_init( &renderer->statics, 50 );
 
     renderer->mCurrentMesh = -1;
     renderer->mCurrentShader = -1;
@@ -126,7 +127,8 @@ void Renderer_destroy() {
         TextureArray_destroy( &renderer->mTextures );
         ShaderArray_destroy( &renderer->mShaders );
         FontArray_destroy( &renderer->mFonts );
-        SpriteDataArray_destroy( &renderer->sprites );
+        SpritesArray_destroy( &renderer->sprites );
+        StaticsArray_destroy( &renderer->statics );
         DEL_PTR( renderer );
     }
 }
@@ -467,7 +469,7 @@ Font *Renderer_getFont( u32 pHandle ) {
 }
 
 int  Renderer_createSprite( const char *file ) {
-    if( renderer && SpriteDataArray_checkSize( &renderer->sprites ) ) {
+    if( renderer && SpritesArray_checkSize( &renderer->sprites ) ) {
         Sprite s;
         bool loaded = Sprite_load( &s, file );
 
@@ -487,6 +489,29 @@ Sprite *Renderer_getSprite( u32 handle ) {
         return &renderer->sprites.data[handle];
     return NULL;
 }
+
+int  Renderer_createStaticObject( const char *file ) {
+    if( renderer && StaticsArray_checkSize( &renderer->statics ) ) {
+        StaticObject s;
+        bool loaded = StaticObject_load( &s, file );
+
+        if( loaded ) {
+            int index = renderer->statics.cpt++;
+            StaticObject_cpy( &renderer->statics.data[index], &s );
+
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+StaticObject *Renderer_getStaticObject( u32 handle ) {
+    if( renderer && handle < renderer->statics.cpt )
+        return &renderer->statics.data[handle];
+    return NULL;
+}
+
 
 void CheckGLError_func( const char *pFile, u32 pLine ) {
 #ifdef _DEBUG

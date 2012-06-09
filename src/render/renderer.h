@@ -8,6 +8,7 @@
 #include "text.h"
 #include "mesh.h"
 #include "sprite.h"
+#include "static.h"
 
 /// Types of projection matrix
 typedef enum {
@@ -135,6 +136,15 @@ bool Renderer_isInitialized();
 
     /// Returns a pointer to and indexed sprite
     Sprite *Renderer_getSprite( u32 handle );
+
+// ##########################################################################3
+//      STATIC OBJECTS UTILS
+// ##########################################################################3
+    /// Create a new static obj from file and returns its ID
+    int  Renderer_createStaticObject( const char *file );
+
+    /// Returns a pointer to and indexed static obj
+    StaticObject *Renderer_getStaticObject( u32 handle );
 
 // OpenGL Error Handling
     /// Check general Opengl Error and log it

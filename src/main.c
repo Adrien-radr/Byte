@@ -32,19 +32,20 @@ void mousecb( const Event *e, void *data ) {
                 up_time = 0.f;
             }
 
-            p = Map_createPath( &game->world->local_map, &a0->location, &dest );
+            //p = Map_createPath( &game->world->local_map, &a0->location, &dest );
 
-            printf( "Path creation time : %f\n", Game_getElapsedTime() - begin );
+            //printf( "Path creation time : %f\n", Game_getElapsedTime() - begin );
         } else if( e->button == MB_Left ) {
-            bool walkable = Map_isWalkable( &game->world->local_map, &game->mouse_tile, (NW|NE|SW|SE) );
-            SceneMap_redTile( game->scene, &game->mouse_tile, walkable );
-            Map_setWalkable( &game->world->local_map, &game->mouse_tile, (NW|NE|SW|SE), !walkable );
+            //bool walkable = Map_isWalkable( &game->world->local_map, &game->mouse_tile, (NW|NE|SW|SE) );
+            //SceneMap_redTile( game->scene, &game->mouse_tile, walkable );
+            //Map_setWalkable( &game->world->local_map, &game->mouse_tile, (NW|NE|SW|SE), !walkable );
         }
     }
 }
 
 
 void init_callback() {
+    /*
     for( int i = 0; i < 10; ++i ) {
         a_h[i] = World_loadAgent( game->world, "data/game/agent1.json" );
         if( a_h[i] >= 0 ) {
@@ -57,13 +58,14 @@ void init_callback() {
         } else
             log_info( "Unable to load agent %d!!\n", i );
     }
+*/
 
-    a0_h = World_loadAgent( game->world, "data/game/agent0.json" );
+    a0_h = World_loadAgent( game->world, "data/game/agent0.json", 0,0 );
     if( a0_h >= 0 ) {
-        a0 = World_getAgent( game->world, a0_h );
+        a0 = World_getAgent( game->world, a0_h, 0, 0 );
 
-        Scene_addAgentSprite( game->scene, a0 );
-        Agent_setPosition( a0, &(vec2i){ 12,5 } );
+        //Scene_addAgentSprite( game->scene, a0 );
+        Agent_setPosition( a0, &(vec2i){ 3,3 } );
     } else
         log_info( "Unable to load agent 0!!\n" );
 
@@ -87,7 +89,7 @@ void init_callback() {
     Light_init( &lights[1], &(vec2i){17,8}, 300.f, 200.f, &diffuse );
         
     diffuse = (Color){ 1.f, 1.f, 1.f, 1.f };
-    Light_init( &lights[2], &(vec2i){8,8}, 350.f, 200.f, &diffuse );
+    Light_init( &lights[2], &(vec2i){8,8}, 450.f, 200.f, &diffuse );
 
     Scene_addLight( game->scene, &lights[0] );
     Scene_addLight( game->scene, &lights[1] );
@@ -116,9 +118,6 @@ bool frame_callback( f32 frame_time ) {
     if( test >= 3.f ) {
         Agent_playAnimation( a0, MAN_IDLE_SE );
         test = -1.f;
-
-        // light modif test
-        Light_setLocation( &lights[2], &(vec2i){ 3,5 } );
 
     } else if( test >= 0.f ) {
         test += frame_time;

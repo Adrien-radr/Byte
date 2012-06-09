@@ -97,6 +97,8 @@ inline void Agent_setPosition( Agent *a, const vec2i *pos ) {
         // set location
         vec2i_cpy( &a->location, pos );
 
+        // TODO : Check if agent changed its world_tile
+
         // set sprite position
         Sprite_setPosition( &a->sprite, pos );
     }

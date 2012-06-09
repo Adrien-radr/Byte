@@ -11,7 +11,7 @@
 //          SCENE MAP
 
 /// Local function. Initialize the scene map
-void SceneMap_init( Scene *scene ) {
+void SceneMap_init( Scene *scene, SceneTile *tile ) {
     // buffer positions ( 4 vertices for each map tile )
     vec2 map_pos[4*lmap_size];
     // buffer tex coordinates ( 4 for each tile )
@@ -22,6 +22,10 @@ void SceneMap_init( Scene *scene ) {
     // vertex position offsets
     int x_offset, y_offset;  
 
+    // Scene Tile offset (absolute offset to given tile)
+    int stx_offset = tile->map.location.x * lmap_width * tile_w;
+    int sty_offset = tile->map.location.y * lmap_height/2 * tile_h;
+
     // arrays indices offsets ( xi and yj for pos and tcs offsets,
     int xi, yj, ii, ij;      // ii and ij for indices               )
      
@@ -29,8 +33,8 @@ void SceneMap_init( Scene *scene ) {
     // create map mesh data
     for( int j = 0; j < lmap_height/2; ++j )
         for( int i = 0; i < 2*lmap_width; ++i ) {
-            x_offset = i * 50.f;
-            y_offset = j * 50.f + (i&1) * 25.f;
+            x_offset = stx_offset + i * 50.f;
+            y_offset = sty_offset + j * 50.f + (i&1) * 25.f;
 
             // i * 4 : 4 vertices for each tile
             xi = i * 4;
@@ -61,21 +65,20 @@ void SceneMap_init( Scene *scene ) {
             map_indices[ij+ii+5] = yj+xi+2;
         }
 
-    // create mesh
-    scene->local_map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
-    Renderer_setDynamicMeshData( scene->local_map.mesh, (f32*)map_pos, sizeof(map_pos), (f32*)map_tcs, sizeof(map_tcs), map_indices, sizeof(map_indices) );
+    // create mesh 
+    tile->map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
+    Renderer_setDynamicMeshData( tile->map.mesh, (f32*)map_pos, sizeof(map_pos), (f32*)map_tcs, sizeof(map_tcs), map_indices, sizeof(map_indices) );
 
  
     // get shader and texture
-    scene->local_map.texture = ResourceManager_get( "pierre.png" );
-    scene->local_map.shader = ResourceManager_get( "map_shader.json" );
+    tile->map.texture = ResourceManager_get( "pierre.png" );
 }
-
+/*
 void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red ) {
     if( tile->x >= lmap_width*2 || tile->y >= lmap_height/2 ) 
         return;
 
-    Mesh *m = Renderer_getMesh( scene->local_map.mesh );
+    Mesh *m = Renderer_getMesh( tile->map.mesh );
     u32 tcs_offset = m->vertex_count * 2;
     int i_offset = tile->x * 8,
         j_offset = tile->y * 2 * lmap_width * 8;
@@ -90,8 +93,8 @@ void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red ) {
     // rebuild map mesh
     Mesh_build( m, EUpdateVbo, false );
 }
-
-vec2 Scene_screenToGlobal( Scene *scene, const vec2i *local ) {
+*/
+inline vec2 Scene_screenToGlobal( Scene *scene, const vec2i *local ) {
     vec2 ret = { local->x, local->y};
     ret = vec2_mul( &ret, scene->camera->mZoom );
     ret = vec2_add( &ret, &scene->camera->global_position );
@@ -99,11 +102,32 @@ vec2 Scene_screenToGlobal( Scene *scene, const vec2i *local ) {
     return ret;
 }
 
-vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
+inline vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
     // get global mouse position (not depending on camera zoom or pan)
     vec2 global = Scene_screenToGlobal( scene, local );
 
     return Map_globalToIso( &global );
+}
+
+inline SceneTile *Scene_getTile( Scene *scene, u32 x, u32 y  ) {
+    if( x < 3 && y < 3 )
+        return &scene->tiles[y*3+x];
+    return NULL;
+}
+
+void Scene_loadWorldTile( Scene *scene, u32 wx, u32 wy, u32 sx, u32 sy ) {
+    WorldTile *wt = World_getTile( game->world, wx, wy );
+    SceneTile *st = Scene_getTile( scene, sx, sy );
+
+    // TODO : make st load wt actors/map/etc
+    // for now, just create map for this tile.
+    SceneMap_init( scene, st );
+
+    // load all agents 
+    for( u32 i = 0; i < wt->agents->mCount; ++i ) {
+        Agent *a = World_getGlobalAgent( game->world, i );
+        Scene_addAgentSprite( scene, a );
+    }
 }
 
 
@@ -159,7 +183,14 @@ bool Scene_init( Scene **sp ) {
     s->ui_shader = ws;
 
     // map
-        SceneMap_init( s );
+        //SceneMap_init( s );
+        // Initialize Scene Tiles
+        for( int i = 0;i < 3; ++i )
+            for( int j = 0;j < 3; ++j )
+                s->tiles[j*3+i].map.location = (vec2i){ i, j };
+
+        // map shader
+        s->map_shader = ResourceManager_get( "map_shader.json" );
 
     // camera
         s->camera = Camera_new();
@@ -173,7 +204,7 @@ bool Scene_init( Scene **sp ) {
     // Lights
     s->ambient_color = (Color){ 0.05f, 0.05f, 0.05f, 1.f };
 
-    Renderer_useShader( s->local_map.shader );
+    Renderer_useShader( s->map_shader );
     Shader_sendColor( "amb_color", &s->ambient_color );
     Shader_sendFloat( "light_power", 1.f );
     Renderer_useShader( s->sprite_shader );
@@ -183,6 +214,11 @@ bool Scene_init( Scene **sp ) {
     // zero the light array
     memset( s->lights, 0, 8 * sizeof(Light*) );
     s->used_lights = 0;
+
+
+    // Static Objects
+    //s->walls = NULL;
+    //s->wall_objs = StaticObjectArray_init( 100 );
 
 
     return true;
@@ -198,6 +234,10 @@ void Scene_destroy( Scene *scene ) {
         TextArray_destroy( scene->texts );
         WidgetArray_destroy( scene->widgets );
         Camera_destroy( scene->camera );
+
+        //if( scene->walls )
+        //    Mesh_destroy( scene->walls );
+        //StaticObjectArray_destroy( scene->wall_objs );
 
         DEL_PTR( scene );
     }   
@@ -255,17 +295,20 @@ void Scene_render( Scene *pScene ) {
 
         // ##################################################
         //      RENDER MAP
-        Renderer_useShader( pScene->local_map.shader );
+        Renderer_useShader( pScene->map_shader );
         Shader_sendInt( "Depth", 9 );
 
         if( change_power > 0.09f ) 
             Shader_sendFloat( "light_power", light_powers[power_index] );
 
-        Renderer_useTexture( pScene->local_map.texture, 0 );
-        mat3 m;
-        mat3_identity( &m );
-        Shader_sendMat3( "ModelMatrix", &m );
-        Renderer_renderMesh( pScene->local_map.mesh );
+        // loop on all scene tiles
+        for( int i = 0; i < 9; ++i ) {
+            Renderer_useTexture( pScene->tiles[i].map.texture, 0 );
+            mat3 m;
+            mat3_identity( &m );
+            Shader_sendMat3( "ModelMatrix", &m );
+            Renderer_renderMesh( pScene->tiles[i].map.mesh );
+        }
 
 
         // ##################################################
@@ -539,7 +582,7 @@ void Scene_addLight( Scene *scene, Light *l ) {
 
         // update shaders using lights with new light
         // map shader
-        Renderer_useShader( scene->local_map.shader );
+        Renderer_useShader( scene->map_shader );
 
         snprintf( pname, 32, "light_color[%d]", l->scene_id );
         Shader_sendColor( pname, &l->diffuse );
@@ -581,7 +624,7 @@ void Scene_removeLight( Scene *scene, Light *l ) {
 
         // update shaders using lights with new arrangement of lights
         // map
-        Renderer_useShader( scene->local_map.shader );
+        Renderer_useShader( scene->map_shader );
         
         for( int i = l->scene_id; i < scene->used_lights; ++i ) {
             snprintf( pname, 32, "light_color[%d]", i );
@@ -621,7 +664,7 @@ inline void Scene_clearLights( Scene *scene ) {
         memset( scene->lights, 0, 8 * sizeof(Light*) );
 
         // update shaders using lights 
-        Renderer_useShader( scene->local_map.shader );
+        Renderer_useShader( scene->map_shader );
         Shader_sendInt( "light_N", 0 );
 
         Renderer_useShader( scene->sprite_shader );
@@ -637,28 +680,28 @@ void Scene_modifyLight( Scene *scene, Light *l, LightAttribute la ) {
         switch( la ) {
             case LA_Position :
                 snprintf( pname, 32, "light_pos[%d]", l->scene_id );
-                Renderer_useShader( scene->local_map.shader );
+                Renderer_useShader( scene->map_shader );
                 Shader_sendVec2( pname, &l->position );
                 Renderer_useShader( scene->sprite_shader );
                 Shader_sendVec2( pname, &l->position );
                 break;
             case LA_Color :
                 snprintf( pname, 32, "light_color[%d]", l->scene_id );
-                Renderer_useShader( scene->local_map.shader );
+                Renderer_useShader( scene->map_shader );
                 Shader_sendColor( pname, &l->diffuse );
                 Renderer_useShader( scene->sprite_shader );
                 Shader_sendColor( pname, &l->diffuse );
                 break;
             case LA_Radius :
                 snprintf( pname, 32, "light_radius[%d]", l->scene_id );
-                Renderer_useShader( scene->local_map.shader );
+                Renderer_useShader( scene->map_shader );
                 Shader_sendFloat( pname, l->radius );
                 Renderer_useShader( scene->sprite_shader );
                 Shader_sendFloat( pname, l->radius );
                 break;
             case LA_Height :
                 snprintf( pname, 32, "light_height[%d]", l->scene_id );
-                Renderer_useShader( scene->local_map.shader );
+                Renderer_useShader( scene->map_shader );
                 Shader_sendFloat( pname, l->height );
                 Renderer_useShader( scene->sprite_shader );
                 Shader_sendFloat( pname, l->height );
@@ -666,3 +709,23 @@ void Scene_modifyLight( Scene *scene, Light *l, LightAttribute la ) {
         }
     }
 }
+/*
+void Scene_addStaticObject( Scene *scene, StaticObject *so ) {
+    if( scene ){
+        int handle = StaticObjectArray_add( scene->wall_objs );
+
+        if( handle >= 0 ) {
+            so->scene_id = handle;
+            scene->wall_objs->objs[handle] = so;
+        }
+    }
+}
+
+void Scene_removeStaticObject( Scene *scene, int index ) {
+    if( scene )
+        StaticObjectArray_remove( scene->wall_objs, index );
+}
+
+void Scene_buildStaticObjects( Scene *scene ) {
+}
+*/

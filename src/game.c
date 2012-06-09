@@ -189,6 +189,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     // Initialize Game current Scene
     check( Scene_init( &game->scene ), "Error while creating Game Scene. Aborting initialization.\n" );
 
+
     /// Load all animations
     AnimManager_loadAll( &game->anims );
 
@@ -207,6 +208,13 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     // call init func
     if( init_func )
         init_func();
+
+
+    // Initialize scene tiles to upper left world
+    for( int y = 0; y < 3; ++y )
+        for( int x = 0; x < 3; ++x ) 
+            Scene_loadWorldTile( game->scene, x,y,x,y );
+
 
 
     Font *f = Font_get( "DejaVuSans.ttf", 12 );

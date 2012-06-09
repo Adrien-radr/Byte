@@ -9,6 +9,7 @@
 #include "texture.h"
 #include "text.h"
 #include "sprite.h"
+#include "static.h"
 #include "widget.h"
 #include "gui.h"
 #include "light.h"
@@ -19,11 +20,20 @@
 typedef struct {
     u32     mesh;
     u32     texture;
-    u32     shader;
+
+    vec2i   location;                   ///< Tile location [0..2]^2
 } SceneMap;
+
+typedef struct {
+    SceneMap            map;
+    Mesh                *walls;
+    StaticObjectArray   *wall_objs;
+} SceneTile;
 
 /// Scene structure. Keep all info about rendering in the current view
 typedef struct {
+    u32             map_shader;         ///< Shader used to render map
+
     u32             sprite_shader;      ///< Shader used to render sprites
     SpriteArray     *sprites;           ///< Sprites in the scene
 
@@ -37,11 +47,18 @@ typedef struct {
 
     mat3            proj_matrix_2d;     ///< 2D projection matrix (GUI & text)
 
-    SceneMap        local_map;
+    //SceneMap        local_map;
 
     Light           *lights[8];
     u32             used_lights;
     Color           ambient_color;
+
+    //Mesh            *walls;
+    //StaticObjectArray *wall_objs;
+
+    SceneTile       tiles[9];           ///< 9 Scene Tiles
+                                        ///< one for current player pos.
+                                        ///< 8 for surrounding ones
 } Scene;
 
 
@@ -63,6 +80,12 @@ void Scene_render( Scene *pScene );
 /// Update all shaders with the scene projection matrices
 void Scene_updateShadersProjMatrix( Scene *pScene );
 
+/// Returns the SceneTile at (i,j) coordinates, if present
+SceneTile *Scene_getTile( Scene *scene, u32 x, u32 y );
+
+/// Load the (i,j) WorldTile into the (k,l) SceneTile
+void Scene_loadWorldTile( Scene *scene, u32 wx, u32 wy, u32 sx, u32 sy );
+
 // ##########################################################################3
 //      Scene Map
     /// Returns the global coordinates of a screen pos, not depending of camera
@@ -72,7 +95,7 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
     /// Returns the map tile at a given local screen position
     vec2i Scene_screenToIso( Scene *scene, const vec2i *local );
 
-    void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red );
+    //void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red );
     
 
 // ##########################################################################3
@@ -140,6 +163,19 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 
     /// Notify a modification to a light present in scene attribute
     void Scene_modifyLight( Scene *scene, Light *l, LightAttribute la );
+
+// ##########################################################################3
+    /*
+//      Static objects
+    /// Add a static object to the current scene
+    void Scene_addStaticObject( Scene *scene, StaticObject *so );
+
+    /// Remove a static object
+    void Scene_removeStaticObject( Scene *scene, int index );
+
+    /// Build the scene static objects' VBO (call when all Statics are added)
+    void Scene_buildStaticObjects( Scene *scene );
+    */
 
 
 #endif // BYTE_SCENE

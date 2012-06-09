@@ -6,6 +6,8 @@
 #include "game.h"
 #include "json/cJSON.h"
 
+SimpleArrayDef( Sprite, Sprites )
+
 void Sprite_cpy( Sprite *dst, const Sprite *src ) {
     if( dst && src ) {
         memcpy( dst, src, sizeof(Sprite) );
@@ -25,7 +27,7 @@ bool Sprite_load( Sprite *s, const char *file ) {
     if( s && file ) {
         // read and parse json file
         Byte_ReadFile( &json_file, file );
-        check( json_file, "Error while loading entity!\n" );
+        check( json_file, "Error while loading sprite!\n" );
 
         root = cJSON_Parse( json_file );
         check( root, "JSON parse error [%s] before :\n%s\n", file, cJSON_GetErrorPtr() );

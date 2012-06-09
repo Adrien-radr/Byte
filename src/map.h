@@ -11,6 +11,10 @@
 #define lmap_height 84   // Must be divisible by 2(int)
 #define lmap_size (lmap_width*lmap_height)
 
+#define wmap_width 5
+#define wmap_height 5
+#define wmap_size (wmap_width*wmap_height)
+
 extern const int tile_w;        ///< Tile width
 extern const int tile_h;        ///< Tile height
 extern const int tile_hw;       ///< Tile half width
@@ -26,7 +30,6 @@ typedef enum {
 
 typedef struct {
     u32     walkable;           ///< Flag of each edge walkability
-    //bool    walkable[4];        ///< Can walk in dir ? { NW, NE, SW, SE }
 } MapTile;
 
 typedef struct {

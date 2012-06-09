@@ -3,6 +3,10 @@
 #include "common.h"
 #include "vector.h"
 
+// Definition of common array types
+SimpleArrayDef( u32, u32 )
+SimpleArrayDef( vec2, vec2 )
+SimpleArrayDef( vec2i, vec2i )
 
 // Definitions of common.h
 const char DateFmt[] = "%a %d %b %Y";

@@ -24,6 +24,8 @@ typedef struct {
     int     used_sprite;        ///< Sprite ID in scene (-1 if none)
 } Sprite;
 
+// Array SpritesArray with Sprite data type
+SimpleArrayDecl( Sprite, Sprites )
 
 /// Copy a Sprite in another (only textures/sizes references)
 void Sprite_cpy( Sprite *dst, const Sprite *src );

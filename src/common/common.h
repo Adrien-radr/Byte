@@ -128,13 +128,14 @@ typedef enum {
 //      Mesh_bind( i&m_arr->data[index] );
 //      StringArray_destroy( &str_arr );
 //  }
-#   define Array( type, name )                                                  \
-    typedef struct {                                                            \
+#   define ArrayStruct( type, name ) \
+    typedef struct s_##name##Array {                                            \
         type    *data;                                                          \
         u32     cpt;                                                            \
         u32     size;                                                           \
-    } name##Array;                                                              \
-                                                                                \
+    } name##Array;                                                              
+
+#   define Array( type, name )                                                  \
     bool name##Array_init( name##Array *arr, u32 size ) {                       \
         arr->data = byte_alloc( size * sizeof( type ) );                        \
         check_mem( arr->data );                                                 \
@@ -157,13 +158,12 @@ typedef enum {
     }                                                                           \
 
 
-
-#   define SimpleArray( type, name )                                            \
-    Array( type, name )                                                         \
-                                                                                \
+#   define SimpleArrayFuncs( type, name ) \
     void name##Array_destroy( name##Array *arr ) {                              \
-        if( arr )                                                               \
+        if( arr ) {                                                             \
             DEL_PTR( arr->data );                                               \
+            arr->cpt = 0;                                                       \
+        }                                                                       \
     }                                                                           \
                                                                                 \
     void name##Array_clear( name##Array *arr ) {                                \
@@ -173,10 +173,7 @@ typedef enum {
         }                                                                       \
     }
 
-
-#   define HeapArray( type, name, destructionFunc )                             \
-    Array( type, name )                                                         \
-                                                                                \
+#   define HeapArrayFuncs( type, name, destructionFunc ) \
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr ) {                                                             \
             for( int i = 0; i < arr->cpt; ++i )                                 \
@@ -185,8 +182,44 @@ typedef enum {
         DEL_PTR( arr->data );                                                   \
     }
 
-// #############################################################################
 
+//      ONLY DEFINITIONS
+
+#   define SimpleArray( type, name )                                            \
+        ArrayStruct( type, name ) \
+        Array( type, name )                                                     \
+        SimpleArrayFuncs( type, name ) 
+
+#   define HeapArray( type, name, destructionFunc )                             \
+        ArrayStruct( type, name ) \
+        Array( type, name )                                                     \
+        HeapArrayFuncs( type, name, destructionFunc ) 
+
+//      DECLARATIONS / DEFINITIONS
+#   define ArrayDecl( type, name ) \
+        ArrayStruct( type, name ) \
+        bool name##Array_init( name##Array *arr, u32 size ); \
+        bool name##Array_checkSize( name##Array *arr ); 
+
+#   define SimpleArrayDecl( type, name ) \
+        ArrayDecl( type, name ) \
+        void name##Array_destroy( name##Array *arr ); \
+        void name##Array_clear( name##Array *arr ); 
+
+#   define HeapArrayDecl( type, name ) \
+        ArrayDecl( type, name ) \
+        void name##Array_destroy( name##Array *arr );
+
+#   define SimpleArrayDef( type, name ) \
+        Array( type, name )                                                     \
+        SimpleArrayFuncs( type, name ) 
+
+#   define HeapArrayDef( type, name, destructionFunc )                          \
+        Array( type, name )                                                     \
+        HeapArrayFuncs( type, name, destructionFunc ) 
+
+
+// #############################################################################
 
 // #############################################################################
 //      MATH
@@ -242,5 +275,11 @@ typedef enum {
     int PointOnLinei( const vec2i *p, const vec2i *A, const vec2i *B );
 
 // #############################################################################
+
+
+// common Arrays declatations
+SimpleArrayDecl( u32, u32 )
+SimpleArrayDecl( vec2, vec2 )
+SimpleArrayDecl( vec2i, vec2i )
 
 #endif // COMMON_H
