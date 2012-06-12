@@ -11,67 +11,81 @@
 //          SCENE MAP
 
 /// Local function. Initialize the scene map
-void SceneMap_init( Scene *scene, SceneTile *tile ) {
-    // buffer positions ( 4 vertices for each map tile )
-    vec2 map_pos[4*lmap_size];
+void SceneMap_init( Scene *scene, WorldTile *tile ) {
+    static const int tx_off = 2 * lmap_width * lmap_height/2 * 4;
+    static const int ti_off = 2 * lmap_width * lmap_height/2 * 6;
+
+    // buffer positions ( 4 vertices for each map tile; 9 world tiles )
+    vec2 map_pos[9*4*lmap_size];
     // buffer tex coordinates ( 4 for each tile )
-    vec2 map_tcs[4*lmap_size];
+    vec2 map_tcs[9*4*lmap_size];
     // drawing indices ( 2 triangles(3verts) for each tile )
-    u32  map_indices[6*lmap_size];
+    u32  map_indices[9*6*lmap_size];
 
     // vertex position offsets
     int x_offset, y_offset;  
 
     // Scene Tile offset (absolute offset to given tile)
-    int stx_offset = tile->map.location.x * lmap_width * tile_w;
-    int sty_offset = tile->map.location.y * lmap_height/2 * tile_h;
+    int stx_offset;
+    int sty_offset;
 
     // arrays indices offsets ( xi and yj for pos and tcs offsets,
     int xi, yj, ii, ij;      // ii and ij for indices               )
+    int xt, yt, it, jt;      // xt and yt for the tiles (x,y)
      
 
-    // create map mesh data
-    for( int j = 0; j < lmap_height/2; ++j )
-        for( int i = 0; i < 2*lmap_width; ++i ) {
-            x_offset = stx_offset + i * 50.f;
-            y_offset = sty_offset + j * 50.f + (i&1) * 25.f;
+    // create map mesh data for 3x3 world tiles
+    for( int y = 0; y < 3; ++y ) {
+        sty_offset = (tile->location.y + y) * lmap_height/2 * tile_h;
+        yt = y * 3 * tx_off;
+        jt = y * 3 * ti_off;
+        for( int x = 0; x < 3; ++x ) {
+            stx_offset = (tile->location.x + x) * lmap_width * tile_w;
+            xt = x * tx_off;
+            it = x * ti_off;
+            for( int j = 0; j < lmap_height/2; ++j )
+                for( int i = 0; i < 2*lmap_width; ++i ) {
+                    x_offset = stx_offset + i * tile_hw;
+                    y_offset = sty_offset + j * tile_h + (i%2==0? 0.f : tile_hh);
 
-            // i * 4 : 4 vertices for each tile
-            xi = i * 4;
-            // j * 2 : each row index is a col of 2 tiles 
-            // LOCAL_MAP_WIDTH * 4 : 4 vertices for a complete row of tiles
-            yj = j * 2 * lmap_width * 4;
-            map_pos[yj+xi+0].x = x_offset + 50.f;
-            map_pos[yj+xi+0].y = y_offset + 50.f;
-            map_pos[yj+xi+1].x = x_offset;
-            map_pos[yj+xi+1].y = y_offset + 25.f;
-            map_pos[yj+xi+2].x = x_offset + 50.f;
-            map_pos[yj+xi+2].y = y_offset;
-            map_pos[yj+xi+3].x = x_offset + 100.f;
-            map_pos[yj+xi+3].y = y_offset + 25.f; 
+                    // i * 4 : 4 vertices for each tile
+                    xi = xt + i * 4;
+                    // j * 2 : each row index is a col of 2 tiles 
+                    // LOCAL_MAP_WIDTH * 4 : 4 vertices for a complete row of tiles
+                    yj = yt + j * 2 * lmap_width * 4;
+                    map_pos[yj+xi+0].x = x_offset + tile_hw;
+                    map_pos[yj+xi+0].y = y_offset + tile_h;
+                    map_pos[yj+xi+1].x = x_offset;
+                    map_pos[yj+xi+1].y = y_offset + tile_hh;
+                    map_pos[yj+xi+2].x = x_offset + tile_hw;
+                    map_pos[yj+xi+2].y = y_offset;
+                    map_pos[yj+xi+3].x = x_offset + tile_w;
+                    map_pos[yj+xi+3].y = y_offset + tile_hh; 
 
-            map_tcs[yj+xi+0].x = 0.5f;     map_tcs[yj+xi+0].y = 1.f;
-            map_tcs[yj+xi+1].x = 0.f;     map_tcs[yj+xi+1].y = 0.5f;
-            map_tcs[yj+xi+2].x = 0.5f;     map_tcs[yj+xi+2].y = 0.f;
-            map_tcs[yj+xi+3].x = 1.f;     map_tcs[yj+xi+3].y = 0.5f;
+                    map_tcs[yj+xi+0].x = 0.5f;     map_tcs[yj+xi+0].y = 1.f;
+                    map_tcs[yj+xi+1].x = 0.f;     map_tcs[yj+xi+1].y = 0.5f;
+                    map_tcs[yj+xi+2].x = 0.5f;     map_tcs[yj+xi+2].y = 0.f;
+                    map_tcs[yj+xi+3].x = 1.f;     map_tcs[yj+xi+3].y = 0.5f;
 
-            ii = i * 6;
-            ij = j * 2 * lmap_width * 6;
-            map_indices[ij+ii+0] = yj+xi+0;
-            map_indices[ij+ii+1] = yj+xi+2;
-            map_indices[ij+ii+2] = yj+xi+1;
-            map_indices[ij+ii+3] = yj+xi+0;
-            map_indices[ij+ii+4] = yj+xi+3;
-            map_indices[ij+ii+5] = yj+xi+2;
+                    ii = it + i * 6;
+                    ij = jt + j * 2 * lmap_width * 6;
+                    map_indices[ij+ii+0] = yj+xi+0;
+                    map_indices[ij+ii+1] = yj+xi+2;
+                    map_indices[ij+ii+2] = yj+xi+1;
+                    map_indices[ij+ii+3] = yj+xi+0;
+                    map_indices[ij+ii+4] = yj+xi+3;
+                    map_indices[ij+ii+5] = yj+xi+2;
+                }
         }
+    }
 
     // create mesh 
-    tile->map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
-    Renderer_setDynamicMeshData( tile->map.mesh, (f32*)map_pos, sizeof(map_pos), (f32*)map_tcs, sizeof(map_tcs), map_indices, sizeof(map_indices) );
+    scene->map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
+    Renderer_setDynamicMeshData( scene->map.mesh, (f32*)map_pos, sizeof(map_pos), (f32*)map_tcs, sizeof(map_tcs), map_indices, sizeof(map_indices) );
 
  
     // get shader and texture
-    tile->map.texture = ResourceManager_get( "pierre.png" );
+    scene->map.texture = ResourceManager_get( "pierre.png" );
 }
 /*
 void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red ) {
@@ -109,25 +123,37 @@ inline vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
     return Map_globalToIso( &global );
 }
 
+/*
 inline SceneTile *Scene_getTile( Scene *scene, u32 x, u32 y  ) {
     if( x < 3 && y < 3 )
         return &scene->tiles[y*3+x];
     return NULL;
 }
+*/
+void Scene_setLocation( Scene *scene, u32 x, u32 y ) {
+    if( x >= (wmap_width-2) || y >= (wmap_height-2) )
+        return;
 
-void Scene_loadWorldTile( Scene *scene, u32 wx, u32 wy, u32 sx, u32 sy ) {
-    WorldTile *wt = World_getTile( game->world, wx, wy );
-    SceneTile *st = Scene_getTile( scene, sx, sy );
+    // initialize map as a concatenation of a 3x3 world-tiles centered
+    // on (x+1, y+1)
+    WorldTile *wt = World_getTile( game->world, x, y );
 
-    // TODO : make st load wt actors/map/etc
-    // for now, just create map for this tile.
-    SceneMap_init( scene, st );
+    // set location and global location of newly loaded frame
+    scene->map.location = (vec2i){ x,y };
+    scene->map.global_loc = (vec2i){ x*lmap_width*2, y*lmap_height/2 };
 
-    // load all agents 
-    for( u32 i = 0; i < wt->agents->mCount; ++i ) {
-        Agent *a = World_getGlobalAgent( game->world, i );
-        Scene_addAgentSprite( scene, a );
-    }
+
+    SceneMap_init( scene, wt );
+
+    // load all agents from the 3x3 world tiles 
+    for( int y = 0; y < 3; ++y )
+        for( int x = 0; x < 3; ++x ) {
+            WorldTile *t = World_getTile( game->world, x, y );
+            for( u32 i = 0; i < t->agents->mCount; ++i ) {
+                Agent *a = World_getGlobalAgent( game->world, i );
+                Scene_addAgentSprite( scene, a );
+            }
+        }
 }
 
 
@@ -182,15 +208,8 @@ bool Scene_init( Scene **sp ) {
 
     s->ui_shader = ws;
 
-    // map
-        //SceneMap_init( s );
-        // Initialize Scene Tiles
-        for( int i = 0;i < 3; ++i )
-            for( int j = 0;j < 3; ++j )
-                s->tiles[j*3+i].map.location = (vec2i){ i, j };
-
-        // map shader
-        s->map_shader = ResourceManager_get( "map_shader.json" );
+    // map shader
+    s->map_shader = ResourceManager_get( "map_shader.json" );
 
     // camera
         s->camera = Camera_new();
@@ -302,13 +321,13 @@ void Scene_render( Scene *pScene ) {
             Shader_sendFloat( "light_power", light_powers[power_index] );
 
         // loop on all scene tiles
-        for( int i = 0; i < 9; ++i ) {
-            Renderer_useTexture( pScene->tiles[i].map.texture, 0 );
+        //for( int i = 0; i < 9; ++i ) {
+            Renderer_useTexture( pScene->map.texture, 0 );
             mat3 m;
             mat3_identity( &m );
             Shader_sendMat3( "ModelMatrix", &m );
-            Renderer_renderMesh( pScene->tiles[i].map.mesh );
-        }
+            Renderer_renderMesh( pScene->map.mesh );
+        //}
 
 
         // ##################################################

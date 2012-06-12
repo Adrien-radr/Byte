@@ -3,12 +3,14 @@
 
 #include "common/common.h"
 
-#define WORLD_MAP_SIZE  10
+// Starting position on map
+#define wmap_initX 0
+#define wmap_initY 0
 
 // Width and Height of local and world maps
 // You got a nice quad if height = 3 * width + width/2
-#define lmap_width 24    // Can be any size
-#define lmap_height 84   // Must be divisible by 2(int)
+#define lmap_width 8     // Can be any size                         24
+#define lmap_height 28   // Must be divisible by 2(int)             84
 #define lmap_size (lmap_width*lmap_height)
 
 #define wmap_width 5
@@ -29,15 +31,20 @@ typedef enum {
 } MapDirection;
 
 typedef struct {
-    u32     walkable;           ///< Flag of each edge walkability
+    u32     walkable;       ///< Flag of each edge walkability
 } MapTile;
 
 typedef struct {
-    MapTile    tiles[lmap_size];
+    MapTile     *tiles;     ///< Array of all map tiles
+
+    vec2i       size;       ///< Size of map (width,height)
 } Map;
 
-/// Initialize map tiles to all be walkable (what else?)
-void Map_init( Map *map );
+/// Initialize map to the given size (all walkable by def)
+void Map_init( Map *map, u32 width, u32 height );
+
+// free the given map's tiles
+void Map_destroy( Map *map );
 
 /// Set the direction(s) from a tile walkable or not
 void Map_setWalkable( Map *map, const vec2i *tile, MapDirection dir, bool walkable );
@@ -53,6 +60,9 @@ vec2  Map_isoToGlobal( const vec2i *tile );
 
 /// Returns the iso tile under a global position
 vec2i Map_globalToIso( const vec2 *pos );
+
+/// Returns the world tile inside which the given location is
+vec2i Map_globalToWorld( const vec2i *loc );
 
 // ##################################################################
 //      A STAR Pathfinding

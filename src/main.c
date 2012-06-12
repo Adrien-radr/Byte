@@ -20,7 +20,7 @@ Light lights[3];
 
 void mousecb( const Event *e, void *data ) {
     if( e->type == EMouseReleased ) {
-        if( e->button == MB_Right ) {
+        if( e->button == MB_Left ) {
             vec2i dest = Scene_screenToIso( game->scene, &e->v );
 
             // create path
@@ -32,14 +32,10 @@ void mousecb( const Event *e, void *data ) {
                 up_time = 0.f;
             }
 
-            //p = Map_createPath( &game->world->local_map, &a0->location, &dest );
+            p = Map_createPath( &game->world->active_map, &a0->location, &dest );
 
             //printf( "Path creation time : %f\n", Game_getElapsedTime() - begin );
-        } else if( e->button == MB_Left ) {
-            //bool walkable = Map_isWalkable( &game->world->local_map, &game->mouse_tile, (NW|NE|SW|SE) );
-            //SceneMap_redTile( game->scene, &game->mouse_tile, walkable );
-            //Map_setWalkable( &game->world->local_map, &game->mouse_tile, (NW|NE|SW|SE), !walkable );
-        }
+        } 
     }
 }
 

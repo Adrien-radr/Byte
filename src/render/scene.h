@@ -21,13 +21,15 @@ typedef struct {
     u32     mesh;
     u32     texture;
 
-    vec2i   location;                   ///< Tile location [0..2]^2
+    vec2i   location;                   ///< Location of the upper-left tile
+                                        ///< as a world-tile
+    vec2i   global_loc;                 ///< Same but as a global regular tile.
 } SceneMap;
 
 typedef struct {
     SceneMap            map;
-    Mesh                *walls;
-    StaticObjectArray   *wall_objs;
+    //Mesh                *walls;
+    //StaticObjectArray   *wall_objs;
 } SceneTile;
 
 /// Scene structure. Keep all info about rendering in the current view
@@ -56,7 +58,9 @@ typedef struct {
     //Mesh            *walls;
     //StaticObjectArray *wall_objs;
 
-    SceneTile       tiles[9];           ///< 9 Scene Tiles
+    SceneMap        map;
+
+    //SceneTile       tiles[9];           ///< 9 Scene Tiles
                                         ///< one for current player pos.
                                         ///< 8 for surrounding ones
 } Scene;
@@ -81,10 +85,11 @@ void Scene_render( Scene *pScene );
 void Scene_updateShadersProjMatrix( Scene *pScene );
 
 /// Returns the SceneTile at (i,j) coordinates, if present
-SceneTile *Scene_getTile( Scene *scene, u32 x, u32 y );
+//SceneTile *Scene_getTile( Scene *scene, u32 x, u32 y );
 
-/// Load the (i,j) WorldTile into the (k,l) SceneTile
-void Scene_loadWorldTile( Scene *scene, u32 wx, u32 wy, u32 sx, u32 sy );
+/// Load a 3x3 world-tiles centered on (x+1,y+1) to be considered as the current scene
+/// It will load the map geometry and all agents and statics as sprites.
+void Scene_setLocation( Scene *scene, u32 x, u32 y );
 
 // ##########################################################################3
 //      Scene Map

@@ -18,7 +18,10 @@ Byte-Project : TODO File
 + Remove DEVICE and put its stuff in GAME
 + make camera zoom following fixed step zoom levels
 
-+ Animation system (sprite frames)
+    Animation System
+    -----------------
+    + Basic system (load anims as frames on a texture atlas)
+    - Linear movement between tiles (ie. during walk anim)
 
     Map System
     ----------
@@ -31,6 +34,10 @@ Byte-Project : TODO File
         - actors collision (even in-route)
         - actors movement prediction
         - group movement (squad with leader; with flocking?)
+    + World-Tiles -- Scene-Tiles system
+    + Scene-Tiles as a concatenation of a 3x3 world-tiles(for pathfinding)
+    + Transition between world tiles during pathfinding
+    - Recreation of the Scene Tile when the player move to another tile
 
     Scene Managment
     ---------------

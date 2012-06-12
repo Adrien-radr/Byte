@@ -8,24 +8,29 @@
 #include "map.h"
 #include "event.h"
 
-/// Tile of the world, a tile is a squared region of the whole world.
+/// A tile is a squared region of the whole world.
 /// It can contain agents, static objects and lights, and is represented 
 /// visually by a SceneTile (scene.h)
 typedef struct {
     HandleManager   *agents;
     Map             map;
+
+    vec2i           location;   ///< Absolute location of world tile
+    bool            is_active;  ///< True if this tile is currently in active_map
 } WorldTile;
 
 
-void WorldTile_init( WorldTile *t );
+void WorldTile_init( WorldTile *t, u32 x, u32 y );
 void WorldTile_destroy( WorldTile *t );
 
 /// World contains info about every agents and static objects of the game. Also contains the world map and the current local map
 typedef struct {
-    HandleManager   *agents;        ///< World agents, Actual Agent data stored here. Referenced in WorldTiles.
-    //Map             local_map;      ///< World local map
+    HandleManager   *agents;            ///< World agents, Actual Agent data stored here. Referenced in WorldTiles.
 
-    WorldTile       tiles[wmap_size];  ///< World tiles
+    WorldTile       tiles[wmap_size];   ///< World tiles
+
+    vec2i           active_map_loc;     ///< Location of the topleft tile of active_map
+    Map             active_map;         ///< Currently active map (3x3 centered on PL)
 } World;
 
 
@@ -40,6 +45,10 @@ void World_receiveEvent( World *w, const Event *event );
 
 /// Returns the WorldTile present at (i,j) coordinates (if present)
 WorldTile *World_getTile( World *w, u32 x, u32 y );
+WorldTile *World_getTilev( World *w, const vec2i *loc );
+
+/// Sets the active map location ((x,y) is the top-left corner of the 3x3 window
+void World_activeMapLocation( World *w, u32 x, u32 y );
 
 /// Load an agent in the World Agents array
 /// Add its reference to the world tile located at the given position

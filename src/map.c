@@ -7,33 +7,43 @@ const int tile_h = 50;
 const int tile_hw = 50;
 const int tile_hh = 25;
 
-void Map_init( Map *map ) {
+void Map_init( Map *map, u32 width, u32 height ) {
     if( map ) {
-        // map init : all tiles are walkable from everywhere
-        for( int i = 0; i < lmap_size; ++i ) {
-            map->tiles[i].walkable = (NW|NE|SW|SE);
+        if( map->size.x != width || map->size.y != height ) {
+            map->tiles = byte_realloc( map->tiles, width * height * sizeof(MapTile) );
+            map->size = (vec2i) { width, height };
+        
+            // map init : all tiles are walkable from everywhere
+            for( int i = 0; i < width*height; ++i ) {
+                map->tiles[i].walkable = (NW|NE|SW|SE);
+            }
         }
     }
 }
 
+inline void Map_destroy( Map *map ) {
+    if( map )
+        DEL_PTR( map->tiles );
+}
+
 inline void Map_setWalkable( Map *map, const vec2i *tile, MapDirection dir, bool walkable ) {
-    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < lmap_width*2 && tile->y < lmap_height/2 ) {
+    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < map->size.x*2 && tile->y < map->size.y/2 ) {
 
         // if we want the flags in dir to be walkable (walkable==true),
         //   we do a bitwise OR between dir and the current walkable flag;
         // if we want them to not be walbale (walkable==false),
         //   we do a bitwise AND between NOT dir and the current walkable flag;
-        map->tiles[tile->y*2*lmap_width+tile->x].walkable = 
-            walkable ? dir | map->tiles[tile->y*2*lmap_width+tile->x].walkable :
-                      ~dir & map->tiles[tile->y*2*lmap_width+tile->x].walkable; 
+        map->tiles[tile->y*2*map->size.x+tile->x].walkable = 
+            walkable ? dir | map->tiles[tile->y*2*map->size.x+tile->x].walkable :
+                      ~dir & map->tiles[tile->y*2*map->size.x+tile->x].walkable; 
     } 
 }
 
 inline bool Map_isWalkable( const Map *map, const vec2i *tile, MapDirection dir ) {
-    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < lmap_width*2 && tile->y < lmap_height/2 ) 
+    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < map->size.x*2 && tile->y < map->size.y/2 ) 
         // the directions defined by dir are walkable if dir AND current flag
         // result in dir. (all flags in dir are also in current flag)
-        return dir == ( dir & map->tiles[tile->y*2*lmap_width+tile->x].walkable );
+        return dir == ( dir & map->tiles[tile->y*2*map->size.x+tile->x].walkable );
 
     // if out of map : false
     return false;
@@ -84,6 +94,10 @@ vec2i Map_globalToIso( const vec2 *global ) {
     return ret;
 }
 
+vec2i Map_globalToWorld( const vec2i *loc ) {
+    return (vec2i){ loc->x / (lmap_width*2), 
+                    loc->y / (lmap_height/2) };
+}
 
 
 // ##################################################################

@@ -211,10 +211,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
 
     // Initialize scene tiles to upper left world
-    for( int y = 0; y < 3; ++y )
-        for( int x = 0; x < 3; ++x ) 
-            Scene_loadWorldTile( game->scene, x,y,x,y );
-
+    Scene_setLocation( game->scene, wmap_initX, wmap_initY );
 
 
     Font *f = Font_get( "DejaVuSans.ttf", 12 );

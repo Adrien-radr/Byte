@@ -10,9 +10,9 @@ Camera *Camera_new() {
 
     c = byte_alloc( sizeof( Camera ) );
 
-    c->mSpeed = 4.f;
-    c->mZoomX = 0;
+    c->mZoomX = 2;
     c->mZoom = zoom_levels[c->mZoomX];
+    c->mSpeed = 4.f * zoom_levels[c->mZoomX];
     c->mZoomSpeed = .05f;
     c->mZoomMax = 1.f;
     c->mZoomMin = .75f;
