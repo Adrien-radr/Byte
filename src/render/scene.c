@@ -80,7 +80,9 @@ void SceneMap_init( Scene *scene, WorldTile *tile ) {
     }
 
     // create mesh 
-    scene->map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
+    if( 0 == scene->map.mesh )
+        scene->map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
+
     Renderer_setDynamicMeshData( scene->map.mesh, (f32*)map_pos, sizeof(map_pos), (f32*)map_tcs, sizeof(map_tcs), map_indices, sizeof(map_indices) );
 
  
@@ -138,22 +140,69 @@ void Scene_setLocation( Scene *scene, u32 x, u32 y ) {
     // on (x+1, y+1)
     WorldTile *wt = World_getTile( game->world, x, y );
 
-    // set location and global location of newly loaded frame
-    scene->map.location = (vec2i){ x,y };
-    scene->map.global_loc = (vec2i){ x*lmap_width*2, y*lmap_height/2 };
+    // tile movement. dx and dy should be -1, 0 or 1. 
+    // if dx is 0, then dy is 1 or -1, and inversely
+    int dx = (int)x - scene->map.location.x;
+    int dy = (int)y - scene->map.location.y;
 
 
-    SceneMap_init( scene, wt );
+    if( scene->map.location.x >= 0 ) {  // test if NOT initialization
+        if( (dx && dy) || (!dx && !dy) ) {
+            log_err( "Made an impossible SceneMap location deplacement!!" )
+            return; 
+        }
 
-    // load all agents from the 3x3 world tiles 
-    for( int y = 0; y < 3; ++y )
-        for( int x = 0; x < 3; ++x ) {
-            WorldTile *t = World_getTile( game->world, x, y );
+        // Remove all agents from the 3 removed world tiles
+        for( int i = 0; i < 3; ++i ) {
+            // find removed row : - if delta is >0, rem 1 to val, if <0, add 3 to it
+            //                    ==> remove left row if going right, and inversely
+            //                    - then iterate on the unchanged axis
+            int tx = x + (dx? (dx>0? -1:3):0) + (dy? i:0);
+            int ty = y + (dy? (dy>0? -1:3):0) + (dx? i:0);
+
+            WorldTile *t = World_getTile( game->world, tx, ty );
+
             for( u32 i = 0; i < t->agents->mCount; ++i ) {
-                Agent *a = World_getGlobalAgent( game->world, i );
+                Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
+                Scene_removeSprite( scene, a->sprite.used_sprite );
+                a->sprite.used_sprite = -1;
+            }
+
+            // find added row : - if delta is >0, add 3 to val, if <0, rem 1 to it
+            //                  - iterate on the unchanged axis
+            tx = x + (dx? (dx>0? 3:-1):0) + (dy? i:0);
+            ty = y + (dy? (dy>0? 3:-1):0) + (dx? i:0);
+
+            t = World_getTile( game->world, tx, ty );
+
+            for( u32 i = 0; i < t->agents->mCount; ++i ) {
+                Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
+
                 Scene_addAgentSprite( scene, a );
             }
         }
+    } else {
+        // if initialization, just add the agents on the 3x3 tiles at (x,y)
+        for( int j = 0; j < 3; ++j ) 
+            for( int i = 0; i < 3; ++i ) {
+                WorldTile *t = World_getTile( game->world, x+i, y+j );
+                for( u32 i = 0; i < t->agents->mCount; ++i ) {
+                    Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
+
+                    Scene_addAgentSprite( scene, a );
+                }
+
+            }
+    }
+
+
+    // Recreate the scene map geometry
+    SceneMap_init( scene, wt );
+
+
+    // set location and global location of newly loaded frame
+    scene->map.location = (vec2i){ x,y };
+    scene->map.global_loc = (vec2i){ x*lmap_width*2, y*lmap_height/2 };
 }
 
 
@@ -238,6 +287,9 @@ bool Scene_init( Scene **sp ) {
     // Static Objects
     //s->walls = NULL;
     //s->wall_objs = StaticObjectArray_init( 100 );
+
+    // map init
+    s->map.location = (vec2i){ -1, -1 };
 
 
     return true;

@@ -64,6 +64,9 @@ vec2i Map_globalToIso( const vec2 *pos );
 /// Returns the world tile inside which the given location is
 vec2i Map_globalToWorld( const vec2i *loc );
 
+/// Returns the global map tile at the top-left corner of the given world tile
+vec2i Map_worldToGlobal( const vec2i *loc );
+
 // ##################################################################
 //      A STAR Pathfinding
 //

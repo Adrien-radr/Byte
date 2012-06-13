@@ -32,10 +32,15 @@ void mousecb( const Event *e, void *data ) {
                 up_time = 0.f;
             }
 
+            /* TODO : when moving the 3x3 window, Pathfinder dont take into acount
+                        the offset. It calculated always with (0,0) as the top-left :*/
             p = Map_createPath( &game->world->active_map, &a0->location, &dest );
 
             //printf( "Path creation time : %f\n", Game_getElapsedTime() - begin );
-        } 
+        } else if( e->button == MB_Right ) {
+            World_activeMapLocation( game->world, 1, 0 );
+            Scene_setLocation( game->scene, 1, 0 );
+        }
     }
 }
 

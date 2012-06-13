@@ -99,6 +99,10 @@ vec2i Map_globalToWorld( const vec2i *loc ) {
                     loc->y / (lmap_height/2) };
 }
 
+vec2i Map_worldToGlobal( const vec2i *loc ) {
+    return (vec2i){ loc->x * lmap_width * 2,
+                    loc->y * lmap_height/2  };
+}
 
 // ##################################################################
 //      A STAR Pathfinding
