@@ -37,7 +37,7 @@ Byte-Project : TODO File
     + World-Tiles -- Scene-Tiles system
     + Scene-Tiles as a concatenation of a 3x3 world-tiles(for pathfinding)
     + Transition between world tiles during pathfinding
-    - Recreation of the Scene Tile when the player move to another tile
+    + Recreation of the Scene Tile when the player move to another tile
 
     Scene Managment
     ---------------

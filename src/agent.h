@@ -9,7 +9,10 @@ typedef struct {
             lastname,   ///< Last name    (optional)
             surname;    ///< Alias/pseudo (optional)
 
-    vec2i   location;   ///< Location on map (tile)
+    vec2i   location;   ///< Location as absolute map tile
+    vec2i   world_tile; ///< Location as world tile
+
+    u32     world_id;   ///< ID in world storage
 
 
 

@@ -89,7 +89,7 @@ void Scene_updateShadersProjMatrix( Scene *pScene );
 
 /// Load a 3x3 world-tiles centered on (x+1,y+1) to be considered as the current scene
 /// It will load the map geometry and all agents and statics as sprites.
-void Scene_setLocation( Scene *scene, u32 x, u32 y );
+void Scene_setLocation( Scene *scene, int x, int y );
 
 // ##########################################################################3
 //      Scene Map

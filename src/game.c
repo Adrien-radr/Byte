@@ -290,27 +290,28 @@ void Game_run() {
 
         // check for game termination
         if( IsKeyUp( K_Escape ) || !Context_isWindowOpen() )
-            goto end;
+            break;
 
-
+        
+        // update events and inputs
         EventManager_update();
 
         // GAMEPLAY
             phy_update += frame_t;
             one_sec += frame_t;
 
-            // callback. return false immediatly if frame_func said it
+            // custom frame callback. return false immediatly if frame_func said it
             if( game->frame_func && !game->frame_func( frame_t ) )
-                goto end;
+                break;
 
             // AI GAMEPLAY LOOP (fixed at 1/phy_dt FPS)
             while( phy_update >= phy_dt ) {
                 Scene_update( game->scene, phy_dt, game->mode );
-                // WORLD UPDATE !
+                /* TODO : WORLD UPDATE ! */
                 phy_update -= phy_dt;
             }
 
-            // EACH 1 SECOND STUFF
+            // EACH 1 SECOND STUFF, (temp stuff)
             if( one_sec >= 1.f ) {
                 str32 fps_str;
                 snprintf( fps_str, 32, "FPS : %4.0f", (1.f/frame_t) );
@@ -328,10 +329,7 @@ void Game_run() {
         frame_t = Clock_getElapsedTime( &game->clock ) - start_t;
     }
 
-    
-
-end:
-    // End game
+    // End game and free RAM/VRAM resources
     Game_destroy();
 }
 

@@ -48,7 +48,7 @@ WorldTile *World_getTile( World *w, u32 x, u32 y );
 WorldTile *World_getTilev( World *w, const vec2i *loc );
 
 /// Sets the active map location ((x,y) is the top-left corner of the 3x3 window
-void World_activeMapLocation( World *w, u32 x, u32 y );
+void World_activeMapLocation( World *w, int x, int y );
 
 /// Load an agent in the World Agents array
 /// Add its reference to the world tile located at the given position
@@ -58,8 +58,11 @@ int World_loadAgent( World *w, const char *file, u32 x, u32 y );
 /// Returns the agent data of a given handle, in the given world tile
 Agent *World_getAgent( World *w, u32 agent_handle, u32 x, u32 y );
 
-// Returns global agent ptr (index in world->agents)
+/// Returns global agent ptr (index in world->agents)
 Agent *World_getGlobalAgent( World *w, u32 agent_handle );
+
+/// Alert that an agent as changed its world_tile
+void World_movedAgent( World *w, u32 agent_handle, const vec2i *from, const vec2i *to );
 
 
 

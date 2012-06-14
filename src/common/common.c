@@ -59,13 +59,13 @@ inline f32 Rad2Deg( const f32 a ) {
 }
 
 
-inline void Clamp( int *x, const int min, const int max ) {
-    *x = *x > max ? max : ( *x < min ? min : *x );
+inline int Clamp( int x, const int min, const int max ) {
+    return x > max ? max : ( x < min ? min : x );
 }
 
 
-inline void Clampf( f32 *x, const f32 min, const f32 max ) {
-    *x = *x > max ? max : ( *x < min ? min : *x );
+inline f32 Clampf( f32 x, const f32 min, const f32 max ) {
+    return x > max ? max : ( x < min ? min : x );
 }
 
 inline int PointOnLinef( const vec2 *p, const vec2 *A, const vec2 *B ) {

@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 1
-#define BYTE_PATCH 8
+#define BYTE_PATCH 9
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -264,10 +264,10 @@ typedef enum {
     f32 Rad2Deg( const f32 a );
 
     /// Clamp the given int between two other
-    void Clamp( int *x, const int min, const int max );
+    int Clamp( int x, const int min, const int max );
 
     /// Clamp the given float between two other
-    void Clampf( f32 *x, const f32 min, const f32 max );
+    f32 Clampf( f32 x, const f32 min, const f32 max );
 
     /// Returns whether a point p is on, under or over a segment AB
     /// @return : 0 if on line, -1 if under, 1 if above.

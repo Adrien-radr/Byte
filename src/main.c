@@ -32,14 +32,10 @@ void mousecb( const Event *e, void *data ) {
                 up_time = 0.f;
             }
 
-            /* TODO : when moving the 3x3 window, Pathfinder dont take into acount
-                        the offset. It calculated always with (0,0) as the top-left :*/
             p = Map_createPath( &game->world->active_map, &a0->location, &dest );
 
             //printf( "Path creation time : %f\n", Game_getElapsedTime() - begin );
         } else if( e->button == MB_Right ) {
-            World_activeMapLocation( game->world, 1, 0 );
-            Scene_setLocation( game->scene, 1, 0 );
         }
     }
 }
@@ -102,7 +98,19 @@ bool frame_callback( f32 frame_time ) {
         // path step
         if( up_time >= 0.15f ) {
             vec2i *next = Map_getPathNode( p, path_index++ );
+
+            vec2i old_wt = (vec2i){ a0->world_tile.x, a0->world_tile.y };
             Agent_setPosition( a0, next );
+
+            // TO BE DONE IN A PLAYER CLASS OR SMTHG
+            // check if player moved to another world tile and update 
+            // 3x3 window frame if he did
+            if( !vec2i_eq( &a0->world_tile, &old_wt ) ) {
+                World_activeMapLocation( game->world, a0->world_tile.x-1, a0->world_tile.y-1 );
+                Scene_setLocation( game->scene, a0->world_tile.x-1, a0->world_tile.y-1 );
+            }
+
+            // move view 
             up_time = 0.f;
         } else
             up_time += frame_time;

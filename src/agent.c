@@ -97,7 +97,16 @@ inline void Agent_setPosition( Agent *a, const vec2i *pos ) {
         // set location
         vec2i_cpy( &a->location, pos );
 
-        // TODO : Check if agent changed its world_tile
+        // check if agent moved to another world tile
+        vec2i new_wt = Map_globalToWorld( pos );
+
+        if( !vec2i_eq( &a->world_tile, &new_wt ) ) {
+            // alert World that this agent as changed its tile
+            World_movedAgent( game->world, a->world_id, &a->world_tile, &new_wt );
+
+            vec2i_cpy( &a->world_tile, &new_wt );
+        }
+
 
         // set sprite position
         Sprite_setPosition( &a->sprite, pos );

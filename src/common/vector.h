@@ -59,5 +59,9 @@ void vec2_normalize( vec2 *A );
 /// Returns the euclidean distance between two points 
 float vec2_dist( const vec2 *A, const vec2 *B );
 
+/// Returns whether or not two vectors are equals
+int vec2_eq( const vec2 *A, const vec2 *B );
+int vec2i_eq( const vec2i *A, const vec2i *B );
+
 
 #endif

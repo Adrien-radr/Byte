@@ -7,14 +7,18 @@ const int tile_h = 50;
 const int tile_hw = 50;
 const int tile_hh = 25;
 
-void Map_init( Map *map, u32 width, u32 height ) {
+void Map_init( Map *map, const vec2i *loc, const vec2i *size ) {
     if( map ) {
-        if( map->size.x != width || map->size.y != height ) {
-            map->tiles = byte_realloc( map->tiles, width * height * sizeof(MapTile) );
-            map->size = (vec2i) { width, height };
+        // change location if needed
+        vec2i_cpy( &map->location, loc );
+
+        // realloc array with new size, if different
+        if( map->size.x != size->x || map->size.y != size->y ) {
+            map->tiles = byte_realloc( map->tiles, size->x * size->y * sizeof(MapTile) );
+            vec2i_cpy( &map->size, size );
         
             // map init : all tiles are walkable from everywhere
-            for( int i = 0; i < width*height; ++i ) {
+            for( int i = 0; i < size->x*size->y; ++i ) {
                 map->tiles[i].walkable = (NW|NE|SW|SE);
             }
         }
@@ -27,23 +31,23 @@ inline void Map_destroy( Map *map ) {
 }
 
 inline void Map_setWalkable( Map *map, const vec2i *tile, MapDirection dir, bool walkable ) {
-    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < map->size.x*2 && tile->y < map->size.y/2 ) {
+    if( map && tile->x >= map->location.x && tile->y >= map->location.y && tile->x < (map->location.x+map->size.x*2) && tile->y < (map->location.y+map->size.y/2) ) {
 
         // if we want the flags in dir to be walkable (walkable==true),
         //   we do a bitwise OR between dir and the current walkable flag;
         // if we want them to not be walbale (walkable==false),
         //   we do a bitwise AND between NOT dir and the current walkable flag;
-        map->tiles[tile->y*2*map->size.x+tile->x].walkable = 
-            walkable ? dir | map->tiles[tile->y*2*map->size.x+tile->x].walkable :
-                      ~dir & map->tiles[tile->y*2*map->size.x+tile->x].walkable; 
+        map->tiles[tile->y*map->size.x+tile->x].walkable = 
+            walkable ? dir | map->tiles[tile->y*map->size.x+tile->x].walkable :
+                      ~dir & map->tiles[tile->y*map->size.x+tile->x].walkable; 
     } 
 }
 
 inline bool Map_isWalkable( const Map *map, const vec2i *tile, MapDirection dir ) {
-    if( map && tile->x >= 0 && tile->y >= 0 && tile->x < map->size.x*2 && tile->y < map->size.y/2 ) 
+    if( map && tile->x >= map->location.x && tile->y >= map->location.y && tile->x < (map->location.x+map->size.x*2) && tile->y < (map->location.y+map->size.y/2) ) 
         // the directions defined by dir are walkable if dir AND current flag
         // result in dir. (all flags in dir are also in current flag)
-        return dir == ( dir & map->tiles[tile->y*2*map->size.x+tile->x].walkable );
+        return dir == ( dir & map->tiles[tile->y*map->size.x+tile->x].walkable );
 
     // if out of map : false
     return false;
@@ -217,6 +221,8 @@ static void pathNodeNeighbors( NeighborList *nl, const Map *map, const vec2i *no
         { node->x + 1, node->y - offset },      // above node
         { node->x - 1, node->y + (1-offset) }   // below node
     }; 
+
+    curr_n = (int)RandomValue(0,4);
 
     if( Map_isWalkable( map, node, md[curr_n] ) )  
         NeighborList_add( nl, &neighbors[curr_n], 1 );
@@ -527,6 +533,7 @@ Path *Map_createPath( const Map *map, const vec2i *start, const vec2i *end ) {
     // check if destination is off-bounds
     if( !Map_isWalkable( map, end, (NW | NE | SW | SE) ) )
         return NULL;
+
 
     NeighborList *nl = NeighborList_init();
     VisitedNodes *vn = VisitedNodes_init();

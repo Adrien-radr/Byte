@@ -84,13 +84,13 @@ inline void Camera_move( Camera *pCamera, vec2 *pVector ) {
 void Camera_zoom( Camera *pCamera, int pZoom ) {
     if( pCamera ) {
         // clamp pZoom (no rapid zoom)
-        Clamp( &pZoom, -1, 1 );
+        pZoom = Clamp( pZoom, -1, 1 );
 
 
         // get new index for zoom_levels array
         int old_x = pCamera->mZoomX;
         pCamera->mZoomX -= pZoom;
-        Clamp( &pCamera->mZoomX, 0, 9 );
+        pCamera->mZoomX = Clamp( pCamera->mZoomX, 0, 9 );
 
         // if change occured, change zoom level and update cam
         if( old_x != pCamera->mZoomX ) {

@@ -37,11 +37,12 @@ typedef struct {
 typedef struct {
     MapTile     *tiles;     ///< Array of all map tiles
 
+    vec2i       location;   ///< Absolute location of Map
     vec2i       size;       ///< Size of map (width,height)
 } Map;
 
 /// Initialize map to the given size (all walkable by def)
-void Map_init( Map *map, u32 width, u32 height );
+void Map_init( Map *map, const vec2i *loc, const vec2i *size );
 
 // free the given map's tiles
 void Map_destroy( Map *map );

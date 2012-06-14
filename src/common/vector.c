@@ -94,3 +94,10 @@ inline float vec2_dist( const vec2 *A, const vec2 *B ) {
     return sqrt( (A->x-B->x)*(A->x-B->x) + (A->y-B->y)*(A->y-B->y) );
 }
 
+inline int vec2_eq( const vec2 *A, const vec2 *B ) {
+    return A->x == B->x && A->y == B->y;
+}
+
+inline int vec2i_eq( const vec2i *A, const vec2i *B ) {
+    return A->x == B->x && A->y == B->y;
+}

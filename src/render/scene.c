@@ -125,63 +125,83 @@ inline vec2i Scene_screenToIso( Scene *scene, const vec2i *local ) {
     return Map_globalToIso( &global );
 }
 
-/*
-inline SceneTile *Scene_getTile( Scene *scene, u32 x, u32 y  ) {
-    if( x < 3 && y < 3 )
-        return &scene->tiles[y*3+x];
-    return NULL;
-}
-*/
-void Scene_setLocation( Scene *scene, u32 x, u32 y ) {
-    if( x >= (wmap_width-2) || y >= (wmap_height-2) )
-        return;
-
-    // initialize map as a concatenation of a 3x3 world-tiles centered
-    // on (x+1, y+1)
-    WorldTile *wt = World_getTile( game->world, x, y );
-
-    // tile movement. dx and dy should be -1, 0 or 1. 
-    // if dx is 0, then dy is 1 or -1, and inversely
-    int dx = (int)x - scene->map.location.x;
-    int dy = (int)y - scene->map.location.y;
+void Scene_setLocation( Scene *scene, int x, int y ) {
+    // Clamp our 3x3 window frame
+    x = Clamp( x, 0, wmap_width-3 );
+    y = Clamp( y, 0, wmap_height-3 );
 
 
-    if( scene->map.location.x >= 0 ) {  // test if NOT initialization
-        if( (dx && dy) || (!dx && !dy) ) {
-            log_err( "Made an impossible SceneMap location deplacement!!" )
-            return; 
-        }
+    if( scene->map.location.x >=0 && !vec2i_eq( &scene->map.location, &(vec2i){x,y} ) ) {  
+        // check if deplacement on X
+        int dx = (int)x - scene->map.location.x;
+        if( dx ) {
+            for( int i = 0; i < 3; ++i ) {
+                // find removed col : - if delta is >0, rem 1 to val, if <0, add 3 to it
+                //                    ==> remove left row if going right, and inversely
+                //                    - then iterate on the unchanged axis
+                int tx = x + (dx>0? -1:3);
+                int ty = y + i;
 
-        // Remove all agents from the 3 removed world tiles
-        for( int i = 0; i < 3; ++i ) {
-            // find removed row : - if delta is >0, rem 1 to val, if <0, add 3 to it
-            //                    ==> remove left row if going right, and inversely
-            //                    - then iterate on the unchanged axis
-            int tx = x + (dx? (dx>0? -1:3):0) + (dy? i:0);
-            int ty = y + (dy? (dy>0? -1:3):0) + (dx? i:0);
+                WorldTile *t = World_getTile( game->world, tx, ty );
 
-            WorldTile *t = World_getTile( game->world, tx, ty );
+                for( u32 i = 0; i < t->agents->mCount; ++i ) {
+                    Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
+                    if( a->sprite.used_sprite >= 0 ) {
+                        Scene_removeSprite( scene, a->sprite.used_sprite );
+                        a->sprite.used_sprite = -1;
+                    }
+                }
 
-            for( u32 i = 0; i < t->agents->mCount; ++i ) {
-                Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
-                Scene_removeSprite( scene, a->sprite.used_sprite );
-                a->sprite.used_sprite = -1;
-            }
+                // find added col : -if delta is >0, add 2 to val, else, we are in added row
+                //                  -iterate on the unchanged axis
+                tx = x + (dx>0? 2:0);
+                ty = y + i;
 
-            // find added row : - if delta is >0, add 3 to val, if <0, rem 1 to it
-            //                  - iterate on the unchanged axis
-            tx = x + (dx? (dx>0? 3:-1):0) + (dy? i:0);
-            ty = y + (dy? (dy>0? 3:-1):0) + (dx? i:0);
+                t = World_getTile( game->world, tx, ty );
 
-            t = World_getTile( game->world, tx, ty );
+                for( u32 i = 0; i < t->agents->mCount; ++i ) {
+                    Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
 
-            for( u32 i = 0; i < t->agents->mCount; ++i ) {
-                Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
-
-                Scene_addAgentSprite( scene, a );
+                    Scene_addAgentSprite( scene, a );
+                }
             }
         }
-    } else {
+
+        // check if deplacement on Y
+        int dy = (int)y - scene->map.location.y;
+        if( dy ) {
+            for( int i = 0; i < 3; ++i ) {
+                // find removed row : - if delta is >0, rem 1 to val, if <0, add 3 to it
+                //                    ==> remove left row if going right, and inversely
+                //                    - then iterate on the unchanged axis
+                int tx = x + i;
+                int ty = y + (dy>0? -1:3);
+
+                WorldTile *t = World_getTile( game->world, tx, ty );
+
+                for( u32 i = 0; i < t->agents->mCount; ++i ) {
+                    Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
+                    if( a->sprite.used_sprite >= 0 ) {
+                        Scene_removeSprite( scene, a->sprite.used_sprite );
+                        a->sprite.used_sprite = -1;
+                    }
+                }
+
+                // find added row : -if delta is >0, add 2 to val, else, we are in added row
+                //                  -iterate on the unchanged axis
+                tx = x + i;
+                ty = y + (dy>0? 2:0);
+
+                t = World_getTile( game->world, tx, ty );
+
+                for( u32 i = 0; i < t->agents->mCount; ++i ) {
+                    Agent *a = World_getGlobalAgent( game->world, HandleManager_getHandle( t->agents, i ) );
+
+                    Scene_addAgentSprite( scene, a );
+                }
+            }
+        }
+    } else if( scene->map.location.x == -1 ){ // initialization case
         // if initialization, just add the agents on the 3x3 tiles at (x,y)
         for( int j = 0; j < 3; ++j ) 
             for( int i = 0; i < 3; ++i ) {
@@ -197,6 +217,7 @@ void Scene_setLocation( Scene *scene, u32 x, u32 y ) {
 
 
     // Recreate the scene map geometry
+    WorldTile *wt = World_getTile( game->world, x, y );
     SceneMap_init( scene, wt );
 
 

@@ -1,12 +1,13 @@
 #include "world.h"
 
 inline void WorldTile_init( WorldTile *w, u32 x, u32 y ) {
-    // init local map
-    Map_init( &w->map, lmap_width, lmap_height );
-
     w->agents = HandleManager_init( 20 );
     w->location = (vec2i){ x, y };
     w->is_active = false;
+
+    // init local map
+    vec2i glob_loc = Map_worldToGlobal( &w->location );
+    Map_init( &w->map, &glob_loc, &(vec2i){ lmap_width, lmap_height } );
 }
 
 inline void WorldTile_destroy( WorldTile *w ) {
@@ -70,24 +71,29 @@ inline WorldTile *World_getTilev( World *w, const vec2i *loc ) {
     return NULL;
 }
 
-void World_activeMapLocation( World *w, u32 x, u32 y ) {
-    if( !w || x >= (wmap_width-2) || y >= (wmap_height-2) )
-        return;
+void World_activeMapLocation( World *w, int x, int y ) {
+    // Clamp our 3x3 window
+    x = Clamp( x, 0, wmap_width-3 );
+    y = Clamp( y, 0, wmap_height-3 );
 
-    // make last active_map's tiles passive (if not initialization)
-    if( w->active_map_loc.x >= 0 )
+
+    // Do this only when map is already initialized (by default, loc.x is -1)
+    if( w->active_map_loc.x >= 0 ) {
+        // make last active_map's tiles passive
         for( int j= 0;j < 3; ++j )
             for( int i= 0;i < 3; ++i ) {
                 WorldTile *t = World_getTile( w, w->active_map_loc.x+i, 
                                                  w->active_map_loc.y+j );
                 t->is_active = false;
             }
+    }
 
 
     w->active_map_loc = (vec2i){ x,y };
+    vec2i global_loc = Map_worldToGlobal( &w->active_map_loc );
 
     // concat a 3x3 window of world-tiles inside the active map
-    Map_init( &w->active_map, 3*lmap_width, 3*lmap_height );
+    Map_init( &w->active_map, &global_loc, &(vec2i){ 3*lmap_width, 3*lmap_height } );
 
     // copy MapTile data from the 9 WorldTiles to the actiev_map
     for( int j= 0;j < 3; ++j )
@@ -113,8 +119,13 @@ int World_loadAgent( World *w, const char *file, u32 x, u32 y ) {
         // Store it in handle manager of corresponding WorldTile
         if( load ) {
             int global_handle = HandleManager_addData( w->agents, (void*)&a, true, sizeof(Agent) ); 
-            if( global_handle >= 0 )
+            if( global_handle >= 0 ) {
                 handle = HandleManager_addHandle( t->agents, global_handle );
+
+                // sets its world_id
+                Agent *a = (Agent*)HandleManager_getData( w->agents, global_handle );
+                a->world_id = handle;
+            }
         }
     }
 
@@ -138,4 +149,25 @@ inline Agent *World_getGlobalAgent( World *w, u32 agent_handle ) {
     if( w && agent_handle < w->agents->mCount ) 
         return (Agent*)HandleManager_getData( w->agents, agent_handle );
     return NULL;
+}
+
+void World_movedAgent( World *w, u32 agent_handle, const vec2i *from, const vec2i *to ) {
+    WorldTile *from_wt = World_getTile( w, from->x, from->y );
+    WorldTile *to_wt = World_getTile( w, to->x, to->y );
+
+    if( to_wt && from_wt ) {
+        int glob_handle = HandleManager_getHandle( from_wt->agents, agent_handle );
+
+        if( glob_handle >= 0 ) {
+            // remove from old tile
+            HandleManager_remove( from_wt->agents, agent_handle );
+            
+            // add to new tile
+            int handle = HandleManager_addHandle( to_wt->agents, glob_handle );
+
+            // sets its world_id
+            Agent *a = (Agent*)HandleManager_getData( w->agents, glob_handle );
+            a->world_id = handle;
+        }
+    }
 }
