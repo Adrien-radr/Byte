@@ -21,7 +21,7 @@ Byte-Project : TODO File
     Animation System
     -----------------
     + Basic system (load anims as frames on a texture atlas)
-    - Linear movement between tiles (ie. during walk anim)
+    + Linear movement between tiles (ie. during walk anim)
 
     Map System
     ----------

@@ -33,8 +33,11 @@ void Sprite_cpy( Sprite *dst, const Sprite *src );
 /// Loads an Sprite from a JSON file and create its assets
 bool Sprite_load( Sprite *s, const char *file );
 
-/// Sets a sprite position from a map tile, and update scene if in it
-void Sprite_setPosition( Sprite *s, const vec2i *loc );
+/// Sets a sprite location from a map tile, and update scene if in it
+void Sprite_setLocation( Sprite *s, const vec2i *loc );
+
+/// Sets a sprite absolute position, and update scene if in it
+void Sprite_setPosition( Sprite *s, const vec2 *pos );
 
 /// Sets a sprite current animation
 void Sprite_setAnimation( Sprite *s, Animation anim );

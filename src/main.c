@@ -24,6 +24,7 @@ void mousecb( const Event *e, void *data ) {
             vec2i dest = Scene_screenToIso( game->scene, &e->v );
 
             // create path
+            /*
             f32 begin = Game_getElapsedTime();
 
             if( p ) {
@@ -33,6 +34,8 @@ void mousecb( const Event *e, void *data ) {
             }
 
             p = Map_createPath( &game->world->active_map, &a0->location, &dest );
+            */
+            Agent_moveTo( a0, &dest );
 
             //printf( "Path creation time : %f\n", Game_getElapsedTime() - begin );
         } else if( e->button == MB_Right ) {
@@ -61,8 +64,7 @@ void init_callback() {
     if( a0_h >= 0 ) {
         a0 = World_getAgent( game->world, a0_h, 0, 0 );
 
-        //Scene_addAgentSprite( game->scene, a0 );
-        Agent_setPosition( a0, &(vec2i){ 3,3 } );
+        //Agent_setLocation( a0, &(vec2i){ 3,3 } );
     } else
         log_info( "Unable to load agent 0!!\n" );
 
@@ -100,7 +102,7 @@ bool frame_callback( f32 frame_time ) {
             vec2i *next = Map_getPathNode( p, path_index++ );
 
             vec2i old_wt = (vec2i){ a0->world_tile.x, a0->world_tile.y };
-            Agent_setPosition( a0, next );
+            Agent_setLocation( a0, next );
 
             // TO BE DONE IN A PLAYER CLASS OR SMTHG
             // check if player moved to another world tile and update 

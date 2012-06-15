@@ -108,10 +108,17 @@ error:
     return return_val;
 }
 
-inline void Sprite_setPosition( Sprite *s, const vec2i *loc ) {
+inline void Sprite_setLocation( Sprite *s, const vec2i *loc ) {
     s->position = Map_isoToGlobal( loc );
 
     if( s->used_sprite >= 0 ) 
+        Scene_modifySprite( game->scene, s->used_sprite, SA_Position, &s->position );
+}
+
+inline void Sprite_setPosition( Sprite *s, const vec2 *pos ) {
+    vec2_cpy( &s->position, pos );
+
+    if( s->used_sprite >= 0 )
         Scene_modifySprite( game->scene, s->used_sprite, SA_Position, &s->position );
 }
 

@@ -98,12 +98,12 @@ vec2i Map_globalToIso( const vec2 *global ) {
     return ret;
 }
 
-vec2i Map_globalToWorld( const vec2i *loc ) {
+inline vec2i Map_isoToWorld( const vec2i *loc ) {
     return (vec2i){ loc->x / (lmap_width*2), 
                     loc->y / (lmap_height/2) };
 }
 
-vec2i Map_worldToGlobal( const vec2i *loc ) {
+inline vec2i Map_worldToIso( const vec2i *loc ) {
     return (vec2i){ loc->x * lmap_width * 2,
                     loc->y * lmap_height/2  };
 }
@@ -211,7 +211,7 @@ static void pathNodeNeighbors( NeighborList *nl, const Map *map, const vec2i *no
     const int offset = (node->x%2 == 0) ? 1 : 0;
 
     // Add a little shifting in the order of added nodes, for the path to seems more 'organic'
-    static const MapDirection md[4] = { SE, NW, NE, SW }; 
+    static const MapDirection md[4] = { SW, NW, NE, SE }; 
     static int curr_n = 0;                      // index in following array
 
     // array of neighbors to check and possibly add.
@@ -245,10 +245,13 @@ static void pathNodeNeighbors( NeighborList *nl, const Map *map, const vec2i *no
 
 /// Manhattan heuristic between two nodes 
 static inline float pathNodeHeuristic( const vec2i *from, const vec2i *to ) {
-    vec2i ito = Map_isoToSquare( to );
-    vec2i ifrom = Map_isoToSquare( from );
+    //vec2i ito = Map_isoToSquare( to );
+    //vec2i ifrom = Map_isoToSquare( from );
+    vec2 fto = Map_isoToGlobal( to );
+    vec2 ffrom = Map_isoToGlobal( from );
 
-    return abs( ito.x - ifrom.x ) + abs( ito.y - ifrom.y );
+    return abs( fto.x - ffrom.x ) + abs( fto.y - ffrom.y );
+    //return (abs( ito.x - ifrom.x ) + abs( ito.y - ifrom.y ) + abs( fto.x - ffrom.x ) + abs( fto.y - ffrom.y )) / 2.f;
 }
 
 
@@ -530,8 +533,8 @@ Path *Map_createPath( const Map *map, const vec2i *start, const vec2i *end ) {
     if( !map || !start || !end )
         return NULL;
 
-    // check if destination is off-bounds
-    if( !Map_isWalkable( map, end, (NW | NE | SW | SE) ) )
+    // check if destination is not start, and is not off-bounds
+    if( vec2i_eq( start, end ) || !Map_isWalkable( map, end, (NW | NE | SW | SE) ) )
         return NULL;
 
 

@@ -43,6 +43,9 @@ void World_destroy( World *w );
 /// World receive an event to be processed
 void World_receiveEvent( World *w, const Event *event );
 
+/// Update world. Gameplay and AI updates will originate from here
+void World_update( World *w, f32 frame_time );
+
 /// Returns the WorldTile present at (i,j) coordinates (if present)
 WorldTile *World_getTile( World *w, u32 x, u32 y );
 WorldTile *World_getTilev( World *w, const vec2i *loc );

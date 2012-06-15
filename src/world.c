@@ -6,7 +6,7 @@ inline void WorldTile_init( WorldTile *w, u32 x, u32 y ) {
     w->is_active = false;
 
     // init local map
-    vec2i glob_loc = Map_worldToGlobal( &w->location );
+    vec2i glob_loc = Map_worldToIso( &w->location );
     Map_init( &w->map, &glob_loc, &(vec2i){ lmap_width, lmap_height } );
 }
 
@@ -42,11 +42,18 @@ error:
 
 inline void World_destroy( World *w ) {
     if( w ) {
+        // Destroy world tiles and current map
         for( int i = 0; i < wmap_size; ++i )
             WorldTile_destroy( &w->tiles[i] );
 
-        HandleManager_destroy( w->agents );
         Map_destroy( &w->active_map );
+
+        // destroy all agents
+        for( int i = 0; i < w->agents->mCount; ++i )
+            if( HandleManager_isUsed( w->agents, i ) )
+                Agent_destroy( (Agent*)HandleManager_getData( w->agents, i ) );
+
+        HandleManager_destroy( w->agents );
 
         DEL_PTR( w );
     }
@@ -57,6 +64,13 @@ void World_receiveEvent( World *w, const Event *event ) {
     default :
         break;
     }
+}
+
+void World_update( World *w, f32 frame_time ) {
+    // update all registered agents
+    for( int i = 0; i < w->agents->mCount; ++i )
+        if( HandleManager_isUsed( w->agents, i ) )
+            Agent_update( (Agent*)HandleManager_getData( w->agents, i ), frame_time );
 }
 
 inline WorldTile *World_getTile( World *w, u32 x, u32 y ) {
@@ -90,7 +104,7 @@ void World_activeMapLocation( World *w, int x, int y ) {
 
 
     w->active_map_loc = (vec2i){ x,y };
-    vec2i global_loc = Map_worldToGlobal( &w->active_map_loc );
+    vec2i global_loc = Map_worldToIso( &w->active_map_loc );
 
     // concat a 3x3 window of world-tiles inside the active map
     Map_init( &w->active_map, &global_loc, &(vec2i){ 3*lmap_width, 3*lmap_height } );

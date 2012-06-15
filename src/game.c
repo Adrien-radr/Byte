@@ -306,8 +306,8 @@ void Game_run() {
 
             // AI GAMEPLAY LOOP (fixed at 1/phy_dt FPS)
             while( phy_update >= phy_dt ) {
+                World_update( game->world, phy_dt );
                 Scene_update( game->scene, phy_dt, game->mode );
-                /* TODO : WORLD UPDATE ! */
                 phy_update -= phy_dt;
             }
 

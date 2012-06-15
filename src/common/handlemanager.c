@@ -123,19 +123,19 @@ void HandleManager_remove( HandleManager *pHm, u32 pHandle ) {
     }
 }
 
-void *HandleManager_getData( HandleManager *pHm, u32 pHandle ) {
+inline void *HandleManager_getData( HandleManager *pHm, u32 pHandle ) {
     if( pHm && pHandle < pHm->mSize )
         return pHm->mHandles[pHandle].data;
     return NULL;
 }
 
-int HandleManager_getHandle( HandleManager *pHm, u32 pHandle ) {
+inline int HandleManager_getHandle( HandleManager *pHm, u32 pHandle ) {
     if( pHm && pHandle < pHm->mSize )
         return pHm->mHandles[pHandle].handle;
     return -1;
 }
 
-bool HandleManager_isUsed( HandleManager *pHm, u32 pHandle ) {
+inline bool HandleManager_isUsed( HandleManager *pHm, u32 pHandle ) {
     if( pHm && pHandle < pHm->mMaxIndex )
         return pHm->mHandles[pHandle].used;
     return false;
