@@ -1,0 +1,1297 @@
+# depslib dependency file v1.0
+1327762186 source:c:\users\beul\desktop\byte\src\camera.c
+	"camera.h"
+	"context.h"
+	"renderer.h"
+
+1327762186 c:\users\beul\desktop\byte\src\camera.h
+	"common.h"
+	"event.h"
+	"matrix.h"
+
+1327952133 c:\users\beul\desktop\byte\src\common.h
+	<stdlib.h>
+	<time.h>
+	"debug.h"
+	<math.h>
+
+1327762186 c:\users\beul\desktop\byte\src\debug.h
+	<stdio.h>
+	<errno.h>
+	<string.h>
+	<stdbool.h>
+
+1327958651 c:\users\beul\desktop\byte\src\event.h
+	"common.h"
+	"keys.h"
+	"vector.h"
+
+1327762186 c:\users\beul\desktop\byte\src\keys.h
+
+1327762186 c:\users\beul\desktop\byte\src\vector.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\byte\src\matrix.h
+	"common.h"
+	"vector.h"
+
+1327762186 c:\users\beul\desktop\byte\src\context.h
+	"common.h"
+	"matrix.h"
+
+1327762186 c:\users\beul\desktop\byte\src\renderer.h
+	"common.h"
+	"vector.h"
+	"matrix.h"
+	"shader.h"
+	"text.h"
+
+1327762186 c:\users\beul\desktop\byte\src\shader.h
+	"common.h"
+	"vector.h"
+	"matrix.h"
+	"texture.h"
+	"color.h"
+
+1327762186 c:\users\beul\desktop\byte\src\texture.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\byte\src\color.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\byte\src\text.h
+	"color.h"
+	"vector.h"
+	"world.h"
+	"device.h"
+
+1327762186 c:\users\beul\desktop\byte\src\world.h
+	"common.h"
+	"handlemanager.h"
+	"resource.h"
+
+1327958985 c:\users\beul\desktop\byte\src\handlemanager.h
+	"common.h"
+
+1328029135 c:\users\beul\desktop\byte\src\resource.h
+	"common.h"
+
+1327762186 c:\users\beul\desktop\byte\src\device.h
+	"common.h"
+	"camera.h"
+	"ft2build.h"
+
+1328132574 c:\users\beul\desktop\byte\ext\freetype\ft2build.h
+	<freetype/config/ftheader.h>
+
+1328132576 c:\users\beul\desktop\byte\ext\freetype\freetype\config\ftheader.h
+
+1327955653 source:c:\users\beul\desktop\byte\src\clock.c
+	"clock.h"
+	<Windows.h>
+	<sys/time.h>
+	<unistd.h>
+
+1327762186 c:\users\beul\desktop\byte\src\clock.h
+	"common.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\color.c
+	"color.h"
+
+1327952120 source:c:\users\beul\desktop\byte\src\common.c
+	<stdarg.h>
+	"common.h"
+
+1327955733 source:c:\users\beul\desktop\byte\src\context.c
+	"GL/glew.h"
+	"GL/glfw.h"
+	"context.h"
+	"event.h"
+	"vector.h"
+
+1328213870 c:\users\beul\desktop\byte\ext\gl\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1328208284 c:\users\beul\desktop\byte\ext\gl\glfw.h
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1327762186 source:c:\users\beul\desktop\byte\src\debug.c
+	"common.h"
+	"debug.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\device.c
+	"device.h"
+	"event.h"
+	"clock.h"
+	"context.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\entity.c
+	"entity.h"
+
+1327762186 c:\users\beul\desktop\byte\src\entity.h
+	"matrix.h"
+	"handlemanager.h"
+
+1327958550 source:c:\users\beul\desktop\byte\src\event.c
+	"event.h"
+
+1327959056 source:c:\users\beul\desktop\byte\src\handlemanager.c
+	"handlemanager.h"
+
+1328639609 source:c:\users\beul\desktop\byte\src\main.c
+	"color.h"
+	"shader.h"
+	"device.h"
+	"camera.h"
+	"GL/glew.h"
+	"scene.h"
+	"world.h"
+	"renderer.h"
+	"context.h"
+
+1327762186 c:\users\beul\desktop\byte\src\scene.h
+	"common.h"
+	"handlemanager.h"
+	"mesh.h"
+	"shader.h"
+	"texture.h"
+	"text.h"
+	"entity.h"
+
+1327762186 c:\users\beul\desktop\byte\src\mesh.h
+	"common.h"
+	"vector.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\matrix.c
+	"matrix.h"
+
+1328140751 source:c:\users\beul\desktop\byte\src\mesh.c
+	"mesh.h"
+	"GL/glew.h"
+
+1328639922 source:c:\users\beul\desktop\byte\src\renderer.c
+	"renderer.h"
+	"mesh.h"
+	"texture.h"
+	"GL/glew.h"
+
+1328141054 source:c:\users\beul\desktop\byte\src\resource.c
+	"resource.h"
+	"renderer.h"
+	"json/cJSON.h"
+	<dirent.h>
+
+1328129602 c:\users\beul\desktop\byte\ext\json\cjson.h
+
+1328120932 source:c:\users\beul\desktop\byte\src\scene.c
+	"scene.h"
+	"renderer.h"
+	"camera.h"
+	"device.h"
+	"context.h"
+
+1328141064 source:c:\users\beul\desktop\byte\src\shader.c
+	"shader.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\text.c
+	"text.h"
+	"texture.h"
+	"renderer.h"
+	"context.h"
+	"GL/glew.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\texture.c
+	"texture.h"
+	"renderer.h"
+	"GL/SOIL.h"
+	"GL/glew.h"
+
+1328635217 c:\users\beul\desktop\byte\ext\gl\soil.h
+
+1327762186 source:c:\users\beul\desktop\byte\src\vector.c
+	"vector.h"
+
+1327762186 source:c:\users\beul\desktop\byte\src\world.c
+	"world.h"
+
+1328213864 source:c:\users\beul\desktop\byte\ext\gl\glew.c
+	<GL/glew.h>
+	<GL/wglew.h>
+	<GL/glxew.h>
+	<dlfcn.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdlib.h>
+	<string.h>
+	<AvailabilityMacros.h>
+	<dlfcn.h>
+	<mach-o/dyld.h>
+
+1328125120 c:\users\beul\desktop\byte\ext\gl\wglew.h
+	<windows.h>
+
+1328125120 c:\users\beul\desktop\byte\ext\gl\glxew.h
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	<X11/Xmd.h>
+	<GL/glew.h>
+
+1328129602 source:c:\users\beul\desktop\byte\ext\json\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1328213864 source:c:\users\beul\desktop\code\byte\ext\gl\glew.c
+	<GL/glew.h>
+	<GL/wglew.h>
+	<GL/glxew.h>
+	<dlfcn.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdlib.h>
+	<string.h>
+	<AvailabilityMacros.h>
+	<dlfcn.h>
+	<mach-o/dyld.h>
+
+1329434744 source:c:\users\beul\desktop\code\byte\ext\json\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1329434744 c:\users\beul\desktop\code\byte\ext\json\cjson.h
+
+1332724461 source:c:\users\beul\desktop\code\byte\src\camera.c
+	"camera.h"
+	"context.h"
+	"renderer.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\camera.h
+	"common.h"
+	"event.h"
+	"matrix.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\common.h
+	<stdlib.h>
+	<time.h>
+	"debug.h"
+	<stdint.h>
+	<math.h>
+
+1329434744 c:\users\beul\desktop\code\byte\src\debug.h
+	<stdio.h>
+	<errno.h>
+	<string.h>
+	<stdbool.h>
+
+1333293132 c:\users\beul\desktop\code\byte\src\event.h
+	"common.h"
+	"keys.h"
+	"vector.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\keys.h
+
+1329434744 c:\users\beul\desktop\code\byte\src\vector.h
+	"common.h"
+
+1332348116 c:\users\beul\desktop\code\byte\src\matrix.h
+	"common.h"
+	"vector.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\context.h
+	"common.h"
+	"matrix.h"
+
+1332724928 c:\users\beul\desktop\code\byte\src\renderer.h
+	"common.h"
+	"vector.h"
+	"matrix.h"
+	"shader.h"
+	"text.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\shader.h
+	"common.h"
+	"vector.h"
+	"matrix.h"
+	"texture.h"
+	"color.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\texture.h
+	"common.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\color.h
+	"common.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\text.h
+	"color.h"
+	"vector.h"
+	"handlemanager.h"
+	"device.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\world.h
+	"common.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\handlemanager.h
+	"common.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\resource.h
+	"common.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\device.h
+	"common.h"
+	"camera.h"
+	"context.h"
+	"ft2build.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\clock.c
+	"clock.h"
+	<Windows.h>
+	<sys/time.h>
+	<unistd.h>
+
+1329434744 c:\users\beul\desktop\code\byte\src\clock.h
+	"common.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\color.c
+	"color.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\common.c
+	<stdarg.h>
+	"common.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\context.c
+	"GL/glew.h"
+	"GL/glfw.h"
+	"context.h"
+	"event.h"
+	"vector.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\debug.c
+	"common.h"
+	"debug.h"
+
+1332786438 source:c:\users\beul\desktop\code\byte\src\device.c
+	"device.h"
+	"event.h"
+	"clock.h"
+	"renderer.h"
+	"GL/glew.h"
+	"json/cJSON.h"
+
+1332970070 source:c:\users\beul\desktop\code\byte\src\entity.c
+	"entity.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\entity.h
+	"matrix.h"
+	"handlemanager.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\event.c
+	"event.h"
+
+1332892695 source:c:\users\beul\desktop\code\byte\src\handlemanager.c
+	"handlemanager.h"
+
+1335992830 source:c:\users\beul\desktop\code\byte\src\main.c
+	"game.h"
+	"color.h"
+	"actor.h"
+	"GL/glew.h"
+
+1335991718 c:\users\beul\desktop\code\byte\src\scene.h
+	"common.h"
+	"handlemanager.h"
+	"mesh.h"
+	"shader.h"
+	"texture.h"
+	"text.h"
+	"entity.h"
+	"actor.h"
+	"widget.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\mesh.h
+	"common.h"
+	"vector.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\matrix.c
+	"matrix.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\mesh.c
+	"mesh.h"
+	"GL/glew.h"
+
+1332725064 source:c:\users\beul\desktop\code\byte\src\renderer.c
+	"renderer.h"
+	"mesh.h"
+	"texture.h"
+	"GL/glew.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\resource.c
+	"resource.h"
+	"renderer.h"
+	"json/cJSON.h"
+	<dirent.h>
+
+1335995858 source:c:\users\beul\desktop\code\byte\src\scene.c
+	"scene.h"
+	"renderer.h"
+	"camera.h"
+	"device.h"
+	"context.h"
+	"world.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\shader.c
+	"shader.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1332970086 source:c:\users\beul\desktop\code\byte\src\text.c
+	"text.h"
+	"texture.h"
+	"renderer.h"
+	"context.h"
+	"world.h"
+	"GL/glew.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\texture.c
+	"texture.h"
+	"renderer.h"
+	"GL/SOIL.h"
+	"GL/glew.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\vector.c
+	"vector.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\world.c
+	"world.h"
+	"handlemanager.h"
+	"resource.h"
+
+1329434744 c:\users\beul\desktop\code\byte\ext\gl\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1329434744 c:\users\beul\desktop\code\byte\ext\gl\wglew.h
+	<windows.h>
+
+1329434744 c:\users\beul\desktop\code\byte\ext\gl\glxew.h
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	<X11/Xmd.h>
+	<GL/glew.h>
+
+1329434744 c:\users\beul\desktop\code\byte\ext\freetype\ft2build.h
+	<freetype/config/ftheader.h>
+
+1329434744 c:\users\beul\desktop\code\byte\ext\freetype\freetype\config\ftheader.h
+
+1329434744 c:\users\beul\desktop\code\byte\ext\gl\glfw.h
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1329434744 c:\users\beul\desktop\code\byte\ext\gl\soil.h
+
+1329434744 source:c:\users\beul\desktop\code\byte\ext\gl\glewwin.c
+	<GL/glew.h>
+	<GL/wglew.h>
+	<GL/glxew.h>
+	<dlfcn.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdlib.h>
+	<string.h>
+	<AvailabilityMacros.h>
+	<dlfcn.h>
+	<mach-o/dyld.h>
+
+1329434744 c:\users\beul\desktop\code\byte\src\game.h
+	"device.h"
+	"world.h"
+	"scene.h"
+
+1329434744 c:\users\beul\desktop\code\byte\src\actor.h
+	"common.h"
+	"matrix.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\game.c
+	"game.h"
+
+1329434744 source:c:\users\beul\desktop\code\byte\src\actor.c
+	"actor.h"
+	"world.h"
+	"json/cJSON.h"
+
+1335995779 c:\users\beul\desktop\code\byte\src\widget.h
+	"handlemanager.h"
+	"vector.h"
+	"matrix.h"
+	"text.h"
+
+1335991902 source:c:\users\beul\desktop\code\byte\src\widget.c
+	"widget.h"
+	"renderer.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\camera.c
+	"camera.h"
+	"context.h"
+	"renderer.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\camera.h
+	"common/common.h"
+	"common/matrix.h"
+	"event.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\common.h
+	<unistd.h>
+	<stdlib.h>
+	<time.h>
+	"debug.h"
+	<stdint.h>
+	<math.h>
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\debug.h
+	<stdio.h>
+	<errno.h>
+	<string.h>
+	<stdbool.h>
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\matrix.h
+	"common.h"
+	"vector.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\vector.h
+	"common.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\event.h
+	"common/common.h"
+	"common/vector.h"
+	"keys.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\keys.h
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\context.h
+	"common/common.h"
+	"common/matrix.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\renderer.h
+	"common/common.h"
+	"common/vector.h"
+	"common/matrix.h"
+	"shader.h"
+	"text.h"
+	"mesh.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\shader.h
+	"common/common.h"
+	"common/vector.h"
+	"common/matrix.h"
+	"common/color.h"
+	"texture.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\color.h
+	"common.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\texture.h
+	"common/common.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\text.h
+	"common/color.h"
+	"common/vector.h"
+	"common/handlemanager.h"
+	"ft2build.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\handlemanager.h
+	"common.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\mesh.h
+	"common/common.h"
+	"common/vector.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\client.c
+	"common/clock.h"
+	"client.h"
+	"game.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\clock.h
+	"common.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\client.h
+	"common/net.h"
+	"common/clock.h"
+
+1336172526 c:\users\beul\desktop\code\bytelastversion\src\\common\net.h
+	"common.h"
+	<winsock2.h>
+	<netinet/in.h>
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\game.h
+	"common/world.h"
+	"scene.h"
+	"ft2build.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\world.h
+	"common.h"
+	"actor.h"
+	"map.h"
+	"handlemanager.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\actor.h
+	"common.h"
+	"matrix.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\\common\map.h
+	"common.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\scene.h
+	"common/common.h"
+	"common/handlemanager.h"
+	"common/actor.h"
+	"mesh.h"
+	"shader.h"
+	"texture.h"
+	"text.h"
+	"sprite.h"
+	"widget.h"
+	"light.h"
+	"camera.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\sprite.h
+	"common/handlemanager.h"
+	"common/matrix.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\widget.h
+	"common/handlemanager.h"
+	"common/matrix.h"
+	"text.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\light.h
+	"common/color.h"
+	"common/vector.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\context.c
+	"GL/glfw.h"
+	"common/vector.h"
+	"context.h"
+	"event.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\ext\\gl\glfw.h
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\event.c
+	"event.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\game.c
+	"game.h"
+	"resource.h"
+	"renderer.h"
+	"context.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+	"json/cJSON.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\client\resource.h
+	"common/common.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\ext\\gl\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1329434744 c:\users\beul\desktop\code\bytelastversion\ext\\json\cjson.h
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\light.c
+	"light.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\main.c
+	"common/clock.h"
+	"common/vector.h"
+	"client.h"
+	"game.h"
+	"resource.h"
+	"renderer.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\mesh.c
+	"mesh.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\renderer.c
+	"renderer.h"
+	"texture.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\resource.c
+	"resource.h"
+	"renderer.h"
+	"json/cJSON.h"
+	"GL/glew.h"
+	<dirent.h>
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\scene.c
+	"scene.h"
+	"renderer.h"
+	"camera.h"
+	"context.h"
+	"resource.h"
+	"game.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\shader.c
+	"shader.h"
+	"renderer.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\sprite.c
+	"sprite.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\text.c
+	"common/world.h"
+	"renderer.h"
+	"context.h"
+	"resource.h"
+	"game.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+
+1336178054 source:c:\users\beul\desktop\code\bytelastversion\src\client\texture.c
+	"texture.h"
+	"renderer.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+	<png.h>
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\client\widget.c
+	"widget.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\actor.c
+	"actor.h"
+	"json/cJSON.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\actor.h
+	"common.h"
+	"matrix.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\common.h
+	<unistd.h>
+	<stdlib.h>
+	<time.h>
+	"debug.h"
+	<stdint.h>
+	<math.h>
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\debug.h
+	<stdio.h>
+	<errno.h>
+	<string.h>
+	<stdbool.h>
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\matrix.h
+	"common.h"
+	"vector.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\vector.h
+	"common.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\clock.c
+	"clock.h"
+	<Windows.h>
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\clock.h
+	"common.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\color.c
+	"color.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\color.h
+	"common.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\common.c
+	<stdarg.h>
+	"common.h"
+	"vector.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\debug.c
+	"common.h"
+	"clock.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\handlemanager.c
+	"handlemanager.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\handlemanager.h
+	"common.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\map.c
+	"map.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\map.h
+	"common.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\matrix.c
+	"matrix.h"
+
+1336175550 source:c:\users\beul\desktop\code\bytelastversion\src\common\net.c
+	"net.h"
+	<winsock2.h>
+	<ws2tcpip.h>
+	<sys/socket.h>
+	<netdb.h>
+	<netinet/in.h>
+	<net/if.h>
+	<fcntl.h>
+	<ifaddrs.h>
+
+1336172526 c:\users\beul\desktop\code\bytelastversion\src\common\net.h
+	"common.h"
+	<winsock2.h>
+	<netinet/in.h>
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\vector.c
+	"vector.h"
+
+1336166522 source:c:\users\beul\desktop\code\bytelastversion\src\common\world.c
+	"world.h"
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\src\common\world.h
+	"common.h"
+	"actor.h"
+	"map.h"
+	"handlemanager.h"
+
+1336176579 source:c:\users\beul\desktop\code\bytelastversion\ext\gl\glewwin.c
+	<GL/glewWIN.h>
+	<GL/wglew.h>
+	<GL/glxew.h>
+	<dlfcn.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdlib.h>
+	<string.h>
+	<AvailabilityMacros.h>
+	<dlfcn.h>
+	<mach-o/dyld.h>
+
+1329434744 c:\users\beul\desktop\code\bytelastversion\ext\\gl\glewwin.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\ext\\gl\wglew.h
+	<windows.h>
+
+1336166522 c:\users\beul\desktop\code\bytelastversion\ext\\gl\glxew.h
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	<X11/Xmd.h>
+	"glew.h"
+
+1329434744 source:c:\users\beul\desktop\code\bytelastversion\ext\json\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1329434744 c:\users\beul\desktop\code\bytelastversion\ext\json\cjson.h
+
+1328999133 c:\users\beul\desktop\code\bytelastversion\ext\\png.h
+	"pnglibconf.h"
+	<setjmp.h>
+	<time.h>
+	"pngconf.h"
+
+1328999133 c:\users\beul\desktop\code\bytelastversion\ext\\pngconf.h
+	<limits.h>
+	<strings.h>
+	<string.h>
+	<stdio.h>
+	<dos.h>
+
+1336183187 c:\users\beul\desktop\code\bytelastversion\ext\\zlib.h
+	"zconf.h"
+
+1333831050 source:e:\dev\byte\ext\gl\glew.c
+	"glew.h"
+	"wglew.h"
+	"glxew.h"
+	<dlfcn.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdlib.h>
+	<string.h>
+	<AvailabilityMacros.h>
+	<dlfcn.h>
+	<mach-o/dyld.h>
+
+1333821528 e:\dev\byte\ext\gl\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1329353771 e:\dev\byte\ext\gl\wglew.h
+	<windows.h>
+
+1334426026 e:\dev\byte\ext\gl\glxew.h
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	<X11/Xmd.h>
+	"glew.h"
+
+1329353771 source:e:\dev\byte\ext\json\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1329353771 e:\dev\byte\ext\json\cjson.h
+
+1341775241 source:e:\dev\byte\src\agent.c
+	"agent.h"
+	"game.h"
+	"resource.h"
+	"render/renderer.h"
+	"json/cJSON.h"
+
+1341775241 e:\dev\byte\src\agent.h
+	"map.h"
+	"render/sprite.h"
+
+1341775242 e:\dev\byte\src\map.h
+	"common/common.h"
+
+1341775242 e:\dev\byte\src\common\common.h
+	<unistd.h>
+	<stdlib.h>
+	<time.h>
+	"debug.h"
+	<stdint.h>
+	<math.h>
+	"vector.h"
+	"matrix.h"
+
+1337461447 e:\dev\byte\src\common\debug.h
+	<stdio.h>
+	<errno.h>
+	<string.h>
+	<stdbool.h>
+
+1341775242 e:\dev\byte\src\common\vector.h
+
+1337469412 e:\dev\byte\src\common\matrix.h
+	"vector.h"
+
+1341775242 e:\dev\byte\src\render\sprite.h
+	"common/handlemanager.h"
+	"common/matrix.h"
+	"anim.h"
+
+1333821529 e:\dev\byte\src\common\handlemanager.h
+	"common.h"
+
+1341775242 e:\dev\byte\src\anim.h
+	"common/common.h"
+
+1341775242 e:\dev\byte\src\game.h
+	"world.h"
+	"common/clock.h"
+	"render/scene.h"
+	"ft2build.h"
+
+1341775242 e:\dev\byte\src\world.h
+	"common/common.h"
+	"common/handlemanager.h"
+	"agent.h"
+	"map.h"
+	"event.h"
+
+1337461447 e:\dev\byte\src\event.h
+	"common/common.h"
+	"common/vector.h"
+	"keys.h"
+
+1337461447 e:\dev\byte\src\keys.h
+
+1333821529 e:\dev\byte\src\common\clock.h
+	"common.h"
+
+1341775242 e:\dev\byte\src\render\scene.h
+	"common/common.h"
+	"common/handlemanager.h"
+	"anim.h"
+	"mesh.h"
+	"shader.h"
+	"texture.h"
+	"text.h"
+	"sprite.h"
+	"static.h"
+	"widget.h"
+	"gui.h"
+	"light.h"
+	"camera.h"
+	"agent.h"
+
+1337461447 e:\dev\byte\src\render\mesh.h
+	"common/common.h"
+	"common/vector.h"
+
+1337461447 e:\dev\byte\src\render\shader.h
+	"common/common.h"
+	"common/vector.h"
+	"common/matrix.h"
+	"common/color.h"
+	"texture.h"
+
+1336156910 e:\dev\byte\src\common\color.h
+	"common.h"
+
+1337461447 e:\dev\byte\src\render\texture.h
+	"common/common.h"
+
+1337461447 e:\dev\byte\src\render\text.h
+	"common/color.h"
+	"common/handlemanager.h"
+	<ft2build.h>
+
+1341775242 e:\dev\byte\src\render\static.h
+	"common/handlemanager.h"
+
+1337461447 e:\dev\byte\src\render\widget.h
+	"common/handlemanager.h"
+	"common/matrix.h"
+	"text.h"
+
+1341775242 e:\dev\byte\src\gui.h
+	"common/common.h"
+	"common/vector.h"
+
+1341775242 e:\dev\byte\src\render\light.h
+	"common/color.h"
+	"common/vector.h"
+
+1341775242 e:\dev\byte\src\render\camera.h
+	"common/common.h"
+	"common/matrix.h"
+	"event.h"
+
+1341775242 e:\dev\byte\src\resource.h
+	"common/common.h"
+
+1341775242 e:\dev\byte\src\render\renderer.h
+	"common/common.h"
+	"common/vector.h"
+	"common/matrix.h"
+	"shader.h"
+	"text.h"
+	"mesh.h"
+	"sprite.h"
+	"static.h"
+
+1341775242 source:e:\dev\byte\src\anim.c
+	"anim.h"
+	"json/cJSON.h"
+	<dirent.h>
+
+1341775242 source:e:\dev\byte\src\common\clock.c
+	"clock.h"
+	<Windows.h>
+
+1336156910 source:e:\dev\byte\src\common\color.c
+	"color.h"
+
+1341775242 source:e:\dev\byte\src\common\common.c
+	<stdarg.h>
+	"common.h"
+	"vector.h"
+
+1336156910 source:e:\dev\byte\src\common\debug.c
+	"common.h"
+	"clock.h"
+
+1341775242 source:e:\dev\byte\src\common\handlemanager.c
+	"handlemanager.h"
+
+1337469412 source:e:\dev\byte\src\common\matrix.c
+	"matrix.h"
+	"common.h"
+
+1341775242 source:e:\dev\byte\src\common\vector.c
+	"vector.h"
+	"common.h"
+
+1337461447 source:e:\dev\byte\src\event.c
+	"event.h"
+
+1341775242 source:e:\dev\byte\src\game.c
+	"game.h"
+	"resource.h"
+	"render/context.h"
+	"render/renderer.h"
+	"json/cJSON.h"
+
+1337461447 e:\dev\byte\src\render\context.h
+	"common/common.h"
+	"common/matrix.h"
+
+1337461447 source:e:\dev\byte\src\gui.c
+	"gui.h"
+	"game.h"
+	"resource.h"
+	"render/renderer.h"
+
+1341775242 source:e:\dev\byte\src\main.c
+	"game.h"
+	"map.h"
+
+1341775242 source:e:\dev\byte\src\map.c
+	"map.h"
+
+1341775242 source:e:\dev\byte\src\render\camera.c
+	"camera.h"
+	"context.h"
+	"renderer.h"
+
+1337461447 source:e:\dev\byte\src\render\context.c
+	"context.h"
+	"event.h"
+	"GL/glfw.h"
+
+1329358683 e:\dev\byte\ext\gl\glfw.h
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1341775242 source:e:\dev\byte\src\render\light.c
+	"light.h"
+	"map.h"
+	"game.h"
+	"render/scene.h"
+
+1337461447 source:e:\dev\byte\src\render\mesh.c
+	"mesh.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+
+1341775242 source:e:\dev\byte\src\render\renderer.c
+	"renderer.h"
+	"texture.h"
+	"static.h"
+	"GL/glew.h"
+
+1341775242 source:e:\dev\byte\src\render\scene.c
+	"scene.h"
+	"renderer.h"
+	"camera.h"
+	"context.h"
+	"resource.h"
+	"game.h"
+	"GL/glew.h"
+
+1337733878 source:e:\dev\byte\src\render\shader.c
+	"shader.h"
+	"renderer.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+
+1341775242 source:e:\dev\byte\src\render\sprite.c
+	"sprite.h"
+	"resource.h"
+	"renderer.h"
+	"map.h"
+	"scene.h"
+	"game.h"
+	"json/cJSON.h"
+
+1341775242 source:e:\dev\byte\src\render\static.c
+	"static.h"
+	"resource.h"
+	"json/cJSON.h"
+
+1337461447 source:e:\dev\byte\src\render\text.c
+	"world.h"
+	"renderer.h"
+	"context.h"
+	"resource.h"
+	"game.h"
+	"GL/glew.h"
+
+1337461447 source:e:\dev\byte\src\render\texture.c
+	"texture.h"
+	"renderer.h"
+	"GL/gldl.h"
+	"GL/glew.h"
+	<png.h>
+
+1337461447 source:e:\dev\byte\src\render\widget.c
+	"widget.h"
+	"renderer.h"
+	"GL/glew.h"
+
+1341775242 source:e:\dev\byte\src\resource.c
+	"resource.h"
+	"render/renderer.h"
+	"json/cJSON.h"
+	<dirent.h>
+
+1341775242 source:e:\dev\byte\src\wall.c
+	"wall.h"
+
+1341775242 e:\dev\byte\src\wall.h
+	"map.h"
+	"render/static.h"
+
+1341775242 source:e:\dev\byte\src\world.c
+	"world.h"
+
