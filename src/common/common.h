@@ -4,7 +4,7 @@
 // Version
 #define BYTE_MAJOR 0
 #define BYTE_MINOR 1
-#define BYTE_PATCH 6
+#define BYTE_PATCH 9
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)
@@ -22,15 +22,23 @@
 #include "debug.h"
 
 
+/// Different game modes 
+typedef enum {
+    EGame,      ///< In game. IA, camera, animations activated
+    EMenu,      ///< In game menu. No IA, no camera, no animations
+    EEditor     ///< In editor. Mo IA, no animations
+} GameMode;
+
 
 // #############################################################################
 //      MISC
     // Types shortcuts
     #include <stdint.h>
-	typedef uint8_t		        u8;
-	typedef uint16_t    		u16;
-	typedef uint32_t    	    u32;
-	typedef uint64_t    	    u64;
+    typedef int8_t      s8;
+	typedef uint8_t     u8;
+	typedef uint16_t    u16;
+	typedef uint32_t    u32;
+	typedef uint64_t    u64;
 
 	typedef float f32;
 	typedef double f64;
@@ -41,12 +49,14 @@
     typedef char str16[16];
     typedef char str32[32];
     typedef char str64[64];
+    typedef char str128[128];
     typedef char str256[256];
     typedef char str512[512];
     typedef char str1024[1024];
 
 
-    // Data structures Reallocation ratio (at each realloc, multiply the current size by this)
+    // Data structures Reallocation ratio (at each realloc, multiply the current
+    // size by this)
 #   define REALLOC_RATIO 1.7
 
     // Format for Date and Time
@@ -83,9 +93,11 @@
 
 // #############################################################################
 // Generic array type
-// One must choose if the objects in the array hate to be dynamically destroyed or not :
+// One must choose if the objects in the array hate to be dynamically destroyed
+// or not :
 //  - SimpleArray : no memory managment for individual data in array
-//  - HeapArray : individual data in array are destroyed with DEL_PTR when the array is destroyed
+//  - HeapArray : individual data in array are destroyed with DEL_PTR when the
+//                array is destroyed
 //
 // Use :
 //  SimpleArray( float, Float );
@@ -116,13 +128,14 @@
 //      Mesh_bind( i&m_arr->data[index] );
 //      StringArray_destroy( &str_arr );
 //  }
-#   define Array( type, name )                                                  \
-    typedef struct {                                                            \
+#   define ArrayStruct( type, name ) \
+    typedef struct s_##name##Array {                                            \
         type    *data;                                                          \
         u32     cpt;                                                            \
         u32     size;                                                           \
-    } name##Array;                                                              \
-                                                                                \
+    } name##Array;                                                              
+
+#   define Array( type, name )                                                  \
     bool name##Array_init( name##Array *arr, u32 size ) {                       \
         arr->data = byte_alloc( size * sizeof( type ) );                        \
         check_mem( arr->data );                                                 \
@@ -145,13 +158,12 @@
     }                                                                           \
 
 
-
-#   define SimpleArray( type, name )                                            \
-    Array( type, name )                                                         \
-                                                                                \
+#   define SimpleArrayFuncs( type, name ) \
     void name##Array_destroy( name##Array *arr ) {                              \
-        if( arr )                                                               \
+        if( arr ) {                                                             \
             DEL_PTR( arr->data );                                               \
+            arr->cpt = 0;                                                       \
+        }                                                                       \
     }                                                                           \
                                                                                 \
     void name##Array_clear( name##Array *arr ) {                                \
@@ -161,10 +173,7 @@
         }                                                                       \
     }
 
-
-#   define HeapArray( type, name, destructionFunc )                             \
-    Array( type, name )                                                         \
-                                                                                \
+#   define HeapArrayFuncs( type, name, destructionFunc ) \
     void name##Array_destroy( name##Array *arr ) {                              \
         if( arr ) {                                                             \
             for( int i = 0; i < arr->cpt; ++i )                                 \
@@ -173,12 +182,50 @@
         DEL_PTR( arr->data );                                                   \
     }
 
-// #############################################################################
 
+//      ONLY DEFINITIONS
+
+#   define SimpleArray( type, name )                                            \
+        ArrayStruct( type, name ) \
+        Array( type, name )                                                     \
+        SimpleArrayFuncs( type, name ) 
+
+#   define HeapArray( type, name, destructionFunc )                             \
+        ArrayStruct( type, name ) \
+        Array( type, name )                                                     \
+        HeapArrayFuncs( type, name, destructionFunc ) 
+
+//      DECLARATIONS / DEFINITIONS
+#   define ArrayDecl( type, name ) \
+        ArrayStruct( type, name ) \
+        bool name##Array_init( name##Array *arr, u32 size ); \
+        bool name##Array_checkSize( name##Array *arr ); 
+
+#   define SimpleArrayDecl( type, name ) \
+        ArrayDecl( type, name ) \
+        void name##Array_destroy( name##Array *arr ); \
+        void name##Array_clear( name##Array *arr ); 
+
+#   define HeapArrayDecl( type, name ) \
+        ArrayDecl( type, name ) \
+        void name##Array_destroy( name##Array *arr );
+
+#   define SimpleArrayDef( type, name ) \
+        Array( type, name )                                                     \
+        SimpleArrayFuncs( type, name ) 
+
+#   define HeapArrayDef( type, name, destructionFunc )                          \
+        Array( type, name )                                                     \
+        HeapArrayFuncs( type, name, destructionFunc ) 
+
+
+// #############################################################################
 
 // #############################################################################
 //      MATH
 #include <math.h>
+#include "vector.h"
+#include "matrix.h"
 
 #   define M_EPS  1.0e-4
 #ifndef M_PI
@@ -193,55 +240,41 @@
 #   define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 #endif
 
+<<<<<<< HEAD
 
     // forward decl (definition in vector.h)
     typedef struct vec2_ vec2;
     typedef struct vec2i_ vec2i;
+=======
+>>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227
 
     /// Returns the sign of a float
-    inline int Sign( const f32 a, const f32 threshold ) {
-        if( a > threshold )
-            return 1;
-        else if ( a < - threshold )
-            return -1;
-        return 0;
-    }
+    int Sign( const f32 a, const f32 threshold );
 
     /// Return absolute value of float number
-    inline f32 Abs( const f32 a ) {
-        return ( a >= 0.f ) ? a : -a;
-    }
+    f32 Abs( const f32 a );
 
     /// Test equality of two floating pt numbers
-    inline bool Eq( f32 a, f32 b, f32 e ) {
-        return Abs( a - b ) < e;
-    }
+    bool Eq( f32 a, f32 b, f32 e );
 
-    /// Returns a random floating pt number between to vals
-    inline f32 RandomValue( f32 a, f32 b ) {
-        f32 range = Abs( a - b );
-        return ( (f32)rand() / RAND_MAX ) * range + ( ( a < b ) ? a : b );
-    }
+    /// Returns a random floating pt number between two vals
+    f32 RandomValue( f32 a, f32 b );
+
+    /// Returns a random vec2 with x and y between two vals
+    vec2 RandomVec2( f32 a, f32 b );
+    vec2i RandomVec2i( int a, int b );
 
     /// Return the given radian value in degrees
-    inline f32 Deg2Rad( const f32 a ) {
-        return a * ( M_PI / 180.f );
-    }
+    f32 Deg2Rad( const f32 a );
 
     /// Returns the given degree value in radians
-    inline f32 Rad2Deg( const f32 a ) {
-        return a * ( 180.f / M_PI );
-    }
+    f32 Rad2Deg( const f32 a );
 
     /// Clamp the given int between two other
-    inline void Clamp( int *x, const int min, const int max ) {
-        *x = *x > max ? max : ( *x < min ? min : *x );
-    }
+    int Clamp( int x, const int min, const int max );
 
     /// Clamp the given float between two other
-    inline void Clampf( f32 *x, const f32 min, const f32 max ) {
-        *x = *x > max ? max : ( *x < min ? min : *x );
-    }
+    f32 Clampf( f32 x, const f32 min, const f32 max );
 
     /// Returns whether a point p is on, under or over a segment AB
     /// @return : 0 if on line, -1 if under, 1 if above.
@@ -249,5 +282,11 @@
     int PointOnLinei( const vec2i *p, const vec2i *A, const vec2i *B );
 
 // #############################################################################
+
+
+// common Arrays declatations
+SimpleArrayDecl( u32, u32 )
+SimpleArrayDecl( vec2, vec2 )
+SimpleArrayDecl( vec2i, vec2i )
 
 #endif // COMMON_H

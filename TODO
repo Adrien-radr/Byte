@@ -18,27 +18,31 @@ Byte-Project : TODO File
 + Remove DEVICE and put its stuff in GAME
 + make camera zoom following fixed step zoom levels
 
-    Client-Server
-    ------------
-    + Client part
-    + Msg struct for msg transmission
-    + Dedicated server & client-only
-    - server/client (for solo)
-
-    + Add free port finding (several connection from single machine )
-    + Handle server refusing because not enough slot
+    Animation System
+    -----------------
+    + Basic system (load anims as frames on a texture atlas)
+    + Linear movement between tiles (ie. during walk anim)
 
     Map System
     ----------
     + Squared tiles map (3d?)
     + Mouse picking support
-    - Quad-Tree 
     - Procedurally created map (world-map and scene-map)
-    - Pathfinding
-        - basic A* pathfinding
+    + Pathfinding
+        + basic A* pathfinding
         - wall (between tiles) collision
         - actors collision (even in-route)
         - actors movement prediction
+        - group movement (squad with leader; with flocking?)
+    + World-Tiles -- Scene-Tiles system
+    + Scene-Tiles as a concatenation of a 3x3 world-tiles(for pathfinding)
+    + Transition between world tiles during pathfinding
+    + Recreation of the Scene Tile when the player move to another tile
+
+    Scene Managment
+    ---------------
+    - Quad-Tree 
+    - Back-to-front sorting of sprites (use depth instead?)
 
     Lighting
     --------
@@ -46,13 +50,18 @@ Byte-Project : TODO File
         + Map isometric fragment lighting
         + Sprites fragment lighting
         + Sprites lighting with sprite height support
+    + Multiple scene lights
     - Directional (sun) lights
     - 2D Normal maps of sprites ?
-    - Dynamic shadows
+    - Dynamic shadows (only walls?)
+
+    Gameplay
+    --------
+    - Handling events/inputs (if GUI says so)
+    ...
 
     Misc
     ----
     + Clean the main
     - Lua integration as a scripting language (??)
     - GUI (with Lua or json) (Handled by Beulard)
-    - Fix camera position when resizing window (messy)! (maybe no window resizing at all +)
