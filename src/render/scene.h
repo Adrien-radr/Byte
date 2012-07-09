@@ -33,13 +33,9 @@ typedef struct {
 } SceneTile;
 
 /// Scene structure. Keep all info about rendering in the current view
-<<<<<<< HEAD:src/client/scene.h
 typedef struct s_Scene {
-=======
-typedef struct {
     u32             map_shader;         ///< Shader used to render map
 
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/render/scene.h
     u32             sprite_shader;      ///< Shader used to render sprites
     SpriteArray     *sprites;           ///< Sprites in the scene
 
@@ -98,31 +94,25 @@ void Scene_setLocation( Scene *scene, int x, int y );
 // ##########################################################################3
 //      Scene Map
     /// Returns the global coordinates of a screen pos, not depending of camera
-    /// zoom or pan. 
+    /// zoom or pan.
     vec2  Scene_screenToGlobal( Scene *scene, const vec2i *local );
 
     /// Returns the map tile at a given local screen position
     vec2i Scene_screenToIso( Scene *scene, const vec2i *local );
 
-<<<<<<< HEAD:src/client/scene.h
     void SceneMap_redTile( Scene *scene, u32 i, u32 j );
 
-=======
     //void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red );
-    
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/render/scene.h
+
 
 // ##########################################################################3
 //      Sprite Array
     /// Add a sprite to be rendered each frame in the scene
     /// @param pActor : the Actor that must be drawn as a sprite
-<<<<<<< HEAD:src/client/scene.h
     /// @return : The handle to the given sprite
-    int  Scene_addSpriteFromActor( Scene *pScene, Actor *pActor );
-=======
-    /// @return : The handle to the given sprite 
+    int  Scene_addSpriteFromActor( Scene *pScene, Agent *pAgent );
+    /// @return : The handle to the given sprite
     int  Scene_addAgentSprite( Scene *scene, Agent *agent );
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/render/scene.h
 
     /// Modify one attribute of a Sprite (given by its handle)
     /// @param pAttrib : the attribute type we want to change (see sprite.h)
@@ -155,7 +145,7 @@ void Scene_setLocation( Scene *scene, int x, int y );
 // ##########################################################################3
 //      Widgets Array
     /// Add a widget (and recursively all its children) to be rendered
-    int Scene_addWidget( Scene *scene, Widget *widget );
+    void Scene_addWidget( Scene *scene, Widget *widget );
 
     /// Modify one attribute of a Widget (given by its handle)
     /// @param attrib : the attribute type we want to change (see widget.h)

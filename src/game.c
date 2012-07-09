@@ -22,10 +22,10 @@ void Game_mouseListener( const Event *event, void *data ) {
 
     // if in game mode
     if( game->mode == EGame ) {
-        // TODO : send event to GUI, and if not intercepted, 
+        // TODO : send event to GUI, and if not intercepted,
         // send event to World
         World_receiveEvent( game->world, event );
-        Scene_receiveEvent( game->scene, event ); 
+        Scene_receiveEvent( game->scene, event );
     }
 }
 
@@ -36,10 +36,10 @@ void Game_keyListener( const Event *event, void *data ) {
 
     // if in game mode
     if( game->mode == EGame ) {
-        // TODO : send event to GUI, and if not intercepted, 
+        // TODO : send event to GUI, and if not intercepted,
         // send event to World
         World_receiveEvent( game->world, event );
-        Scene_receiveEvent( game->scene, event ); 
+        Scene_receiveEvent( game->scene, event );
     }
 }
 
@@ -145,7 +145,7 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
 
     // Initialize game clock
     Clock_reset( &game->clock );
-    
+
     // Initialize game log
     InitLog( "Byte.log", &game->clock );
 
@@ -182,14 +182,8 @@ bool Game_init( void (*init_func)(), bool (*frame_func)(f32) ) {
     check( ResourceManager_loadAllResources(), "Error while loading Game Resources. Aborting initialization.\n");
 
 
-<<<<<<< HEAD:src/client/game.c
     // Init Game World
-    check( World_init(), "Error while creating Game World. Aborting initialization.\n" );
-
-=======
-    // Init Game World 
     check( World_init( &game->world ), "Error while creating Game World. Aborting initialization.\n" );
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/game.c
 
 
     // Initialize Game current Scene
@@ -263,11 +257,9 @@ error:
 void Game_destroy() {
     if( game ) {
         Scene_destroy( game->scene );
-<<<<<<< HEAD:src/client/game.c
         Widget_remove( root->widget );
-=======
+
         World_destroy( game->world );
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/game.c
 
         AnimManager_unloadAll( &game->anims );
         ResourceManager_destroy();
@@ -302,33 +294,7 @@ void Game_run() {
         if( IsKeyUp( K_Escape ) || !Context_isWindowOpen() )
             break;
 
-<<<<<<< HEAD:src/client/game.c
-    actor->mesh_id = ResourceManager_get( scaled_mesh_str );
-    // if correctly sized mesh is not yet loaded, create it
-    if( -1 == actor->mesh_id ) {
-        actor->mesh_id = ResourceManager_get( actor->assets.mesh );
-        check( actor->mesh_id >= 0, "Error while loading actor '%s' mesh. Mesh '%s' is not a loaded resource.\n", actor->mFirstname, actor->assets.mesh );
 
-        // resize
-        int scaled_mesh = Renderer_createRescaledMesh( actor->mesh_id, &actor->size );
-        check( scaled_mesh >= 0, "Error while creating scaled mesh for actor '%s'. \n", actor->mFirstname );
-
-        actor->mesh_id = scaled_mesh;
-
-        // add newly rescaled mesh to resource manager
-        ResourceManager_add( scaled_mesh_str, scaled_mesh );
-    }
-
-    // load textures
-    for( int i = 0; i < actor->assets.tex_n; ++i ) {
-        if( !actor->assets.texture[i][0] )
-            actor->texture_ids[i] = -1;
-        else {
-            actor->texture_ids[i] = ResourceManager_get( actor->assets.texture[i] );
-            check( actor->assets.texture[i] >= 0, "Error while loading actor '%s' texture. Texture '%s' is not a loaded resource.\n", actor->mFirstname, actor->assets.texture[i] );
-        }
-=======
-        
         // update events and inputs
         EventManager_update();
 
@@ -359,11 +325,10 @@ void Game_run() {
             Renderer_beginFrame();
             Scene_render( game->scene );
             Context_swap();
-    
+
 
         // calculate frame time
         frame_t = Clock_getElapsedTime( &game->clock ) - start_t;
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/game.c
     }
 
     // End game and free RAM/VRAM resources

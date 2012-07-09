@@ -3,8 +3,8 @@
 
 #include "common/common.h"
 #include "common/vector.h"
-#include "client/event.h"
-#include "client/context.h"
+#include "event.h"
+#include "render/context.h"
 
 typedef struct s_Widget Widget;
 typedef struct s_Scene Scene;
@@ -101,14 +101,9 @@ typedef struct s_Widget {
     u32                 childrenSize;
 
     struct {
-<<<<<<< HEAD:src/client/gui.h
         u32 mesh;
         u32 texture;
         u32 text;
-=======
-        int mesh;
-        int texture;
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/gui.h
     }                   assets;
 } Widget;
 

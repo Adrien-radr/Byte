@@ -1,9 +1,10 @@
 #include "gui.h"
 #include "game.h"
 #include "resource.h"
-<<<<<<< HEAD:src/client/gui.c
-#include "renderer.h"
-#include "scene.h"
+#include "render/renderer.h"
+#include "render/scene.h"
+
+
 //  Root widget listener functions
 void rootMouseListener( const Event* event, void* root ) {
     RootWidget* r = (RootWidget*)root;
@@ -12,9 +13,6 @@ void rootMouseListener( const Event* event, void* root ) {
     if( event->type == EMouseReleased )
         r->mouseDown = false;
 }
-=======
-#include "render/renderer.h"
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/gui.c
 
 void rootKeyListener( const Event* event, void* root ) {
 
@@ -203,7 +201,6 @@ bool topLeftResizeCallback( Widget* widget, const Event* e ) {
     else
         widget->mouseOffset = vec2i_c( 1, 1 );
 
-<<<<<<< HEAD:src/client/gui.c
     return false;
 }
 
@@ -228,12 +225,6 @@ bool bottomLeftResizeCallback( Widget* widget, const Event* e ) {
     }
     else
         widget->mouseOffset = vec2i_c( 1, -1 );
-=======
-            // resize
-            vec2 size = vec2_vec2i( &widget->size );
-            int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size, &(vec2){ 1,1 } );
-            check( scaled_mesh >= 0, "Error while creating scaled mesh for widget.\n" );
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227:src/gui.c
 
     return false;
 }
@@ -321,7 +312,7 @@ Widget* Widget_init( WidgetType type, vec2i* size, const char *mesh, const char 
 
                         // resize
                         vec2 size = vec2_vec2i( &widget->size );
-                        int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size );
+                        int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size, &(vec2){ 1, 1 } );
                         check( scaled_mesh >= 0, "Error while creating scaled mesh for widget.\n" );
 
                         widget->assets.mesh = scaled_mesh;
@@ -354,7 +345,7 @@ Widget* Widget_init( WidgetType type, vec2i* size, const char *mesh, const char 
 
                         // resize
                         vec2 size = vec2_vec2i( &widget->size );
-                        int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size );
+                        int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size, &(vec2){ 1, 1 } );
                         check( scaled_mesh >= 0, "Error while creating scaled mesh for widget.\n" );
 
                         widget->assets.mesh = scaled_mesh;
@@ -388,7 +379,7 @@ Widget* Widget_init( WidgetType type, vec2i* size, const char *mesh, const char 
 
                         // resize
                         vec2 size = vec2_vec2i( &widget->size );
-                        int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size );
+                        int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size, &(vec2){ 1, 1 } );
                         check( scaled_mesh >= 0, "Error while creating scaled mesh for widget.\n" );
 
                         widget->assets.mesh = scaled_mesh;
@@ -426,7 +417,7 @@ Widget* Widget_init( WidgetType type, vec2i* size, const char *mesh, const char 
 
                         // resize
                         vec2 size = vec2_vec2i( &widget->size );
-                        int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size );
+                        int scaled_mesh = Renderer_createRescaledMesh( widget->assets.mesh, &size, &(vec2){ 1, 1 } );
                         check( scaled_mesh >= 0, "Error while creating scaled mesh for widget.\n" );
 
                         widget->assets.mesh = scaled_mesh;
@@ -546,7 +537,7 @@ Widget* Widget_createWindowHead( Widget* window, u32 name ) {
 
     windowOutline->position.x = head->position.x - 5;
     windowOutline->position.y = head->position.y - 5;
-    windowOutline->depth = window->depth;
+    windowOutline->depth = window->depth + 1;
 
     windowCornerTopLeft->position.x = head->position.x - 5;
     windowCornerTopLeft->position.y = head->position.y - 5;
@@ -804,6 +795,5 @@ vec2i Window_minSize( Widget* widget ) {
     }
     return minSize;
 }
-
 
 

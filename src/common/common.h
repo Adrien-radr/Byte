@@ -22,7 +22,7 @@
 #include "debug.h"
 
 
-/// Different game modes 
+/// Different game modes
 typedef enum {
     EGame,      ///< In game. IA, camera, animations activated
     EMenu,      ///< In game menu. No IA, no camera, no animations
@@ -133,7 +133,7 @@ typedef enum {
         type    *data;                                                          \
         u32     cpt;                                                            \
         u32     size;                                                           \
-    } name##Array;                                                              
+    } name##Array;
 
 #   define Array( type, name )                                                  \
     bool name##Array_init( name##Array *arr, u32 size ) {                       \
@@ -188,23 +188,23 @@ typedef enum {
 #   define SimpleArray( type, name )                                            \
         ArrayStruct( type, name ) \
         Array( type, name )                                                     \
-        SimpleArrayFuncs( type, name ) 
+        SimpleArrayFuncs( type, name )
 
 #   define HeapArray( type, name, destructionFunc )                             \
         ArrayStruct( type, name ) \
         Array( type, name )                                                     \
-        HeapArrayFuncs( type, name, destructionFunc ) 
+        HeapArrayFuncs( type, name, destructionFunc )
 
 //      DECLARATIONS / DEFINITIONS
 #   define ArrayDecl( type, name ) \
         ArrayStruct( type, name ) \
         bool name##Array_init( name##Array *arr, u32 size ); \
-        bool name##Array_checkSize( name##Array *arr ); 
+        bool name##Array_checkSize( name##Array *arr );
 
 #   define SimpleArrayDecl( type, name ) \
         ArrayDecl( type, name ) \
         void name##Array_destroy( name##Array *arr ); \
-        void name##Array_clear( name##Array *arr ); 
+        void name##Array_clear( name##Array *arr );
 
 #   define HeapArrayDecl( type, name ) \
         ArrayDecl( type, name ) \
@@ -212,11 +212,11 @@ typedef enum {
 
 #   define SimpleArrayDef( type, name ) \
         Array( type, name )                                                     \
-        SimpleArrayFuncs( type, name ) 
+        SimpleArrayFuncs( type, name )
 
 #   define HeapArrayDef( type, name, destructionFunc )                          \
         Array( type, name )                                                     \
-        HeapArrayFuncs( type, name, destructionFunc ) 
+        HeapArrayFuncs( type, name, destructionFunc )
 
 
 // #############################################################################
@@ -240,13 +240,10 @@ typedef enum {
 #   define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-<<<<<<< HEAD
 
     // forward decl (definition in vector.h)
     typedef struct vec2_ vec2;
     typedef struct vec2i_ vec2i;
-=======
->>>>>>> 3bea4da6e8557a059857b1b87581cf849d4e7227
 
     /// Returns the sign of a float
     int Sign( const f32 a, const f32 threshold );

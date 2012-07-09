@@ -23,7 +23,7 @@ void SceneMap_init( Scene *scene, WorldTile *tile ) {
     u32  map_indices[9*6*lmap_size];
 
     // vertex position offsets
-    int x_offset, y_offset;  
+    int x_offset, y_offset;
 
     // Scene Tile offset (absolute offset to given tile)
     int stx_offset;
@@ -32,7 +32,7 @@ void SceneMap_init( Scene *scene, WorldTile *tile ) {
     // arrays indices offsets ( xi and yj for pos and tcs offsets,
     int xi, yj, ii, ij;      // ii and ij for indices               )
     int xt, yt, it, jt;      // xt and yt for the tiles (x,y)
-     
+
 
     // create map mesh data for 3x3 world tiles
     for( int y = 0; y < 3; ++y ) {
@@ -50,7 +50,7 @@ void SceneMap_init( Scene *scene, WorldTile *tile ) {
 
                     // i * 4 : 4 vertices for each tile
                     xi = xt + i * 4;
-                    // j * 2 : each row index is a col of 2 tiles 
+                    // j * 2 : each row index is a col of 2 tiles
                     // LOCAL_MAP_WIDTH * 4 : 4 vertices for a complete row of tiles
                     yj = yt + j * 2 * lmap_width * 4;
                     map_pos[yj+xi+0].x = x_offset + tile_hw;
@@ -60,7 +60,7 @@ void SceneMap_init( Scene *scene, WorldTile *tile ) {
                     map_pos[yj+xi+2].x = x_offset + tile_hw;
                     map_pos[yj+xi+2].y = y_offset;
                     map_pos[yj+xi+3].x = x_offset + tile_w;
-                    map_pos[yj+xi+3].y = y_offset + tile_hh; 
+                    map_pos[yj+xi+3].y = y_offset + tile_hh;
 
                     map_tcs[yj+xi+0].x = 0.5f;     map_tcs[yj+xi+0].y = 1.f;
                     map_tcs[yj+xi+1].x = 0.f;     map_tcs[yj+xi+1].y = 0.5f;
@@ -79,26 +79,26 @@ void SceneMap_init( Scene *scene, WorldTile *tile ) {
         }
     }
 
-    // create mesh 
+    // create mesh
     if( 0 == scene->map.mesh )
         scene->map.mesh = Renderer_createDynamicMesh( GL_TRIANGLES );
 
     Renderer_setDynamicMeshData( scene->map.mesh, (f32*)map_pos, sizeof(map_pos), (f32*)map_tcs, sizeof(map_tcs), map_indices, sizeof(map_indices) );
 
- 
+
     // get shader and texture
     scene->map.texture = ResourceManager_get( "pierre.png" );
 }
 /*
 void SceneMap_redTile( Scene *scene, const vec2i *tile, bool red ) {
-    if( tile->x >= lmap_width*2 || tile->y >= lmap_height/2 ) 
+    if( tile->x >= lmap_width*2 || tile->y >= lmap_height/2 )
         return;
 
     Mesh *m = Renderer_getMesh( tile->map.mesh );
     u32 tcs_offset = m->vertex_count * 2;
     int i_offset = tile->x * 8,
         j_offset = tile->y * 2 * lmap_width * 8;
- 
+
 
     // we change only on even indices, only the X coord, not Y
     m->data[tcs_offset+i_offset+j_offset+0] = red ? 0.75f : 0.25f;
@@ -131,7 +131,7 @@ void Scene_setLocation( Scene *scene, int x, int y ) {
     y = Clamp( y, 0, wmap_height-3 );
 
 
-    if( scene->map.location.x >=0 && !vec2i_eq( &scene->map.location, &(vec2i){x,y} ) ) {  
+    if( scene->map.location.x >=0 && !vec2i_eq( &scene->map.location, &(vec2i){x,y} ) ) {
         // check if deplacement on X
         int dx = (int)x - scene->map.location.x;
         if( dx ) {
@@ -203,7 +203,7 @@ void Scene_setLocation( Scene *scene, int x, int y ) {
         }
     } else if( scene->map.location.x == -1 ){ // initialization case
         // if initialization, just add the agents on the 3x3 tiles at (x,y)
-        for( int j = 0; j < 3; ++j ) 
+        for( int j = 0; j < 3; ++j )
             for( int i = 0; i < 3; ++i ) {
                 WorldTile *t = World_getTile( game->world, x+i, y+j );
                 for( u32 i = 0; i < t->agents->mCount; ++i ) {
@@ -332,7 +332,7 @@ void Scene_destroy( Scene *scene ) {
         //StaticObjectArray_destroy( scene->wall_objs );
 
         DEL_PTR( scene );
-    }   
+    }
 }
 
 
@@ -348,7 +348,7 @@ inline void Scene_receiveEvent( Scene *scene, const Event *evt ) {
 
 void Scene_updateAnimations( Scene *scene, f32 frame_time );
 inline void Scene_updateAnimations( Scene *scene, f32 frame_time ) {
-    for( u32 i = 0; i < scene->sprites->mMaxIndex; ++i ) 
+    for( u32 i = 0; i < scene->sprites->mMaxIndex; ++i )
         if( HandleManager_isUsed( scene->sprites->mUsed, i ) && scene->sprites->anims[i].frame_n >= 0 ) {
             if( Anim_update( &scene->sprites->anims[i], frame_time ) ) {
                 scene->sprites->mAttributes[i].x[6] = scene->sprites->anims[i].frames[scene->sprites->anims[i].curr_n].x;
@@ -363,6 +363,7 @@ inline void Scene_updateShadersProjMatrix( Scene *pScene ) {
 }
 
 inline void Scene_update( Scene *scene, f32 frame_time, GameMode mode ) {
+    Widget_update( scene, root->widget );
     switch( mode ) {
         case EGame:
             Scene_updateAnimations( scene, frame_time );
@@ -390,7 +391,7 @@ void Scene_render( Scene *pScene ) {
         Renderer_useShader( pScene->map_shader );
         Shader_sendInt( "Depth", 9 );
 
-        if( change_power > 0.09f ) 
+        if( change_power > 0.09f )
             Shader_sendFloat( "light_power", light_powers[power_index] );
 
         // loop on all scene tiles
@@ -409,7 +410,7 @@ void Scene_render( Scene *pScene ) {
 
         if( change_power > 0.09f ) {
             Shader_sendFloat( "light_power", light_powers[power_index] );
-            change_power = 0.f; 
+            change_power = 0.f;
             power_index = (power_index + 1) % 5;
         }
 
@@ -430,10 +431,13 @@ void Scene_render( Scene *pScene ) {
 
         for( u32 i = 0; i < pScene->widgets->max_index; ++i ){
             if( HandleManager_isUsed( pScene->widgets->used, i ) ) {
-                Renderer_useTexture( pScene->widgets->textures[i], 0 );
-                Shader_sendVec2( "Position", &pScene->widgets->positions[i] );
-                Shader_sendInt( "Depth", pScene->widgets->depths[i] );
-                Renderer_renderMesh( pScene->widgets->meshes[i] );
+                if( pScene->widgets->textures[i] >= 0 ){
+                    Renderer_useTexture( pScene->widgets->textures[i], 0 );
+                    Shader_sendVec2( "Position", &pScene->widgets->positions[i] );
+                    Shader_sendVec2( "Scale", &pScene->widgets->scales[i] );
+                    Shader_sendInt( "Depth", pScene->widgets->depths[i] );
+                    Renderer_renderMesh( pScene->widgets->meshes[i] );
+                }
             }
         }
 
@@ -444,11 +448,13 @@ void Scene_render( Scene *pScene ) {
 
         for( u32 i = 0; i < pScene->texts->mMaxIndex; ++i ) {
             if( HandleManager_isUsed( pScene->texts->mUsed, i ) ) {
-                Renderer_useTexture( pScene->texts->mFonts[i]->mTexture, 0 );
-                Shader_sendInt( "Depth", pScene->texts->mDepths[i] );
-                Shader_sendColor( "Color", &pScene->texts->mColors[i] );
-                Shader_sendVec2( "Position", &pScene->texts->mPositions[i] );
-                Renderer_renderMesh( pScene->texts->mMeshes[i] );
+                if( pScene->texts->mVisible[i] ) {
+                    Renderer_useTexture( pScene->texts->mFonts[i]->mTexture, 0 );
+                    Shader_sendInt( "Depth", pScene->texts->mDepths[i] );
+                    Shader_sendColor( "Color", &pScene->texts->mColors[i] );
+                    Shader_sendVec2( "Position", &pScene->texts->mPositions[i] );
+                    Renderer_renderMesh( pScene->texts->mMeshes[i] );
+                }
             }
         }
 
@@ -516,7 +522,7 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
                 break;
                 case SA_Animation :
                 {
-                    // copy of anim 
+                    // copy of anim
                     Anim_cpy( &pScene->sprites->anims[pHandle], (Anim*)pData );
 
                     // change current frame in Attribute matrix
@@ -536,16 +542,16 @@ void Scene_modifySprite( Scene *pScene, u32 pHandle, SpriteAttrib pAttrib, void 
                     break;
             }
         }
-    }   
+    }
 }
 
 void Scene_removeSprite( Scene *pScene, u32 pIndex ) {
-    if( pScene ) 
+    if( pScene )
         SpriteArray_remove( pScene->sprites, pIndex );
 }
 
 void Scene_clearSprites( Scene *pScene ) {
-    if( pScene ) 
+    if( pScene )
         SpriteArray_clear( pScene->sprites );
 }
 
@@ -560,6 +566,7 @@ int Scene_addText( Scene *pScene, const Font *pFont, Color pColor ) {
         if( handle >= 0 ) {
             pScene->texts->mFonts[handle] = pFont;
             pScene->texts->mColors[handle] = pColor;
+            pScene->texts->mVisible[handle] = true;
         }
     }
 
@@ -587,7 +594,7 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
                         // recreate VBO
                         Text_setString( pScene->texts->mMeshes[pHandle], pScene->texts->mFonts[pHandle], s );
 
-                        // copy string inside textarray to keep track of current string 
+                        // copy string inside textarray to keep track of current string
                         pScene->texts->mStrings[pHandle] = byte_realloc( pScene->texts->mStrings[pHandle], strlen( s ) + 1 );
                         strcpy( pScene->texts->mStrings[pHandle], s );
                     }
@@ -598,38 +605,57 @@ void Scene_modifyText( Scene *pScene, u32 pHandle, TextAttrib pAttrib, void *pDa
                 case TA_Color:
                     pScene->texts->mColors[pHandle] = *((Color*)pData);
                     break;
+                case TA_Visible :
+                    pScene->texts->mVisible[pHandle] = *((bool*)pData);
             }
         }
     }
 }
 
 void Scene_removeText( Scene *pScene, u32 pIndex ) {
-    if( pScene ) 
+    if( pScene )
         TextArray_remove( pScene->texts, pIndex );
 }
 
 void Scene_clearTexts( Scene *pScene ) {
-    if( pScene ) 
+    if( pScene )
         TextArray_clear( pScene->texts );
 }
 
 
 //  =======================
 
-inline int Scene_addWidget( Scene *scene, const Widget *widget ) {
+void Scene_addWidget( Scene *scene, Widget *widget ) {
     int handle = -1;
 
     if( scene ){
         handle = WidgetArray_add( scene->widgets );
         if( handle >= 0 ) {
-            scene->widgets->meshes[handle] = widget->assets.mesh;
-            scene->widgets->textures[handle] = widget->assets.texture;
+            widget->sceneIndex = handle;
+            widget->visible = true;
+
+            if( widget->assets.mesh >= 0 )
+                scene->widgets->meshes[handle] = widget->assets.mesh;
+            if( widget->assets.texture >= 0 )
+                scene->widgets->textures[handle] = widget->assets.texture;
+            if( widget->assets.text >= 0 ) {
+                scene->widgets->texts[handle] = widget->assets.text;
+                vec2i textPos = vec2i_add( &widget->position, &widget->textOffset );
+                scene->widgets->textOffsets[handle] = vec2_vec2i(&widget->textOffset);
+                Scene_modifyText( scene, widget->assets.text, TA_Position, &textPos );
+                Scene_modifyText( scene, widget->assets.text, TA_Visible, &(bool){true} );
+                int depth = widget->depth - 1;
+                Scene_modifyText( scene, widget->assets.text, TA_Depth, &depth );
+            }
+
+            scene->widgets->scales[handle] = widget->scale;
             scene->widgets->depths[handle] = widget->depth;
             scene->widgets->positions[handle] = vec2_vec2i( &widget->position );
+            for( u32 i = 0; i < widget->childrenCount; ++i ) {
+                Scene_addWidget( scene, widget->children[i] );
+            }
         }
     }
-
-    return handle;
 }
 
 void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *data ) {
@@ -641,9 +667,18 @@ void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *da
                     break;
                 case WA_Position :
                     scene->widgets->positions[handle] = vec2_vec2i( (vec2i*)data );
+                    vec2i pos = vec2i_c( (int)scene->widgets->positions[handle].x, (int)scene->widgets->positions[handle].y );
+                    vec2i off = vec2i_c( (int)scene->widgets->textOffsets[handle].x, (int)scene->widgets->textOffsets[handle].y );
+                    vec2i textPos = vec2i_add( &pos, &off );
+                    Scene_modifyText( scene, scene->widgets->texts[handle], TA_Position, &textPos );
                     break;
                 case WA_Depth :
                     scene->widgets->depths[handle] = *((u32*)data);
+                    int depth = scene->widgets->depths[handle] - 1;
+                    Scene_modifyText( scene, scene->widgets->texts[handle], TA_Depth, &depth );
+                    break;
+                case WA_Scale :
+                    scene->widgets->scales[handle] = *((vec2*)data);
                     break;
                 default :
                     break;
@@ -654,12 +689,21 @@ void Scene_modifyWidget( Scene *scene, u32 handle, WidgetAttrib attrib, void *da
 
 
 
-inline void Scene_removeWidget( Scene *scene, u32 widget ) {
-    if( scene )
-        WidgetArray_remove( scene->widgets, widget );
+void Scene_removeWidget( Scene *scene, Widget* widget ) {
+    if( scene ) {
+        for( int i = widget->childrenCount - 1; i >= 0; --i )
+            Scene_removeWidget( scene, widget->children[i] );
+        WidgetArray_remove( scene->widgets, widget->sceneIndex );
+        if( widget->assets.text >= 0 ) {
+            Scene_modifyText( scene, widget->assets.text, TA_Visible, &(bool){false} );
+        }
+
+        widget->visible = false;
+        widget->sceneIndex = -1;
+    }
 }
 
-inline void Scene_clearWidgets( Scene *scene) {
+void Scene_clearWidgets( Scene *scene) {
     if( scene )
         WidgetArray_clear( scene->widgets );
 }
@@ -669,7 +713,7 @@ void Scene_addLight( Scene *scene, Light *l ) {
     static str32 pname;
 
     if( scene && scene->used_lights < 8 ) {
-        l->scene_id = scene->used_lights; 
+        l->scene_id = scene->used_lights;
         scene->lights[scene->used_lights++] = l;
 
         // update shaders using lights with new light
@@ -717,7 +761,7 @@ void Scene_removeLight( Scene *scene, Light *l ) {
         // update shaders using lights with new arrangement of lights
         // map
         Renderer_useShader( scene->map_shader );
-        
+
         for( int i = l->scene_id; i < scene->used_lights; ++i ) {
             snprintf( pname, 32, "light_color[%d]", i );
             Shader_sendColor( pname, &scene->lights[i]->diffuse );
@@ -733,7 +777,7 @@ void Scene_removeLight( Scene *scene, Light *l ) {
 
         // sprites
         Renderer_useShader( scene->sprite_shader );
-        
+
         for( int i = l->scene_id; i < scene->used_lights; ++i ) {
             snprintf( pname, 32, "light_color[%d]", i );
             Shader_sendColor( pname, &scene->lights[i]->diffuse );
@@ -755,7 +799,7 @@ inline void Scene_clearLights( Scene *scene ) {
     if( scene ) {
         memset( scene->lights, 0, 8 * sizeof(Light*) );
 
-        // update shaders using lights 
+        // update shaders using lights
         Renderer_useShader( scene->map_shader );
         Shader_sendInt( "light_N", 0 );
 
