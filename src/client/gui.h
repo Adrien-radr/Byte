@@ -4,17 +4,23 @@
 #include "common/common.h"
 #include "common/vector.h"
 #include "client/event.h"
+#include "client/context.h"
 
 typedef struct s_Widget Widget;
 typedef struct s_Scene Scene;
+typedef struct s_RootWidget RootWidget;
 
 //  Widget tree
-Widget *RootWidget,
-                *windowHead,
-                    *window,
-                *button;
+RootWidget *root;
+Widget            *windowHead,
+                          *window,
+                      *button,
+                      *openWindow;
 
 typedef bool (*WidgetCallback)(Widget*, const Event*);
+
+void rootMouseListener( const Event* event, void* root );
+void rootKeyListener( const Event* event, void* root );
 
 //  General function for close buttons on windows.
 bool windowCloseButtonCallback( Widget* widget, const Event* e );
@@ -31,6 +37,7 @@ bool topLeftResizeCallback( Widget* widget, const Event* e );
 bool topRightResizeCallback( Widget* widget, const Event* e );
 bool bottomLeftResizeCallback( Widget* widget, const Event* e );
 bool bottomRightResizeCallback( Widget* widget, const Event* e );
+bool openWindowCallback( Widget* widget, const Event* e );
 
 typedef enum {
     WO_Window = 0,
@@ -47,8 +54,6 @@ typedef enum {
     WO_Cross = 3
 }   WindowOrganization;
 
-
-
 typedef enum {
     WT_Root,
     WT_Window,
@@ -57,6 +62,19 @@ typedef enum {
     WT_Text,
     WT_Button,
 }   WidgetType;
+
+typedef enum {
+    WA_None,
+    WA_TopLeft,
+    WA_TopCenter,
+    WA_TopRight,
+    WA_CenterLeft,
+    WA_Center,
+    WA_CenterRight,
+    WA_BottomLeft,
+    WA_BottomCenter,
+    WA_BottomRight
+}   WidgetAnchor;
 
 typedef struct s_Widget {
     bool                visible;
@@ -68,11 +86,14 @@ typedef struct s_Widget {
 
     bool resized;
     bool moved;
+    bool confined;  //  Will the widget always be inside its parent ?
+    WidgetAnchor anchor;
 
     int                 depth;
     int                 sceneIndex; //  Index set when this widget is to be rendered. -1 when it's not.
 
     WidgetCallback callback;
+    vec2i mouseOffset;  //  This value is used when a widget must be resized or moved
 
     struct s_Widget        *parent;
     struct s_Widget       **children;
@@ -86,9 +107,17 @@ typedef struct s_Widget {
     }                   assets;
 } Widget;
 
+typedef struct s_RootWidget {
+    Widget* widget;
+    ListenerFunc mouseListener;
+    ListenerFunc keyListener;
+    bool mouseDown;
+}   RootWidget;
+
 
 
 /// Initialize the given widget (build the mesh);
+RootWidget* RootWidget_init();
 Widget* Widget_init( WidgetType type, vec2i* size, const char *mesh, const char *texture, int text );
 /// Create a head bar for the window, you must give the window widget and its name as parameters.
 Widget* Widget_createWindowHead( Widget* window, u32 name );
@@ -96,16 +125,17 @@ void Widget_update( Scene* scene, Widget* widget );
 bool Widget_callback( Widget* widget, const Event* e );
 void Widget_setPosition( Widget* widget, vec2i* pos );
 void Widget_resize( Widget* widget, vec2i* size );
-void Widget_addChild( Widget *parent, Widget* child );
+void Widget_addChild( Widget *parent, Widget* child, bool confined );
 void Widget_toggleShow( Widget* widget );
 bool Widget_mouseOver( const Widget* widget, const vec2i* mouse );
 
 /// Will be called on RootWidget when closing game to remove every widget.
 void Widget_remove( Widget* widget );
 
-//  Window head widget specific functions
-//  Those make the window re-place all its children when it is resized.
-void WidgetHead_reorganizeHorizontal( Widget* widget, Scene* scene );
-void WidgetHead_reorganizeVertical( Widget* widget, Scene* scene );
+void Window_resizeRight( Widget* widget, int size );
+void Window_resizeLeft( Widget* widget, int size );
+void Window_resizeUp( Widget* widget, int size );
+void Window_resizeDown( Widget* widget, int size );
+vec2i Window_minSize( Widget* widget );
 
 #endif /* BYTE_GUI */

@@ -211,7 +211,7 @@ error:
 void Game_destroy() {
     if( game ) {
         Scene_destroy( game->scene );
-        Widget_remove( RootWidget );
+        Widget_remove( root->widget );
 
         World_destroy();
         ResourceManager_destroy();

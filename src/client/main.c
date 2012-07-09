@@ -21,10 +21,9 @@
 Actor *a1;
 int a1_h;
 
-int root, window1, window1head, window1name, button1, text1;
 
 void mousecb( const Event *e, void *data ) {
-    if( !Widget_callback( RootWidget, e ) ) {
+    if( !Widget_callback( root->widget, e ) ) {
         if( e->type == EMouseReleased ) {
             if( e->button == MB_Right ) {
                 vec2 newpos = Scene_localToGlobal( game->scene, &e->v );
@@ -64,40 +63,41 @@ void init_callback() {
     Color c;
     Color_set( &c, 1.f, 1.f, 1.f, 1.f );
 
-    text1 = Scene_addText( game->scene, f, c );
-    Scene_modifyText( game->scene, text1, TA_String, "Button" );
 
-    window1name = Scene_addText( game->scene, f, c );
-    Scene_modifyText( game->scene, window1name, TA_String, "Window" );
 
     // GUI
-    vec2i contextsize = Context_getSize();
-    RootWidget = Widget_init( WT_Root, &contextsize, NULL, NULL, -1 );
-    RootWidget->position = vec2i_c( 0, 0 );
-
+    root = RootWidget_init();
 
     window = Widget_init( WT_Window, &(vec2i){ 300, 250 }, "quadmesh.json", "widgettexture.png", -1 );
     window->position = vec2i_c( 100, 100 );
     window->size = vec2i_c( 300, 250 );
     window->depth = -5;
 
-    windowHead = Widget_createWindowHead( window, window1name );
+    openWindow = Widget_init( WT_Button, &(vec2i){ 15, 15 }, "quadmesh.json", "winicon.png", -1 );
+    vec2i size = Context_getSize();
+    openWindow->position = vec2i_c( size.x - 15, 0 );
+    openWindow->callback = &openWindowCallback;
 
+    int winName = Scene_addText( game->scene, f, c );
+    Scene_modifyText( game->scene, winName, TA_String, "Window" );
 
+    windowHead = Widget_createWindowHead( window, winName );
 
-    button = Widget_init( WT_Button, &(vec2i){ 192, 38 }, "quadmesh.json", "widgettexture.png", text1 );
+    int buttonText = Scene_addText( game->scene, f, c );
+    Scene_modifyText( game->scene, buttonText, TA_String, "Button" );
+
+    button = Widget_init( WT_Button, &(vec2i){ 192, 38 }, "quadmesh.json", "widgettexture.png", buttonText );
     button->position = vec2i_c( 400, 400 );
-    button->size = vec2i_c( 192, 38 );
     button->textOffset = vec2i_c( 72, 11 );
-    button->depth = -5;
+    button->depth = -6;
     button->callback = &button1Callback;
 
 
-    Widget_addChild( RootWidget, windowHead );
-    Widget_addChild( RootWidget, button );
+    Widget_addChild( root->widget, windowHead, false );
+    Widget_addChild( root->widget, openWindow, false );
+    Widget_addChild( window, button, true );
 
-    window1head = Scene_addWidget( game->scene, windowHead );
-    button1 = Scene_addWidget( game->scene, button );
+    Scene_addWidget( game->scene, windowHead );
 
     EventManager_addListener( LT_MouseListener, mousecb, NULL );
 }

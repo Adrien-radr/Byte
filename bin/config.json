@@ -1,6 +1,6 @@
 {
     "bFullscreen" : false,
-    "iWindowWidth" : 800,
-    "iWindowHeight" : 600,
+    "iWindowWidth" : 1280,
+    "iWindowHeight" : 800,
     "iMultiSamples" : 0
 }

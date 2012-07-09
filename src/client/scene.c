@@ -258,7 +258,7 @@ void Scene_destroy( Scene *pScene ) {
 
 void Scene_update( Scene *pScene ) {
     Camera_update( pScene->camera );
-    Widget_update( pScene, RootWidget );
+    Widget_update( pScene, root->widget );
 }
 
 void Scene_updateShadersProjMatrix( Scene *pScene ) {
