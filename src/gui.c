@@ -21,31 +21,62 @@ void rootKeyListener( const Event* event, void* root ) {
 
 ////////////////////////////////////////////////////////
 ////    Some callback functions
-bool windowCloseButtonCallback( Widget* widget, const Event* e ) {
-    if( e->type == EMousePressed ){
-        if( Widget_mouseOver( widget, &e->v ) ) {
-            widget->parent->visible = false;
-            return true;
-        }
-    }
+bool defaultCallback( Widget* w, const Event* e ) {
     return false;
 }
 
-bool button1Callback( Widget* widget, const Event* e ) {
-    if( e->type == EMouseReleased )
-        if( Widget_mouseOver( widget, &e->v ) ){
-            Widget_toggleShow( windowHead );
+bool windowCloseButtonCallback( Widget* widget, const Event* e ) {
+    if( e->type == EMousePressed )
+        if( Widget_mouseOver( widget, &e->v ) ) {
+            widget->pressed = true;
             return true;
         }
+
+    if( e->type == EMouseReleased && widget->pressed ){
+        if( Widget_mouseOver( widget, &e->v ) ) {
+            Widget_toggleShow( widget->parent, !widget->parent->visible );
+            widget->pressed = false;
+            return true;
+        }
+    }
+    if( !root->mouseDown )
+        widget->pressed = false;
+
+    return false;
+}
+
+bool window1Callback( Widget* widget, const Event* e ) {
+    if( Widget_mouseOver( widget, &e->v ) )
+        if( e->type == EMousePressed || e->type == EMouseReleased )
+            return true;
+}
+
+bool button1Callback( Widget* widget, const Event* e ) {
+    if( e->type == EMousePressed )
+        if( Widget_mouseOver( widget, &e->v ) )
+            widget->pressed = true;
+
+    if( e->type == EMouseReleased && widget->pressed ) {
+        if( Widget_mouseOver( widget, &e->v ) ){
+            Widget_toggleShow( windowHead, !windowHead->visible );
+            widget->pressed = false;
+            return true;
+        }
+    }
+    if( !root->mouseDown )
+        widget->pressed = false;
+
     return false;
 }
 
 bool moveWindowCallback( Widget* widget, const Event* e ) {
-    if( Widget_mouseOver( widget, &e->v ) ) {
-        if( e->type == EMousePressed )
+    if( e->type == EMousePressed ) {
+        if( Widget_mouseOver( widget, &e->v ) ) {
             widget->mouseOffset = vec2i_sub( &widget->position, &e->v );
+            widget->pressed = true;
+        }
     }
-    if( root->mouseDown && widget->mouseOffset.x != -1 ) {
+    if( widget->pressed && widget->mouseOffset.x != -1 ) {
         vec2i pos = vec2i_add( &e->v, &widget->mouseOffset );
         Widget_setPosition( widget, &pos );
         vec2i win = pos;
@@ -56,104 +87,134 @@ bool moveWindowCallback( Widget* widget, const Event* e ) {
         out.x -= 5;
         out.y -= 5;
         Widget_setPosition( widget->children[WO_Outline], &out );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
 
         return true;
     }
-    else
+    else {
         widget->mouseOffset = vec2i_c( -1, -1 );
-
-    return false;
+        return false;
+    }
 }
 
 bool rightResizeCallback( Widget* widget, const Event* e ) {
-    if( Widget_mouseOver( widget, &e->v ) ) {
-        if( e->type == EMousePressed )
+    if( e->type == EMousePressed ) {
+        if( Widget_mouseOver( widget, &e->v ) ) {
             widget->mouseOffset.x =  e->v.x - widget->position.x;
+            widget->pressed = true;
+        }
     }
-    if( root->mouseDown && widget->mouseOffset.x != -1 ) {
+
+    if( widget->pressed && widget->mouseOffset.x != -1 ) {
         int right = e->v.x - widget->mouseOffset.x;
 
         int size = right - widget->parent->parent->position.x;
         Window_resizeRight( widget->parent->parent->children[WO_Window], size );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
+
         return true;
     }
-    else
+    else {
         widget->mouseOffset.x = -1;
-
-    return false;
+        return false;
+    }
 }
 
 bool bottomResizeCallback( Widget* widget, const Event* e ) {
-    if( Widget_mouseOver( widget, &e->v ) ) {
-        if( e->type == EMousePressed )
-            widget->mouseOffset.y = e->v.y - widget->position.y;
+    if( e->type == EMousePressed ) {
+        if( Widget_mouseOver( widget, &e->v ) ) {
+            widget->mouseOffset.y =  e->v.y - widget->position.y;
+            widget->pressed = true;
+        }
     }
-    if( root->mouseDown && widget->mouseOffset.y != -1 ) {
+
+    if( widget->pressed && widget->mouseOffset.y != -1 ) {
         int bottom = e->v.y - widget->mouseOffset.y;
 
         int size = bottom - widget->parent->parent->children[WO_Window]->position.y;
         Window_resizeDown( widget->parent->parent->children[WO_Window], size );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
+
         return true;
     }
-    else
+    else {
         widget->mouseOffset.y = -1;
-
-    return false;
+        return false;
+    }
 }
 
 bool leftResizeCallback( Widget* widget, const Event* e ) {
-    if( Widget_mouseOver( widget, &e->v ) ) {
-        if( e->type == EMousePressed )
-            widget->mouseOffset.x = widget->position.x - e->v.x;
+    if( e->type == EMousePressed ) {
+        if( Widget_mouseOver( widget, &e->v ) ) {
+            widget->mouseOffset.x =  widget->position.x - e->v.x;
+            widget->pressed = true;
+        }
     }
-    if( root->mouseDown && widget->mouseOffset.x != 1 ) {
+
+    if( widget->pressed && widget->mouseOffset.x != 1 ) {
         int left = e->v.x + 5 + widget->mouseOffset.x;
 
         int size = widget->parent->parent->children[WO_Window]->position.x + widget->parent->parent->children[WO_Window]->size.x - left;
         Window_resizeLeft( widget->parent->parent->children[WO_Window], size );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
+
         return true;
     }
-    else
+    else {
         widget->mouseOffset.x = 1;
-
-    return false;
+        return false;
+    }
 }
 
 bool topResizeCallback( Widget* widget, const Event* e ) {
-    if( Widget_mouseOver( widget, &e->v ) ) {
-        if( e->type == EMousePressed )
-            widget->mouseOffset.y = widget->position.y - e->v.y;
+    if( e->type == EMousePressed ) {
+        if( Widget_mouseOver( widget, &e->v ) ) {
+            widget->mouseOffset.y =  e->v.y - widget->position.y;
+            widget->pressed = true;
+        }
     }
-    if( root->mouseDown && widget->mouseOffset.y != 1 ) {
+    if( widget->pressed && widget->mouseOffset.y != 1 ) {
         int top = e->v.y + 5 + widget->mouseOffset.y + 18;
 
         int size = widget->parent->parent->children[WO_Window]->position.y + widget->parent->parent->children[WO_Window]->size.y - top;
         Window_resizeUp( widget->parent->parent->children[WO_Window], size );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
+
         return true;
     }
-    else
+    else {
         widget->mouseOffset.y = 1;
-
-    return false;
+        return false;
+    }
 }
 
 bool bottomRightResizeCallback( Widget* widget, const Event* e ) {
     if( Widget_mouseOver( widget, &e->v ) ) {
-        if( e->type == EMousePressed )
+        if( e->type == EMousePressed ) {
             widget->mouseOffset = vec2i_sub( &e->v, &widget->position );
+            widget->pressed = true;
+        }
     }
-    if( root->mouseDown && widget->mouseOffset.x != -1 ) {
+    if( widget->pressed && widget->mouseOffset.x != -1 ) {
         vec2i bottomright = vec2i_sub( &e->v, &widget->mouseOffset );
 
         vec2i size = vec2i_sub( &bottomright, &widget->parent->parent->children[WO_Window]->position );
         Window_resizeRight( widget->parent->parent->children[WO_Window], size.x );
         Window_resizeDown( widget->parent->parent->children[WO_Window], size.y );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
+
         return true;
     }
-    else
+    else {
         widget->mouseOffset = vec2i_c( -1, -1 );
-
-    return false;
+        return false;
+    }
 }
 
 bool topRightResizeCallback( Widget* widget, const Event* e ) {
@@ -161,9 +222,10 @@ bool topRightResizeCallback( Widget* widget, const Event* e ) {
         if( e->type == EMousePressed ) {
             widget->mouseOffset.x = e->v.x - widget->position.x;
             widget->mouseOffset.y = widget->position.y - e->v.y;
+            widget->pressed = true;
         }
     }
-    if( root->mouseDown && widget->mouseOffset.x != -1 ) {
+    if( widget->pressed && widget->mouseOffset.x != -1 ) {
         vec2i topright;
         topright.x = e->v.x - widget->mouseOffset.x;
         topright.y = e->v.y + 5 + widget->mouseOffset.y + 18;
@@ -173,21 +235,25 @@ bool topRightResizeCallback( Widget* widget, const Event* e ) {
         size.y = widget->parent->parent->children[WO_Window]->position.y + widget->parent->parent->children[WO_Window]->size.y - topright.y;
         Window_resizeRight( widget->parent->parent->children[WO_Window], size.x );
         Window_resizeUp( widget->parent->parent->children[WO_Window], size.y );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
+
         return true;
     }
-    else
+    else {
         widget->mouseOffset = vec2i_c( -1, 1 );
-
-    return false;
+        return false;
+    }
 }
 
 bool topLeftResizeCallback( Widget* widget, const Event* e ) {
     if( Widget_mouseOver( widget, &e->v ) ) {
         if( e->type == EMousePressed ) {
             widget->mouseOffset = vec2i_sub( &widget->position, &e->v );
+            widget->pressed = true;
         }
     }
-    if( root->mouseDown && widget->mouseOffset.x != 1 ) {
+    if( widget->pressed && widget->mouseOffset.x != 1 ) {
         vec2i topleft = vec2i_add( &e->v, &widget->mouseOffset );
         topleft.x += 5;
         topleft.y += 23;
@@ -196,12 +262,15 @@ bool topLeftResizeCallback( Widget* widget, const Event* e ) {
         vec2i size = vec2i_sub( &bottomright, &topleft );
         Window_resizeLeft( widget->parent->parent->children[WO_Window], size.x );
         Window_resizeUp( widget->parent->parent->children[WO_Window], size.y );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
+
         return true;
     }
-    else
+    else {
         widget->mouseOffset = vec2i_c( 1, 1 );
-
-    return false;
+        return false;
+    }
 }
 
 bool bottomLeftResizeCallback( Widget* widget, const Event* e ) {
@@ -209,9 +278,10 @@ bool bottomLeftResizeCallback( Widget* widget, const Event* e ) {
         if( e->type == EMousePressed ) {
             widget->mouseOffset.x = widget->position.x - e->v.x;
             widget->mouseOffset.y = e->v.y - widget->position.y;
+            widget->pressed = true;
         }
     }
-    if( root->mouseDown && widget->mouseOffset.x != 1 ) {
+    if( widget->pressed && widget->mouseOffset.x != 1 ) {
         vec2i bottomleft;
         bottomleft.x = e->v.x + widget->mouseOffset.x + 5;
         bottomleft.y = e->v.y - widget->mouseOffset.y;
@@ -221,18 +291,21 @@ bool bottomLeftResizeCallback( Widget* widget, const Event* e ) {
         size.y = bottomleft.y - widget->parent->parent->children[WO_Window]->position.y;
         Window_resizeLeft( widget->parent->parent->children[WO_Window], size.x );
         Window_resizeDown( widget->parent->parent->children[WO_Window], size.y );
+        if( e->type == EMouseReleased )
+            widget->pressed = false;
+
         return true;
     }
-    else
+    else {
         widget->mouseOffset = vec2i_c( 1, -1 );
-
-    return false;
+        return false;
+    }
 }
 
 bool openWindowCallback( Widget* widget, const Event* e ) {
     if( Widget_mouseOver( widget, &e->v ) ) {
         if( e->type == EMousePressed ){
-            Widget_toggleShow( windowHead );
+            Widget_toggleShow( windowHead, !windowHead->visible );
             return true;
         }
     }
@@ -273,7 +346,7 @@ Widget* Widget_init( WidgetType type, vec2i* size, const char *mesh, const char 
         widget->assets.mesh = -1;
         widget->children = NULL;
         widget->parent = NULL;
-        widget->callback = NULL;
+        widget->callback = &defaultCallback;
         widget->visible = true;
         widget->size.x = size->x;
         widget->size.y = size->y;
@@ -451,7 +524,7 @@ void Widget_remove( Widget* widget ) {
 }
 
 
-void Widget_addChild( Widget *parent, Widget* child, bool confine ) {
+void Widget_addChild( Widget *parent, Widget* child, bool confine, WidgetAnchor anchor ) {
     if( parent && child ) {
         if( child->parent ) {
             log_err( "Widget already has a parent, can't change it !" );
@@ -490,15 +563,19 @@ void Widget_addChild( Widget *parent, Widget* child, bool confine ) {
                 Widget_setPosition( child, &(vec2i){ child->position.x, parent->position.y + parent->size.y - child->size.y } );
         }
 
-
-
+    switch( anchor ) {
+        case WA_CenterLeft :
+        break;
+        default:
+        break;
+    }
     }
 }
 
-void Widget_toggleShow( Widget* widget ) {
+void Widget_toggleShow( Widget* widget, bool visible ) {
     for( u32 i = 0; i < widget->childrenCount; ++i )
-        Widget_toggleShow( widget->children[i] );
-    widget->visible = !(widget->visible);
+        Widget_toggleShow( widget->children[i], visible );
+    widget->visible = visible;
 }
 
 bool Widget_mouseOver( const Widget* widget, const vec2i* mouse ) {
@@ -579,16 +656,16 @@ Widget* Widget_createWindowHead( Widget* window, u32 name ) {
     windowSideBottom->depth = windowOutline->depth - 1;
     windowSideBottom->callback = &bottomResizeCallback;
 
-    Widget_addChild( head, window, false );
-    Widget_addChild( head, windowOutline, false );
-    Widget_addChild( windowOutline, windowSideTop, true );
-    Widget_addChild( windowOutline, windowSideLeft, true );
-    Widget_addChild( windowOutline, windowSideRight, true );
-    Widget_addChild( windowOutline, windowSideBottom, true );
-    Widget_addChild( windowOutline, windowCornerTopLeft, true );
-    Widget_addChild( windowOutline, windowCornerTopRight, true );
-    Widget_addChild( windowOutline, windowCornerBottomLeft, true );
-    Widget_addChild( windowOutline, windowCornerBottomRight, true );
+    Widget_addChild( head, window, false, WA_None );
+    Widget_addChild( head, windowOutline, false, WA_None );
+    Widget_addChild( windowOutline, windowSideTop, true, WA_None );
+    Widget_addChild( windowOutline, windowSideLeft, true, WA_None );
+    Widget_addChild( windowOutline, windowSideRight, true, WA_None );
+    Widget_addChild( windowOutline, windowSideBottom, true, WA_None );
+    Widget_addChild( windowOutline, windowCornerTopLeft, true, WA_None );
+    Widget_addChild( windowOutline, windowCornerTopRight, true, WA_None );
+    Widget_addChild( windowOutline, windowCornerBottomLeft, true, WA_None );
+    Widget_addChild( windowOutline, windowCornerBottomRight, true, WA_None );
 
 
 
@@ -601,8 +678,8 @@ Widget* Widget_createWindowHead( Widget* window, u32 name ) {
     cross->depth = window->depth - 1;
     cross->callback = &windowCloseButtonCallback;
 
-    Widget_addChild( head, icon, true );
-    Widget_addChild( head, cross, true );
+    Widget_addChild( head, icon, true, WA_None );
+    Widget_addChild( head, cross, true, WA_None );
 
 
     return head;
@@ -612,7 +689,7 @@ void Widget_update( Scene* scene, Widget* widget ) {
     if( widget->sceneIndex >= 0 ) {
         if( widget->visible == false )
             Scene_removeWidget( scene, widget );
-        //  For windows : if it has been resized, update all his children. //TODO BEULARD
+
         if( widget->resized ) {
             Scene_modifyWidget( scene, widget->sceneIndex, WA_Scale, &widget->scale );
             widget->resized = false;
@@ -639,7 +716,7 @@ bool Widget_callback( Widget* widget, const Event* e ) {
         if( Widget_callback( widget->children[i], e ) )
             ret = true;
     }
-    if( widget->sceneIndex >= 0 && widget->callback && !ret ) {
+    if( widget->visible && widget->callback && !ret ) {
         if( widget->callback( widget, e ) )
             ret = true;
     }

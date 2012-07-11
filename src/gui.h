@@ -22,10 +22,13 @@ typedef bool (*WidgetCallback)(Widget*, const Event*);
 void rootMouseListener( const Event* event, void* root );
 void rootKeyListener( const Event* event, void* root );
 
+//  Default callback function
+bool defaultCallback( Widget* widget, const Event* e );
 //  General function for close buttons on windows.
 bool windowCloseButtonCallback( Widget* widget, const Event* e );
 
 bool button1Callback( Widget* widget, const Event* e );
+bool window1Callback( Widget* widget, const Event* e );
 
 //  General functions for resizing of windows in every direction.
 bool moveWindowCallback( Widget* widget, const Event* e );
@@ -84,6 +87,7 @@ typedef struct s_Widget {
     vec2i               textOffset; //  Position of the text compared to the texture's.
     vec2               scale;      //  Used when the widget is resized.
 
+    bool pressed;
     bool resized;
     bool moved;
     bool confined;  //  Will the widget always be inside its parent ?
@@ -125,8 +129,8 @@ void Widget_update( Scene* scene, Widget* widget );
 bool Widget_callback( Widget* widget, const Event* e );
 void Widget_setPosition( Widget* widget, vec2i* pos );
 void Widget_resize( Widget* widget, vec2i* size );
-void Widget_addChild( Widget *parent, Widget* child, bool confined );
-void Widget_toggleShow( Widget* widget );
+void Widget_addChild( Widget *parent, Widget* child, bool confined, WidgetAnchor anchor );
+void Widget_toggleShow( Widget* widget, bool visible );
 bool Widget_mouseOver( const Widget* widget, const vec2i* mouse );
 
 /// Will be called on RootWidget when closing game to remove every widget.

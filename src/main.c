@@ -101,12 +101,12 @@ void init_callback() {
     button->depth = -6;
     button->callback = &button1Callback;
 
+    window->callback = &window1Callback;
 
-    Widget_addChild( root->widget, windowHead, false );
-    Widget_addChild( root->widget, openWindow, false );
-    Widget_addChild( window, button, true );
+    Widget_addChild( root->widget, windowHead, false, WA_Center );
+    Widget_addChild( root->widget, openWindow, false, WA_None );
+    Widget_addChild( window, button, true, WA_Center );
 
-    Scene_addWidget( game->scene, windowHead );
 
     EventManager_addListener( LT_MouseListener, mousecb, NULL );
 

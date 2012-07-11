@@ -3,8 +3,8 @@
 
 // Version
 #define BYTE_MAJOR 0
-#define BYTE_MINOR 1
-#define BYTE_PATCH 9
+#define BYTE_MINOR 2
+#define BYTE_PATCH 0
 
 // Platform
 #if defined(WIN32) || defined(_WIN32)

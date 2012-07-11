@@ -2,14 +2,14 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Byte Client" />
+		<Option title="Byte" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\..\bin\Byte" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="..\..\..\bin\" />
-				<Option object_output="..\..\..\obj\" />
+				<Option output="..\..\bin\Byte" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\bin\" />
+				<Option object_output="..\..\obj\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -17,19 +17,18 @@
 					<Add option="-std=c99" />
 					<Add option="-ggdb3" />
 					<Add option="-DGLEW_STATIC" />
-					<Add directory="..\..\..\ext" />
-					<Add directory="..\..\..\ext\json" />
-					<Add directory="..\..\..\src\" />
+					<Add directory="..\..\ext" />
+					<Add directory="..\..\ext\json" />
+					<Add directory="..\..\src\" />
 				</Compiler>
 				<Linker>
 					<Add option="-lglfwWIN" />
 					<Add option="-lfreetype" />
 					<Add option="-lz" />
 					<Add option="-lpng" />
-					<Add option="-lwsock32" />
 					<Add option="-lopengl32" />
 					<Add option="-static-libgcc" />
-					<Add directory="..\..\..\ext" />
+					<Add directory="..\..\ext" />
 				</Linker>
 				<MakeCommands>
 					<Build command="mingw32-make.exe -f $makefile Byte" />
@@ -56,124 +55,128 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="..\..\..\ext\GL\glewWIN.c">
+		<Unit filename="..\..\ext\GL\glewWIN.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\ext\json\cJSON.c">
+		<Unit filename="..\..\ext\json\cJSON.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\camera.c">
+		<Unit filename="..\..\src\agent.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\camera.h" />
-		<Unit filename="..\..\..\src\client\client.c">
+		<Unit filename="..\..\src\agent.h" />
+		<Unit filename="..\..\src\anim.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\client.h" />
-		<Unit filename="..\..\..\src\client\context.c">
+		<Unit filename="..\..\src\anim.h" />
+		<Unit filename="..\..\src\common\clock.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\context.h" />
-		<Unit filename="..\..\..\src\client\event.c">
+		<Unit filename="..\..\src\common\clock.h" />
+		<Unit filename="..\..\src\common\color.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\event.h" />
-		<Unit filename="..\..\..\src\client\game.c">
+		<Unit filename="..\..\src\common\color.h" />
+		<Unit filename="..\..\src\common\common.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\game.h" />
-		<Unit filename="..\..\..\src\client\gui.c">
+		<Unit filename="..\..\src\common\common.h" />
+		<Unit filename="..\..\src\common\debug.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\gui.h" />
-		<Unit filename="..\..\..\src\client\keys.h" />
-		<Unit filename="..\..\..\src\client\light.c">
+		<Unit filename="..\..\src\common\debug.h" />
+		<Unit filename="..\..\src\common\handlemanager.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\light.h" />
-		<Unit filename="..\..\..\src\client\main.c">
+		<Unit filename="..\..\src\common\handlemanager.h" />
+		<Unit filename="..\..\src\common\matrix.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\mesh.c">
+		<Unit filename="..\..\src\common\matrix.h" />
+		<Unit filename="..\..\src\common\vector.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\mesh.h" />
-		<Unit filename="..\..\..\src\client\renderer.c">
+		<Unit filename="..\..\src\common\vector.h" />
+		<Unit filename="..\..\src\event.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\renderer.h" />
-		<Unit filename="..\..\..\src\client\resource.c">
+		<Unit filename="..\..\src\event.h" />
+		<Unit filename="..\..\src\game.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\resource.h" />
-		<Unit filename="..\..\..\src\client\scene.c">
+		<Unit filename="..\..\src\game.h" />
+		<Unit filename="..\..\src\gui.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\scene.h" />
-		<Unit filename="..\..\..\src\client\shader.c">
+		<Unit filename="..\..\src\gui.h" />
+		<Unit filename="..\..\src\keys.h" />
+		<Unit filename="..\..\src\main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\shader.h" />
-		<Unit filename="..\..\..\src\client\sprite.c">
+		<Unit filename="..\..\src\map.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\sprite.h" />
-		<Unit filename="..\..\..\src\client\text.c">
+		<Unit filename="..\..\src\map.h" />
+		<Unit filename="..\..\src\render\camera.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\text.h" />
-		<Unit filename="..\..\..\src\client\texture.c">
+		<Unit filename="..\..\src\render\camera.h" />
+		<Unit filename="..\..\src\render\context.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\texture.h" />
-		<Unit filename="..\..\..\src\client\widget.c">
+		<Unit filename="..\..\src\render\context.h" />
+		<Unit filename="..\..\src\render\light.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\client\widget.h" />
-		<Unit filename="..\..\..\src\common\actor.c">
+		<Unit filename="..\..\src\render\light.h" />
+		<Unit filename="..\..\src\render\mesh.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\actor.h" />
-		<Unit filename="..\..\..\src\common\clock.c">
+		<Unit filename="..\..\src\render\mesh.h" />
+		<Unit filename="..\..\src\render\renderer.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\clock.h" />
-		<Unit filename="..\..\..\src\common\color.c">
+		<Unit filename="..\..\src\render\renderer.h" />
+		<Unit filename="..\..\src\render\scene.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\color.h" />
-		<Unit filename="..\..\..\src\common\common.c">
+		<Unit filename="..\..\src\render\scene.h" />
+		<Unit filename="..\..\src\render\shader.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\common.h" />
-		<Unit filename="..\..\..\src\common\debug.c">
+		<Unit filename="..\..\src\render\shader.h" />
+		<Unit filename="..\..\src\render\sprite.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\debug.h" />
-		<Unit filename="..\..\..\src\common\handlemanager.c">
+		<Unit filename="..\..\src\render\sprite.h" />
+		<Unit filename="..\..\src\render\static.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\handlemanager.h" />
-		<Unit filename="..\..\..\src\common\map.c">
+		<Unit filename="..\..\src\render\static.h" />
+		<Unit filename="..\..\src\render\text.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\map.h" />
-		<Unit filename="..\..\..\src\common\matrix.c">
+		<Unit filename="..\..\src\render\text.h" />
+		<Unit filename="..\..\src\render\texture.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\matrix.h" />
-		<Unit filename="..\..\..\src\common\net.c">
+		<Unit filename="..\..\src\render\texture.h" />
+		<Unit filename="..\..\src\render\widget.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\net.h" />
-		<Unit filename="..\..\..\src\common\vector.c">
+		<Unit filename="..\..\src\render\widget.h" />
+		<Unit filename="..\..\src\resource.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\vector.h" />
-		<Unit filename="..\..\..\src\common\world.c">
+		<Unit filename="..\..\src\resource.h" />
+		<Unit filename="..\..\src\wall.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\..\src\common\world.h" />
+		<Unit filename="..\..\src\wall.h" />
+		<Unit filename="..\..\src\world.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\src\world.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
