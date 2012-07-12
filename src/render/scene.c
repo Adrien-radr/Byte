@@ -357,13 +357,38 @@ inline void Scene_updateAnimations( Scene *scene, f32 frame_time ) {
         }
 }
 
+void Scene_updateWidgets( Scene* scene, Widget *widget, f32 frame_time ) {
+    if( widget->sceneIndex >= 0 ) {
+        if( widget->visible == false )
+            Scene_removeWidget( scene, widget );
+
+        if( widget->resized ) {
+            Scene_modifyWidget( scene, widget->sceneIndex, WA_Scale, &widget->scale );
+            widget->resized = false;
+        }
+        if( widget->moved ){
+            for( u32 i = 0; i< widget->childrenCount; ++i )
+                widget->children[i]->moved = true;
+
+            Scene_modifyWidget( scene, widget->sceneIndex, WA_Position, &widget->position );
+            widget->moved = false;
+        }
+    }
+    else {
+        if( widget->visible == true )
+            Scene_addWidget( scene, widget );
+    }
+    for( u32 i = 0; i < widget->childrenCount; ++i )
+        Scene_updateWidgets( scene, widget->children[i], frame_time );
+}
+
 inline void Scene_updateShadersProjMatrix( Scene *pScene ) {
     Renderer_updateProjectionMatrix( ECamera, &pScene->camera->mProjectionMatrix );
     Renderer_updateProjectionMatrix( EGui, &pScene->proj_matrix_2d );
 }
 
 inline void Scene_update( Scene *scene, f32 frame_time, GameMode mode ) {
-    Widget_update( scene, root->widget );
+    Scene_updateWidgets( scene, root->widget, frame_time );
     switch( mode ) {
         case EGame:
             Scene_updateAnimations( scene, frame_time );

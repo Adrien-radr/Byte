@@ -9,12 +9,12 @@
 			<Target title="Debug">
 				<Option output="..\..\bin\Byte" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="..\..\bin\" />
-				<Option object_output="..\..\obj\" />
+				<Option object_output="debug\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-g" />
-					<Add option="-std=c99" />
+					<Add option="-Wall" />
+					<Add option="-std=gnu99" />
 					<Add option="-ggdb3" />
 					<Add option="-DGLEW_STATIC" />
 					<Add directory="..\..\ext" />
@@ -22,7 +22,7 @@
 					<Add directory="..\..\src\" />
 				</Compiler>
 				<Linker>
-					<Add option="-lglfwWIN" />
+					<Add option="-lglfw" />
 					<Add option="-lfreetype" />
 					<Add option="-lz" />
 					<Add option="-lpng" />
@@ -40,8 +40,9 @@
 				</MakeCommands>
 			</Target>
 			<Target title="Release">
-				<Option output="bin\Release\Byte" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Release\" />
+				<Option output="..\..\bin\Byte" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\bin\" />
+				<Option object_output="release\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>

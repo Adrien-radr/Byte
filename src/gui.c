@@ -685,31 +685,6 @@ Widget* Widget_createWindowHead( Widget* window, u32 name ) {
     return head;
 }
 
-void Widget_update( Scene* scene, Widget* widget ) {
-    if( widget->sceneIndex >= 0 ) {
-        if( widget->visible == false )
-            Scene_removeWidget( scene, widget );
-
-        if( widget->resized ) {
-            Scene_modifyWidget( scene, widget->sceneIndex, WA_Scale, &widget->scale );
-            widget->resized = false;
-        }
-        if( widget->moved ){
-            for( u32 i = 0; i< widget->childrenCount; ++i )
-                widget->children[i]->moved = true;
-
-            Scene_modifyWidget( scene, widget->sceneIndex, WA_Position, &widget->position );
-            widget->moved = false;
-        }
-    }
-    else {
-        if( widget->visible == true )
-            Scene_addWidget( scene, widget );
-    }
-    for( u32 i = 0; i < widget->childrenCount; ++i )
-        Widget_update( scene, widget->children[i] );
-}
-
 bool Widget_callback( Widget* widget, const Event* e ) {
     bool ret = false;
     for( u32 i = 0; i < widget->childrenCount; ++i ) {

@@ -7,8 +7,11 @@
 	<File name="..\..\src\agent.c" open="0" top="0" tabpos="13">
 		<Cursor position="3232" topLine="92" />
 	</File>
-	<File name="..\..\src\common\common.h" open="0" top="0" tabpos="1">
-		<Cursor position="9394" topLine="229" />
+	<File name="..\..\src\common\common.h" open="1" top="0" tabpos="7">
+		<Cursor position="9280" topLine="226" />
+	</File>
+	<File name="..\..\src\common\handlemanager.c" open="1" top="0" tabpos="9">
+		<Cursor position="440" topLine="0" />
 	</File>
 	<File name="..\..\src\event.h" open="1" top="0" tabpos="6">
 		<Cursor position="314" topLine="0" />
@@ -16,11 +19,11 @@
 	<File name="..\..\src\game.c" open="1" top="0" tabpos="5">
 		<Cursor position="1508" topLine="9" />
 	</File>
-	<File name="..\..\src\gui.c" open="1" top="1" tabpos="2">
-		<Cursor position="1783" topLine="27" />
+	<File name="..\..\src\gui.c" open="1" top="0" tabpos="2">
+		<Cursor position="28129" topLine="684" />
 	</File>
 	<File name="..\..\src\gui.h" open="1" top="0" tabpos="1">
-		<Cursor position="927" topLine="6" />
+		<Cursor position="180" topLine="0" />
 	</File>
 	<File name="..\..\src\main.c" open="1" top="0" tabpos="3">
 		<Cursor position="3066" topLine="71" />
@@ -28,11 +31,11 @@
 	<File name="..\..\src\render\renderer.h" open="0" top="0" tabpos="7">
 		<Cursor position="2108" topLine="40" />
 	</File>
-	<File name="..\..\src\render\scene.c" open="1" top="0" tabpos="4">
-		<Cursor position="13324" topLine="343" />
+	<File name="..\..\src\render\scene.c" open="1" top="1" tabpos="4">
+		<Cursor position="13220" topLine="354" />
 	</File>
-	<File name="..\..\src\render\scene.h" open="0" top="0" tabpos="9">
-		<Cursor position="5830" topLine="133" />
+	<File name="..\..\src\render\scene.h" open="1" top="0" tabpos="8">
+		<Cursor position="2044" topLine="47" />
 	</File>
 	<File name="..\..\src\render\sprite.h" open="0" top="0" tabpos="2">
 		<Cursor position="75" topLine="0" />
@@ -42,6 +45,9 @@
 	</File>
 	<File name="..\..\src\render\text.h" open="0" top="0" tabpos="12">
 		<Cursor position="2204" topLine="47" />
+	</File>
+	<File name="..\..\src\render\texture.c" open="1" top="0" tabpos="10">
+		<Cursor position="134" topLine="0" />
 	</File>
 	<File name="..\..\src\world.h" open="0" top="0" tabpos="5">
 		<Cursor position="1228" topLine="15" />

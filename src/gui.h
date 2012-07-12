@@ -7,7 +7,6 @@
 #include "render/context.h"
 
 typedef struct s_Widget Widget;
-typedef struct s_Scene Scene;
 typedef struct s_RootWidget RootWidget;
 
 //  Widget tree
@@ -79,7 +78,7 @@ typedef enum {
     WA_BottomRight
 }   WidgetAnchor;
 
-typedef struct s_Widget {
+struct s_Widget {
     bool                visible;
     vec2i               position;
     vec2i               size;
@@ -109,14 +108,14 @@ typedef struct s_Widget {
         u32 texture;
         u32 text;
     }                   assets;
-} Widget;
+};
 
-typedef struct s_RootWidget {
+struct s_RootWidget {
     Widget* widget;
     ListenerFunc mouseListener;
     ListenerFunc keyListener;
     bool mouseDown;
-}   RootWidget;
+};
 
 
 
@@ -125,7 +124,6 @@ RootWidget* RootWidget_init();
 Widget* Widget_init( WidgetType type, vec2i* size, const char *mesh, const char *texture, int text );
 /// Create a head bar for the window, you must give the window widget and its name as parameters.
 Widget* Widget_createWindowHead( Widget* window, u32 name );
-void Widget_update( Scene* scene, Widget* widget );
 bool Widget_callback( Widget* widget, const Event* e );
 void Widget_setPosition( Widget* widget, vec2i* pos );
 void Widget_resize( Widget* widget, vec2i* size );
