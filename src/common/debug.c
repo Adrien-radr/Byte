@@ -23,7 +23,7 @@ int InitLog( const char *log_name, struct s_Clock *log_clock ) {
     str64 date;
     GetTime( date, 64, DateFmt );
     GetTime( time, 16, TimeFmt );
-    strncat( date, " - ", 3 );  
+    strncat( date, " - ", 3 );
     strncat( date, time, 16 );
 
     WriteLog( "Byte-Project Log v%d.%d.%d\n", BYTE_MAJOR, BYTE_MINOR, BYTE_PATCH );
@@ -70,23 +70,23 @@ void MemoryManager_destroy() {
         // rapport :
         log_info( "\nMemory Manager Rapport :\n"
                 "============================\n"
-                "Allocated bytes at the end of execution : %zu.\n", mem_manager->allocated_bytes );
+                "Allocated bytes at the end of execution : %du.\n", mem_manager->allocated_bytes );
         if( mem_manager->allocated_bytes ) {
             log_info( "Non-free'd pointers :\n" );
             u32 cpt = mem_manager->alloc_cpt;
             for( u32 i = 0; i < cpt; ++i ) {
                 if( mem_manager->alloc_sizes[i] ) {
                     log_info( "\n\tAddress : %p  (%s:%d)\n"
-                            "\tSize : %zu\n", mem_manager->alloc_stack[i], 
+                            "\tSize : %du\n", mem_manager->alloc_stack[i],
                                               mem_manager->alloc_files[i],
                                               mem_manager->alloc_lines[i],
                                               mem_manager->alloc_sizes[i] );
                     free( mem_manager->alloc_stack[i] );
-                } 
+                }
             }
         }
         free( mem_manager );
-        mem_manager = NULL; 
+        mem_manager = NULL;
     }
 }
 

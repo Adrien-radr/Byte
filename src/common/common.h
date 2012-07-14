@@ -241,9 +241,6 @@ typedef enum {
 #endif
 
 
-    // forward decl (definition in vector.h)
-    typedef struct vec2_ vec2;
-    typedef struct vec2i_ vec2i;
 
     /// Returns the sign of a float
     int Sign( const f32 a, const f32 threshold );

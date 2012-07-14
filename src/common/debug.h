@@ -2,7 +2,7 @@
 #define BYTE_DEBUG_H
 
 #include <stdio.h>
-#include <errno.h> 
+#include <errno.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -13,13 +13,13 @@
 // DEBUG MACROS slightly modified, originally from Zed Shaw.
 #ifdef NDEBUG
 #   define debug(M, ...)
-#else 
-#   define debug(M, ...) fprintf(stderr, "DEBUG %s:%d: " M , __FILE__, __LINE__, ##__VA_ARGS__) 
+#else
+#   define debug(M, ...) fprintf(stderr, "DEBUG %s:%d: " M , __FILE__, __LINE__, ##__VA_ARGS__)
 #endif
 
 // Function to get time for the log
 // Defaults returns 0. Game define its own clock (Game_init)
-float LogClockFunc(); 
+float LogClockFunc();
 
 #   define WriteLog( M, ... ) do { \
                                 if( LogOpened ) { \
@@ -35,20 +35,20 @@ float LogClockFunc();
                                           } while(0)
 
 #   define clean_errno() (errno == 0 ? "None" : strerror(errno))
- 
+
 #   define log_err(M, ... ) write_and_log( "ERROR", M, ##__VA_ARGS__ );
 #   define log_warn(M, ...) write_and_log( "WARN", M, ##__VA_ARGS__ );
 #   define log_info(M, ...) write_and_log( "INFO", M, ##__VA_ARGS__ );
-                                
 
 
-#   define check(A, M, ...) if(!(A)) { log_err(M, ##__VA_ARGS__); errno=0; goto error; } 
 
-#   define sentinel(M, ...)  { log_err(M, ##__VA_ARGS__); errno=0; goto error; } 
+#   define check(A, M, ...) if(!(A)) { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
+
+#   define sentinel(M, ...)  { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
 
 #   define check_mem(A) check((A), "Out of memory.")
- 
-#   define check_debug(A, M, ...) if(!(A)) { debug(M, ##__VA_ARGS__); errno=0; goto error; } 
+
+#   define check_debug(A, M, ...) if(!(A)) { debug(M, ##__VA_ARGS__); errno=0; goto error; }
 
 
 //  ##########################################3
@@ -64,7 +64,7 @@ typedef struct {
 
     int     alloc_cpt;
 } MemoryManager;
-    
+
 /// Initialize memory manager (call this at the very begining of program)
 bool MemoryManager_init();
 
@@ -105,7 +105,7 @@ inline void CloseLog() {
 //  ##########################################3
 //      MEMORY ALLOCATORS
 //  ##########################################3
-    // Allocate a pointer 
+    // Allocate a pointer
     inline void* byte_alloc_func( size_t size, const char* file, int line ) {
         void* ret = calloc( 1, size );
         MemoryManager_allocation( ret, size, file, line );
@@ -126,7 +126,7 @@ inline void CloseLog() {
         if( ptr ) {
             if( *ptr ) {    // reallocation
                 void *oldptr = *ptr;
-                *ptr = realloc( *ptr, size );   
+                *ptr = realloc( *ptr, size );
                 MemoryManager_reallocation( *ptr, oldptr, size, file, line );
             } else {        // pointer to realloc is null. alloc it
                 *ptr = byte_alloc_func( size, file, line );
@@ -147,9 +147,9 @@ inline void CloseLog() {
     // Free a pointer and set it to NULL (tell memory managment)
     inline void byte_dealloc_func( void **ptr, const char *file, int line ) {
         if( ptr && *ptr ) {
-            MemoryManager_deallocation( *ptr, file, line );  
-            free(*ptr);                            
-            *ptr = NULL;                        
+            MemoryManager_deallocation( *ptr, file, line );
+            free(*ptr);
+            *ptr = NULL;
         }
     }
 #ifndef DEL_PTR

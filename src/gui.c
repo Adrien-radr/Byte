@@ -910,5 +910,3 @@ void Window_resizeUp( Widget* widget, int size ) {
     Widget_resize( widget, &(vec2i){ widget->size.x, size } );
     Widget_recalculateAnchors( widget );
 }
-
-
