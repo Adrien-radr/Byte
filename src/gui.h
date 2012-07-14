@@ -14,8 +14,17 @@ typedef struct s_RootWidget RootWidget;
 RootWidget *root;
 Widget            *windowHead,
                           *window,
-                      *button,
-                      *openWindow;
+                              *button,
+                              *openWindow,
+                              *topleft,
+                              *topcenter,
+                              *topright,
+                              *centerleft,
+                              *center,
+                              *centerright,
+                              *bottomleft,
+                              *bottomcenter;
+
 
 typedef bool (*WidgetCallback)(Widget*, const Event*);
 
@@ -91,6 +100,7 @@ typedef struct s_Widget {
     bool resized;
     bool moved;
     bool confined;  //  Will the widget always be inside its parent ?
+    bool bound;     //  Will the widget move along with its parent ?
     WidgetAnchor anchor;
 
     int                 depth;
@@ -129,17 +139,18 @@ void Widget_update( Scene* scene, Widget* widget );
 bool Widget_callback( Widget* widget, const Event* e );
 void Widget_setPosition( Widget* widget, vec2i* pos );
 void Widget_resize( Widget* widget, vec2i* size );
-void Widget_addChild( Widget *parent, Widget* child, bool confined, WidgetAnchor anchor );
+void Widget_addChild( Widget *parent, Widget* child, bool confine, WidgetAnchor anchor, bool bind );
 void Widget_toggleShow( Widget* widget, bool visible );
 bool Widget_mouseOver( const Widget* widget, const vec2i* mouse );
 
 /// Will be called on RootWidget when closing game to remove every widget.
 void Widget_remove( Widget* widget );
 
+void Widget_recalculateAnchors( Widget* widget );
+
 void Window_resizeRight( Widget* widget, int size );
 void Window_resizeLeft( Widget* widget, int size );
 void Window_resizeUp( Widget* widget, int size );
 void Window_resizeDown( Widget* widget, int size );
-vec2i Window_minSize( Widget* widget );
 
 #endif /* BYTE_GUI */

@@ -49,6 +49,7 @@ bool window1Callback( Widget* widget, const Event* e ) {
     if( Widget_mouseOver( widget, &e->v ) )
         if( e->type == EMousePressed || e->type == EMouseReleased )
             return true;
+    return false;
 }
 
 bool button1Callback( Widget* widget, const Event* e ) {
@@ -79,14 +80,6 @@ bool moveWindowCallback( Widget* widget, const Event* e ) {
     if( widget->pressed && widget->mouseOffset.x != -1 ) {
         vec2i pos = vec2i_add( &e->v, &widget->mouseOffset );
         Widget_setPosition( widget, &pos );
-        vec2i win = pos;
-        win.y += 18;
-        Widget_setPosition( widget->children[WO_Window], &win );
-
-        vec2i out = pos;
-        out.x -= 5;
-        out.y -= 5;
-        Widget_setPosition( widget->children[WO_Outline], &out );
         if( e->type == EMouseReleased )
             widget->pressed = false;
 
@@ -173,7 +166,7 @@ bool leftResizeCallback( Widget* widget, const Event* e ) {
 bool topResizeCallback( Widget* widget, const Event* e ) {
     if( e->type == EMousePressed ) {
         if( Widget_mouseOver( widget, &e->v ) ) {
-            widget->mouseOffset.y =  e->v.y - widget->position.y;
+            widget->mouseOffset.y =  widget->position.y - e->v.y;
             widget->pressed = true;
         }
     }
@@ -524,7 +517,7 @@ void Widget_remove( Widget* widget ) {
 }
 
 
-void Widget_addChild( Widget *parent, Widget* child, bool confine, WidgetAnchor anchor ) {
+void Widget_addChild( Widget *parent, Widget* child, bool confine, WidgetAnchor anchor, bool bind ) {
     if( parent && child ) {
         if( child->parent ) {
             log_err( "Widget already has a parent, can't change it !" );
@@ -541,8 +534,10 @@ void Widget_addChild( Widget *parent, Widget* child, bool confine, WidgetAnchor 
 
         if( confine )
             child->confined = true;
+        if( bind )
+            child->bound = true;
+        child->anchor = anchor;
 
-        parent->minSize = Window_minSize( parent );
         if( parent->size.x < parent->minSize.x )
             Window_resizeRight( parent, parent->minSize.x );
 
@@ -563,12 +558,37 @@ void Widget_addChild( Widget *parent, Widget* child, bool confine, WidgetAnchor 
                 Widget_setPosition( child, &(vec2i){ child->position.x, parent->position.y + parent->size.y - child->size.y } );
         }
 
-    switch( anchor ) {
-        case WA_CenterLeft :
-        break;
-        default:
-        break;
-    }
+        switch( anchor ) {
+            case WA_TopLeft :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + 15, parent->position.y + 15 } );
+                break;
+            case WA_TopCenter :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + parent->size.x / 2 - child->size.x / 2, parent->position.y + 15 } );
+                break;
+            case WA_TopRight :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + parent->size.x - child->size.x - 15, parent->position.y + 15 } );
+                break;
+            case WA_CenterLeft :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + 15, parent->position.y + parent->size.y / 2 - child->size.y / 2 } );
+                break;
+            case WA_Center :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + parent->size.x / 2 - child->size.x / 2, parent->position.y + parent->size.y / 2 - child->size.y / 2 } );
+                break;
+            case WA_CenterRight :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + parent->size.x - child->size.x - 15, parent->position.y + parent->size.y / 2 - child->size.y / 2 } );
+                break;
+            case WA_BottomLeft :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + 15, parent->position.y + parent->size.y - child->size.y - 15 } );
+                break;
+            case WA_BottomCenter :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + parent->size.x / 2 - child->size.x / 2, parent->position.y + parent->size.y - child->size.y - 15 } );
+                break;
+            case WA_BottomRight :
+                Widget_setPosition( child, &(vec2i){ parent->position.x + parent->size.x - child->size.x - 15, parent->position.y + parent->size.y - child->size.y - 15 } );
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -583,6 +603,43 @@ bool Widget_mouseOver( const Widget* widget, const vec2i* mouse ) {
     if( mouse->x < widget->position.x || mouse->x > extents.x || mouse->y < widget->position.y || mouse->y > extents.y )
         return false;
     return true;
+}
+
+void Widget_recalculateAnchors( Widget* widget ) {
+    for( u32 i = 0; i < widget->childrenCount; ++i ) {
+        Widget* child = widget->children[i];
+        switch( child->anchor ) {
+            case WA_TopLeft :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + 15, widget->position.y + 15 } );
+                break;
+            case WA_TopCenter :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + widget->size.x / 2 - child->size.x / 2, widget->position.y + 15 } );
+                break;
+            case WA_TopRight :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + widget->size.x - child->size.x - 15, widget->position.y + 15 } );
+                break;
+            case WA_CenterLeft :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + 15, widget->position.y + widget->size.y / 2 - child->size.y / 2 } );
+                break;
+            case WA_Center :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + widget->size.x / 2 - child->size.x / 2, widget->position.y + widget->size.y / 2 - child->size.y / 2 } );
+                break;
+            case WA_CenterRight :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + widget->size.x - child->size.x - 15, widget->position.y + widget->size.y / 2 - child->size.y / 2 } );
+                break;
+            case WA_BottomLeft :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + 15, widget->position.y + widget->size.y - child->size.y - 15 } );
+                break;
+            case WA_BottomCenter :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + widget->size.x / 2 - child->size.x / 2, widget->position.y + widget->size.y - child->size.y - 15 } );
+                break;
+            case WA_BottomRight :
+                Widget_setPosition( child, &(vec2i){ widget->position.x + widget->size.x - child->size.x - 15, widget->position.y + widget->size.y - child->size.y - 15 } );
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 Widget* Widget_createWindowHead( Widget* window, u32 name ) {
@@ -656,16 +713,16 @@ Widget* Widget_createWindowHead( Widget* window, u32 name ) {
     windowSideBottom->depth = windowOutline->depth - 1;
     windowSideBottom->callback = &bottomResizeCallback;
 
-    Widget_addChild( head, window, false, WA_None );
-    Widget_addChild( head, windowOutline, false, WA_None );
-    Widget_addChild( windowOutline, windowSideTop, true, WA_None );
-    Widget_addChild( windowOutline, windowSideLeft, true, WA_None );
-    Widget_addChild( windowOutline, windowSideRight, true, WA_None );
-    Widget_addChild( windowOutline, windowSideBottom, true, WA_None );
-    Widget_addChild( windowOutline, windowCornerTopLeft, true, WA_None );
-    Widget_addChild( windowOutline, windowCornerTopRight, true, WA_None );
-    Widget_addChild( windowOutline, windowCornerBottomLeft, true, WA_None );
-    Widget_addChild( windowOutline, windowCornerBottomRight, true, WA_None );
+    Widget_addChild( head, window, false, WA_None, true );
+    Widget_addChild( head, windowOutline, false, WA_None, true );
+    Widget_addChild( windowOutline, windowSideTop, true, WA_None, true );
+    Widget_addChild( windowOutline, windowSideLeft, true, WA_None, true );
+    Widget_addChild( windowOutline, windowSideRight, true, WA_None, true );
+    Widget_addChild( windowOutline, windowSideBottom, true, WA_None, true );
+    Widget_addChild( windowOutline, windowCornerTopLeft, true, WA_None, true );
+    Widget_addChild( windowOutline, windowCornerTopRight, true, WA_None, true );
+    Widget_addChild( windowOutline, windowCornerBottomLeft, true, WA_None, true );
+    Widget_addChild( windowOutline, windowCornerBottomRight, true, WA_None, true );
 
 
 
@@ -678,8 +735,8 @@ Widget* Widget_createWindowHead( Widget* window, u32 name ) {
     cross->depth = window->depth - 1;
     cross->callback = &windowCloseButtonCallback;
 
-    Widget_addChild( head, icon, true, WA_None );
-    Widget_addChild( head, cross, true, WA_None );
+    Widget_addChild( head, icon, true, WA_None, true );
+    Widget_addChild( head, cross, true, WA_None, true );
 
 
     return head;
@@ -725,7 +782,7 @@ bool Widget_callback( Widget* widget, const Event* e ) {
 
 void Widget_setPosition( Widget* widget, vec2i* pos ) {
     vec2i originalPos =  widget->position;
-    //  TODO FIX
+
     widget->position = *pos;
     widget->moved = true;
     if( widget->confined ) {
@@ -742,7 +799,7 @@ void Widget_setPosition( Widget* widget, vec2i* pos ) {
     vec2i offSet = vec2i_sub( pos, &originalPos );
 
     for( u32 i = 0; i < widget->childrenCount; ++i ) {
-        if( widget->children[i]->confined ){
+        if( widget->children[i]->bound ){
             vec2i newPos = vec2i_add( &widget->children[i]->position, &offSet );
             Widget_setPosition( widget->children[i], &newPos );
         }
@@ -782,9 +839,9 @@ void Window_resizeRight( Widget* widget, int size ) {
     Widget_resize( widget, &(vec2i){ size, widget->size.y } );
 
     for( u32 i = 0; i < widget->childrenCount; ++i )
-        Widget_setPosition( widget->children[i], &(vec2i){ widget->children[i]->position.x + offSet, widget->children[i]->position.y } );
-
-
+        if( widget->children[i]->bound )
+            Widget_setPosition( widget->children[i], &(vec2i){ widget->children[i]->position.x + offSet, widget->children[i]->position.y } );
+    Widget_recalculateAnchors( widget );
 }
 
 void Window_resizeDown( Widget* widget, int size ) {
@@ -805,7 +862,9 @@ void Window_resizeDown( Widget* widget, int size ) {
     Widget_resize( widget, &(vec2i){ widget->size.x, size } );
 
     for( u32 i = 0; i < widget->childrenCount; ++i )
-        Widget_setPosition( widget->children[i], &(vec2i){ widget->children[i]->position.x, widget->children[i]->position.y + offSet } );
+        if( widget->children[i]->bound )
+            Widget_setPosition( widget->children[i], &(vec2i){ widget->children[i]->position.x, widget->children[i]->position.y + offSet } );
+    Widget_recalculateAnchors( widget );
 }
 
 void Window_resizeLeft( Widget* widget, int size ) {
@@ -817,21 +876,18 @@ void Window_resizeLeft( Widget* widget, int size ) {
     Widget_resize( head, &(vec2i){ size, 17 } );
     Widget_setPosition( head, &(vec2i){ widget->position.x + widget->size.x - size, widget->position.y - 18 } );
     Widget_resize( outline, &(vec2i){ size + 10, widget->size.y + head->size.y + 11 } );
-    Widget_setPosition( outline, &(vec2i){ head->position.x - 5, head->position.y - 5 } );
+
     Widget_resize( outline->children[WO_Bottom], &(vec2i){ size, 5 } );
-    Widget_setPosition( outline->children[WO_Bottom], &(vec2i){ head->position.x, widget->position.y + widget->size.y } );
     Widget_resize( outline->children[WO_Top], &(vec2i){ size, 5 } );
-    Widget_setPosition( outline->children[WO_Top], &(vec2i){ head->position.x, head->position.y - 5 } );
 
 
     Widget_setPosition( outline->children[WO_TopRight], &(vec2i){ outline->position.x + outline->size.x - 5, outline->position.y } );
     Widget_setPosition( outline->children[WO_Right], &(vec2i){ outline->position.x + outline->size.x - 5, outline->position.y + 5 } );
     Widget_setPosition( outline->children[WO_BottomRight], &(vec2i){ outline->position.x + outline->size.x - 5, outline->position.y + outline->size.y - 5 } );
     Widget_setPosition( head->children[WO_Cross], &(vec2i){ head->position.x + head->size.x - 13, head->position.y + 3 } );
-    Widget_setPosition( head->children[WO_Icon], &(vec2i){ head->position.x + 3, head->position.y + 3 } );
 
     Widget_resize( widget, &(vec2i){ size, widget->size.y } );
-    Widget_setPosition( widget, &(vec2i){ head->position.x, head->position.y + 18 } );
+    Widget_recalculateAnchors( widget );
 }
 
 void Window_resizeUp( Widget* widget, int size ) {
@@ -841,36 +897,18 @@ void Window_resizeUp( Widget* widget, int size ) {
     Widget* head = widget->parent;
     Widget* outline = widget->parent->children[WO_Outline];
     Widget_setPosition( head, &(vec2i){ widget->position.x, widget->position.y + widget->size.y - size - 18  } );
-
     Widget_resize( outline, &(vec2i){ widget->size.x + 10, head->size.y + 11 + size } );
-    Widget_setPosition( outline, &(vec2i){ head->position.x - 5, head->position.y - 5 } );
+
     Widget_resize( outline->children[WO_Left], &(vec2i){ 5, size + 18 } );
-    Widget_setPosition( outline->children[WO_Left], &(vec2i){ outline->position.x, outline->position.y + 5 } );
     Widget_resize( outline->children[WO_Right], &(vec2i){ 5, size + 18 } );
-    Widget_setPosition( outline->children[WO_Right], &(vec2i){ outline->position.x + outline->size.x - 5, outline->position.y + 5 } );
 
 
-    Widget_setPosition( head->children[WO_Cross], &(vec2i){ head->position.x + head->size.x - 13, head->position.y + 3 } );
-    Widget_setPosition( head->children[WO_Icon], &(vec2i){ head->position.x + 3, head->position.y + 3 } );
     Widget_setPosition( outline->children[WO_Bottom], &(vec2i){ outline->position.x + 5, outline->position.y + outline->size.y - 5 } );
     Widget_setPosition( outline->children[WO_BottomLeft], &(vec2i){ outline->position.x, outline->position.y + outline->size.y - 5 } );
     Widget_setPosition( outline->children[WO_BottomRight], &(vec2i){ outline->position.x + outline->size.x - 5, outline->position.y + outline->size.y - 5 } );
 
     Widget_resize( widget, &(vec2i){ widget->size.x, size } );
-    Widget_setPosition( widget, &(vec2i){ head->position.x, head->position.y + 18 } );
-}
-
-vec2i Window_minSize( Widget* widget ) {
-    vec2i minSize = vec2i_c( 100, 1 );
-    for( u32 i = 0; i < widget->childrenCount; ++i ) {
-        if( widget->children[i]->confined ) {
-            if( widget->children[i]->size.x > minSize.x )
-                minSize.x = widget->children[i]->size.x;
-            if( widget->children[i]->size.y > minSize.y )
-                minSize.y = widget->children[i]->size.y;
-        }
-    }
-    return minSize;
+    Widget_recalculateAnchors( widget );
 }
 
 

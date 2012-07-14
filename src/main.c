@@ -81,6 +81,7 @@ void init_callback() {
     window->position = vec2i_c( 100, 100 );
     window->size = vec2i_c( 300, 250 );
     window->depth = -5;
+    window->minSize = vec2i_c( 300, 120 );
 
     openWindow = Widget_init( WT_Button, &(vec2i){ 15, 15 }, "quadmesh.json", "winicon.png", -1 );
     vec2i size = Context_getSize();
@@ -95,17 +96,41 @@ void init_callback() {
     int buttonText = Scene_addText( game->scene, f, c );
     Scene_modifyText( game->scene, buttonText, TA_String, "Button" );
 
-    button = Widget_init( WT_Button, &(vec2i){ 192, 38 }, "quadmesh.json", "widgettexture.png", buttonText );
-    button->position = vec2i_c( 400, 400 );
-    button->textOffset = vec2i_c( 72, 11 );
-    button->depth = -6;
+    button = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", buttonText );
+    button->textOffset = vec2i_c( 20, 5 );
     button->callback = &button1Callback;
+
+    topleft = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", -1 );
+    topleft->textOffset = vec2i_c( 72, 11 );
+    topcenter = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", -1 );
+    topcenter->textOffset = vec2i_c( 72, 11 );
+    topright = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", -1 );
+    topright->textOffset = vec2i_c( 72, 11 );
+    centerleft = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", -1 );
+    centerleft->textOffset = vec2i_c( 72, 11 );
+    center = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", -1 );
+    center->textOffset = vec2i_c( 72, 11 );
+    centerright = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", -1 );
+    centerright->textOffset = vec2i_c( 72, 11 );
+    bottomleft = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", -1 );
+    bottomleft->textOffset = vec2i_c( 72, 11 );
+    bottomcenter = Widget_init( WT_Button, &(vec2i){ 85, 25 }, "quadmesh.json", "widgettexture.png", -1 );
+    bottomcenter->textOffset = vec2i_c( 72, 11 );
+
 
     window->callback = &window1Callback;
 
-    Widget_addChild( root->widget, windowHead, false, WA_Center );
-    Widget_addChild( root->widget, openWindow, false, WA_None );
-    Widget_addChild( window, button, true, WA_Center );
+    Widget_addChild( root->widget, windowHead, false, WA_Center, true );
+    Widget_addChild( root->widget, openWindow, false, WA_None, true );
+    Widget_addChild( window, button, true, WA_BottomRight, true );
+    Widget_addChild( window, topleft, true, WA_TopLeft, true );
+    Widget_addChild( window, topcenter, true, WA_TopCenter, true );
+    Widget_addChild( window, topright, true, WA_TopRight, true );
+    Widget_addChild( window, centerleft, true, WA_CenterLeft, true );
+    Widget_addChild( window, center, true, WA_Center, true );
+    Widget_addChild( window, centerright, true, WA_CenterRight, true );
+    Widget_addChild( window, bottomleft, true, WA_BottomLeft, true );
+    Widget_addChild( window, bottomcenter, true, WA_BottomCenter, true );
 
 
     EventManager_addListener( LT_MouseListener, mousecb, NULL );
